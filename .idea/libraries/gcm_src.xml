@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gcm-src">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/HABDroid/libs/gcm-src.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
