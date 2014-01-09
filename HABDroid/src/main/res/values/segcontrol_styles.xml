@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:bd="http://schemas.android.com/apk/res/at.bookworm.widget.segcontrol">
+<resources>
 
-    <style xmlns:bd="http://schemas.android.com/apk/res/at.bookworm.widget.segcontrol" name="buttonStyle1">
+    <style name="buttonStyle1">
         <item name="android:layout_margin">0px</item><item name="textColorSelected">@color/light</item>
         <item name="textColorUnselected">@color/normal</item>
         <item name="lineColor">@color/highlight</item>
@@ -17,7 +17,7 @@
         <item name="android:layout_gravity">center_vertical|center_horizontal</item>
     </style>
 
-    <style xmlns:bd="http://schemas.android.com/apk/res/at.bookworm.widget.segcontrol" name="buttonStyle2">
+    <style name="buttonStyle2">
         <item name="android:layout_margin">0px</item>
         <item name="textColorUnselected">@color/normal</item>
         <item name="android:minWidth">45dp</item>

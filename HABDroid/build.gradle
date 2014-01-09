@@ -8,6 +8,10 @@ buildscript {
 }
 apply plugin: 'android'
 
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
+
 repositories {
     mavenCentral()
 }
@@ -30,6 +34,3 @@ android {
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-}
