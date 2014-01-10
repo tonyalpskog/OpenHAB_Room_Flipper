@@ -62,7 +62,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.crittercism.app.Crittercism;
-import com.crittercism.app.CrittercismConfig;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -195,7 +194,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			else
 				Log.e(TAG, "Crittercism JSON exception");
 		}
-		Crittercism.initialize(getApplicationContext(), "5117659f59e1bd4ba9000004", new CrittercismConfig(crittercismConfig));
+		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
 		// Initialize activity view
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.openhabwidgetlist);

@@ -70,14 +70,14 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="android-async-http-1.4.4" level="project" />
+    <orderEntry type="library" exported="" name="android-async-http-1.0-openhab" level="project" />
     <orderEntry type="library" exported="" name="jmdns-3.4.1" level="project" />
     <orderEntry type="library" exported="" name="android-smart-image-view-1.0.0" level="project" />
-    <orderEntry type="library" exported="" name="gcm" level="project" />
-    <orderEntry type="library" exported="" name="libGoogleAnalyticsV2" level="project" />
-    <orderEntry type="library" exported="" name="google-play-services" level="project" />
+    <orderEntry type="library" exported="" name="google-play-services-4" level="project" />
+    <orderEntry type="library" exported="" name="crittercism-android-3.0.3" level="project" />
+    <orderEntry type="library" exported="" name="analytics-2.0" level="project" />
+    <orderEntry type="library" exported="" name="memorizingtrustmanager-1.1" level="project" />
     <orderEntry type="library" exported="" name="android-support-v13" level="project" />
-    <orderEntry type="library" exported="" name="crittercism_v4_3_0_sdkonly" level="project" />
   </component>
 </module>
 

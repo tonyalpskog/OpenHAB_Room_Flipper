@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="buttonStyle1">
         <item name="android:layout_margin">0px</item><item name="textColorSelected">@color/light</item>

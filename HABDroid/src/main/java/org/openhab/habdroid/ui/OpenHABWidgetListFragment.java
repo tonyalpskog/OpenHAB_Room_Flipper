@@ -43,6 +43,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+//import com.loopj.android.http.AsyncHttpAbortException;
+
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.openhab.habdroid.R;
@@ -240,7 +242,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public void onPause () {
         super.onPause();
         Log.d(TAG, "onPause() " + displayPageUrl);
-        mAsyncHttpClient.cancelRequests(mActivity, true);
+        mAsyncHttpClient.cancelRequests(mActivity, mTag, true);
         if (openHABWidgetAdapter != null) {
             openHABWidgetAdapter.stopImageRefresh();
             openHABWidgetAdapter.stopVideoWidgets();
@@ -324,10 +326,10 @@ public class OpenHABWidgetListFragment extends ListFragment {
             public void onFailure(Throwable error, String content) {
                 if (!longPolling)
                     stopProgressIndicator();
-//                if (error instanceof AsyncHttpAbortException) {
-//                    Log.d(TAG, "Request for " + displayPageUrl + " was aborted");
-//                    return;
-//                }
+                if (error instanceof AsyncHttpAbortException) {
+                    Log.d(TAG, "Request for " + displayPageUrl + " was aborted");
+                    return;
+                }
                 if (error instanceof SocketTimeoutException) {
                     Log.d(TAG, "Connection timeout, reconnecting");
                     showPage(displayPageUrl, longPolling);
@@ -336,7 +338,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
                 Log.e(TAG, error.getClass().toString());
                 Log.e(TAG, "Connection error = " + error.getClass().toString() + ", cycle aborted");
             }
-        });
+        }, mTag);
     }
 
     /**

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="google-play-services-4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/HABDroid/libs/google-play-services-4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

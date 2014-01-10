@@ -47,11 +47,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
 
-    protected static final int SUCCESS_MESSAGE = 0;
-    protected static final int FAILURE_MESSAGE = 1;
-    protected static final int START_MESSAGE = 2;
-    protected static final int FINISH_MESSAGE = 3;
-
     public void onSuccess(Document response) {}
 
     public void onSuccess(int statusCode, Header[] headers, Document response) {
@@ -80,25 +75,20 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
                 Document responseDocument = null;
                 Log.d("DocumentHttpResponseHandler", String.format("response[%d]", response.length));
                 try {
-                    Log.d("DocumentHttpResponseHandler", "Got response = " + (String) response[2].toString());
-                    responseDocument = parseResponse(response[2]);
-                    onSuccess(responseDocument);//TODO - Added by TA
-//                    handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], responseDocument);
+                    Log.d("DocumentHttpResponseHandler", "Got response = " + (String) response[2]);
+                    responseDocument = parseResponse((String) response[2]);
+                    handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], responseDocument);
                 } catch (ParserConfigurationException e) {
-//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
-                    Log.e("DocumentHttpResponseHandler", "Got ParserConfigurationException in handleMessage()");
+                    handleFailureMessage(e, (String) response[2]);
                 } catch (IOException e) {
-//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
-                    Log.e("DocumentHttpResponseHandler", "Got IOException in handleMessage()");
+                    handleFailureMessage(e, (String) response[2]);
                 } catch (SAXException e) {
-//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
-                    Log.e("DocumentHttpResponseHandler", "Got SAXException in handleMessage()");
+                    handleFailureMessage(e, (String) response[2]);
                 }
                 break;
             case FAILURE_MESSAGE:
                 response = (Object[])msg.obj;
-//                handleFailureMessage((Throwable)response[0], (String)response[1]);//TODO  - removed by TA
-                Log.e("DocumentHttpResponseHandler", "Got FAILURE_MESSAGE in handleMessage()");
+                handleFailureMessage((Throwable)response[0], (String)response[1]);
                 break;
             case START_MESSAGE:
                 onStart();
@@ -106,18 +96,6 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
             case FINISH_MESSAGE:
                 onFinish();
                 break;
-        }
-    }
-
-    protected Document parseResponse(Object responseBody) throws ParserConfigurationException, IOException, SAXException {
-        Log.d("DocumentHttpResponseHandler", "parseResponse() object type = "+ responseBody.getClass().getSimpleName());
-        if(responseBody instanceof byte[])
-            return parseResponse((byte[]) responseBody);
-        else if(responseBody instanceof String)
-            return parseResponse((String) responseBody);
-        else {
-            Log.w("DocumentHttpResponseHandler", "parseResponse() - Unsupported object type: "+ responseBody.getClass().toString());
-            return null;
         }
     }
 
@@ -132,14 +110,4 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
             return null;
     }
 
-    protected Document parseResponse(byte[] responseBody) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document;
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        if (responseBody != null) {
-            document = builder.parse(new ByteArrayInputStream(responseBody));
-            return document;
-        } else
-            return null;
-    }
 }
