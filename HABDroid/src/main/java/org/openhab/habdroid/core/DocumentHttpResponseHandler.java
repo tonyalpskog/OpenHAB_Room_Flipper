@@ -47,6 +47,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
 
+    protected static final int SUCCESS_MESSAGE = 0;
+    protected static final int FAILURE_MESSAGE = 1;
+    protected static final int START_MESSAGE = 2;
+    protected static final int FINISH_MESSAGE = 3;
+
     public void onSuccess(Document response) {}
 
     public void onSuccess(int statusCode, Header[] headers, Document response) {

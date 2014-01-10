@@ -32,6 +32,8 @@ package org.openhab.habdroid.util;
 import android.content.Context;
 import android.util.Log;
 import com.crittercism.app.Crittercism;
+import com.crittercism.app.CrittercismConfig;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openhab.habdroid.R;
@@ -108,7 +110,7 @@ public class Util {
             else
                 Log.e(TAG, "Crittercism JSON exception");
         }
-        Crittercism.init(ctx, appKey, crittercismConfig);
+        Crittercism.initialize(ctx, appKey, new CrittercismConfig(crittercismConfig));
     }
 
     public static List<OpenHABSitemap> parseSitemapList(Document document) {

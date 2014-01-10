@@ -62,6 +62,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.crittercism.app.Crittercism;
+import com.crittercism.app.CrittercismConfig;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -194,7 +195,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			else
 				Log.e(TAG, "Crittercism JSON exception");
 		}
-		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
+		Crittercism.initialize(getApplicationContext(), "5117659f59e1bd4ba9000004", new CrittercismConfig(crittercismConfig));
 		// Initialize activity view
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.openhabwidgetlist);
@@ -569,7 +570,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			pageAsyncHttpClient = new MyAsyncHttpClient(this);
 		}
 		// If authentication is needed
-		pageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
+//		pageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);//TODO - removed by TA
 		// If long-polling is needed
 		if (longPolling) {
 			// Add corresponding fields to header to make openHAB know we need long-polling
@@ -832,7 +833,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		Log.d(TAG, "Loding sitemap list from " + baseURL + "rest/sitemaps");
 	    AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(this);
 		// If authentication is needed
-	    asyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
+//	    asyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);//TODO - removed by TA
 	    asyncHttpClient.get(baseURL + "rest/sitemaps", new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {

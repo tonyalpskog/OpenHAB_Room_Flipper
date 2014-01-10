@@ -39,6 +39,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.openhab.habdroid.R;
 
 import com.loopj.android.http.AsyncHttpClient;
 
@@ -50,7 +51,7 @@ public class MyAsyncHttpClient extends AsyncHttpClient {
 	private SSLSocketFactory sslSocketFactory;
 	
 	public MyAsyncHttpClient(Context ctx) {
-		super(ctx);
+		super();
 		try {
 	        sslContext = SSLContext.getInstance("TLS");
 	        sslContext.init(null, MemorizingTrustManager.getInstanceList(ctx), new java.security.SecureRandom());
