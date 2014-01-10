@@ -110,12 +110,15 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
     }
 
     protected Document parseResponse(Object responseBody) throws ParserConfigurationException, IOException, SAXException {
+        Log.d("DocumentHttpResponseHandler", "parseResponse() object type = "+ responseBody.getClass().getSimpleName());
         if(responseBody instanceof byte[])
             return parseResponse((byte[]) responseBody);
         else if(responseBody instanceof String)
             return parseResponse((String) responseBody);
-        else
+        else {
+            Log.w("DocumentHttpResponseHandler", "parseResponse() - Unsupported object type: "+ responseBody.getClass().toString());
             return null;
+        }
     }
 
     protected Document parseResponse(String responseBody) throws ParserConfigurationException, IOException, SAXException {
