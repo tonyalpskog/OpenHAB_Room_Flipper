@@ -570,7 +570,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			pageAsyncHttpClient = new MyAsyncHttpClient(this);
 		}
 		// If authentication is needed
-//		pageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);//TODO - removed by TA
+		pageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
 		// If long-polling is needed
 		if (longPolling) {
 			// Add corresponding fields to header to make openHAB know we need long-polling
@@ -833,7 +833,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		Log.d(TAG, "Loding sitemap list from " + baseURL + "rest/sitemaps");
 	    AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(this);
 		// If authentication is needed
-//	    asyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);//TODO - removed by TA
+	    asyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
 	    asyncHttpClient.get(baseURL + "rest/sitemaps", new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {

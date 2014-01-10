@@ -72,7 +72,7 @@ public class OpenHABInfoActivity extends Activity {
             mOpenHABBaseUrl = getIntent().getStringExtra("openHABBaseUrl");
             mUsername = getIntent().getStringExtra("username");
             mPassword = getIntent().getStringExtra("password");
-//            mAsyncHttpClient.setBasicAuth(mUsername, mPassword);//TODO - removed by TA
+            mAsyncHttpClient.setBasicAuth(mUsername, mPassword);
         } else {
             Log.e(TAG, "No openHABBaseURl parameter passed, can't fetch openHAB info from nowhere");
             finish();

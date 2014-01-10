@@ -80,20 +80,25 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
                 Document responseDocument = null;
                 Log.d("DocumentHttpResponseHandler", String.format("response[%d]", response.length));
                 try {
-                    Log.d("DocumentHttpResponseHandler", "Got response = " + (String) response[2]);
-                    responseDocument = parseResponse((String) response[2]);
-                    handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], responseDocument);
+                    Log.d("DocumentHttpResponseHandler", "Got response = " + (String) response[2].toString());
+                    responseDocument = parseResponse(response[2]);
+                    onSuccess(responseDocument);//TODO - Added by TA
+//                    handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], responseDocument);
                 } catch (ParserConfigurationException e) {
-                    handleFailureMessage(e, (String) response[2]);
+//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
+                    Log.e("DocumentHttpResponseHandler", "Got ParserConfigurationException in handleMessage()");
                 } catch (IOException e) {
-                    handleFailureMessage(e, (String) response[2]);
+//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
+                    Log.e("DocumentHttpResponseHandler", "Got IOException in handleMessage()");
                 } catch (SAXException e) {
-                    handleFailureMessage(e, (String) response[2]);
+//                    handleFailureMessage(e, (String) response[2]);//TODO  - removed by TA
+                    Log.e("DocumentHttpResponseHandler", "Got SAXException in handleMessage()");
                 }
                 break;
             case FAILURE_MESSAGE:
                 response = (Object[])msg.obj;
-                handleFailureMessage((Throwable)response[0], (String)response[1]);
+//                handleFailureMessage((Throwable)response[0], (String)response[1]);//TODO  - removed by TA
+                Log.e("DocumentHttpResponseHandler", "Got FAILURE_MESSAGE in handleMessage()");
                 break;
             case START_MESSAGE:
                 onStart();
@@ -102,6 +107,15 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
                 onFinish();
                 break;
         }
+    }
+
+    protected Document parseResponse(Object responseBody) throws ParserConfigurationException, IOException, SAXException {
+        if(responseBody instanceof byte[])
+            return parseResponse((byte[]) responseBody);
+        else if(responseBody instanceof String)
+            return parseResponse((String) responseBody);
+        else
+            return null;
     }
 
     protected Document parseResponse(String responseBody) throws ParserConfigurationException, IOException, SAXException {
@@ -115,4 +129,14 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
             return null;
     }
 
+    protected Document parseResponse(byte[] responseBody) throws ParserConfigurationException, IOException, SAXException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document document;
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        if (responseBody != null) {
+            document = builder.parse(new ByteArrayInputStream(responseBody));
+            return document;
+        } else
+            return null;
+    }
 }

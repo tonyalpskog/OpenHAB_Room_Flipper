@@ -171,7 +171,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         // Get username/password from preferences
         openHABUsername = mSettings.getString("default_openhab_username", null);
         openHABPassword = mSettings.getString("default_openhab_password", null);
-//        mAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);//TODO - removed by TA
+        mAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
         mAsyncHttpClient.addHeader("Accept", "application/xml");
         mAsyncHttpClient.setTimeout(30000);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
