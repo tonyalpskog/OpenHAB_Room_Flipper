@@ -43,7 +43,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-//import com.loopj.android.http.AsyncHttpAbortException;
+//import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -326,10 +326,10 @@ public class OpenHABWidgetListFragment extends ListFragment {
             public void onFailure(Throwable error, String content) {
                 if (!longPolling)
                     stopProgressIndicator();
-                if (error instanceof AsyncHttpAbortException) {
-                    Log.d(TAG, "Request for " + displayPageUrl + " was aborted");
-                    return;
-                }
+//                if (error instanceof AsyncHttpAbortException) {//TODO - removed by TA
+//                    Log.d(TAG, "Request for " + displayPageUrl + " was aborted");
+//                    return;
+//                }
                 if (error instanceof SocketTimeoutException) {
                     Log.d(TAG, "Connection timeout, reconnecting");
                     showPage(displayPageUrl, longPolling);
