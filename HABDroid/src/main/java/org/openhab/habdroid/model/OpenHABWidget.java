@@ -47,7 +47,7 @@ public class OpenHABWidget {
 	private String id;
 	private String label;
 	private String icon;
-	private String type;
+	private OpenHABWidgetType type;
 	private String url;
 	private String period = "";
 	private float minValue =0;
@@ -166,15 +166,45 @@ public class OpenHABWidget {
 		}
 	}
 	
-	public String getType() {
+	public OpenHABWidgetType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(OpenHABWidgetType type) {
 		this.type = type;
 	}
 
-	public OpenHABItem getItem() {
+    public void setType(String type) {
+        if (type.equals(OpenHABWidgetType.SWITCH.Name)) {
+            if (hasMappings()) {
+                setType(OpenHABWidgetType.SECTIONSWITCH);
+            } else if (getItem() != null) {
+                if (getItem().getType()!= null) {
+                    if (getItem().getType() == OpenHABItemType.ROLLERSHUTTER)
+                        setType(OpenHABWidgetType.ROLLERSHUTTER);
+                    else
+                        setType(OpenHABWidgetType.SWITCH);
+                } else
+                    setType(OpenHABWidgetType.SWITCH);
+            } else {
+                setType(OpenHABWidgetType.SWITCH);
+            }
+            return;
+        } else {
+            for(int i = 0; i < OpenHABWidgetType.values().length; i++) {
+                if(type.equals(OpenHABWidgetType.values()[i].Name)) {
+                    setType(OpenHABWidgetType.values()[i]);
+                    return;
+                }
+            }
+
+            //Type not found by name => Generic
+            Log.w("OpenHABWidget", "Unknown widget type: '" + type + "'");
+            setType(OpenHABWidgetType.GENERICITEM);
+        }
+    }
+
+    public OpenHABItem getItem() {
 		return item;
 	}
 

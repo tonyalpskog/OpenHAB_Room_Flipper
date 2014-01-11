@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HABDroid/HABDroid.iml" filepath="$PROJECT_DIR$/HABDroid/HABDroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MyHABDroid.iml" filepath="$PROJECT_DIR$/MyHABDroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/MyHABDroid2.iml" filepath="$PROJECT_DIR$/MyHABDroid2.iml" />
     </modules>
   </component>

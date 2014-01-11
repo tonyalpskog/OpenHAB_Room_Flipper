@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import android.graphics.Color;
+import android.util.Log;
 
 /**
  * This is a class to hold basic information about openHAB Item.
@@ -43,7 +44,7 @@ import android.graphics.Color;
 
 public class OpenHABItem {
 	private String name;
-	private String type;
+	private OpenHABItemType type;
 	private String state = "";
 	private String link;
 
@@ -77,13 +78,23 @@ public class OpenHABItem {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
-	}
+    public OpenHABItemType getType() {
+        return type;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setType(OpenHABItemType type) {
+        this.type = type;
+    }
+
+    public void setType(String type) {
+        for(int i = 0; i < OpenHABItemType.values().length; i++) {
+            if(type.equals(OpenHABItemType.values()[i].Name)) {
+                setType(OpenHABItemType.values()[i]);
+                return;
+            }
+        }
+        Log.w("OpenHABItem", "Unknown item type: '" + type + "'");
+    }
 
 	public String getState() {
 		return state;

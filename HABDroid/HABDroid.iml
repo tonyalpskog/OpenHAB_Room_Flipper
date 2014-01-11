@@ -76,7 +76,6 @@
     <orderEntry type="library" exported="" name="crittercism-android-3.0.3" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.2-openhab" level="project" />
     <orderEntry type="library" exported="" name="analytics-2.0" level="project" />
-    <orderEntry type="library" exported="" name="memorizingtrustmanager-1.1" level="project" />
     <orderEntry type="library" exported="" name="android-support-v13" level="project" />
   </component>
 </module>

@@ -50,9 +50,11 @@ import org.apache.http.message.BasicHeader;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.model.OpenHABItem;
+import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABNFCActionList;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
+import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
 import org.w3c.dom.Document;
@@ -184,29 +186,31 @@ public class OpenHABWidgetListFragment extends ListFragment {
                 Log.d(TAG, "Widget long-clicked " + String.valueOf(position));
                 OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
                 Log.d(TAG, "Widget type = " + openHABWidget.getType());
-                if (openHABWidget.getType().equals("Switch") || openHABWidget.getType().equals("Selection") ||
-                        openHABWidget.getType().equals("Colorpicker")) {
-                    selectedOpenHABWidget = openHABWidget;
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle(R.string.nfc_dialog_title);
-                    OpenHABNFCActionList nfcActionList = new OpenHABNFCActionList(selectedOpenHABWidget);
-                    builder.setItems(nfcActionList.getNames(), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent writeTagIntent = new Intent(getActivity().getApplicationContext(),
-                                    OpenHABWriteTagActivity.class);
-                            writeTagIntent.putExtra("sitemapPage", displayPageUrl);
-                            writeTagIntent.putExtra("item", selectedOpenHABWidget.getItem().getName());
-                            writeTagIntent.putExtra("itemType", selectedOpenHABWidget.getItem().getType());
-                            OpenHABNFCActionList nfcActionList =
-                                    new OpenHABNFCActionList(selectedOpenHABWidget);
-                            writeTagIntent.putExtra("command", nfcActionList.getCommands()[which]);
-                            startActivityForResult(writeTagIntent, 0);
-                            Util.overridePendingTransition(getActivity(), false);
-                            selectedOpenHABWidget = null;
-                        }
-                    });
-                    builder.show();
-                    return true;
+
+                switch (openHABWidget.getType()) {
+                    case SWITCH:
+                    case SELECTION:
+                    case COLOR:
+                        selectedOpenHABWidget = openHABWidget;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle(R.string.nfc_dialog_title);
+                        OpenHABNFCActionList nfcActionList = new OpenHABNFCActionList(selectedOpenHABWidget);
+                        builder.setItems(nfcActionList.getNames(), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent writeTagIntent = new Intent(getActivity().getApplicationContext(),
+                                        OpenHABWriteTagActivity.class);
+                                writeTagIntent.putExtra("sitemapPage", displayPageUrl);
+                                writeTagIntent.putExtra("item", selectedOpenHABWidget.getItem().getName());
+                                writeTagIntent.putExtra("itemType", selectedOpenHABWidget.getItem().getType().Name);
+                                OpenHABNFCActionList nfcActionList =
+                                        new OpenHABNFCActionList(selectedOpenHABWidget);
+                                writeTagIntent.putExtra("command", nfcActionList.getCommands()[which]);
+                                startActivityForResult(writeTagIntent, 0);
+                                Util.overridePendingTransition(getActivity(), false);
+                                selectedOpenHABWidget = null;
+                            }
+                        });
+                        builder.show();
                 }
                 return true;
             }
@@ -358,7 +362,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
         widgetList.clear();
         for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
             // Remove frame widgets with no label text
-            if (w.getType().equals("Frame") && TextUtils.isEmpty(w.getLabel()))
+            if (w.getType() == OpenHABWidgetType.FRAME && TextUtils.isEmpty(w.getLabel()))
                 continue;
             widgetList.add(w);
         }
@@ -382,7 +386,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             if (nfcWidget != null && nfcItem != null) {
                 // TODO: Perform nfc widget action here
                 if (this.nfcCommand.equals("TOGGLE")) {
-                    if (nfcItem.getType().equals("RollershutterItem")) {
+                    if (nfcItem.getType() == OpenHABItemType.ROLLERSHUTTER) {
                         if (nfcItem.getStateAsBoolean())
                             this.openHABWidgetAdapter.sendItemCommand(nfcItem, "UP");
                         else
