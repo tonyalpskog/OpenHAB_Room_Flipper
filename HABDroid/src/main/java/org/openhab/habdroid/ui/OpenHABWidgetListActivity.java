@@ -247,7 +247,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		}
 		// If yes, then just go to it (means restore activity from it's saved state)
 		if (displayPageUrl.length() > 0) {
-			Log.d(TAG, "displayPageUrl = " + displayPageUrl);
+			Log.d(TAG, "onCreate() calling showPage(...)  displayPageUrl = " + displayPageUrl);
 			showPage(displayPageUrl, false);
 		// If not means it is a clean start
 		} else {
@@ -469,7 +469,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		if (NfcAdapter.getDefaultAdapter(this) != null)
 			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pendingIntent, null, null);
 		if (this.displayPageUrl.length() > 0) {
-			Log.d(TAG, "displayPageUrl > 0, resuming");
+			Log.d(TAG, "OnResume() calling showPage(...) displayPageUrl > 0, resuming");
 			showPage(displayPageUrl, false);
 		}
 	}
@@ -557,7 +557,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
      * @return      void
      */
 	public void showPage(String pageUrl, boolean longPolling) {
-		Log.i(TAG, "showPage for " + pageUrl + " longPolling = " + longPolling);
+		Log.i(TAG, "showPage() for " + pageUrl + " longPolling = " + longPolling);
 		// Cancel any existing http request to openHAB (typically ongoing long poll)
 		if (!longPolling)
 			setProgressBarIndeterminateVisibility(true);
@@ -719,6 +719,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        Log.d(TAG, "processContent() - Calling showPage() displayPageUrl = " + displayPageUrl);
 		showPage(displayPageUrl, true);
 	}
 
@@ -991,7 +992,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	}
 	
 	private void openSitemap(String sitemapUrl) {
-		Log.i(TAG, "Opening sitemap at " + sitemapUrl);
+		Log.i(TAG, "openSitemap() - Calling showPage(...) Opening sitemap at " + sitemapUrl);
 		displayPageUrl = sitemapUrl;
 		sitemapRootUrl = sitemapUrl;
 		showPage(displayPageUrl, false);

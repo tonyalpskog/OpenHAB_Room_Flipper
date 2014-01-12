@@ -742,8 +742,8 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     }
 
     public void onWidgetSelectedListener(OpenHABLinkedPage linkedPage, OpenHABWidgetListFragment source) {
-        Log.i(TAG, "Got widget link = " + linkedPage.getLink());
-        Log.i(TAG, String.format("Link came from fragment on position %d", source.getPosition()));
+        Log.i(TAG, "onWidgetSelectedListener() Got widget link = " + linkedPage.getLink());
+        Log.i(TAG, "       " + String.format("Link came from fragment on position %d", source.getPosition()));
         pagerAdapter.openPage(linkedPage.getLink(), source.getPosition() + 1);
         pager.setCurrentItem(pagerAdapter.getCount()-1);
         setTitle(linkedPage.getTitle());

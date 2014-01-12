@@ -162,6 +162,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
                     // Widget have a page linked to it
                     String[] splitString;
                     splitString = openHABWidget.getLinkedPage().getTitle().split("\\[|\\]");
+                    Log.d(TAG, "    widget id = " + openHABWidget.getLinkedPage().getId() + "  link = " + openHABWidget.getLinkedPage().getLink());
                     if (OpenHABWidgetListFragment.this.widgetSelectedListener != null) {
                         widgetSelectedListener.onWidgetSelectedListener(openHABWidget.getLinkedPage(),
                                 OpenHABWidgetListFragment.this);
@@ -255,11 +256,13 @@ public class OpenHABWidgetListFragment extends ListFragment {
     }
 
     @Override
-    public void onResume () {
+    public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume() " + displayPageUrl);
-        if (displayPageUrl != null)
+        if (displayPageUrl != null) {
+            Log.d(TAG, "onResume() - Calling showPage() displayPageUrl = " + displayPageUrl);
             showPage(displayPageUrl, false);
+        }
     }
 
     @Override
@@ -306,7 +309,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
-        Log.i(TAG, " showPage for " + pageUrl + " longPolling = " + longPolling);
+        Log.i(TAG, "showPage(...) - showPage for " + pageUrl + " longPolling = " + longPolling);
         // Cancel any existing http request to openHAB (typically ongoing long poll)
         Header[] headers = {};
         if (!longPolling)
@@ -314,6 +317,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
         if (longPolling) {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
         }
+        //TA - Calling REST Get method, requesting data from server.
         mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler() {
             @Override
             public void onSuccess(Document document) {
@@ -336,6 +340,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
 //                }
                 if (error instanceof SocketTimeoutException) {
                     Log.d(TAG, "Connection timeout, reconnecting");
+                    Log.d(TAG, "showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
                     showPage(displayPageUrl, longPolling);
                     return;
                 }
@@ -407,6 +412,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
                 getActivity().finish();
             }
         }
+        Log.d(TAG, "ProcessContent() - Calling showPage() with displayUrl = " + displayPageUrl);
         showPage(displayPageUrl, true);
     }
 

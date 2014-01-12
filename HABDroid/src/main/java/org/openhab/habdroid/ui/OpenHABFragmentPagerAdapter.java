@@ -163,6 +163,8 @@ public class OpenHABFragmentPagerAdapter extends FragmentStatePagerAdapter imple
             }
             notifyDataSetChanged();
         }
+        Log.d(TAG, "openPage() - Creating a new OpenHABWidgetListFragment with pageUrl = '" + pageUrl + "'\n     openHABBaseUrl = '" + openHABBaseUrl + "'\n" +
+                "     sitemapRootUrl = '" + sitemapRootUrl + "'");
         OpenHABWidgetListFragment fragment = OpenHABWidgetListFragment.withPage(pageUrl, openHABBaseUrl,
                 sitemapRootUrl, openHABUsername, openHABPassword, position);
         fragmentList.add(fragment);
