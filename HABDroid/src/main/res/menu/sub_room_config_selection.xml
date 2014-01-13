@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sub_room_config_deselect_all"
+        android:title="@string/deselect_all"
+        android:showAsAction="ifRoom"/>
+    <item android:id="@+id/sub_room_config_select_all"
+        android:title="@string/select_all"
+        android:showAsAction="ifRoom"/>
+    <item android:id="@+id/sub_room_config_select_types"
+        android:title="@string/select_all_types"
+        android:showAsAction="ifRoom"/>
+    <item android:id="@+id/sub_room_config_select_clones"
+        android:title="@string/select_all_clones"
+        android:showAsAction="ifRoom"/>
+</menu>

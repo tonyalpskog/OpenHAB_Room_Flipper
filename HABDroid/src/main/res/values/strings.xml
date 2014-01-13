@@ -66,4 +66,32 @@
     <string name="mtm_decision_once">Once</string>
     <string name="mtm_decision_abort">Abort</string>
     <string name="mtm_notification">Certificate verification</string>
+
+
+    <!-- Flipper -->
+    <string name="title_section1">Room Flipper</string>
+    <string name="title_section2">Unit Placement</string>
+    <string name="title_section3">Room Config</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">GlobalAction</string>
+    <string name="action_add_unit">Add unit</string>
+    <string name="action_selection">Selection</string>
+    <string name="str_img1">Image1</string>
+    <string name="str_img2">Image2</string>
+    <string name="action_remove_unit">Remove unit</string>
+    <string name="action_edit_unit">Edit unit</string>
+    <string name="action_remove_room">Remove</string>
+    <string name="action_edit_room">Edit</string>
+    <string name="action_clone_room">Clone</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="select_all">Select all</string>
+    <string name="select_all_types">Select all of current type(s)</string>
+    <string name="select_all_clones">Select all clones</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="action_add_room">Add room</string>
+    <string name="title_activity_rule">RuleActivity</string>
+    <string name="rule_tab_if">IF</string>
+    <string name="rule_tab_then">THEN</string>
+
 </resources>

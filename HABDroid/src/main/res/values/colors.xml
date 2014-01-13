@@ -7,4 +7,7 @@
     <color name="dark">#191919</color>
     <color name="highlight">#38c0f4</color>
 
+    <!-- FLIPPER -->
+    <color name="red">#FF660000</color>
+    <color name="blue">#FF330099</color>
 </resources>
