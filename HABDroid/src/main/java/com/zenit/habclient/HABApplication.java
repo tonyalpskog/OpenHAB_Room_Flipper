@@ -15,6 +15,21 @@ public class HABApplication extends Application {
     private UUID currentFlipperRoom = null;
     private RuleOperationProvider mRuleOperationProvider = null;
 
+    private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
+    public static OpenHABWidgetProvider getOpenHABWidgetProvider() {
+        if(mOpenHABWidgetProvider == null)
+            mOpenHABWidgetProvider = new OpenHABWidgetProvider();
+
+        return mOpenHABWidgetProvider;
+    }
+
+    private static OpenHABSetting mOpenHABSetting;
+    public static OpenHABSetting getOpenHABSetting() {
+        if(mOpenHABSetting == null)
+            mOpenHABSetting = new OpenHABSetting();
+        return mOpenHABSetting;
+    }
+
     public Room getConfigRoom() {
         Room room = getRoom(currentConfigRoom);
         currentConfigRoom = room.getId();

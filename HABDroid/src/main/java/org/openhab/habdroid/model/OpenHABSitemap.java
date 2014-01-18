@@ -28,16 +28,32 @@
  */
 package org.openhab.habdroid.model;
 
+import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.INavDrawerActivity;
+import com.zenit.habclient.INavDrawerItem;
+import com.zenit.habclient.NavDrawerItemType;
+
+import org.openhab.habdroid.R;
+import org.openhab.habdroid.util.MySmartImageView;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class OpenHABSitemap {
+public class OpenHABSitemap implements INavDrawerItem {
 	private String name;
     private String label;
 	private String link;
     private String icon;
 	private String homepageLink;
     private boolean leaf = false;
+    private NavDrawerItemType drawerItemType = NavDrawerItemType.Sitemap;
 	
 	public OpenHABSitemap(Node startNode) {
 		if (startNode.hasChildNodes()) {
@@ -76,24 +92,31 @@ public class OpenHABSitemap {
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getLink() {
 		return link;
 	}
+
 	public void setLink(String link) {
 		this.link = link;
 	}
+
 	public String getHomepageLink() {
 		return homepageLink;
 	}
+
 	public void setHomepageLink(String homepageLink) {
 		this.homepageLink = homepageLink;
 	}
+
     public String getIcon() {
         return icon;
     }
+
     public void setIcon(String icon) {
         this.icon = icon;
     }
@@ -112,5 +135,54 @@ public class OpenHABSitemap {
 
     public void setLeaf(boolean isLeaf) {
         leaf = isLeaf;
+    }
+
+// ======================================
+//    INavDrawerItem implementation
+// ======================================
+
+    @Override
+    public void itemClickAction(Context context, INavDrawerActivity activity) {
+        Log.d(this.getClass().getSimpleName(), "This is sitemap " + getLink());
+        activity.getDrawerLayout().closeDrawers();
+        activity.openSitemap(getHomepageLink());
+    }
+
+    @Override
+    public NavDrawerItemType getType() {
+        return drawerItemType;
+    }
+
+    @Override
+    public View getView(Context context, View convertView) {
+        final RelativeLayout drawerItemView;
+        TextView drawerItemLabelTextView;
+        MySmartImageView drawerItemImage;
+
+        if (convertView == null) {
+            drawerItemView = new RelativeLayout(context);
+            String inflater = Context.LAYOUT_INFLATER_SERVICE;
+            LayoutInflater vi;
+            vi = (LayoutInflater) context.getSystemService(inflater);
+            vi.inflate(R.layout.openhabdrawer_item, drawerItemView, true);//TA - TODO: Change attachToRoot to false ?
+        } else {
+            drawerItemView = (RelativeLayout) convertView;
+        }
+        drawerItemLabelTextView = (TextView)drawerItemView.findViewById(R.id.itemlabel);
+        drawerItemImage = (MySmartImageView)drawerItemView.findViewById(R.id.itemimage);
+        if (getLabel() != null && drawerItemLabelTextView != null) {
+            drawerItemLabelTextView.setText(getLabel());
+        } else {
+            drawerItemLabelTextView.setText(getName());
+        }
+        if (getIcon() != null && drawerItemImage != null) {
+            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(getIcon() + ".png");
+            drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall,
+                    HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+        } else {
+            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + ".png";
+            drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+        }
+        return drawerItemView;
     }
 }

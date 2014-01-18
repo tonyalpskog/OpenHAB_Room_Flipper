@@ -47,15 +47,15 @@ public class OpenHABNFCActionList {
 					actionNames.add(openHABWidget.getMappings().get(i).getLabel());
 					actionCommands.add(openHABWidget.getMappings().get(i).getCommand());
 				}
-			} else if (openHABWidget.getType() == OpenHABWidgetType.SWITCH) {
-				if (openHABWidget.getItem().getType() == OpenHABItemType.SWITCH) {
+			} else if (openHABWidget.getType() == OpenHABWidgetType.Switch) {
+				if (openHABWidget.getItem().getType() == OpenHABItemType.Switch) {
 					actionNames.add("On");
 					actionCommands.add("ON");
 					actionNames.add("Off");
 					actionCommands.add("OFF");
 					actionNames.add("Toggle");
 					actionCommands.add("TOGGLE");
-				} else if (openHABWidget.getItem().getType() == OpenHABItemType.ROLLERSHUTTER) {
+				} else if (openHABWidget.getItem().getType() == OpenHABItemType.Rollershutter) {
 					actionNames.add("Up");
 					actionCommands.add("UP");
 					actionNames.add("Down");
@@ -63,7 +63,7 @@ public class OpenHABNFCActionList {
 					actionNames.add("Toggle");
 					actionCommands.add("TOGGLE");					
 				}
-			} else if (openHABWidget.getType() == OpenHABWidgetType.COLOR) {
+			} else if (openHABWidget.getType() == OpenHABWidgetType.Color) {
 				actionNames.add("On");
 				actionCommands.add("ON");
 				actionNames.add("Off");

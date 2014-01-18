@@ -20,5 +20,9 @@
             android:orderInCategory="100"
             android:showAsAction="always"
             android:icon="?attr/customMicIcon"
-            android:title="Voice Recognition"/>
+            android:title="Voice Recognition"
+        />
+    <item android:id="@+id/mainmenu_openhab_flipper"
+        android:title="@string/mainmenu_openhab_flipper"
+        />
 </menu>

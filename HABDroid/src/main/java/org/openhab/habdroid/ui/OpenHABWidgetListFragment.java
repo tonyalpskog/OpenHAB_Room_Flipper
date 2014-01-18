@@ -45,6 +45,8 @@ import android.widget.ListView;
 
 //import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
+import com.zenit.habclient.HABApplication;
+
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.openhab.habdroid.R;
@@ -156,13 +158,13 @@ public class OpenHABWidgetListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                Log.d(TAG, "Widget clicked " + String.valueOf(position));
+                Log.d(TAG, "onActivityCreated() -> Widget clicked " + String.valueOf(position));
                 OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
                 if (openHABWidget.hasLinkedPage()) {
                     // Widget have a page linked to it
                     String[] splitString;
                     splitString = openHABWidget.getLinkedPage().getTitle().split("\\[|\\]");
-                    Log.d(TAG, "    widget id = " + openHABWidget.getLinkedPage().getId() + "  link = " + openHABWidget.getLinkedPage().getLink());
+                    Log.d(TAG, "onActivityCreated() ->    widget id = " + openHABWidget.getLinkedPage().getId() + "  link = " + openHABWidget.getLinkedPage().getLink());
                     if (OpenHABWidgetListFragment.this.widgetSelectedListener != null) {
                         widgetSelectedListener.onWidgetSelectedListener(openHABWidget.getLinkedPage(),
                                 OpenHABWidgetListFragment.this);
@@ -170,7 +172,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
 //                        navigateToPage(openHABWidget.getLinkedPage().getLink(), splitString[0]);
                     mOldSelectedItem = position;
                 } else {
-                    Log.d(TAG, String.format("Click on item with no linked page, reverting selection to item %d", mOldSelectedItem));
+                    Log.d(TAG, String.format("onActivityCreated() -> Click on item with no linked page, reverting selection to item %d", mOldSelectedItem));
                     // If an item without a linked page is clicked this will clear the selection
                     // and revert it to previously selected item (if any) when CHOICE_MODE_SINGLE
                     // is switched on for widget listview in multi-column mode on tablets
@@ -189,9 +191,9 @@ public class OpenHABWidgetListFragment extends ListFragment {
                 Log.d(TAG, "Widget type = " + openHABWidget.getType());
 
                 switch (openHABWidget.getType()) {
-                    case SWITCH:
-                    case SELECTION:
-                    case COLOR:
+                    case Switch:
+                    case Selection:
+                    case Color:
                         selectedOpenHABWidget = openHABWidget;
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle(R.string.nfc_dialog_title);
@@ -364,10 +366,11 @@ public class OpenHABWidgetListFragment extends ListFragment {
         openHABWidgetAdapter.stopImageRefresh();
         Node rootNode = document.getFirstChild();
         openHABWidgetDataSource.setSourceNode(rootNode);
+        HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
             // Remove frame widgets with no label text
-            if (w.getType() == OpenHABWidgetType.FRAME && TextUtils.isEmpty(w.getLabel()))
+            if (w.getType() == OpenHABWidgetType.Frame && TextUtils.isEmpty(w.getLabel()))
                 continue;
             widgetList.add(w);
         }
@@ -391,7 +394,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             if (nfcWidget != null && nfcItem != null) {
                 // TODO: Perform nfc widget action here
                 if (this.nfcCommand.equals("TOGGLE")) {
-                    if (nfcItem.getType() == OpenHABItemType.ROLLERSHUTTER) {
+                    if (nfcItem.getType() == OpenHABItemType.Rollershutter) {
                         if (nfcItem.getStateAsBoolean())
                             this.openHABWidgetAdapter.sendItemCommand(nfcItem, "UP");
                         else

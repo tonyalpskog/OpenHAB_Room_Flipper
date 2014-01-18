@@ -154,7 +154,7 @@ public class OpenHABFragmentPagerAdapter extends FragmentStatePagerAdapter imple
     }
 
     public void openPage(String pageUrl, int position) {
-        Log.d(TAG, "openPage(" + pageUrl + ")");
+        Log.d(TAG, String.format("openPage() -> pageUrl = '%s'  position = '%s'", pageUrl, position));
         int oldColumnCount = getActualColumnsNumber();
         if (position < fragmentList.size()) {
             for (int i=fragmentList.size()-1; i>=position; i--) {
@@ -163,7 +163,7 @@ public class OpenHABFragmentPagerAdapter extends FragmentStatePagerAdapter imple
             }
             notifyDataSetChanged();
         }
-        Log.d(TAG, "openPage() - Creating a new OpenHABWidgetListFragment with pageUrl = '" + pageUrl + "'\n     openHABBaseUrl = '" + openHABBaseUrl + "'\n" +
+        Log.d(TAG, "openPage() -> Creating a new OpenHABWidgetListFragment with pageUrl = '" + pageUrl + "'\n     openHABBaseUrl = '" + openHABBaseUrl + "'\n" +
                 "     sitemapRootUrl = '" + sitemapRootUrl + "'");
         OpenHABWidgetListFragment fragment = OpenHABWidgetListFragment.withPage(pageUrl, openHABBaseUrl,
                 sitemapRootUrl, openHABUsername, openHABPassword, position);

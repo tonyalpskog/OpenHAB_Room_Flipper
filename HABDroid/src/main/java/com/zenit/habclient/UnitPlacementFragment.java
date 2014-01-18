@@ -20,11 +20,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -157,7 +165,39 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void showAddUnitDialog(Context context) {
-        final CharSequence[] items = {"Switch", "Dimmer", "Heating", "Vent", "Socket"};
+//        final CharSequence[] items = {"Switch", "Dimmer", "Heating", "Vent", "Socket"};
+
+        AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
+        asyncHttpClient.get(HABApplication.getOpenHABSetting().getBaseUrl() + "rest/items", new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String content) {
+                Log.d("get_items", content);
+            }
+            @Override
+            public void onFailure(Throwable e, String errorResponse) {
+                Log.e("get_items", "asyncHttpClient.onFailure - " + e.toString());
+            }
+        });
+
+
+
+        Toast.makeText(context, "ALL widgetList = " + HABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetType.Switch).size(), Toast.LENGTH_SHORT).show();
+        //TA: Just a test
+        List<CharSequence> itemsList = new ArrayList<CharSequence>();
+        itemsList.add("Switch");
+        itemsList.add("Dimmer");
+        itemsList.add("Heating");
+        itemsList.add("Vent");
+        itemsList.add("Socket");
+        EnumSet<OpenHABWidgetType> unitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color);
+        List<OpenHABWidget> widgetList = HABApplication.getOpenHABWidgetProvider().getWidgetList(unitTypes);
+        Iterator<OpenHABWidget> iterator = widgetList.iterator();
+        while(iterator.hasNext()) {
+            OpenHABWidget next = iterator.next();
+            itemsList.add(next.getType().Name + ": " + next.getLabel()/* getItem().getName()*/);
+        }
+        CharSequence[] items = (CharSequence[]) itemsList.toArray(new CharSequence[itemsList.size()]);
+        Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
 
         AlertDialog addUnitDialog;
         // Creating and Building the Dialog
@@ -170,19 +210,19 @@ public class UnitPlacementFragment extends Fragment {
                 switch(item)
                 {
                     case 0:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.SWITCH), 150, 150);
+                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Switch), 150, 150);
                         break;
                     case 1:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.DIMMER), 150, 150);
+                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Dimmer), 150, 150);
                         break;
                     case 2:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.ROOM_HEATER), 150, 150);
+                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.RoomHeater), 150, 150);
                         break;
                     case 3:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.VENT), 150, 150);
+                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Vent), 150, 150);
                         break;
                     case 4:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.SOCKET), 150, 150);
+                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Socket), 150, 150);
                         break;
 
                 }

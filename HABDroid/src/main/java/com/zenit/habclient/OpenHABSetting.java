@@ -1,0 +1,46 @@
+package com.zenit.habclient;
+
+import android.content.Context;
+
+import com.loopj.android.http.AsyncHttpClient;
+
+import org.openhab.habdroid.util.MyAsyncHttpClient;
+
+/**
+ * Created by Tony Alpskog in 2014.
+ */
+public class OpenHABSetting {
+    private String mUsername;
+    private String mPassword;
+    private String mBaseUrl;
+
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public void setUsername(String username) {
+        mUsername = username;
+    }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String password) {
+        mPassword = password;
+    }
+
+    public String getBaseUrl() {
+        return mBaseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        mBaseUrl = baseUrl;
+    }
+
+    public AsyncHttpClient getAsyncHttpClient(Context context) {
+        AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(context);
+        asyncHttpClient.setBasicAuth(mUsername, mPassword);
+        return asyncHttpClient;
+    }
+}

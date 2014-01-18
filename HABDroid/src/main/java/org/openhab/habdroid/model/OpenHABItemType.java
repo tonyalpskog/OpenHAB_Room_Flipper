@@ -4,10 +4,15 @@ package org.openhab.habdroid.model;
  * Created by Tony Alpskog in 2014.
  */
 public enum OpenHABItemType {
-    GENERICITEM(0, ""),
-    GROUP(1, "GroupItem"),
-    ROLLERSHUTTER(2, "RollershutterItem"),
-    SWITCH(3, "SwitchItem");
+    GenericItem(0, ""),
+    Group(1, "GroupItem"),
+    Rollershutter(2, "RollershutterItem"),
+    Switch(3, "SwitchItem"),
+    Dimmer(4, "DimmerItem"),
+    Number(5, "NumberItem"),
+    Contact(6, "ContactItem"),
+    Color(7, "ColorItem"),
+    String(8,"StringItem");
 
     public final String Name;
     public final int Id;

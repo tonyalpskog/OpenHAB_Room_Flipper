@@ -63,7 +63,7 @@ public class OpenHABWidgetDataSource {
 	public void setSourceNode(Node rootNode) {
 		Log.i(TAG, "Loading new data");
 		rootWidget = new OpenHABWidget();
-		rootWidget.setType(OpenHABWidgetType.ROOT);
+		rootWidget.setType(OpenHABWidgetType.Root);
 		if (rootNode.hasChildNodes()) {
 			NodeList childNodes = rootNode.getChildNodes();
 			for (int i = 0; i < childNodes.getLength(); i ++) {
@@ -138,8 +138,8 @@ public class OpenHABWidgetDataSource {
             if (this.rootWidget.hasChildren()) {
                 for (int i = 0; i < rootWidget.getChildren().size(); i++) {
                     OpenHABWidget openHABWidget = this.rootWidget.getChildren().get(i);
-                    if ((openHABWidget.getType() == OpenHABWidgetType.FRAME && openHABWidget.childrenHasNonlinkedPages()) ||
-                            (openHABWidget.getType() != OpenHABWidgetType.FRAME  && !openHABWidget.hasLinkedPage()))
+                    if ((openHABWidget.getType() == OpenHABWidgetType.Frame && openHABWidget.childrenHasNonlinkedPages()) ||
+                            (openHABWidget.getType() != OpenHABWidgetType.Frame && !openHABWidget.hasLinkedPage()))
                         result.add(openHABWidget);
                     if (openHABWidget.hasChildren()) {
                         for (int j = 0; j < openHABWidget.getChildren().size(); j++) {

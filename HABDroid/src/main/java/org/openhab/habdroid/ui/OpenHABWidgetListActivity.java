@@ -66,6 +66,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
+import com.zenit.habclient.HABApplication;
 
 import android.Manifest.permission;
 import android.app.AlertDialog;
@@ -216,6 +217,10 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		// Get username/password from preferences
 		openHABUsername = settings.getString("default_openhab_username", null);
 		openHABPassword = settings.getString("default_openhab_password", null);
+
+        HABApplication.getOpenHABSetting().setUsername(openHABUsername);
+        HABApplication.getOpenHABSetting().setPassword(openHABPassword);
+
 		// Create new data source and adapter and set it to list view
 		openHABWidgetDataSource = new OpenHABWidgetDataSource();
 		openHABWidgetAdapter = new OpenHABWidgetAdapter(OpenHABWidgetListActivity.this,
@@ -327,6 +332,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	
 	// Start openHAB browsing!
 	public void showTime() {
+        Log.d(TAG, "showTime() - openHABBaseUrl = '" + openHABBaseUrl + "'");
 		if (openHABBaseUrl != null) {
 			openHABWidgetAdapter.setOpenHABBaseUrl(openHABBaseUrl);
 			if (nfcTagData.length() > 0) {
@@ -596,6 +602,36 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		});
 	}
 
+    public Node getRootNode(String XMLContent) {
+        Node rootNode = null;
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document;
+            openHABWidgetAdapter.stopVideoWidgets();
+            openHABWidgetAdapter.stopImageRefresh();
+            if (XMLContent != null) {
+                document = builder.parse(new ByteArrayInputStream(XMLContent.getBytes("UTF-8")));
+                rootNode = document.getFirstChild();
+            } else {
+                Log.e(TAG, "getNode: XMLContent == null");
+            }
+        } catch (ParserConfigurationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return rootNode;
+    }
+
 	/**
      * Parse XML sitemap page and show it
      *
@@ -603,122 +639,98 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
      * @return      void
      */
 	public void processContent(String content) {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document;
-			openHABWidgetAdapter.stopVideoWidgets();
-			openHABWidgetAdapter.stopImageRefresh();
-			// TODO: fix crash with null content
-			if (content != null) {
-				document = builder.parse(new ByteArrayInputStream(content.getBytes("UTF-8")));
-			} else {
-				Log.e(TAG, "processContent: content == null");
-				return;
-			}
-			Node rootNode = document.getFirstChild();
-			openHABWidgetDataSource.setSourceNode(rootNode);
-			widgetList.clear();
-			// As we change the page we need to stop all videos on current page
-			// before going to the new page. This is quite dirty, but is the only
-			// way to do that...
-			for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
-				widgetList.add(w);
-			}
-			openHABWidgetAdapter.notifyDataSetChanged();
-			setTitle(openHABWidgetDataSource.getTitle());
-			setProgressBarIndeterminateVisibility(false);
-			// Set widget list index to saved or zero position
-			// This would mean we got widget and command from nfc tag, so we need to do some automatic actions!
-			if (this.nfcWidgetId != null && this.nfcCommand != null) {
-				Log.d(TAG, "Have widget and command, NFC action!");
-				OpenHABWidget nfcWidget = this.openHABWidgetDataSource.getWidgetById(this.nfcWidgetId);
-				OpenHABItem nfcItem = nfcWidget.getItem();
-				// Found widget with id from nfc tag and it has an item
-				if (nfcWidget != null && nfcItem != null) {
-					// TODO: Perform nfc widget action here
-					if (this.nfcCommand.equals("TOGGLE")) {
-						if (nfcItem.getType() == OpenHABItemType.ROLLERSHUTTER) {
-							if (nfcItem.getStateAsBoolean())
-								openHABWidgetAdapter.sendItemCommand(nfcItem, "UP");
-							else
-								openHABWidgetAdapter.sendItemCommand(nfcItem, "DOWN");
-						} else {
-							if (nfcItem.getStateAsBoolean())
-								openHABWidgetAdapter.sendItemCommand(nfcItem, "OFF");
-							else
-								openHABWidgetAdapter.sendItemCommand(nfcItem, "ON");
-						}
-					} else {
-						openHABWidgetAdapter.sendItemCommand(nfcItem, this.nfcCommand);
-					}
-				}
-				this.nfcWidgetId = null;
-				this.nfcCommand = null;
-				if (this.nfcAutoClose) {
-					finish();
-				}
-			}
-			getListView().setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> parent, View view, int position,
-						long id) {
-					Log.d(TAG, "Widget clicked " + String.valueOf(position));
-					OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
-					if (openHABWidget.hasLinkedPage()) {
-						// Widget have a page linked to it
-                        String[] splitString;
-                        splitString = openHABWidget.getLinkedPage().getTitle().split("\\[|\\]");
-                        navigateToPage(openHABWidget.getLinkedPage().getLink(), splitString[0]);
-					}
-				}
-				
-			});
-			getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-				public boolean onItemLongClick(AdapterView<?> parent, View view,
-						int position, long id) {
-					Log.d(TAG, "Widget long-clicked " + String.valueOf(position));
-					OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
-					Log.d(TAG, "Widget type = " + openHABWidget.getType());
-                    switch (openHABWidget.getType()) {
-                        case SWITCH:
-                        case SELECTION:
-                        case COLOR:
-                            OpenHABWidgetListActivity.this.selectedOpenHABWidget = openHABWidget;
-                            AlertDialog.Builder builder = new AlertDialog.Builder(OpenHABWidgetListActivity.this);
-                            builder.setTitle(R.string.nfc_dialog_title);
-                            OpenHABNFCActionList nfcActionList = new OpenHABNFCActionList(OpenHABWidgetListActivity.this.selectedOpenHABWidget);
-                            builder.setItems(nfcActionList.getNames(), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent writeTagIntent = new Intent(OpenHABWidgetListActivity.this.getApplicationContext(),
-                                            OpenHABWriteTagActivity.class);
-                                    writeTagIntent.putExtra("sitemapPage", OpenHABWidgetListActivity.this.displayPageUrl);
-                                    writeTagIntent.putExtra("widget", OpenHABWidgetListActivity.this.selectedOpenHABWidget.getId());
-                                    OpenHABNFCActionList nfcActionList =
-                                            new OpenHABNFCActionList(OpenHABWidgetListActivity.this.selectedOpenHABWidget);
-                                    writeTagIntent.putExtra("command", nfcActionList.getCommands()[which]);
-                                    startActivityForResult(writeTagIntent, 0);
-                                    Util.overridePendingTransition(OpenHABWidgetListActivity.this, false);
-                                    OpenHABWidgetListActivity.this.selectedOpenHABWidget = null;
-                                }
-                            });
-                            builder.show();
+        Node rootNode = getRootNode(content);
+        openHABWidgetDataSource.setSourceNode(rootNode);
+        HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
+        widgetList.clear();
+        // As we change the page we need to stop all videos on current page
+        // before going to the new page. This is quite dirty, but is the only
+        // way to do that...
+        for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
+            widgetList.add(w);
+        }
+        openHABWidgetAdapter.notifyDataSetChanged();
+        setTitle(openHABWidgetDataSource.getTitle());
+        setProgressBarIndeterminateVisibility(false);
+        // Set widget list index to saved or zero position
+        // This would mean we got widget and command from nfc tag, so we need to do some automatic actions!
+        if (this.nfcWidgetId != null && this.nfcCommand != null) {
+            Log.d(TAG, "Have widget and command, NFC action!");
+            OpenHABWidget nfcWidget = this.openHABWidgetDataSource.getWidgetById(this.nfcWidgetId);
+            OpenHABItem nfcItem = nfcWidget.getItem();
+            // Found widget with id from nfc tag and it has an item
+            if (nfcWidget != null && nfcItem != null) {
+                // TODO: Perform nfc widget action here
+                if (this.nfcCommand.equals("TOGGLE")) {
+                    if (nfcItem.getType() == OpenHABItemType.Rollershutter) {
+                        if (nfcItem.getStateAsBoolean())
+                            openHABWidgetAdapter.sendItemCommand(nfcItem, "UP");
+                        else
+                            openHABWidgetAdapter.sendItemCommand(nfcItem, "DOWN");
+                    } else {
+                        if (nfcItem.getStateAsBoolean())
+                            openHABWidgetAdapter.sendItemCommand(nfcItem, "OFF");
+                        else
+                            openHABWidgetAdapter.sendItemCommand(nfcItem, "ON");
                     }
-					return true;
-				}				
-			});
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+                } else {
+                    openHABWidgetAdapter.sendItemCommand(nfcItem, this.nfcCommand);
+                }
+            }
+            this.nfcWidgetId = null;
+            this.nfcCommand = null;
+            if (this.nfcAutoClose) {
+                finish();
+            }
+        }
+        getListView().setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                    long id) {
+                Log.d(TAG, "Widget clicked " + String.valueOf(position));
+                OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
+                if (openHABWidget.hasLinkedPage()) {
+                    // Widget have a page linked to it
+                    String[] splitString;
+                    splitString = openHABWidget.getLinkedPage().getTitle().split("\\[|\\]");
+                    navigateToPage(openHABWidget.getLinkedPage().getLink(), splitString[0]);
+                }
+            }
+
+        });
+        getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                Log.d(TAG, "Widget long-clicked " + String.valueOf(position));
+                OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
+                Log.d(TAG, "Widget type = " + openHABWidget.getType());
+                switch (openHABWidget.getType()) {
+                    case Switch:
+                    case Selection:
+                    case Color:
+                        OpenHABWidgetListActivity.this.selectedOpenHABWidget = openHABWidget;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(OpenHABWidgetListActivity.this);
+                        builder.setTitle(R.string.nfc_dialog_title);
+                        OpenHABNFCActionList nfcActionList = new OpenHABNFCActionList(OpenHABWidgetListActivity.this.selectedOpenHABWidget);
+                        builder.setItems(nfcActionList.getNames(), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent writeTagIntent = new Intent(OpenHABWidgetListActivity.this.getApplicationContext(),
+                                        OpenHABWriteTagActivity.class);
+                                writeTagIntent.putExtra("sitemapPage", OpenHABWidgetListActivity.this.displayPageUrl);
+                                writeTagIntent.putExtra("widget", OpenHABWidgetListActivity.this.selectedOpenHABWidget.getId());
+                                OpenHABNFCActionList nfcActionList =
+                                        new OpenHABNFCActionList(OpenHABWidgetListActivity.this.selectedOpenHABWidget);
+                                writeTagIntent.putExtra("command", nfcActionList.getCommands()[which]);
+                                startActivityForResult(writeTagIntent, 0);
+                                Util.overridePendingTransition(OpenHABWidgetListActivity.this, false);
+                                OpenHABWidgetListActivity.this.selectedOpenHABWidget = null;
+                            }
+                        });
+                        builder.show();
+                }
+                return true;
+            }
+        });
+
         Log.d(TAG, "processContent() - Calling showPage() displayPageUrl = " + displayPageUrl);
 		showPage(displayPageUrl, true);
 	}
@@ -727,6 +739,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 * Put current page and current widget list position into the stack and go to new page
 	 */
 	private void navigateToPage(String pageLink, String pageTitle) {
+        Log.d(TAG, "navigateToPage(): pageTitle = '" + pageTitle + "'  pageLink = '" + pageLink + "'");
 		// We don't want to put current page to stack if navigateToPage is trying to go to the same page
 		if (!pageLink.equals(displayPageUrl)) {
             Intent drillDownIntent = new Intent(OpenHABWidgetListActivity.this.getApplicationContext(),

@@ -4,11 +4,11 @@ package com.zenit.habclient;
  * Created by Tony Alpskog in 2013.
  */
 public enum UnitType {
-    SWITCH(0),
-    DIMMER(1),
-    ROOM_HEATER(2),
-    VENT(3),
-    SOCKET(4);
+    Switch(0),
+    Dimmer(1),
+    RoomHeater(2),
+    Vent(3),
+    Socket(4);
 
     public final int Value;
 

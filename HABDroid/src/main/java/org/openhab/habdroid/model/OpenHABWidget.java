@@ -84,49 +84,47 @@ public class OpenHABWidget {
 					this.setLinkedPage(new OpenHABLinkedPage(childNode));
 				} else if (childNode.getNodeName().equals("widget")) {
 					new OpenHABWidget(this, childNode);
-				} else {
-					if (childNode.getNodeName().equals("type")) {
+				} else if (childNode.getNodeName().equals("type")) {
 						this.setType(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("widgetId")) {
-						this.setId(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("label")) {
-						this.setLabel(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("icon")) {
-						this.setIcon(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("url")) {
-						this.setUrl(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("minValue")) {
-						setMinValue(Float.valueOf(childNode.getTextContent()).floatValue());
-					} else if (childNode.getNodeName().equals("maxValue")) {
-						setMaxValue(Float.valueOf(childNode.getTextContent()).floatValue());
-					} else if (childNode.getNodeName().equals("step")) {
-						setStep(Float.valueOf(childNode.getTextContent()).floatValue());
-					} else if (childNode.getNodeName().equals("refresh")) {
-						setRefresh(Integer.valueOf(childNode.getTextContent()).intValue());
-					} else if (childNode.getNodeName().equals("period")) {
-						setPeriod(childNode.getTextContent());
-					} else if (childNode.getNodeName().equals("height")) {
-						setHeight(Integer.valueOf(childNode.getTextContent()));
-					} else if (childNode.getNodeName().equals("mapping")) {
-						NodeList mappingChildNodes = childNode.getChildNodes();
-						String mappingCommand = "";
-						String mappingLabel = "";
-						for (int k = 0; k < mappingChildNodes.getLength(); k++) {
-							if (mappingChildNodes.item(k).getNodeName().equals("command"))
-								mappingCommand = mappingChildNodes.item(k).getTextContent();
-							if (mappingChildNodes.item(k).getNodeName().equals("label"))
-								mappingLabel = mappingChildNodes.item(k).getTextContent();
-						}
-						OpenHABWidgetMapping mapping = new OpenHABWidgetMapping(mappingCommand, mappingLabel);
-						mappings.add(mapping);
-					} else if (childNode.getNodeName().equals("iconcolor")) {
-                        setIconColor(childNode.getTextContent());
-                    } else if (childNode.getNodeName().equals("labelcolor")) {
-                        setLabelColor(childNode.getTextContent());
-                    } else if (childNode.getNodeName().equals("valuecolor")) {
-                        setValueColor(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("widgetId")) {
+                    this.setId(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("label")) {
+                    this.setLabel(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("icon")) {
+                    this.setIcon(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("url")) {
+                    this.setUrl(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("minValue")) {
+                    setMinValue(Float.valueOf(childNode.getTextContent()).floatValue());
+                } else if (childNode.getNodeName().equals("maxValue")) {
+                    setMaxValue(Float.valueOf(childNode.getTextContent()).floatValue());
+                } else if (childNode.getNodeName().equals("step")) {
+                    setStep(Float.valueOf(childNode.getTextContent()).floatValue());
+                } else if (childNode.getNodeName().equals("refresh")) {
+                    setRefresh(Integer.valueOf(childNode.getTextContent()).intValue());
+                } else if (childNode.getNodeName().equals("period")) {
+                    setPeriod(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("height")) {
+                    setHeight(Integer.valueOf(childNode.getTextContent()));
+                } else if (childNode.getNodeName().equals("mapping")) {
+                    NodeList mappingChildNodes = childNode.getChildNodes();
+                    String mappingCommand = "";
+                    String mappingLabel = "";
+                    for (int k = 0; k < mappingChildNodes.getLength(); k++) {
+                        if (mappingChildNodes.item(k).getNodeName().equals("command"))
+                            mappingCommand = mappingChildNodes.item(k).getTextContent();
+                        if (mappingChildNodes.item(k).getNodeName().equals("label"))
+                            mappingLabel = mappingChildNodes.item(k).getTextContent();
                     }
-				}
+                    OpenHABWidgetMapping mapping = new OpenHABWidgetMapping(mappingCommand, mappingLabel);
+                    mappings.add(mapping);
+                } else if (childNode.getNodeName().equals("iconcolor")) {
+                    setIconColor(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("labelcolor")) {
+                    setLabelColor(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("valuecolor")) {
+                    setValueColor(childNode.getTextContent());
+                }
 			}
 		}
 		this.parent.addChildWidget(this);
@@ -175,19 +173,19 @@ public class OpenHABWidget {
 	}
 
     public void setType(String type) {
-        if (type.equals(OpenHABWidgetType.SWITCH.Name)) {
+        if (type.equals(OpenHABWidgetType.Switch.Name)) {
             if (hasMappings()) {
-                setType(OpenHABWidgetType.SECTIONSWITCH);
+                setType(OpenHABWidgetType.SelectionSwitch);
             } else if (getItem() != null) {
                 if (getItem().getType()!= null) {
-                    if (getItem().getType() == OpenHABItemType.ROLLERSHUTTER)
-                        setType(OpenHABWidgetType.ROLLERSHUTTER);
+                    if (getItem().getType() == OpenHABItemType.Rollershutter)
+                        setType(OpenHABWidgetType.RollerShutter);
                     else
-                        setType(OpenHABWidgetType.SWITCH);
+                        setType(OpenHABWidgetType.Switch);
                 } else
-                    setType(OpenHABWidgetType.SWITCH);
+                    setType(OpenHABWidgetType.Switch);
             } else {
-                setType(OpenHABWidgetType.SWITCH);
+                setType(OpenHABWidgetType.Switch);
             }
             return;
         } else {
@@ -200,7 +198,7 @@ public class OpenHABWidget {
 
             //Type not found by name => Generic
             Log.w("OpenHABWidget", "Unknown widget type: '" + type + "'");
-            setType(OpenHABWidgetType.GENERICITEM);
+            setType(OpenHABWidgetType.GenericItem);
         }
     }
 
