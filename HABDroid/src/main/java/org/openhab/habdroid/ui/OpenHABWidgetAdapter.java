@@ -46,8 +46,9 @@ import org.openhab.habdroid.model.OpenHABWidgetMapping;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.widget.ColorPickerDialog;
 import org.openhab.habdroid.ui.widget.OnColorChangedListener;
+import org.openhab.habdroid.util.AutoRefreshImageView;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
-import org.openhab.habdroid.util.MySmartImageView;
+
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -93,7 +94,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
 	private String openHABUsername = "";
 	private String openHABPassword = "";
 	private ArrayList<VideoView> videoWidgetList;
-	private ArrayList<MySmartImageView> refreshImageList;
+	private ArrayList<AutoRefreshImageView> refreshImageList;
     private MyAsyncHttpClient mAsyncHttpClient;
 
 	public OpenHABWidgetAdapter(Context context, int resource,
@@ -101,116 +102,82 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
 		super(context, resource, objects);
 		// Initialize video view array
 		videoWidgetList = new ArrayList<VideoView>();
-		refreshImageList = new ArrayList<MySmartImageView>();
+		refreshImageList = new ArrayList<AutoRefreshImageView>();
 	}
 
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewData textViewData = new ViewData();
+        ViewData preparedViewData = new ViewData();
     	int widgetLayout;
-    	textViewData.openHABWidget = getItem(position);
+    	preparedViewData.openHABWidget = getItem(position);
     	int screenWidth = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
     	widgetLayout = getItem(position).getType().LayoutId;
 
     	if (convertView == null) {
-            textViewData.widgetView = new RelativeLayout(getContext());
+            preparedViewData.widgetView = new RelativeLayout(getContext());
     		String inflater = Context.LAYOUT_INFLATER_SERVICE;
     		LayoutInflater vi;
     		vi = (LayoutInflater)getContext().getSystemService(inflater);
-    		vi.inflate(widgetLayout, textViewData.widgetView, true);
+    		vi.inflate(widgetLayout, preparedViewData.widgetView, true);
     	} else {
-            textViewData.widgetView = (RelativeLayout) convertView;
+            preparedViewData.widgetView = (RelativeLayout) convertView;
     	}
 
-        // Process the colour attributes
-        Integer iconColor = textViewData.openHABWidget.getIconColor();
-        Integer labelColor = textViewData.openHABWidget.getLabelColor();
-        Integer valueColor = textViewData.openHABWidget.getValueColor();
+        processIconImage(preparedViewData.widgetView, preparedViewData.openHABWidget);
+        preparedViewData.labelTextView = getLabelTextView(preparedViewData.widgetView, preparedViewData.openHABWidget);
+        preparedViewData.valueTextView = getValueTextView(preparedViewData.widgetView, preparedViewData.openHABWidget);
 
-        // Process widgets icon image
-        MySmartImageView widgetImage = (MySmartImageView)textViewData.widgetView.findViewById(R.id.widgetimage);
-        // Some of widgets, for example Frame doesnt' have an icon, so...
-        if (widgetImage != null) {
-            if (textViewData.openHABWidget.getIcon() != null) {
-                // This is needed to escape possible spaces and everything according to rfc2396
-                String iconUrl = openHABBaseUrl + "images/" + Uri.encode(textViewData.openHABWidget.getIcon() + ".png");
-//                Log.d(TAG, "Will try to load icon from " + iconUrl);
-                // Now set image URL
-                widgetImage.setImageUrl(iconUrl, R.drawable.blank_icon,
-                        openHABUsername, openHABPassword);
-                if(iconColor != null)
-                    widgetImage.setColorFilter(iconColor);
-                else
-                    widgetImage.clearColorFilter();
-            }
-        }
-        TextView defaultTextView = new TextView(textViewData.widgetView.getContext());
-        // Get TextView for widget label and set it's color
-        textViewData.labelTextView = (TextView)textViewData.widgetView.findViewById(R.id.widgetlabel);
-        if(labelColor != null && textViewData.labelTextView != null) {
-            Log.d(TAG, String.format("Setting label color to %d", labelColor));
-            textViewData.labelTextView.setTextColor(labelColor);
-        } else if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setTextColor(defaultTextView.getTextColors().getDefaultColor());
-        // Get TextView for widget value and set it's color
-        textViewData.valueTextView = (TextView)textViewData.widgetView.findViewById(R.id.widgetvalue);
-        if (valueColor != null && textViewData.valueTextView != null) {
-            Log.d(TAG, String.format("Setting value color to %d", valueColor));
-            textViewData.valueTextView.setTextColor(valueColor);
-        } else if (textViewData.valueTextView != null)
-            textViewData.valueTextView.setTextColor(defaultTextView.getTextColors().getDefaultColor());
-        defaultTextView = null;
-
+        View widgetView = null;
     	switch (getItem(position).getType()) {
             case Frame:
-                textViewData = getFrameWidget(textViewData);
+                widgetView = getFrameWidget(preparedViewData);
                 break;
             case Group:
-                textViewData = getGroupWidget(textViewData);
+                widgetView = getGroupWidget(preparedViewData);
                 break;
             case SelectionSwitch:
-                textViewData = getSelectionSwitchWidget(textViewData);
+                widgetView = getSelectionSwitchWidget(preparedViewData);
                 break;
             case Switch:
-                textViewData = getSwitchWidget(textViewData);
+                widgetView = getSwitchWidget(preparedViewData);
                 break;
             case Color:
-                textViewData = getColorWidget(textViewData);
+                widgetView = getColorWidget(preparedViewData);
                 break;
             case RollerShutter:
-                textViewData = getRollerShutterWidget(textViewData);
+                widgetView = getRollerShutterWidget(preparedViewData);
                 break;
             case Text:
-                textViewData = getTextWidget(textViewData);
+                widgetView = getTextWidget(preparedViewData);
                 break;
             case Slider:
-                textViewData = getSliderWidget(textViewData);
+                widgetView = getSliderWidget(preparedViewData);
                 break;
             case Image:
-                textViewData = getImageWidget(textViewData);
+                widgetView = getImageWidget(preparedViewData);
                 break;
             case Chart:
-                textViewData = getChartWidget(textViewData, screenWidth);
+                widgetView = getChartWidget(preparedViewData, screenWidth);
                 break;
             case Video:
-                textViewData = getVideoWidget(textViewData);
+                widgetView = getVideoWidget(preparedViewData);
                 break;
             case Web:
-                textViewData = getWebWidget(textViewData);
+                widgetView = getWebWidget(preparedViewData);
                 break;
             case Selection:
-                textViewData = getSelectionWidget(textViewData);
+                widgetView = getSelectionWidget(preparedViewData);
                 break;
             case Setpoint:
-                textViewData = getSetpointWidget(textViewData);
+                widgetView = getSetpointWidget(preparedViewData);
                 break;
             default:
-                if (textViewData.labelTextView != null)
-                    textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
+                if (preparedViewData.labelTextView != null)
+                    preparedViewData.labelTextView.setText(preparedViewData.openHABWidget.getLabel());
                 break;
     	}
 
-    	LinearLayout dividerLayout = (LinearLayout)textViewData.widgetView.findViewById(R.id.listdivider);
+    	LinearLayout dividerLayout = (LinearLayout)widgetView.findViewById(R.id.listdivider);
     	if (dividerLayout != null) {
     		if (position < this.getCount()-1) {
     			if (getItem(position + 1).getType() == OpenHABWidgetType.Frame) {
@@ -222,55 +189,108 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
     			dividerLayout.setVisibility(View.GONE);
     		}
     	}
-    	return textViewData.widgetView;
+    	return widgetView;
     }
 
-    private ViewData getFrameWidget(ViewData textViewData) {
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
-        textViewData.widgetView.setClickable(false);
-        if (textViewData.openHABWidget.getLabel().length() > 0) { // hide empty frames
-            textViewData.widgetView.setVisibility(View.VISIBLE);
-            textViewData.labelTextView.setVisibility(View.VISIBLE);
-        } else {
-            textViewData.widgetView.setVisibility(View.GONE);
-            textViewData.labelTextView.setVisibility(View.GONE);
+    private TextView getValueTextView(RelativeLayout widgetView, OpenHABWidget openHABWidget) {
+        // Get TextView for widget value and set it's color
+        Integer valueColor = openHABWidget.getValueColor();
+        TextView valueTextView = (TextView) widgetView.findViewById(R.id.widgetvalue);
+
+        if (valueColor != null && valueTextView != null) {
+            Log.d(TAG, String.format("Setting value color to %d", valueColor));
+            valueTextView.setTextColor(valueColor);
+        } else if (valueTextView != null) {
+            TextView defaultTextView = new TextView(widgetView.getContext());
+            valueTextView.setTextColor(defaultTextView.getTextColors().getDefaultColor());
         }
 
-        return textViewData;
+        return valueTextView;
     }
 
-    private ViewData getGroupWidget(ViewData textViewData) {
-        if (textViewData.labelTextView != null && textViewData.valueTextView != null) {
-            textViewData.splitString = textViewData.openHABWidget.getLabel().split("\\[|\\]");
-            textViewData.labelTextView.setText(textViewData.splitString[0]);
-            if (textViewData.splitString.length > 1) { // We have some value
-                textViewData.valueTextView.setText(textViewData.splitString[1]);
+    private TextView getLabelTextView(RelativeLayout widgetView, OpenHABWidget openHABWidget) {
+        // Get TextView for widget label and set it's color
+        Integer labelColor = openHABWidget.getLabelColor();
+        TextView labelTextView = (TextView) widgetView.findViewById(R.id.widgetlabel);
+
+        if(labelColor != null && labelTextView != null) {
+            Log.d(TAG, String.format("Setting label color to %d", labelColor));
+            labelTextView.setTextColor(labelColor);
+        } else if (labelTextView != null) {
+            TextView defaultTextView = new TextView(widgetView.getContext());
+            labelTextView.setTextColor(defaultTextView.getTextColors().getDefaultColor());
+        }
+
+        return labelTextView;
+    }
+
+    private void processIconImage(RelativeLayout widgetView, OpenHABWidget openHABWidget) {
+        // Process widgets icon image
+        Integer iconColor = openHABWidget.getIconColor();
+        AutoRefreshImageView widgetImage = (AutoRefreshImageView) widgetView.findViewById(R.id.widgetimage);
+        // Some of widgets, for example Frame doesnt' have an icon, so...
+        if (widgetImage != null) {
+            if (openHABWidget.getIcon() != null) {
+                // This is needed to escape possible spaces and everything according to rfc2396
+                String iconUrl = openHABBaseUrl + "images/" + Uri.encode(openHABWidget.getIcon() + ".png");
+//                Log.d(TAG, "Will try to load icon from " + iconUrl);
+                // Now set image URL
+                widgetImage.setImageUrl(iconUrl, R.drawable.blank_icon,
+                        openHABUsername, openHABPassword);
+                if(iconColor != null)
+                    widgetImage.setColorFilter(iconColor);
+                else
+                    widgetImage.clearColorFilter();
+            }
+        }
+    }
+
+    private View getFrameWidget(ViewData viewData) {
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
+        viewData.widgetView.setClickable(false);
+        if (viewData.openHABWidget.getLabel().length() > 0) { // hide empty frames
+            viewData.widgetView.setVisibility(View.VISIBLE);
+            viewData.labelTextView.setVisibility(View.VISIBLE);
+        } else {
+            viewData.widgetView.setVisibility(View.GONE);
+            viewData.labelTextView.setVisibility(View.GONE);
+        }
+
+        return viewData.widgetView;
+    }
+
+    private View getGroupWidget(ViewData viewData) {
+        if (viewData.labelTextView != null && viewData.valueTextView != null) {
+            viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+            viewData.labelTextView.setText(viewData.splitString[0]);
+            if (viewData.splitString.length > 1) { // We have some value
+                viewData.valueTextView.setText(viewData.splitString[1]);
             } else {
                 // This is needed to clean up cached TextViews
-                textViewData.valueTextView.setText("");
+                viewData.valueTextView.setText("");
             }
         }
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getSelectionSwitchWidget(ViewData textViewData) {
-        textViewData.splitString = textViewData.openHABWidget.getLabel().split("\\[|\\]");
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.splitString[0]);
-        if (textViewData.splitString.length > 1 && textViewData.valueTextView != null) { // We have some value
-            textViewData.valueTextView.setText(textViewData.splitString[1]);
+    private View getSelectionSwitchWidget(ViewData viewData) {
+        viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.splitString[0]);
+        if (viewData.splitString.length > 1 && viewData.valueTextView != null) { // We have some value
+            viewData.valueTextView.setText(viewData.splitString[1]);
         } else {
             // This is needed to clean up cached TextViews
-            textViewData.valueTextView.setText("");
+            viewData.valueTextView.setText("");
         }
-        RadioGroup sectionSwitchRadioGroup = (RadioGroup)textViewData.widgetView.findViewById(R.id.sectionswitchradiogroup);
+        RadioGroup sectionSwitchRadioGroup = (RadioGroup)viewData.widgetView.findViewById(R.id.sectionswitchradiogroup);
         // As we create buttons in this radio in runtime, we need to remove all
         // exiting buttons first
         sectionSwitchRadioGroup.removeAllViews();
-        sectionSwitchRadioGroup.setTag(textViewData.openHABWidget);
-        Iterator<OpenHABWidgetMapping> sectionMappingIterator = textViewData.openHABWidget.getMappings().iterator();
+        sectionSwitchRadioGroup.setTag(viewData.openHABWidget);
+        Iterator<OpenHABWidgetMapping> sectionMappingIterator = viewData.openHABWidget.getMappings().iterator();
         while (sectionMappingIterator.hasNext()) {
             OpenHABWidgetMapping widgetMapping = sectionMappingIterator.next();
             SegmentedControlButton segmentedControlButton =
@@ -278,8 +298,8 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
                             R.layout.openhabwidgetlist_sectionswitchitem_button, sectionSwitchRadioGroup, false);
             segmentedControlButton.setText(widgetMapping.getLabel());
             segmentedControlButton.setTag(widgetMapping.getCommand());
-            if (textViewData.openHABWidget.getItem() != null && widgetMapping.getCommand() != null) {
-                if (widgetMapping.getCommand().equals(textViewData.openHABWidget.getItem().getState())) {
+            if (viewData.openHABWidget.getItem() != null && widgetMapping.getCommand() != null) {
+                if (widgetMapping.getCommand().equals(viewData.openHABWidget.getItem().getState())) {
                     segmentedControlButton.setChecked(true);
                 } else {
                     segmentedControlButton.setChecked(false);
@@ -318,21 +338,21 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getSwitchWidget(ViewData textViewData) {
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
-        Switch switchSwitch = (Switch)textViewData.widgetView.findViewById(R.id.switchswitch);
-        if (textViewData.openHABWidget.hasItem()) {
-            if (textViewData.openHABWidget.getItem().getState().equals("ON")) {
+    private View getSwitchWidget(ViewData viewData) {
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
+        Switch switchSwitch = (Switch)viewData.widgetView.findViewById(R.id.switchswitch);
+        if (viewData.openHABWidget.hasItem()) {
+            if (viewData.openHABWidget.getItem().getState().equals("ON")) {
                 switchSwitch.setChecked(true);
             } else {
                 switchSwitch.setChecked(false);
             }
         }
-        switchSwitch.setTag(textViewData.openHABWidget.getItem());
+        switchSwitch.setTag(viewData.openHABWidget.getItem());
         switchSwitch.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent motionEvent) {
                 Switch switchSwitch = (Switch)v;
@@ -347,18 +367,18 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getColorWidget(ViewData textViewData) {
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
-        ImageButton colorUpButton = (ImageButton)textViewData.widgetView.findViewById(R.id.colorbutton_up);
-        ImageButton colorDownButton = (ImageButton)textViewData.widgetView.findViewById(R.id.colorbutton_down);
-        ImageButton colorColorButton = (ImageButton)textViewData.widgetView.findViewById(R.id.colorbutton_color);
-        colorUpButton.setTag(textViewData.openHABWidget.getItem());
-        colorDownButton.setTag(textViewData.openHABWidget.getItem());
-        colorColorButton.setTag(textViewData.openHABWidget.getItem());
+    private View getColorWidget(ViewData viewData) {
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
+        ImageButton colorUpButton = (ImageButton)viewData.widgetView.findViewById(R.id.colorbutton_up);
+        ImageButton colorDownButton = (ImageButton)viewData.widgetView.findViewById(R.id.colorbutton_down);
+        ImageButton colorColorButton = (ImageButton)viewData.widgetView.findViewById(R.id.colorbutton_color);
+        colorUpButton.setTag(viewData.openHABWidget.getItem());
+        colorDownButton.setTag(viewData.openHABWidget.getItem());
+        colorColorButton.setTag(viewData.openHABWidget.getItem());
         colorUpButton.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent motionEvent) {
                 ImageButton colorButton = (ImageButton)v;
@@ -370,8 +390,8 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
         });
         colorDownButton.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent motionEvent) {
-                ImageButton colorButton = (ImageButton)v;
-                OpenHABItem colorItem = (OpenHABItem)colorButton.getTag();
+                ImageButton colorButton = (ImageButton) v;
+                OpenHABItem colorItem = (OpenHABItem) colorButton.getTag();
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
                     sendItemCommand(colorItem, "OFF");
                 return false;
@@ -399,18 +419,18 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    public ViewData getRollerShutterWidget(ViewData textViewData) {
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
-        ImageButton rollershutterUpButton = (ImageButton)textViewData.widgetView.findViewById(R.id.rollershutterbutton_up);
-        ImageButton rollershutterStopButton = (ImageButton)textViewData.widgetView.findViewById(R.id.rollershutterbutton_stop);
-        ImageButton rollershutterDownButton = (ImageButton)textViewData.widgetView.findViewById(R.id.rollershutterbutton_down);
-        rollershutterUpButton.setTag(textViewData.openHABWidget.getItem());
-        rollershutterStopButton.setTag(textViewData.openHABWidget.getItem());
-        rollershutterDownButton.setTag(textViewData.openHABWidget.getItem());
+    public View getRollerShutterWidget(ViewData viewData) {
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
+        ImageButton rollershutterUpButton = (ImageButton)viewData.widgetView.findViewById(R.id.rollershutterbutton_up);
+        ImageButton rollershutterStopButton = (ImageButton)viewData.widgetView.findViewById(R.id.rollershutterbutton_stop);
+        ImageButton rollershutterDownButton = (ImageButton)viewData.widgetView.findViewById(R.id.rollershutterbutton_down);
+        rollershutterUpButton.setTag(viewData.openHABWidget.getItem());
+        rollershutterStopButton.setTag(viewData.openHABWidget.getItem());
+        rollershutterDownButton.setTag(viewData.openHABWidget.getItem());
         rollershutterUpButton.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent motionEvent) {
                 ImageButton rollershutterButton = (ImageButton)v;
@@ -422,8 +442,8 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
         });
         rollershutterStopButton.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent motionEvent) {
-                ImageButton rollershutterButton = (ImageButton)v;
-                OpenHABItem rollershutterItem = (OpenHABItem)rollershutterButton.getTag();
+                ImageButton rollershutterButton = (ImageButton) v;
+                OpenHABItem rollershutterItem = (OpenHABItem) rollershutterButton.getTag();
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
                     sendItemCommand(rollershutterItem, "STOP");
                 return false;
@@ -439,50 +459,50 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-       return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getTextWidget(ViewData textViewData) {
-        textViewData.splitString = textViewData.openHABWidget.getLabel().split("\\[|\\]");
-        if (textViewData.labelTextView != null)
-            if (textViewData.splitString.length > 0) {
-                textViewData.labelTextView.setText(textViewData.splitString[0]);
+    private View getTextWidget(ViewData viewData) {
+        viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+        if (viewData.labelTextView != null)
+            if (viewData.splitString.length > 0) {
+                viewData.labelTextView.setText(viewData.splitString[0]);
             } else {
-                textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
+                viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
             }
 
-        if (textViewData.valueTextView != null)
-            if (textViewData.splitString.length > 1) {
+        if (viewData.valueTextView != null)
+            if (viewData.splitString.length > 1) {
                 // If value is not empty, show TextView
-                textViewData.valueTextView.setVisibility(View.VISIBLE);
-                textViewData.valueTextView.setText(textViewData.splitString[1]);
+                viewData.valueTextView.setVisibility(View.VISIBLE);
+                viewData.valueTextView.setText(viewData.splitString[1]);
             } else {
                 // If value is empty, hide TextView to fix vertical alignment of label
-                textViewData.valueTextView.setVisibility(View.GONE);
-                textViewData.valueTextView.setText("");
+                viewData.valueTextView.setVisibility(View.GONE);
+                viewData.valueTextView.setText("");
             }
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getSliderWidget(ViewData textViewData) {
-        textViewData.splitString = textViewData.openHABWidget.getLabel().split("\\[|\\]");
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.splitString[0]);
-        SeekBar sliderSeekBar = (SeekBar)textViewData.widgetView.findViewById(R.id.sliderseekbar);
-        if (textViewData.openHABWidget.hasItem()) {
-            sliderSeekBar.setTag(textViewData.openHABWidget.getItem());
+    private View getSliderWidget(ViewData viewData) {
+        viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.splitString[0]);
+        SeekBar sliderSeekBar = (SeekBar)viewData.widgetView.findViewById(R.id.sliderseekbar);
+        if (viewData.openHABWidget.hasItem()) {
+            sliderSeekBar.setTag(viewData.openHABWidget.getItem());
             int sliderState = 0;
             try {
-                sliderState = (int)Float.parseFloat(textViewData.openHABWidget.getItem().getState());
+                sliderState = (int)Float.parseFloat(viewData.openHABWidget.getItem().getState());
             } catch (NumberFormatException e) {
                 if (e != null) {
                     Crittercism.logHandledException(e);
                     Log.e(TAG, e.getMessage());
                 }
-                if (textViewData.openHABWidget.getItem().getState().equals("OFF")) {
+                if (viewData.openHABWidget.getItem().getState().equals("OFF")) {
                     sliderState = 0;
-                } else if (textViewData.openHABWidget.getItem().getState().equals("ON")) {
+                } else if (viewData.openHABWidget.getItem().getState().equals("ON")) {
                     sliderState = 100;
                 }
             }
@@ -504,38 +524,38 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             });
         }
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getImageWidget(ViewData textViewData) {
-        MySmartImageView imageImage = (MySmartImageView)textViewData.widgetView.findViewById(R.id.imageimage);
-        imageImage.setImageUrl(ensureAbsoluteURL(openHABBaseUrl, textViewData.openHABWidget.getUrl()), false,
+    private View getImageWidget(ViewData viewData) {
+        AutoRefreshImageView imageImage = (AutoRefreshImageView)viewData.widgetView.findViewById(R.id.imageimage);
+        imageImage.setImageUrl(ensureAbsoluteURL(openHABBaseUrl, viewData.openHABWidget.getUrl()), false,
                 openHABUsername, openHABPassword);
         //    		ViewGroup.LayoutParams imageLayoutParams = imageImage.getLayoutParams();
         //    		float imageRatio = imageImage.getDrawable().getIntrinsicWidth()/imageImage.getDrawable().getIntrinsicHeight();
         //    		imageLayoutParams.height = (int) (screenWidth/imageRatio);
         //    		imageImage.setLayoutParams(imageLayoutParams);
-        if (textViewData.openHABWidget.getRefresh() > 0) {
-            imageImage.setRefreshRate(textViewData.openHABWidget.getRefresh());
+        if (viewData.openHABWidget.getRefresh() > 0) {
+            imageImage.setRefreshRate(viewData.openHABWidget.getRefresh());
             refreshImageList.add(imageImage);
         }
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getChartWidget(ViewData textViewData, int screenWidth) {
-        MySmartImageView chartImage = (MySmartImageView)textViewData.widgetView.findViewById(R.id.chartimage);
-        OpenHABItem chartItem = textViewData.openHABWidget.getItem();
+    private View getChartWidget(ViewData viewData, int screenWidth) {
+        AutoRefreshImageView chartImage = (AutoRefreshImageView)viewData.widgetView.findViewById(R.id.chartimage);
+        OpenHABItem chartItem = viewData.openHABWidget.getItem();
         Random random = new Random();
         String chartUrl = "";
         if (chartItem != null) {
             if (chartItem.getType() == OpenHABItemType.Group) {
                 chartUrl = openHABBaseUrl + "rrdchart.png?groups=" + chartItem.getName() +
-                        "&period=" + textViewData.openHABWidget.getPeriod() + "&random=" +
+                        "&period=" + viewData.openHABWidget.getPeriod() + "&random=" +
                         String.valueOf(random.nextInt());
             } else {
                 chartUrl = openHABBaseUrl + "rrdchart.png?items=" + chartItem.getName() +
-                        "&period=" + textViewData.openHABWidget.getPeriod() + "&random=" +
+                        "&period=" + viewData.openHABWidget.getPeriod() + "&random=" +
                         String.valueOf(random.nextInt());
             }
         }
@@ -550,18 +570,18 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
         ViewGroup.LayoutParams chartLayoutParams = chartImage.getLayoutParams();
         chartLayoutParams.height = (int) (screenWidth/1.88);
         chartImage.setLayoutParams(chartLayoutParams);
-        if (textViewData.openHABWidget.getRefresh() > 0) {
-            chartImage.setRefreshRate(textViewData.openHABWidget.getRefresh());
+        if (viewData.openHABWidget.getRefresh() > 0) {
+            chartImage.setRefreshRate(viewData.openHABWidget.getRefresh());
             refreshImageList.add(chartImage);
         }
         Log.d(TAG, "chart size = " + chartLayoutParams.width + " " + chartLayoutParams.height);
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getVideoWidget(ViewData textViewData) {
-        VideoView videoVideo = (VideoView)textViewData.widgetView.findViewById(R.id.videovideo);
-        Log.d(TAG, "Opening video at " + textViewData.openHABWidget.getUrl());
+    private View getVideoWidget(ViewData viewData) {
+        VideoView videoVideo = (VideoView)viewData.widgetView.findViewById(R.id.videovideo);
+        Log.d(TAG, "Opening video at " + viewData.openHABWidget.getUrl());
         // TODO: This is quite dirty fix to make video look maximum available size on all screens
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         ViewGroup.LayoutParams videoLayoutParams = videoVideo.getLayoutParams();
@@ -573,38 +593,38 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             videoWidgetList.add(videoVideo);
         // Start video
         if (!videoVideo.isPlaying()) {
-            videoVideo.setVideoURI(Uri.parse(textViewData.openHABWidget.getUrl()));
+            videoVideo.setVideoURI(Uri.parse(viewData.openHABWidget.getUrl()));
             videoVideo.start();
         }
         Log.d(TAG, "Video height is " + videoVideo.getHeight());
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getWebWidget(ViewData textViewData) {
-        WebView webWeb = (WebView)textViewData.widgetView.findViewById(R.id.webweb);
-        if (textViewData.openHABWidget.getHeight() > 0) {
+    private View getWebWidget(ViewData viewData) {
+        WebView webWeb = (WebView)viewData.widgetView.findViewById(R.id.webweb);
+        if (viewData.openHABWidget.getHeight() > 0) {
             ViewGroup.LayoutParams webLayoutParams = webWeb.getLayoutParams();
-            webLayoutParams.height = textViewData.openHABWidget.getHeight() * 80;
+            webLayoutParams.height = viewData.openHABWidget.getHeight() * 80;
             webWeb.setLayoutParams(webLayoutParams);
         }
         webWeb.setWebViewClient(new WebViewClient());
-        webWeb.loadUrl(textViewData.openHABWidget.getUrl());
+        webWeb.loadUrl(viewData.openHABWidget.getUrl());
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getSelectionWidget(ViewData textViewData) {
+    private View getSelectionWidget(ViewData viewData) {
         int spinnerSelectedIndex = -1;
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.openHABWidget.getLabel());
-        Spinner selectionSpinner = (Spinner)textViewData.widgetView.findViewById(R.id.selectionspinner);
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.openHABWidget.getLabel());
+        Spinner selectionSpinner = (Spinner)viewData.widgetView.findViewById(R.id.selectionspinner);
         ArrayList<String> spinnerArray = new ArrayList<String>();
-        Iterator<OpenHABWidgetMapping> mappingIterator = textViewData.openHABWidget.getMappings().iterator();
+        Iterator<OpenHABWidgetMapping> mappingIterator = viewData.openHABWidget.getMappings().iterator();
         while (mappingIterator.hasNext()) {
             OpenHABWidgetMapping openHABWidgetMapping = mappingIterator.next();
             spinnerArray.add(openHABWidgetMapping.getLabel());
-            if (openHABWidgetMapping.getCommand().equals(textViewData.openHABWidget.getItem().getState())) {
+            if (openHABWidgetMapping.getCommand().equals(viewData.openHABWidget.getItem().getState())) {
                 spinnerSelectedIndex = spinnerArray.size() - 1;
             }
         }
@@ -612,7 +632,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
                 android.R.layout.simple_spinner_item, spinnerArray);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectionSpinner.setAdapter(spinnerAdapter);
-        selectionSpinner.setTag(textViewData.openHABWidget);
+        selectionSpinner.setTag(viewData.openHABWidget);
         if (spinnerSelectedIndex >= 0)
             selectionSpinner.setSelection(spinnerSelectedIndex);
 
@@ -620,10 +640,10 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int index, long id) {
                 Log.d(TAG, "Spinner item click on index " + index);
-                Spinner spinner = (Spinner)parent;
-                String selectedLabel = (String)spinner.getAdapter().getItem(index);
+                Spinner spinner = (Spinner) parent;
+                String selectedLabel = (String) spinner.getAdapter().getItem(index);
                 Log.d(TAG, "Spinner onItemSelected selected label = " + selectedLabel);
-                OpenHABWidget openHABWidget = (OpenHABWidget)parent.getTag();
+                OpenHABWidget openHABWidget = (OpenHABWidget) parent.getTag();
                 if (openHABWidget != null) {
                     Log.d(TAG, "Label selected = " + openHABWidget.getMapping(index).getLabel());
                     Iterator<OpenHABWidgetMapping> mappingIterator = openHABWidget.getMappings().iterator();
@@ -647,23 +667,23 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
-    private ViewData getSetpointWidget(ViewData textViewData) {
-        textViewData.splitString = textViewData.openHABWidget.getLabel().split("\\[|\\]");
-        if (textViewData.labelTextView != null)
-            textViewData.labelTextView.setText(textViewData.splitString[0]);
-        if (textViewData.valueTextView != null)
-            if (textViewData.splitString.length > 1) {
+    private View getSetpointWidget(ViewData viewData) {
+        viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+        if (viewData.labelTextView != null)
+            viewData.labelTextView.setText(viewData.splitString[0]);
+        if (viewData.valueTextView != null)
+            if (viewData.splitString.length > 1) {
                 // If value is not empty, show TextView
-                textViewData.valueTextView.setVisibility(View.VISIBLE);
-                textViewData.valueTextView.setText(textViewData.splitString[1]);
+                viewData.valueTextView.setVisibility(View.VISIBLE);
+                viewData.valueTextView.setText(viewData.splitString[1]);
             }
-        Button setPointMinusButton = (Button)textViewData.widgetView.findViewById(R.id.setpointbutton_minus);
-        Button setPointPlusButton = (Button)textViewData.widgetView.findViewById(R.id.setpointbutton_plus);
-        setPointMinusButton.setTag(textViewData.openHABWidget);
-        setPointPlusButton.setTag(textViewData.openHABWidget);
+        Button setPointMinusButton = (Button)viewData.widgetView.findViewById(R.id.setpointbutton_minus);
+        Button setPointPlusButton = (Button)viewData.widgetView.findViewById(R.id.setpointbutton_plus);
+        setPointMinusButton.setTag(viewData.openHABWidget);
+        setPointPlusButton.setTag(viewData.openHABWidget);
         setPointMinusButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 Log.d(TAG, "Minus");
@@ -692,7 +712,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
             }
         });
 
-        return textViewData;
+        return viewData.widgetView;
     }
 
     @Override
@@ -723,6 +743,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
     
     public void sendItemCommand(OpenHABItem item, String command) {
         try {
+            Log.d(TAG, String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
             StringEntity se = new StringEntity(command);
             mAsyncHttpClient.post(getContext(), item.getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
                 @Override

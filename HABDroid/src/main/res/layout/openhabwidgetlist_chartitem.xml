@@ -9,7 +9,7 @@
         android:background="?android:activatedBackgroundIndicator"
 
         >
-<org.openhab.habdroid.util.MySmartImageView
+<org.openhab.habdroid.util.AutoRefreshImageView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" 
         android:id="@+id/chartimage"

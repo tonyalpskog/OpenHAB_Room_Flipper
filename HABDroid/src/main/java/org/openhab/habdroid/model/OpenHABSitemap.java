@@ -42,7 +42,7 @@ import com.zenit.habclient.INavDrawerItem;
 import com.zenit.habclient.NavDrawerItemType;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.util.MySmartImageView;
+import org.openhab.habdroid.util.AutoRefreshImageView;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -157,7 +157,7 @@ public class OpenHABSitemap implements INavDrawerItem {
     public View getView(Context context, View convertView) {
         final RelativeLayout drawerItemView;
         TextView drawerItemLabelTextView;
-        MySmartImageView drawerItemImage;
+        AutoRefreshImageView drawerItemImage;
 
         if (convertView == null) {
             drawerItemView = new RelativeLayout(context);
@@ -169,7 +169,7 @@ public class OpenHABSitemap implements INavDrawerItem {
             drawerItemView = (RelativeLayout) convertView;
         }
         drawerItemLabelTextView = (TextView)drawerItemView.findViewById(R.id.itemlabel);
-        drawerItemImage = (MySmartImageView)drawerItemView.findViewById(R.id.itemimage);
+        drawerItemImage = (AutoRefreshImageView)drawerItemView.findViewById(R.id.itemimage);
         if (getLabel() != null && drawerItemLabelTextView != null) {
             drawerItemLabelTextView.setText(getLabel());
         } else {

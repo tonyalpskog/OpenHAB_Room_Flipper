@@ -38,21 +38,21 @@ import android.util.Log;
 
 import com.loopj.android.image.SmartImageView;
 
-public class MySmartImageView extends SmartImageView {
+public class AutoRefreshImageView extends SmartImageView {
 	private String myImageUrl;
 	private Timer imageRefreshTimer;
 	
 	boolean useImageCache = true;
 
-	public MySmartImageView(Context context) {
+	public AutoRefreshImageView(Context context) {
 		super(context);
 	}
 	
-    public MySmartImageView(Context context, AttributeSet attrs) {
+    public AutoRefreshImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MySmartImageView(Context context, AttributeSet attrs, int defStyle) {
+    public AutoRefreshImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -99,14 +99,14 @@ public class MySmartImageView extends SmartImageView {
     }
     
     public void setRefreshRate(int msec) {
-    	Log.i("MySmartImageView", "Setting image refresh rate to " + msec + " msec");
+    	Log.i("AutoRefreshImageView", "Setting image refresh rate to " + msec + " msec");
     	if (this.imageRefreshTimer != null)
     		this.imageRefreshTimer.cancel();
     	this.imageRefreshTimer = new Timer();
     	final Handler timerHandler = new Handler() {
     		public void handleMessage(Message msg) {
-				Log.i("MySmartImageView", "Refreshing image at " + MySmartImageView.this.myImageUrl);
-				MySmartImageView.this.setImage(new MyWebImage(MySmartImageView.this.myImageUrl, false));
+				Log.i("AutoRefreshImageView", "Refreshing image at " + AutoRefreshImageView.this.myImageUrl);
+				AutoRefreshImageView.this.setImage(new MyWebImage(AutoRefreshImageView.this.myImageUrl, false));
     		}
     	};
     	imageRefreshTimer.scheduleAtFixedRate(new TimerTask() {

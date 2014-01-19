@@ -3,6 +3,8 @@ package com.zenit.habclient;
 import android.content.Context;
 import android.widget.ImageView;
 
+import org.openhab.habdroid.model.OpenHABWidget;
+
 import java.util.UUID;
 
 /**
@@ -15,6 +17,7 @@ public class GraphicUnit {
     private float roomRelativeX = 0;
     private float roomRelativeY = 0;
     private GraphicUnitWidget view;
+    private OpenHABWidget openHABWidget;
     private boolean isSelected;
 
     public GraphicUnit(UnitType type) {

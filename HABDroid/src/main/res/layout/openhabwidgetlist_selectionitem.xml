@@ -16,7 +16,7 @@
         android:layout_height="wrap_content" 
 		android:layout_alignParentLeft="true"
       >
-<org.openhab.habdroid.util.MySmartImageView 
+<org.openhab.habdroid.util.AutoRefreshImageView
         android:paddingTop="6dip" 
         android:paddingBottom="6dip" 
         android:layout_width="wrap_content"

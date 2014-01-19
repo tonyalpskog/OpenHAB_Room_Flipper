@@ -13,11 +13,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.util.AutoRefreshImageView;
 
 /**
  * Created by Tony Alpskog in 2013.
  */
-public class GraphicUnitWidget extends ImageView implements View.OnClickListener, View.OnLongClickListener {
+public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnClickListener, View.OnLongClickListener {
 
     GraphicUnit gUnit;
     Bitmap originalBitmap;

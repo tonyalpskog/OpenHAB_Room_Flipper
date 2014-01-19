@@ -7,7 +7,7 @@
   android:paddingRight="@dimen/widgetlist_item_right_margin"
   android:background="@drawable/list_selector"
         >
-<org.openhab.habdroid.util.MySmartImageView 
+<org.openhab.habdroid.util.AutoRefreshImageView
         android:paddingTop="6dip" 
         android:paddingBottom="6dip" 
         android:layout_width="wrap_content"

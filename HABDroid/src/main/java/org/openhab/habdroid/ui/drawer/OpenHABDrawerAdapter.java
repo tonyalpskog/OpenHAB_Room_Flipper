@@ -29,24 +29,14 @@
 package org.openhab.habdroid.ui.drawer;
 
 import android.content.Context;
-import android.net.Uri;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.zenit.habclient.INavDrawerItem;
 import com.zenit.habclient.NavDrawerItemType;
 
-import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABSitemap;
-import org.openhab.habdroid.util.MySmartImageView;
-
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class OpenHABDrawerAdapter extends ArrayAdapter<INavDrawerItem> {
 
@@ -68,7 +58,7 @@ public class OpenHABDrawerAdapter extends ArrayAdapter<INavDrawerItem> {
 //TA - TODO: Move this to an implementation of INavDrawerItem => OpenHABSitemap
 //        final RelativeLayout drawerItemView;
 //        TextView drawerItemLabelTextView;
-//        MySmartImageView drawerItemImage;
+//        AutoRefreshImageView drawerItemImage;
 //        int drawerItemLayout;
 //
 //        OpenHABSitemap openHABSitemap = getItem(position);
@@ -90,7 +80,7 @@ public class OpenHABDrawerAdapter extends ArrayAdapter<INavDrawerItem> {
 //            drawerItemView = (RelativeLayout) convertView;
 //        }
 //        drawerItemLabelTextView = (TextView)drawerItemView.findViewById(R.id.itemlabel);
-//        drawerItemImage = (MySmartImageView)drawerItemView.findViewById(R.id.itemimage);
+//        drawerItemImage = (AutoRefreshImageView)drawerItemView.findViewById(R.id.itemimage);
 //        if (openHABSitemap.getLabel() != null && drawerItemLabelTextView != null) {
 //            drawerItemLabelTextView.setText(openHABSitemap.getLabel());
 //        } else {
