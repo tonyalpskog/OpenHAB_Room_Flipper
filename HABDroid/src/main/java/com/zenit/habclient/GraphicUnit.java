@@ -3,7 +3,9 @@ package com.zenit.habclient;
 import android.content.Context;
 import android.widget.ImageView;
 
+import org.openhab.habdroid.model.OpenHABItemSet;
 import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.UUID;
 
@@ -13,19 +15,24 @@ import java.util.UUID;
 public class GraphicUnit {
 
     private UUID id;
-    private UnitType type;
+//    private OpenHABWidgetType type;
     private float roomRelativeX = 0;
     private float roomRelativeY = 0;
     private GraphicUnitWidget view;
-    private OpenHABWidget openHABWidget;
+
+    private OpenHABWidget mOpenHABWidget;
     private boolean isSelected;
 
     public GraphicUnit(UnitType type) {
-        this(type, 3, 4);
+        this(3, 4);
+        //this.type = type;
     }
 
-    public GraphicUnit(UnitType type, int roomRelativeX, int roomRelativeY) {
-        this.type = type;
+    public GraphicUnit(OpenHABWidget openHABWidget) {
+        this(3, 4);
+        mOpenHABWidget = openHABWidget;
+    }
+    public GraphicUnit(int roomRelativeX, int roomRelativeY) {
         this.view = null;
         isSelected = false;
         this.roomRelativeX = roomRelativeX;
@@ -71,13 +78,13 @@ public class GraphicUnit {
         return id;
     }
 
-    public UnitType getType() {
-        return type;
+    public OpenHABWidgetType getType() {
+        return mOpenHABWidget.getType();
     }
 
-    public void setType(UnitType type) {
-        this.type = type;
-    }
+//    public void setType(UnitType type) {
+//        this.type = type;
+//    }
 
     public float getRoomRelativeX() {
         return roomRelativeX;
@@ -94,4 +101,13 @@ public class GraphicUnit {
     public void setRoomRelativeY(float roomRelativeY) {
         this.roomRelativeY = roomRelativeY;
     }
+
+    public OpenHABWidget getOpenHABWidget() {
+        return mOpenHABWidget;
+    }
+
+    public void setOpenHABWidget(OpenHABWidget openHABWidget) {
+        mOpenHABWidget = openHABWidget;
+    }
+
 }

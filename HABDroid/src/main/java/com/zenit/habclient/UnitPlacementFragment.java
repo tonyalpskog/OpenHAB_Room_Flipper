@@ -207,11 +207,6 @@ public class UnitPlacementFragment extends Fragment {
         Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
         //TA: Just a test
         List<CharSequence> itemsList = new ArrayList<CharSequence>();
-        itemsList.add("Switch");
-        itemsList.add("Dimmer");
-        itemsList.add("Heating");
-        itemsList.add("Vent");
-        itemsList.add("Socket");
         EnumSet<OpenHABWidgetType> unitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color);
         List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();
         if(mOpenHABWidgetRoomProvider != null) {
@@ -222,6 +217,14 @@ public class UnitPlacementFragment extends Fragment {
                 itemsList.add(next.getType().Name + ": " + next.getLabel()/* getItem().getName()*/);
             }
         }
+        final List<OpenHABWidget> widgetList2 = widgetList;
+
+        itemsList.add("Switch");
+        itemsList.add("Dimmer");
+        itemsList.add("Heating");
+        itemsList.add("Vent");
+        itemsList.add("Socket");
+
         CharSequence[] items = (CharSequence[]) itemsList.toArray(new CharSequence[itemsList.size()]);
         Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
 
@@ -232,26 +235,26 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-
-                switch(item)
-                {
-                    case 0:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Switch), 150, 150);
-                        break;
-                    case 1:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Dimmer), 150, 150);
-                        break;
-                    case 2:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.RoomHeater), 150, 150);
-                        break;
-                    case 3:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Vent), 150, 150);
-                        break;
-                    case 4:
-                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Socket), 150, 150);
-                        break;
-
-                }
+                roomView.addNewUnitToRoom(new GraphicUnit(widgetList2.get(item)), 150, 150);
+//                switch(item)
+//                {
+//                    case 0:
+//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Switch), 150, 150);
+//                        break;
+//                    case 1:
+//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Dimmer), 150, 150);
+//                        break;
+//                    case 2:
+//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.RoomHeater), 150, 150);
+//                        break;
+//                    case 3:
+//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Vent), 150, 150);
+//                        break;
+//                    case 4:
+//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Socket), 150, 150);
+//                        break;
+//
+//                }
                 dialog.dismiss();
             }
         });
@@ -288,7 +291,7 @@ public class UnitPlacementFragment extends Fragment {
                         multiUnitSelection(false);
                         break;
                     case 2:
-                        ArrayList<UnitType> selectedTypes = new ArrayList<UnitType>();
+                        ArrayList<OpenHABWidgetType> selectedTypes = new ArrayList<OpenHABWidgetType>();
 
                         Iterator iterator = roomView.getRoom().getUnitIterator();
                         while(iterator.hasNext()) {

@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,23 +32,24 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
         this(context);
         gUnit = graphicUnit;
 
-        int imageResource = R.drawable.ic_lightbulb;
-        switch (gUnit.getType()) {
-            case Switch:
-                imageResource = R.drawable.ic_lightbulb;
-                break;
-            case Dimmer:
-                break;
-            case RoomHeater:
-                break;
-            case Vent:
-                imageResource = R.drawable.ic_unit_fan;
-                break;
-        }
-
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), imageResource);
-        originalBitmap = bitmap;
-        setImageBitmap(bitmap);
+//        int imageResource = R.drawable.ic_lightbulb;
+//        switch (gUnit.getType()) {
+//            case Switch:
+//                imageResource = R.drawable.ic_lightbulb;
+//                break;
+//            case Dimmer:
+//                break;
+//            case RoomHeater:
+//                break;
+//            case Vent:
+//                imageResource = R.drawable.ic_unit_fan;
+//                break;
+//        }
+        String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+        setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+//        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), imageResource);
+//        originalBitmap = bitmap;
+//        setImageBitmap(bitmap);
         setOnLongClickListener(this);
         setOnClickListener(this);
     }
@@ -73,8 +75,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
 
     public void drawSelection(boolean selected) {
         if(selected) {
-            Bitmap bitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
+//            Bitmap bitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Bitmap bitmap = getDrawingCache().copy(Bitmap.Config.ARGB_8888, true);
             Rect bounds = getDrawable().getBounds();
             int width = bounds.width();
             int height = bounds.height();
@@ -92,7 +94,9 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             canvas.drawCircle(canvas.getHeight()/2, canvas.getWidth()/2, (float) Math.floor(bitmapHeight/2) - Math.round(paint.getStrokeWidth()/2), paint);
             setImageBitmap(bitmap);
         } else {
-            setImageBitmap(originalBitmap);
+//            setImageBitmap(originalBitmap);
+            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+            setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
         }
     }
 }
