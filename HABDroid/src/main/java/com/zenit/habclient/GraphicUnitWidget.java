@@ -8,10 +8,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AutoRefreshImageView;
@@ -31,25 +34,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
         this(context);
         gUnit = graphicUnit;
-
-//        int imageResource = R.drawable.ic_lightbulb;
-//        switch (gUnit.getType()) {
-//            case Switch:
-//                imageResource = R.drawable.ic_lightbulb;
-//                break;
-//            case Dimmer:
-//                break;
-//            case RoomHeater:
-//                break;
-//            case Vent:
-//                imageResource = R.drawable.ic_unit_fan;
-//                break;
-//        }
         String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
         setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
-//        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), imageResource);
-//        originalBitmap = bitmap;
-//        setImageBitmap(bitmap);
         setOnLongClickListener(this);
         setOnClickListener(this);
     }
@@ -61,22 +47,28 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     @Override
     public boolean onLongClick(View v) {
        Log.d("G-Click", "Long click detected");
-       ClipData clipData = ClipData.newPlainText("label","text");
-       this.startDrag(clipData, new DragShadow(this), this, 0);
+       if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+           ClipData clipData = ClipData.newPlainText("label","text");
+           this.startDrag(clipData, new DragShadow(this), this, 0);
+       }
        return false;
     }
 
     @Override
     public void onClick(View v) {
-        Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
-        gUnit.setSelected(!gUnit.isSelected());
-        Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
+        Log.d("G-Click", "Short click detected");
+        if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+            Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
+            gUnit.setSelected(!gUnit.isSelected());
+            Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
+        } else if(HABApplication.getAppMode() == ApplicationMode.RoomFlipper) {
+            Toast.makeText(getContext(), "A unit action dialog will be shown here", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void drawSelection(boolean selected) {
         if(selected) {
-//            Bitmap bitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
-            Bitmap bitmap = getDrawingCache().copy(Bitmap.Config.ARGB_8888, true);
+            Bitmap bitmap = drawableToBitmap(getDrawable()).copy(Bitmap.Config.ARGB_8888, true);
             Rect bounds = getDrawable().getBounds();
             int width = bounds.width();
             int height = bounds.height();
@@ -98,5 +90,18 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
             setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
         }
+    }
+
+    private Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

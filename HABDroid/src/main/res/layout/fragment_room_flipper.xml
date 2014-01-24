@@ -33,7 +33,7 @@
 
             <com.zenit.habclient.UnitContainerView
                 android:id="@+id/flipper_image_1"
-                android:src="@drawable/room_extra"
+                android:src="@drawable/added_room"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/str_img1"
@@ -43,7 +43,7 @@
 
             <com.zenit.habclient.UnitContainerView
                 android:id="@+id/flipper_image_2"
-                android:src="@drawable/room_extra"
+                android:src="@drawable/added_room"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/str_img2"

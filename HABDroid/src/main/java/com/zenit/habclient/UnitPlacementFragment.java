@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
@@ -32,18 +31,11 @@ import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -54,10 +46,12 @@ public class UnitPlacementFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String TAG = "UnitPlacementFragment";
 
     private View fragmentView;
     private UnitContainerView roomView;
-    private OpenHABWidgetProvider mOpenHABWidgetRoomProvider = null;
+    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color);
+    //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -91,6 +85,7 @@ public class UnitPlacementFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        HABApplication.setAppMode(ApplicationMode.UnitPlacement);
         Log.d("LifeCycle", "UnitPlacementFragment.onCreateView() room<" + ((HABApplication) getActivity().getApplication()).getConfigRoom().getId() + ">");
 
         fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
@@ -112,23 +107,22 @@ public class UnitPlacementFragment extends Fragment {
 
     private void loadOpenHABItems(Context context) {
         AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
-        asyncHttpClient.get(HABApplication.getOpenHABSetting().getBaseUrl() + "rest/sitemaps/demo/" + roomView.getRoom().getName(), new DocumentHttpResponseHandler() {
+        final String RESTaddress = HABApplication.getOpenHABSetting().getBaseUrl() + "rest/sitemaps/demo/" + roomView.getRoom().getSitemapId();
+        asyncHttpClient.get(RESTaddress, new DocumentHttpResponseHandler() {
             @Override
             public void onSuccess(Document document) {
                 if(document != null) {
                     Log.d("UnitPlacementFragment", "showAddUnitDialog.DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
                     Node rootNode = document.getFirstChild();
-                    if(mOpenHABWidgetRoomProvider == null)
-                        mOpenHABWidgetRoomProvider = new OpenHABWidgetProvider();
 
-                    mOpenHABWidgetRoomProvider.setOpenHABWidgets(new OpenHABWidgetDataSource(rootNode));
+                    HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(new OpenHABWidgetDataSource(rootNode));
                 } else {
-                    Log.e("UnitPlacementFragment", "showAddUnitDialog() -> Got a null response from openHAB");
+                    Log.e("UnitPlacementFragment.loadOpenHABItems()", RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
                 }
             }
             @Override
             public void onFailure(Throwable e, String errorResponse) {
-                Log.e("get_items", "asyncHttpClient.onFailure - " + e.toString());
+                Log.e("UnitPlacementFragment.loadOpenHABItems()", RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
             }
         });
     }
@@ -193,6 +187,9 @@ public class UnitPlacementFragment extends Fragment {
             case R.id.action_add:
                 showAddUnitDialog(getActivity());
                 return true;
+            case R.id.action_remove:
+                removeSelectedUnits();
+                return true;
             case R.id.action_selection:
                 unitSelectionDialog(getActivity());
                 return true;
@@ -201,32 +198,58 @@ public class UnitPlacementFragment extends Fragment {
         }
     }
 
-    private void showAddUnitDialog(Context context) {
-//        final CharSequence[] items = {"Switch", "Dimmer", "Heating", "Vent", "Socket"};
+    private void removeSelectedUnits() {
+        List<GraphicUnit> unitsToBeRemovedList = new ArrayList<GraphicUnit>();
 
-        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
-        //TA: Just a test
+        Iterator iterator = roomView.getRoom().getUnitIterator();
+        while(iterator.hasNext()) {
+            GraphicUnit gu = (GraphicUnit) iterator.next();
+            if(gu.isSelected())
+                unitsToBeRemovedList.add(gu);
+        }
+
+        GraphicUnit[] unitsToBeRemovedArray =  unitsToBeRemovedList.toArray(new GraphicUnit[0]);
+        for(GraphicUnit gu : unitsToBeRemovedArray)
+            roomView.getRoom().removeUnit(gu);
+
+        roomView.redrawAllUnits();//TA: TODO - Ugly way too remove a single View.
+    }
+
+    private void showAddUnitDialog(Context context) {
+//        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
+        //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
         List<CharSequence> itemsList = new ArrayList<CharSequence>();
-        EnumSet<OpenHABWidgetType> unitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color);
-        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();
-        if(mOpenHABWidgetRoomProvider != null) {
-            widgetList = mOpenHABWidgetRoomProvider.getWidgetList(unitTypes);
-            Iterator<OpenHABWidget> iterator = widgetList.iterator();
-            while(iterator.hasNext()) {
-                OpenHABWidget next = iterator.next();
+        List<String> widgetIdList = new ArrayList<String>();
+        String strLogAll = "showAddUnitDialog() -> Full list: ";
+        String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
+
+        if(!HABApplication.getOpenHABWidgetProvider().hasWidget(roomView.getRoom().getHABGroupId()))
+            loadOpenHABItems(context);
+
+        List<OpenHABWidget> widgetList = HABApplication.getOpenHABWidgetProvider().getWidget(roomView.getRoom().getHABGroupId()).getChildren();
+        Iterator<OpenHABWidget> iterator = widgetList.iterator();
+        while(iterator.hasNext()) {
+            OpenHABWidget next = iterator.next();
+            strLogAll += next.getId() + ", ";
+            if(mUnitTypes.contains(next.getType()) && !roomView.getRoom().contains(next)){
+                widgetIdList.add(next.getId());
                 itemsList.add(next.getType().Name + ": " + next.getLabel()/* getItem().getName()*/);
             }
+            else
+                strLogRemoved += next.getId() + ", ";
         }
-        final List<OpenHABWidget> widgetList2 = widgetList;
+        Log.d(TAG, strLogAll);
+        Log.d(TAG, strLogRemoved);
 
-        itemsList.add("Switch");
-        itemsList.add("Dimmer");
-        itemsList.add("Heating");
-        itemsList.add("Vent");
-        itemsList.add("Socket");
+        if(itemsList.size() < 1) {
+            Toast.makeText(context, "There are no more items for this room.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final List<String> finalWidgetIdList = widgetIdList;
 
         CharSequence[] items = (CharSequence[]) itemsList.toArray(new CharSequence[itemsList.size()]);
-        Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
 
         AlertDialog addUnitDialog;
         // Creating and Building the Dialog
@@ -235,27 +258,9 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                roomView.addNewUnitToRoom(new GraphicUnit(widgetList2.get(item)), 150, 150);
-//                switch(item)
-//                {
-//                    case 0:
-//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Switch), 150, 150);
-//                        break;
-//                    case 1:
-//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Dimmer), 150, 150);
-//                        break;
-//                    case 2:
-//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.RoomHeater), 150, 150);
-//                        break;
-//                    case 3:
-//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Vent), 150, 150);
-//                        break;
-//                    case 4:
-//                        roomView.addNewUnitToRoom(new GraphicUnit(UnitType.Socket), 150, 150);
-//                        break;
-//
-//                }
-                dialog.dismiss();
+            roomView.addNewUnitToRoom(new GraphicUnit(finalWidgetIdList.get(item)), 150, 150);
+            Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalWidgetIdList.get(item));
+            dialog.dismiss();
             }
         });
         addUnitDialog = builder.create();

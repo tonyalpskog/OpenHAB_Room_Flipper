@@ -49,6 +49,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        HABApplication.setAppMode(ApplicationMode.RoomFlipper);
         View rootView = inflater.inflate(R.layout.fragment_room_flipper, container, false);
         mRoomLabel = (TextView) rootView.findViewById(R.id.room_flipper_section_label);
         mRoomViewFlipper = (RoomFlipper) rootView.findViewById(R.id.flipper);

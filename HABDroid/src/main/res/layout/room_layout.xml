@@ -9,7 +9,7 @@
         android:id="@+id/dropImage"
         android:layout_below="@+id/room_config_section_label"
         android:focusableInTouchMode="false"
-        android:src="@drawable/room_extra"
+        android:src="@drawable/added_room"
         android:layout_centerInParent="true"
         android:layout_gravity="center" />
 

@@ -33,6 +33,8 @@ import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -64,6 +66,7 @@ public class OpenHABWidget {
     private Integer iconcolor;
     private Integer labelcolor;
     private Integer valuecolor;
+    private UUID updateUUID;
 
 	public OpenHABWidget() {
 		this.children = new ArrayList<OpenHABWidget>();
@@ -383,4 +386,13 @@ public class OpenHABWidget {
             return "#FFA500";
         return colorName;
     }
+
+    public UUID getUpdateUUID() {
+        return updateUUID;
+    }
+
+    public void setUpdateUUID(UUID updateUUID) {
+        this.updateUUID = updateUUID;
+    }
+
 }

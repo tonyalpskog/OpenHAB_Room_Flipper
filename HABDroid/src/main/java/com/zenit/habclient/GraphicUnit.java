@@ -20,7 +20,8 @@ public class GraphicUnit {
     private float roomRelativeY = 0;
     private GraphicUnitWidget view;
 
-    private OpenHABWidget mOpenHABWidget;
+    private String mWidgetId;
+    private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
     public GraphicUnit(UnitType type) {
@@ -28,9 +29,10 @@ public class GraphicUnit {
         //this.type = type;
     }
 
-    public GraphicUnit(OpenHABWidget openHABWidget) {
+    public GraphicUnit(String widgetId) {
         this(3, 4);
-        mOpenHABWidget = openHABWidget;
+        mWidgetId = widgetId;
+        mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider().getUpdateUUID();
     }
     public GraphicUnit(int roomRelativeX, int roomRelativeY) {
         this.view = null;
@@ -52,6 +54,8 @@ public class GraphicUnit {
 //            );
 //            params.setMargins(relativeLeft, relativeTop, 0, 0);
 //            view.setLayoutParams(params);
+            view.setMinimumWidth(64);
+            view.setMinimumHeight(64);
             view.setTag(id);
             view.setSelected(isSelected);
         }
@@ -79,7 +83,7 @@ public class GraphicUnit {
     }
 
     public OpenHABWidgetType getType() {
-        return mOpenHABWidget.getType();
+        return getOpenHABWidget().getType();
     }
 
 //    public void setType(UnitType type) {
@@ -103,11 +107,11 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return mOpenHABWidget;
+        return HABApplication.getOpenHABWidgetProvider().getWidget(mWidgetId);
     }
 
-    public void setOpenHABWidget(OpenHABWidget openHABWidget) {
-        mOpenHABWidget = openHABWidget;
+    public void setOpenHABWidget(String widgetID) {
+        mWidgetId = widgetID;
     }
 
 }

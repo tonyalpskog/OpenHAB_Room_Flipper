@@ -5,6 +5,10 @@
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/action_add_unit"
         android:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_remove"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/action_remove_unit"
+        android:showAsAction="ifRoom"/>
     <item android:id="@+id/action_selection"
         android:icon="@drawable/ic_action_item_selection"
         android:title="@string/action_selection"

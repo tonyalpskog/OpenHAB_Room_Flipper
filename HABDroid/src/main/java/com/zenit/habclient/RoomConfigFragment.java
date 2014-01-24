@@ -28,7 +28,7 @@ public class RoomConfigFragment extends Fragment {
     private Room mCurrentRoom;
     private Button mSaveButton;
     private EditText mRoomNameText;
-    private final Room NULL_ROOM = new Room("<Undefined room>", null);
+    private final Room NULL_ROOM = new Room("<Undefined room>", null);//TA: TODO - Fix name problem. (now sitemapID)
     HashMap<Direction, Spinner> mSpinnerHashMap;
 
 //    private OnFragmentInteractionListener mListener;
@@ -46,6 +46,7 @@ public class RoomConfigFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HABApplication.setAppMode(ApplicationMode.RoomEdit);
     }
 
     @Override
@@ -213,6 +214,6 @@ public class RoomConfigFragment extends Fragment {
         }
 
         if(mRoomNameText.getText().toString().length() > 0)
-            mCurrentRoom.setName(mRoomNameText.getText().toString());
+            mCurrentRoom.setHABGroupId(mRoomNameText.getText().toString());
     }
 }

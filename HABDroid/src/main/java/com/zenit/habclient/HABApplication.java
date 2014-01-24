@@ -15,6 +15,17 @@ public class HABApplication extends Application {
     private UUID currentFlipperRoom = null;
     private RuleOperationProvider mRuleOperationProvider = null;
 
+    private static ApplicationMode mAppMode = ApplicationMode.Unknown;
+
+
+    public static ApplicationMode getAppMode() {
+        return mAppMode;
+    }
+
+    public static void setAppMode(ApplicationMode appMode) {
+        mAppMode = appMode;
+    }
+
     private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
     public static OpenHABWidgetProvider getOpenHABWidgetProvider() {
         if(mOpenHABWidgetProvider == null)

@@ -25,6 +25,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     OnContainerBackgroundDrawn mOnContainerBackgroundDrawn;
     private final String TAG = "UnitContainerView";
 
+    //TA: TODO - Will disposal of unused RoomImageView save some memory?
     private RoomImageView roomImage;
     private Room mRoom;
     private List<View> addedUnitViews;
@@ -93,7 +94,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         return false;
     }
 
-    private void redrawAllUnits() {
+    public void redrawAllUnits() {
         Log.d(TAG, "redrawAllUnits() - method called");
         if(mRoom == null || mBlockUnitRedraw)
             return;
