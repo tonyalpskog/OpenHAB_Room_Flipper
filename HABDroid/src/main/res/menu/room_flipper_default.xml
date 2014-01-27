@@ -4,9 +4,13 @@
     <item android:id="@+id/action_edit_room_from_flipper"
         android:icon="@android:drawable/ic_menu_edit"
         android:title="@string/action_edit_room"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
     <item android:id="@+id/action_add_room_from_flipper"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/action_add_room"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
+    <item android:id="@+id/action_speak_room_from_flipper"
+        android:icon="@android:drawable/ic_btn_speak_now"
+        android:title="@string/action_speak_room"
+        android:showAsAction="always"/>
 </menu>

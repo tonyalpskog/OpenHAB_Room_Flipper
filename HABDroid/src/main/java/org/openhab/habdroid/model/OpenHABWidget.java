@@ -395,4 +395,7 @@ public class OpenHABWidget {
         this.updateUUID = updateUUID;
     }
 
+    public void removeAllChildren() {
+        children.clear();
+    }
 }

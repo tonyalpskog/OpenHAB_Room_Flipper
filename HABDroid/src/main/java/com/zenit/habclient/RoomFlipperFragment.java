@@ -6,7 +6,9 @@ package com.zenit.habclient;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -99,6 +101,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 Log.d("Add Room", "onOptionsItemSelected() - Add room<" + roomToAdd.getId() + ">");
                 mApplication.setConfigRoom(roomToAdd);
                 ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
+                return true;
+            case R.id.action_speak_room_from_flipper:
+                ((MainActivity) getActivity()).startVoiceRecognition(mRoomViewFlipper);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

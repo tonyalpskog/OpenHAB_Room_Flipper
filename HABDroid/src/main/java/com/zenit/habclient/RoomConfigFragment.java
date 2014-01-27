@@ -28,7 +28,7 @@ public class RoomConfigFragment extends Fragment {
     private Room mCurrentRoom;
     private Button mSaveButton;
     private EditText mRoomNameText;
-    private final Room NULL_ROOM = new Room("<Undefined room>", null);//TA: TODO - Fix name problem. (now sitemapID)
+    private final Room NULL_ROOM = new Room(null, "<Undefined room>", null);//TA: TODO - Fix name problem. (now sitemapID)
     HashMap<Direction, Spinner> mSpinnerHashMap;
 
 //    private OnFragmentInteractionListener mListener;
@@ -69,7 +69,13 @@ public class RoomConfigFragment extends Fragment {
         List<Room> roomArrayList = new ArrayList<Room>(mRoomProvider.roomHash.size());
         Iterator iterator = mRoomProvider.roomHash.values().iterator();
         while(iterator.hasNext()) {
-            roomArrayList.add((Room) iterator.next());
+            Room room = (Room) iterator.next();
+
+//TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
+//            if(room.getGroupItemName() == null)
+//                HABApplication.getRestCommunication().requestOpenHABSitemap(inflater.getContext(), room.getSitemapId());
+
+            roomArrayList.add(room);
         }
         roomArrayList.add(NULL_ROOM);
 
@@ -214,6 +220,6 @@ public class RoomConfigFragment extends Fragment {
         }
 
         if(mRoomNameText.getText().toString().length() > 0)
-            mCurrentRoom.setHABGroupId(mRoomNameText.getText().toString());
+            mCurrentRoom.setName(mRoomNameText.getText().toString());
     }
 }

@@ -4,12 +4,24 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.ArrayAdapter;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.habdroid.model.OpenHABWidgetType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -47,6 +59,13 @@ public class MainActivity extends Activity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
         Fragment newFragment = null;
+
+        HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
+        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetType.Group)) {
+            if(!widget.hasChildren())
+                HABApplication.getRestCommunication().requestOpenHABSitemap(this,  widget);
+        }
+
         switch (position) {
             case 0:
                 fragmentManager.beginTransaction()
@@ -116,5 +135,46 @@ public class MainActivity extends Activity
 
     public void selectNavigationDrawerItem(int itemIndex) {
         mNavigationDrawerFragment.selectItem(itemIndex);
+    }
+
+    public static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
+
+
+    private RoomFlipper mRoomFlipper;
+
+    public void startVoiceRecognition(RoomFlipper roomFlipper) {
+        mRoomFlipper = roomFlipper;
+
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition demo");
+        startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Fill the list view with the strings the recognizer thought it
+            // could have heard
+            List<Room> roomList = new ArrayList<Room>();
+            roomList.addAll(((HABApplication)getApplication()).getRoomProvider().roomHash.values());
+            Iterator<Room> iterator = roomList.iterator();
+            Map<String, Room> roomNameMap = new HashMap<String, Room>();
+            while (iterator.hasNext()) {
+                Room nextRoom = iterator.next();
+                roomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
+            }
+
+            ArrayList matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            for(String match : (String[]) matches.toArray(new String[0]))
+                if(roomNameMap.keySet().contains(match.toUpperCase())) {
+                    //Got a speech match.
+                    Room roomToShow = roomNameMap.get(match.toUpperCase());
+                    Log.d("Speak show Room", "showRoom() - Show room<" + roomToShow.getId() + ">");
+                    mRoomFlipper.showRoom(roomToShow);
+                }
+
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

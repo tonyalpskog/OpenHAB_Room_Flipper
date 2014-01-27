@@ -5,8 +5,6 @@ import android.util.Log;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
@@ -20,16 +18,20 @@ public class Room {
     private String mName;
     private UUID id;
 
-    private String mHABGroupId;
-    private String mSitemapId;
+    private String mGroupItemName;
+//    private String mSitemapId;
     private HashMap<UUID, GraphicUnit> unitHash = null;
     private Bitmap mBackgroundImage = null;//TA: TODO - Add a resource member as an alternative to a Bitmap. Bitmap may still be used as external image input and later on be replaced by a path or URL to an image.
     private static String TAG = "Room";
     private UUID mLatestWidgetUpdateUUID;
+    private OpenHABWidget mLocalWidget;
 
     //TA: TODO - Add a second constructor that replaces the Bitmap with an integer (resource ID) in order to save some memory.
-    public Room(String sitemapId, Bitmap roomImage) {
-        mSitemapId = sitemapId;
+    public Room(String groupItemName, String name, Bitmap roomImage) {
+        mGroupItemName = groupItemName;
+        if(groupItemName == null || groupItemName.isEmpty())
+            mLocalWidget = new OpenHABWidget();
+        mName = name;
         mBackgroundImage = roomImage;
         id = UUID.randomUUID();
         roomAlignment = new HashMap<Direction, Room>(6);
@@ -44,21 +46,21 @@ public class Room {
         return roomAlignment.get(direction);
     }
 
-    public String getHABGroupId() {
-        return mHABGroupId;
+    public String getGroupItemName() {
+        return mGroupItemName;
     }
 
-    public void setHABGroupId(String HABGroupId) {
-        mHABGroupId = HABGroupId;
+    public void setGroupItemName(String groupItemName) {
+        mGroupItemName = groupItemName;
     }
 
-    public String getSitemapId() {
-        return mSitemapId;
-    }
-
-    public void setSitemapId(String sitemapId) {
-        mSitemapId = sitemapId;
-    }
+//    public String getSitemapId() {
+//        return mSitemapId;
+//    }
+//
+//    public void setSitemapId(String sitemapId) {
+//        mSitemapId = sitemapId;
+//    }
 
     public UUID isUpdated() {
         return mLatestWidgetUpdateUUID;
@@ -110,17 +112,33 @@ public class Room {
     }
 
     public String getName() {
-        if(HABApplication.getOpenHABWidgetProvider().hasWidget(mHABGroupId))
-            return HABApplication.getOpenHABWidgetProvider().getWidget(mHABGroupId).getLabel();
-
-        return "<No name>";
+        return mName;
+//        if(HABApplication.getOpenHABWidgetProvider().hasWidget(mGroupItemName)) {
+//            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
+//            if(widget.getLabel() == null) {
+//                Log.w(HABApplication.GetLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.GetLogTag(1), mGroupItemName));
+//                return "<No label>";
+//            }
+//            Log.d(HABApplication.GetLogTag(), String.format("Group ID '%s' got label: '%s'", mGroupItemName, widget.getLabel()));
+//            return widget.getLabel();
+//        }
+//
+//        Log.w(HABApplication.GetLogTag(), String.format("\n%s\nNo Room widget found with ID '%s'", HABApplication.GetLogTag(1), mGroupItemName));
+//        return "<No widget>";
     }
 
-//    public void setName(String name) {
-//        this.mName = name;
-//    }
+    public void setName(String name) {
+        this.mName = name;
+    }
 
     public String toString() {
         return mName;
+    }
+
+    public OpenHABWidget getRoomWidget() {
+        if(mLocalWidget != null)
+            return mLocalWidget;
+
+        return HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
     }
 }

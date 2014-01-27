@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.zenit.habclient.HABApplication;
 
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
@@ -23,19 +24,20 @@ public class NotificationDeletedBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive()");
+        Log.d(HABApplication.GetLogTag(), "Intent received");
         if (intent.hasExtra("notificationId")) {
             gcm = GoogleCloudMessaging.getInstance(context);
             sendBundle = new Bundle();
             sendBundle.putString("type", "hideNotification");
             sendBundle.putString("notificationId", String.valueOf(intent.getExtras().getInt("notificationId")));
+            Log.d(HABApplication.GetLogTag(), "notificationId = " + intent.getExtras().getInt("notificationId"));
             new AsyncTask<Void, Void, Void>() {
                 protected Void doInBackground(Void... params) {
                     try {
                         gcm.send(OpenHABMainActivity.GCM_SENDER_ID + "@gcm.googleapis.com",
                                 "1", sendBundle);
                     } catch (IOException e) {
-                        Log.e(TAG, e.getMessage());
+                        Log.e(HABApplication.GetLogTag(), e.getMessage());
                     }
                     return null;
                 }

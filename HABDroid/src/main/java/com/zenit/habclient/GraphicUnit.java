@@ -3,7 +3,6 @@ package com.zenit.habclient;
 import android.content.Context;
 import android.widget.ImageView;
 
-import org.openhab.habdroid.model.OpenHABItemSet;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 
@@ -20,7 +19,7 @@ public class GraphicUnit {
     private float roomRelativeY = 0;
     private GraphicUnitWidget view;
 
-    private String mWidgetId;
+    private String mItemName;
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
@@ -29,9 +28,9 @@ public class GraphicUnit {
         //this.type = type;
     }
 
-    public GraphicUnit(String widgetId) {
+    public GraphicUnit(String itemName) {
         this(3, 4);
-        mWidgetId = widgetId;
+        mItemName = itemName;
         mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider().getUpdateUUID();
     }
     public GraphicUnit(int roomRelativeX, int roomRelativeY) {
@@ -107,11 +106,11 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return HABApplication.getOpenHABWidgetProvider().getWidget(mWidgetId);
+        return HABApplication.getOpenHABWidgetProvider().getWidget(mItemName);
     }
 
-    public void setOpenHABWidget(String widgetID) {
-        mWidgetId = widgetID;
+    public void setOpenHABWidget(String itemName) {
+        mItemName = itemName;
     }
 
 }

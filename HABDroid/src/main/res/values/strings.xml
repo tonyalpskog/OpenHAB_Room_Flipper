@@ -94,5 +94,6 @@
     <string name="rule_tab_if">IF</string>
     <string name="rule_tab_then">THEN</string>
     <string name="mainmenu_openhab_flipper">Flipper Activity</string>
+    <string name="action_speak_room">Speak room</string>
 
 </resources>

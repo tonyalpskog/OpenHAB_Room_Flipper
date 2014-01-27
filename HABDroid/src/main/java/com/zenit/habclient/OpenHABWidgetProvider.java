@@ -1,5 +1,7 @@
 package com.zenit.habclient;
 
+import android.util.Log;
+
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -16,13 +18,13 @@ import java.util.UUID;
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABWidgetProvider {
-    private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
+    private Map<String, OpenHABWidget> mOpenHABWidgetItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private UUID mUpdateSetUUID;
 
     public OpenHABWidgetProvider() {
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
-        mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
+        mOpenHABWidgetItemNameMap = new HashMap<String, OpenHABWidget>();
     }
 
     //Long polling method..?
@@ -51,8 +53,8 @@ public class OpenHABWidgetProvider {
             Iterator<OpenHABWidget> widgetIterator = widgetList.iterator();
             while (widgetIterator.hasNext()) {
                 OpenHABWidget widget = widgetIterator.next();
-                mOpenHABWidgetIdMap.put(widget.getId(), widget);
-                stringList.add(widget.getId());
+                mOpenHABWidgetItemNameMap.put(widget.getItem().getName(), widget);
+                stringList.add(widget.getItem().getName());
             }
             mOpenHABWidgetTypeMap.put(type, stringList);
         }
@@ -64,7 +66,7 @@ public class OpenHABWidgetProvider {
     }
 
     private void clearData() {
-//        mOpenHABWidgetIdMap.clear();
+//        mOpenHABWidgetItemNameMap.clear();
 //        mOpenHABWidgetTypeMap.clear();
 //
         mUpdateSetUUID = UUID.randomUUID();
@@ -77,13 +79,19 @@ public class OpenHABWidgetProvider {
     private void addOpenHABWidget(OpenHABWidget widget) {
         widget.setUpdateUUID(mUpdateSetUUID);
 
-        mOpenHABWidgetIdMap.put(widget.getId(), widget);
+        if(widget.getItem() == null)
+        {
+            Log.w(HABApplication.GetLogTag(), String.format("Widget ID '%s' of type '%s' doesn't have an item instance and cannot be added to the Widget Provider.", widget.getId(), widget.getType()));
+        } else {
+            mOpenHABWidgetItemNameMap.put(widget.getItem().getName(), widget);
+            Log.d(HABApplication.GetLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getItem().getName(), widget.getType()));
 
-        if(!mOpenHABWidgetTypeMap.containsKey(widget.getType()))
-            mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
+            if(!mOpenHABWidgetTypeMap.containsKey(widget.getType()))
+                mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
 
-        List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
-        widgetList.add(widget.getId());
+            List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
+            widgetList.add(widget.getItem().getName());
+        }
 
         if(widget.hasChildren()) {
             Iterator<OpenHABWidget> iterator = widget.getChildren().iterator();
@@ -105,6 +113,12 @@ public class OpenHABWidgetProvider {
 
     public List<OpenHABWidget> getWidgetList(Set<OpenHABWidgetType> category) {
         ArrayList<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
+
+        if(category == null) {
+            resultList.addAll(mOpenHABWidgetItemNameMap.values());
+            return resultList;
+        }
+
         Iterator<OpenHABWidgetType> iterator = category.iterator();
         while(iterator.hasNext()) {
             resultList.addAll(getWidgetList(iterator.next()));
@@ -119,17 +133,26 @@ public class OpenHABWidgetProvider {
             idList = mOpenHABWidgetTypeMap.get(type);
             Iterator<String> idIterator = idList.iterator();
             while(idIterator.hasNext()) {
-                resultList.add(mOpenHABWidgetIdMap.get(idIterator.next()));
+                resultList.add(mOpenHABWidgetItemNameMap.get(idIterator.next()));
             }
         }
         return resultList;
     }
 
-    public OpenHABWidget getWidget(String widgetId) {
-        return mOpenHABWidgetIdMap.get(widgetId);
+    public OpenHABWidget getWidget(String itemName) {
+        if(!hasWidget(itemName))
+            Log.w(HABApplication.GetLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
+
+        return mOpenHABWidgetItemNameMap.get(itemName);
     }
 
-    public boolean hasWidget(String widgetId) {
-        return mOpenHABWidgetIdMap.containsKey(widgetId);
+    public boolean hasWidget(String itemName) {
+        if(itemName == null)
+            return false;
+
+        boolean result = mOpenHABWidgetItemNameMap.containsKey(itemName);
+        if(!result)
+            Log.w(HABApplication.GetLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
+        return result;
     }
 }

@@ -44,7 +44,7 @@ public class RoomImageView extends ImageView {
 
         if(oldX != scaledBitmapX || oldY != scaledBitmapY || oldHeight != scaledBitmapHeight || oldWidth != scaledBitmapWidth) {
             Log.d(TAG, "onDraw() - Layout is resized");
-            Log.e("Room", "width=" + getScaledBitmapWidth() + " height="+getScaledBitmapHeight() + " x=" + getScaledBitmapX() + " y=" + getScaledBitmapY());
+            Log.d(TAG, "width=" + getScaledBitmapWidth() + " height="+getScaledBitmapHeight() + " x=" + getScaledBitmapX() + " y=" + getScaledBitmapY());
             postOnBackgroundDrawn();
         } else
             Log.d(TAG, "onDraw() - Layout was not resized");

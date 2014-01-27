@@ -22,20 +22,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loopj.android.http.AsyncHttpClient;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -100,31 +95,9 @@ public class UnitPlacementFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        loadOpenHABItems(fragmentView.getContext());
+        HABApplication.getRestCommunication().requestOpenHABSitemap(fragmentView.getContext(), roomView.getRoom().getGroupItemName());
 
         return fragmentView;
-    }
-
-    private void loadOpenHABItems(Context context) {
-        AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
-        final String RESTaddress = HABApplication.getOpenHABSetting().getBaseUrl() + "rest/sitemaps/demo/" + roomView.getRoom().getSitemapId();
-        asyncHttpClient.get(RESTaddress, new DocumentHttpResponseHandler() {
-            @Override
-            public void onSuccess(Document document) {
-                if(document != null) {
-                    Log.d("UnitPlacementFragment", "showAddUnitDialog.DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
-                    Node rootNode = document.getFirstChild();
-
-                    HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(new OpenHABWidgetDataSource(rootNode));
-                } else {
-                    Log.e("UnitPlacementFragment.loadOpenHABItems()", RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
-                }
-            }
-            @Override
-            public void onFailure(Throwable e, String errorResponse) {
-                Log.e("UnitPlacementFragment.loadOpenHABItems()", RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
-            }
-        });
     }
 
     @Override
@@ -216,23 +189,39 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void showAddUnitDialog(Context context) {
+        List<OpenHABWidget> list = HABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+        Iterator<OpenHABWidget> iter = list.iterator();
+        while(iter.hasNext())
+            Log.d("WidgetProvider data", iter.next().getId());
+
 //        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
         //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
         List<CharSequence> itemsList = new ArrayList<CharSequence>();
-        List<String> widgetIdList = new ArrayList<String>();
+        List<String> itemNameList = new ArrayList<String>();
         String strLogAll = "showAddUnitDialog() -> Full list: ";
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
-        if(!HABApplication.getOpenHABWidgetProvider().hasWidget(roomView.getRoom().getHABGroupId()))
-            loadOpenHABItems(context);
+//TA: TODO - Not sure if this is needed.
+//        if(!HABApplication.getOpenHABWidgetProvider().hasWidget(roomView.getRoom().getGroupItemName()))
+//            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
 
-        List<OpenHABWidget> widgetList = HABApplication.getOpenHABWidgetProvider().getWidget(roomView.getRoom().getHABGroupId()).getChildren();
+        if(roomView.getRoom().getRoomWidget() == null) {
+            HABApplication.getRestCommunication().requestOpenHABSitemap(context, (String) null);
+            if(roomView.getRoom().getRoomWidget() == null)
+            {
+                Log.e(HABApplication.GetLogTag(), String.format("Cannot get room items for Room '%s' with item name '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupItemName()));
+                Toast.makeText(context, "Cannot get items for this room.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        List<OpenHABWidget> widgetList = roomView.getRoom().getRoomWidget().getChildren();
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
         while(iterator.hasNext()) {
             OpenHABWidget next = iterator.next();
             strLogAll += next.getId() + ", ";
             if(mUnitTypes.contains(next.getType()) && !roomView.getRoom().contains(next)){
-                widgetIdList.add(next.getId());
+                itemNameList.add(next.getItem().getName());
                 itemsList.add(next.getType().Name + ": " + next.getLabel()/* getItem().getName()*/);
             }
             else
@@ -246,7 +235,7 @@ public class UnitPlacementFragment extends Fragment {
             return;
         }
 
-        final List<String> finalWidgetIdList = widgetIdList;
+        final List<String> finalItemNameList = itemNameList;
 
         CharSequence[] items = (CharSequence[]) itemsList.toArray(new CharSequence[itemsList.size()]);
 //        Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
@@ -258,8 +247,8 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-            roomView.addNewUnitToRoom(new GraphicUnit(finalWidgetIdList.get(item)), 150, 150);
-            Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalWidgetIdList.get(item));
+            roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item)), 150, 150);
+            Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
         });

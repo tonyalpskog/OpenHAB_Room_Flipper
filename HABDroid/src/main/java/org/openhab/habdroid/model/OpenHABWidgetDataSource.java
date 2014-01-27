@@ -45,7 +45,9 @@ import android.util.Log;
  */
 
 public class OpenHABWidgetDataSource {
+
 	private static final String TAG = "OpenHABWidgetDataSource";
+
 	private OpenHABWidget rootWidget;
 	private String title;
 	private String id;
@@ -59,11 +61,21 @@ public class OpenHABWidgetDataSource {
 	public OpenHABWidgetDataSource(Node rootNode) {
 		setSourceNode(rootNode);
 	}
-	
-	public void setSourceNode(Node rootNode) {
+
+    public OpenHABWidgetDataSource(Node rootNode, OpenHABWidget widget) {
+        widget.removeAllChildren();
+        setSourceNode(rootNode, widget);
+    }
+
+    public void setSourceNode(Node rootNode) {
+        OpenHABWidget widget = new OpenHABWidget();
+        widget.setType(OpenHABWidgetType.Root);
+        setSourceNode(rootNode, new OpenHABWidget());
+    }
+
+    private void setSourceNode(Node rootNode, OpenHABWidget widget) {
 		Log.i(TAG, "Loading new data");
-		rootWidget = new OpenHABWidget();
-		rootWidget.setType(OpenHABWidgetType.Root);
+        rootWidget = widget;
 		if (rootNode.hasChildNodes()) {
 			NodeList childNodes = rootNode.getChildNodes();
 			for (int i = 0; i < childNodes.getLength(); i ++) {
