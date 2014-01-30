@@ -41,7 +41,8 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         setOutAnimation(getContext(), android.R.anim.fade_out);
 
         setDisplayedChild(nextChildIndex);//Change room (with animations)
-        postOnRoomShift(Gesture.PINCH_OUT, nextRoom);
+        mRoomFlipperAdapter.setCurrentRoom(nextRoom);
+        postOnRoomShift(Gesture.MAGIC_MOVE);
     }
 
     @Override
@@ -135,7 +136,7 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         if(gestureFound) {
             setDisplayedChild(nextChildIndex);//Change room (with animations)
             if(!doBounce)
-                postOnRoomShift(gesture, nextRoom);
+                postOnRoomShift(gesture);
         }
 
         return true;
@@ -175,7 +176,7 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         boolean onRoomShift(Gesture gesture, Room room);
     }
 
-    private boolean postOnRoomShift(Gesture gesture, Room room) {
+    private boolean postOnRoomShift(Gesture gesture) {
         if(mOnRoomShiftListener != null) {
             mOnRoomShiftListener.onRoomShift(gesture, mRoomFlipperAdapter.getCurrentRoom());
             return true;

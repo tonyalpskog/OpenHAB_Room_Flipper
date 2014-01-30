@@ -9,7 +9,8 @@ public enum Gesture {
     SWIPE_LEFT(2),
     SWIPE_RIGHT(3),
     PINCH_IN(4),
-    PINCH_OUT(5);
+    PINCH_OUT(5),
+    MAGIC_MOVE(6);
 
     public final int Value;
 

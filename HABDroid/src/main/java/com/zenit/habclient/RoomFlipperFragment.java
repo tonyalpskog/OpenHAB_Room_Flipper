@@ -65,6 +65,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         setHasOptionsMenu(true);
 
+        ((HABApplication) mApplication).getSpeechResultAnalyzer().setRoomFlipper(mRoomViewFlipper);
+
         return rootView;
     }
 

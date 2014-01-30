@@ -27,6 +27,8 @@ public class RoomFlipperAdapter {
         return currentRoom;
     }
 
+    public void setCurrentRoom(Room room) { currentRoom = room; }
+
     public Room getRoom(Gesture gesture) {
         Room nextRoom = null;
 

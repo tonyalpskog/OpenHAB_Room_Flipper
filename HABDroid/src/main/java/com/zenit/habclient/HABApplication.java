@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -20,7 +21,22 @@ public class HABApplication extends Application {
     private RuleOperationProvider mRuleOperationProvider = null;
     private static RestCommunication mRestCommunication = null;
     private static ApplicationMode mAppMode = ApplicationMode.Unknown;
+    private TextToSpeechProvider mTextToSpeechProvider = null;
+    private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
+    private static SpeechResultAnalyzer mSpeechResultAnalyzer = null;
 
+    public SpeechResultAnalyzer getSpeechResultAnalyzer() {
+        if(mSpeechResultAnalyzer == null)
+            mSpeechResultAnalyzer = new SpeechResultAnalyzer(getRoomProvider(), getOpenHABWidgetProvider());
+
+        return mSpeechResultAnalyzer;
+    }
+
+    public TextToSpeechProvider getTextToSpeechProvider() {
+        if(mTextToSpeechProvider == null)
+            mTextToSpeechProvider = new TextToSpeechProvider(getApplicationContext(), Locale.ENGLISH);
+        return mTextToSpeechProvider;
+    }
 
     public static ApplicationMode getAppMode() {
         return mAppMode;
@@ -30,7 +46,6 @@ public class HABApplication extends Application {
         mAppMode = appMode;
     }
 
-    private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
     public static OpenHABWidgetProvider getOpenHABWidgetProvider() {
         if(mOpenHABWidgetProvider == null)
             mOpenHABWidgetProvider = new OpenHABWidgetProvider();
@@ -52,11 +67,11 @@ public class HABApplication extends Application {
         return mOpenHABSetting;
     }
 
-    public static String GetLogTag() {
-        return GetLogTag(1);//Actually gets index 0(zero) but this call adds one more level to the stacktrace.
+    public static String getLogTag() {
+        return getLogTag(1);//Actually gets index 0(zero) but this call adds one more level to the stacktrace.
     }
 
-    public static String GetLogTag(int relativeTraceIndex) {
+    public static String getLogTag(int relativeTraceIndex) {
         int traceIndex = 3 + relativeTraceIndex;
         StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[traceIndex];
         return stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "()";
@@ -65,12 +80,12 @@ public class HABApplication extends Application {
     public Room getConfigRoom() {
         Room room = getRoom(currentConfigRoom);
         currentConfigRoom = room.getId();
-        Log.d(GetLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
+        Log.d(getLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
         return room;
     }
 
     public void setConfigRoom(Room room) {
-        Log.d(GetLogTag(), String.format("Setting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
+        Log.d(getLogTag(), String.format("Setting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
         currentConfigRoom = room.getId();
     }
 
@@ -85,16 +100,16 @@ public class HABApplication extends Application {
     }
 
     private Room getRoom(UUID roomId) {
-        if(mRoomProvider == null)
-            mRoomProvider = new RoomProvider(getApplicationContext());
-
         if(roomId == null)
-            return mRoomProvider.getInitialRoom();
+            return getRoomProvider().getInitialRoom();
         else
-            return mRoomProvider.get(roomId);
+            return getRoomProvider().get(roomId);
     }
 
     public RoomProvider getRoomProvider() {
+        if(mRoomProvider == null)
+            mRoomProvider = new RoomProvider(getApplicationContext());
+
         return mRoomProvider;
     }
 

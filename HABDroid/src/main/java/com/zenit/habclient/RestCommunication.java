@@ -1,13 +1,11 @@
 package com.zenit.habclient;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 
 import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
@@ -30,7 +28,7 @@ public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, String sitemapId, OpenHABWidget widget) {
         if(sitemapId == null || sitemapId.isEmpty()) {
-            Log.w(HABApplication.GetLogTag(), String.format("\n%s\nRequested sitemap name is %s", HABApplication.GetLogTag(2), (sitemapId == null? "NULL": "empty")));
+            Log.w(HABApplication.getLogTag(), String.format("\n%s\nRequested sitemap name is %s", HABApplication.getLogTag(2), (sitemapId == null? "NULL": "empty")));
             sitemapId = null;
         }
 
@@ -51,17 +49,17 @@ public class RestCommunication {
             @Override
             public void onSuccess(Document document) {
                 if(document != null) {
-                    Log.d(HABApplication.GetLogTag(), "DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
+                    Log.d(HABApplication.getLogTag(), "DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
                     Node rootNode = document.getFirstChild();
 
                     HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode): new OpenHABWidgetDataSource(rootNode, finalWidget));
                 } else {
-                    Log.e(HABApplication.GetLogTag(), RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
+                    Log.e(HABApplication.getLogTag(), RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
                 }
             }
             @Override
             public void onFailure(Throwable e, String errorResponse) {
-                Log.e(HABApplication.GetLogTag(), RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
+                Log.e(HABApplication.getLogTag(), RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
             }
         });
     }

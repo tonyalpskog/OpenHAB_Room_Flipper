@@ -116,14 +116,14 @@ public class Room {
 //        if(HABApplication.getOpenHABWidgetProvider().hasWidget(mGroupItemName)) {
 //            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
 //            if(widget.getLabel() == null) {
-//                Log.w(HABApplication.GetLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.GetLogTag(1), mGroupItemName));
+//                Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.getLogTag(1), mGroupItemName));
 //                return "<No label>";
 //            }
-//            Log.d(HABApplication.GetLogTag(), String.format("Group ID '%s' got label: '%s'", mGroupItemName, widget.getLabel()));
+//            Log.d(HABApplication.getLogTag(), String.format("Group ID '%s' got label: '%s'", mGroupItemName, widget.getLabel()));
 //            return widget.getLabel();
 //        }
 //
-//        Log.w(HABApplication.GetLogTag(), String.format("\n%s\nNo Room widget found with ID '%s'", HABApplication.GetLogTag(1), mGroupItemName));
+//        Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo Room widget found with ID '%s'", HABApplication.getLogTag(1), mGroupItemName));
 //        return "<No widget>";
     }
 

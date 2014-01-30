@@ -81,10 +81,10 @@ public class OpenHABWidgetProvider {
 
         if(widget.getItem() == null)
         {
-            Log.w(HABApplication.GetLogTag(), String.format("Widget ID '%s' of type '%s' doesn't have an item instance and cannot be added to the Widget Provider.", widget.getId(), widget.getType()));
+            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' of type '%s' doesn't have an item instance and cannot be added to the Widget Provider.", widget.getId(), widget.getType()));
         } else {
             mOpenHABWidgetItemNameMap.put(widget.getItem().getName(), widget);
-            Log.d(HABApplication.GetLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getItem().getName(), widget.getType()));
+            Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getItem().getName(), widget.getType()));
 
             if(!mOpenHABWidgetTypeMap.containsKey(widget.getType()))
                 mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
@@ -141,7 +141,7 @@ public class OpenHABWidgetProvider {
 
     public OpenHABWidget getWidget(String itemName) {
         if(!hasWidget(itemName))
-            Log.w(HABApplication.GetLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
+            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
 
         return mOpenHABWidgetItemNameMap.get(itemName);
     }
@@ -152,7 +152,7 @@ public class OpenHABWidgetProvider {
 
         boolean result = mOpenHABWidgetItemNameMap.containsKey(itemName);
         if(!result)
-            Log.w(HABApplication.GetLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
+            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
         return result;
     }
 }

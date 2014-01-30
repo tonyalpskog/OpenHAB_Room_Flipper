@@ -65,10 +65,12 @@ import com.google.android.gms.location.LocationClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
 import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.HABService;
 import com.zenit.habclient.INavDrawerActivity;
 import com.zenit.habclient.INavDrawerItem;
 import com.zenit.habclient.MainActivity;
 import com.zenit.habclient.NavDrawerItemType;
+import com.zenit.habclient.SpeechService;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
@@ -158,6 +160,10 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         Log.d(TAG, "onCreate()");
         // Check if we are in development mode
         isDeveloper = true;
+
+        startService(new Intent(this, HABService.class));
+        startService(new Intent(this, SpeechService.class));
+
         // Set default values, false means do it one time during the very first launch
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         // Set non-persistent HABDroid version preference to current version from application package

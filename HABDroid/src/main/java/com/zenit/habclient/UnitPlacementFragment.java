@@ -209,7 +209,7 @@ public class UnitPlacementFragment extends Fragment {
             HABApplication.getRestCommunication().requestOpenHABSitemap(context, (String) null);
             if(roomView.getRoom().getRoomWidget() == null)
             {
-                Log.e(HABApplication.GetLogTag(), String.format("Cannot get room items for Room '%s' with item name '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupItemName()));
+                Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with item name '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupItemName()));
                 Toast.makeText(context, "Cannot get items for this room.", Toast.LENGTH_LONG).show();
                 return;
             }

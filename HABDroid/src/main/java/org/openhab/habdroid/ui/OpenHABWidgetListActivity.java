@@ -830,6 +830,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
             startActivityForResult(writeTagIntent, 0);
             Util.overridePendingTransition(this, false);
     		return true;
+        case R.id.mainmenu_openhab_changedate:
+            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidget("Date").getItem(), "2014-02-06T21:42:28");
+            return true;
         default:
     		return super.onOptionsItemSelected(item);
     	}

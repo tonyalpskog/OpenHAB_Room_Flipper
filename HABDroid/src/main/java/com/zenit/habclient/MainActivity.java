@@ -7,21 +7,15 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -33,6 +27,8 @@ public class MainActivity extends Activity
 
     private UnitPlacementFragment configFragment = null;
     private RoomFlipperFragment flipperFragment = null;
+
+    private SpeechResultAnalyzer mSpeechResultAnalyzer;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -154,25 +150,13 @@ public class MainActivity extends Activity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
-            // Fill the list view with the strings the recognizer thought it
-            // could have heard
-            List<Room> roomList = new ArrayList<Room>();
-            roomList.addAll(((HABApplication)getApplication()).getRoomProvider().roomHash.values());
-            Iterator<Room> iterator = roomList.iterator();
-            Map<String, Room> roomNameMap = new HashMap<String, Room>();
-            while (iterator.hasNext()) {
-                Room nextRoom = iterator.next();
-                roomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
-            }
+            if(mSpeechResultAnalyzer == null)
+                mSpeechResultAnalyzer = new SpeechResultAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider());
 
-            ArrayList matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            for(String match : (String[]) matches.toArray(new String[0]))
-                if(roomNameMap.keySet().contains(match.toUpperCase())) {
-                    //Got a speech match.
-                    Room roomToShow = roomNameMap.get(match.toUpperCase());
-                    Log.d("Speak show Room", "showRoom() - Show room<" + roomToShow.getId() + ">");
-                    mRoomFlipper.showRoom(roomToShow);
-                }
+            mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
+            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());
+
+            ((HABApplication) getApplication()).getTextToSpeechProvider().speakText(((HABApplication) getApplication()).getFlipperRoom().getGroupItemName());
 
             super.onActivityResult(requestCode, resultCode, data);
         }

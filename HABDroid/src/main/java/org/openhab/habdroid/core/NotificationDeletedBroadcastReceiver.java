@@ -24,20 +24,20 @@ public class NotificationDeletedBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(HABApplication.GetLogTag(), "Intent received");
+        Log.d(HABApplication.getLogTag(), "Intent received");
         if (intent.hasExtra("notificationId")) {
             gcm = GoogleCloudMessaging.getInstance(context);
             sendBundle = new Bundle();
             sendBundle.putString("type", "hideNotification");
             sendBundle.putString("notificationId", String.valueOf(intent.getExtras().getInt("notificationId")));
-            Log.d(HABApplication.GetLogTag(), "notificationId = " + intent.getExtras().getInt("notificationId"));
+            Log.d(HABApplication.getLogTag(), "notificationId = " + intent.getExtras().getInt("notificationId"));
             new AsyncTask<Void, Void, Void>() {
                 protected Void doInBackground(Void... params) {
                     try {
                         gcm.send(OpenHABMainActivity.GCM_SENDER_ID + "@gcm.googleapis.com",
                                 "1", sendBundle);
                     } catch (IOException e) {
-                        Log.e(HABApplication.GetLogTag(), e.getMessage());
+                        Log.e(HABApplication.getLogTag(), e.getMessage());
                     }
                     return null;
                 }
