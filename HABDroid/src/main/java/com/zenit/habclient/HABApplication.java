@@ -29,6 +29,7 @@ public class HABApplication extends Application {
         if(mSpeechResultAnalyzer == null)
             mSpeechResultAnalyzer = new SpeechResultAnalyzer(getRoomProvider(), getOpenHABWidgetProvider());
 
+        mSpeechResultAnalyzer.setTextToSpeechProvider(getTextToSpeechProvider());
         return mSpeechResultAnalyzer;
     }
 

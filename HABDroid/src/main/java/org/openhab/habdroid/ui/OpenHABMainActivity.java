@@ -256,16 +256,15 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                 if (getIntent().getAction().equals("android.nfc.action.NDEF_DISCOVERED")) {
                     Log.d(TAG, "This is NFC action");
                     if (getIntent().getDataString() != null) {
-
-
-
-
                         Log.d(TAG, "NFC data = " + getIntent().getDataString());
                         mNfcData = getIntent().getDataString();
                     }
                 } else if (getIntent().getAction().equals("org.openhab.notification.selected")) {
                     onNotificationSelected(getIntent());
+                } else if(getIntent().getAction().equalsIgnoreCase("SHOW_PAGE") && getIntent().getStringExtra("pageUrl") != null) {
+                    mNfcData = getIntent().getStringExtra("pageUrl");
                 }
+
             }
         }
     }
@@ -365,13 +364,13 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
      */
 
     private void selectSitemap(final String baseUrl, final boolean forceSelect) {
-        Log.d(TAG, "Loading sitemap list from " + baseUrl + "rest/sitemaps");
+        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Loading sitemap list from " + baseUrl + "rest/sitemaps");
         startProgressIndicator();
         mAsyncHttpClient.get(baseUrl + "rest/sitemaps", new DocumentHttpResponseHandler() {
             @Override
             public void onSuccess(Document document) {
                 stopProgressIndicator();
-                Log.d(TAG, "Response: " + document.toString());
+                Log.d(TAG, "[AsyncHttpClient] Response: " + document.toString());
 
                 //Remove all sitemap items in navigator drawer.
                 Iterator<OpenHABSitemap> iterator = mSitemapList.iterator();
@@ -383,7 +382,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                 mSitemapList.addAll(Util.parseSitemapList(document));
                 if (mSitemapList.size() == 0) {
                     // Got an empty sitemap list!
-                    Log.e(TAG, "openHAB returned empty sitemap list");
+                    Log.e(TAG, "[AsyncHttpClient] openHAB returned empty sitemap list");
                     showAlertDialog(getString(R.string.error_empty_sitemap_list));
                     return;
                 }
@@ -730,11 +729,11 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         String nfcItemType = openHABURI.getQueryParameter("itemType");
         // If there is no item parameter it means tag contains only sitemap page url
         if (TextUtils.isEmpty(nfcItem)) {
-            Log.d(TAG, "This is a sitemap tag without parameters");
             // Form the new sitemap page url
             String newPageUrl = openHABBaseUrl + "rest/sitemaps" + openHABURI.getPath();
             // Check if we have this page in stack?
             mPendingNfcPage = newPageUrl;
+            Log.d(TAG, "[NFC] This is a sitemap tag without parameters:\nmPendingNfcPage = " + newPageUrl);
         } else {
             Log.d(TAG, "Target item = " + nfcItem);
             sendItemCommand(nfcItem, nfcCommand);
@@ -934,6 +933,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         // Finally, all sanity is done
         if (mGcm == null)
             mGcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+
+        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Creating new GCM AsyncTask<...>");
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -947,13 +949,13 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                     mAsyncHttpClient.get(getApplicationContext(), regUrl, new AsyncHttpResponseHandler() {
                         @Override
                         public void onSuccess(String response) {
-                            Log.d(TAG, "GCM reg id success");
+                            Log.d(TAG, "[AsyncHttpClient] GCM reg id success");
                         }
                         @Override
                         public void onFailure(Throwable error, String errorResponse) {
-                            Log.e(TAG, "GCM reg id error: " + error.getMessage());
+                            Log.e(TAG, "[AsyncHttpClient] GCM reg id error: " + error.getMessage());
                             if (errorResponse != null)
-                                Log.e(TAG, "Error response = " + errorResponse);
+                                Log.e(TAG, "[AsyncHttpClient] Error response = " + errorResponse);
                         }
                     });
                 } catch (IOException e) {

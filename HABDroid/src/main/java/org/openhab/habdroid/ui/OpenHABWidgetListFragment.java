@@ -134,6 +134,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             openHABPassword = getArguments().getString("openHABPassword");
             mPosition = getArguments().getInt("position");
         }
+        Log.d(HABApplication.getLogTag(), String.format("[intent] Bundle savedInstanceState =>/ndisplayPageUrl = '%s'/nopenHABBaseUrl = '%s'/nsitemapRootUrl = '%s'", displayPageUrl, openHABBaseUrl, sitemapRootUrl));
         if (savedInstanceState != null)
             if (!displayPageUrl.equals(savedInstanceState.getString("displayPageUrl")))
                 mCurrentSelectedItem = -1;
@@ -311,7 +312,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
-        Log.i(TAG, "showPage(...) - showPage for " + pageUrl + " longPolling = " + longPolling);
+        Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] showPage(...) - showPage for " + pageUrl + " longPolling = " + longPolling);
         // Cancel any existing http request to openHAB (typically ongoing long poll)
         Header[] headers = {};
         if (!longPolling)
@@ -324,12 +325,12 @@ public class OpenHABWidgetListFragment extends ListFragment {
             @Override
             public void onSuccess(Document document) {
                 if (document != null) {
-                    Log.d(TAG, "Response: "  + document.toString());
+                    Log.d(TAG, "[AsyncHttpClient] Response: "  + document.toString());
                     if (!longPolling)
                         stopProgressIndicator();
                     processContent(document, longPolling);
                 } else {
-                    Log.e(TAG, "Got a null response from openHAB");
+                    Log.e(TAG, "[AsyncHttpClient] Got a null response from openHAB");
                 }
             }
             @Override
@@ -341,13 +342,13 @@ public class OpenHABWidgetListFragment extends ListFragment {
 //                    return;
 //                }
                 if (error instanceof SocketTimeoutException) {
-                    Log.d(TAG, "Connection timeout, reconnecting");
-                    Log.d(TAG, "showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
+                    Log.d(TAG, "[AsyncHttpClient] Connection timeout, reconnecting");
+                    Log.d(TAG, "[AsyncHttpClient] showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
                     showPage(displayPageUrl, longPolling);
                     return;
                 }
                 Log.e(TAG, error.getClass().toString());
-                Log.e(TAG, "Connection error = " + error.getClass().toString() + ", cycle aborted");
+                Log.e(TAG, "[AsyncHttpClient] Connection error = " + error.getClass().toString() + ", cycle aborted");
             }
         }, mTag);
     }
@@ -362,8 +363,10 @@ public class OpenHABWidgetListFragment extends ListFragment {
         // As we change the page we need to stop all videos on current page
         // before going to the new page. This is quite dirty, but is the only
         // way to do that...
+        //TA: TODO - Play video/audio in separate threads.
         openHABWidgetAdapter.stopVideoWidgets();
         openHABWidgetAdapter.stopImageRefresh();
+
         Node rootNode = document.getFirstChild();
         openHABWidgetDataSource.setSourceNode(rootNode);
         HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);

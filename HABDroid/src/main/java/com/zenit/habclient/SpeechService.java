@@ -60,9 +60,9 @@ public class SpeechService extends Service
                 this.getPackageName());
 
         //TA: Three rows below added by me, tying to extend the speech input time before timeout occur.
-//        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 10000);
-//        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 10000);
-//        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 10000);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 10000);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 10000);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 10000);
 
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
@@ -97,12 +97,15 @@ public class SpeechService extends Service
                     {
                         // turn off beep sound
                         target.mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+                        Log.d(HABApplication.getLogTag(), "Audio STREAM_SYSTEM mute ON");
                     }
                     if (!target.mIsListening)
                     {
                         target.mSpeechRecognizer.startListening(target.mSpeechRecognizerIntent);
                         target.mIsListening = true;
                         Log.d(HABApplication.getLogTag(), "message start listening");
+                    } else {
+                        Log.d(HABApplication.getLogTag(), "start listening was NOT called");
                     }
                     break;
 
@@ -111,12 +114,16 @@ public class SpeechService extends Service
                     target.mIsListening = false;
                     Log.d(HABApplication.getLogTag(), "message canceled recognizer");
                     break;
+
+                default:
+                    Log.d(HABApplication.getLogTag(), "Unknown message type = " + msg.what);
+                    break;
             }
         }
     }
 
     // Count down timer for Jelly Bean work around
-    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(5000, 5000)//TA: used to be 5000, 5000
+    protected CountDownTimer mNoSpeechCountDown = new CountDownTimer(11000, 11000)//TA: used to be 5000, 5000
     {
 
         @Override
@@ -141,7 +148,7 @@ public class SpeechService extends Service
             }
             catch (RemoteException e)
             {
-                Log.d(HABApplication.getLogTag(), "RemoteException: " + e.toString());
+                Log.e(HABApplication.getLogTag(), "RemoteException: " + e.toString());
             }
         }
     };
@@ -244,13 +251,15 @@ public class SpeechService extends Service
                 Message message = Message.obtain(null, MSG_RECOGNIZER_START_LISTENING);
                 try
                 {
+                    Log.d(HABApplication.getLogTag(), "Sending message MSG_RECOGNIZER_START_LISTENING => " + message.toString());
                     mServerMessenger.send(message);
                 }
                 catch (RemoteException e)
                 {
-                    Log.d(HABApplication.getLogTag(), "RemoteException: " + e.toString());
+                    Log.e(HABApplication.getLogTag(), "RemoteException: " + e.toString());
                 }
-            }
+            } else
+                Log.d(HABApplication.getLogTag(), "No timer interference");
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
 //            {
 //                // turn off beep sound
@@ -270,7 +279,6 @@ public class SpeechService extends Service
         public void onPartialResults(Bundle partialResults)
         {
             Log.d(HABApplication.getLogTag(), "SpeechService result");
-
         }
 
         @Override
@@ -280,8 +288,9 @@ public class SpeechService extends Service
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
             {
                 mIsCountDownOn = true;
-                mNoSpeechCountDown.start();
                 Log.d(HABApplication.getLogTag(), "mNoSpeechCountDown.start()");
+                mNoSpeechCountDown.start();
+                Log.d(HABApplication.getLogTag(), "Audio STREAM_SYSTEM mute OFF");
                 mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
             }
         }
@@ -313,16 +322,20 @@ public class SpeechService extends Service
                     Message message = Message.obtain(null, MSG_RECOGNIZER_START_LISTENING);
                     try
                     {
+                        Log.d(HABApplication.getLogTag(), "Sending message MSG_RECOGNIZER_START_LISTENING => " + message.toString());
                         mServerMessenger.send(message);
                     }
                     catch (RemoteException e)
                     {
-                        Log.d(HABApplication.getLogTag(), "RemoteException: " + e.toString());
+                        Log.e(HABApplication.getLogTag(), "RemoteException: " + e.toString());
                     }
 
                     mSpeechResultAnalyzer.analyze(matches, HABApplication.getAppMode());
-                }
-            }
+                } else
+                    Log.d(HABApplication.getLogTag(), "Matches = NULL");
+            } else
+                Log.d(HABApplication.getLogTag(), "Results = NULL");
+
         }
 
         @Override

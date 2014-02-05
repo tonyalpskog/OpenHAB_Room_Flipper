@@ -21,8 +21,8 @@ public class GestureListener implements View.OnTouchListener {
     final float DIAGONAL_FACTOR = 2;
     //Touch event related variables
     final int IDLE = 0;
-    final int TOUCH = 1;
-    final int PINCH = 2;
+    final int SINGLE_POINT = 1;
+    final int MULTI_POINT = 2;
     int touchState = IDLE;
     float dist0 = 1, distCurrent = 1;
 
@@ -32,11 +32,19 @@ public class GestureListener implements View.OnTouchListener {
     boolean ongoingPinch = false;
     private float initialX;
     private float initialY;
+    private boolean mDiagonalGesturesEnabled;
+    private boolean mRotatingGesturesEnabled;
 
     private View mView;
 
     public GestureListener(View view) {
+        this(view, false, false);
+    }
+
+    public GestureListener(View view, boolean enableDiagonalGestures, boolean enableRotatingGestures) {
         mView = view;
+        setDiagonalGesturesEnabled(enableDiagonalGestures);
+        setRotatingGesturesEnabled(enableRotatingGestures);
     }
 
     @Override
@@ -48,16 +56,16 @@ public class GestureListener implements View.OnTouchListener {
         switch(event.getAction() & MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_DOWN:
                 //A pressed gesture has started, the motion contains the initial starting location.
-//                Log.d(TAG, "ACTION_DOWN");
-                touchState = TOUCH;
+                Log.d(TAG, "ACTION_DOWN");
+                touchState = SINGLE_POINT;
                 initialX = event.getX();
                 initialY = event.getY();
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
                 //A non-primary pointer has gone down.
-//                Log.d(TAG, "ACTION_POINTER_DOWN");
-                touchState = PINCH;
+                Log.d(TAG, "ACTION_POINTER_DOWN");
+                touchState = MULTI_POINT;
 
                 //Get the distance when the second pointer touch
                 distx = event.getX(0) - event.getX(1);
@@ -71,9 +79,9 @@ public class GestureListener implements View.OnTouchListener {
 
             case MotionEvent.ACTION_MOVE:
                 //A change has happened during a press gesture (between ACTION_DOWN and ACTION_UP).
-//                Log.d(TAG, "ACTION_MOVE");
+                Log.d(TAG, "ACTION_MOVE");
 
-                if(touchState == PINCH){
+                if(touchState == MULTI_POINT){
                     //Get the current distance
                     distx = event.getX(0) - event.getX(1);
                     disty = event.getY(0) - event.getY(1);
@@ -95,7 +103,7 @@ public class GestureListener implements View.OnTouchListener {
                     }
                     pinchEndDist = distCurrent;
 
-//                    Log.d(TAG, "Pinching = " + distCurrent);
+                    Log.d(TAG, "Pinching = " + distCurrent);
                 }
 
                 break;
@@ -148,11 +156,27 @@ public class GestureListener implements View.OnTouchListener {
             case MotionEvent.ACTION_POINTER_UP:
                 //A non-primary pointer has gone up.
 //                Log.d(TAG, "ACTION_POINTER_UP");
-                touchState = TOUCH;
+                touchState = SINGLE_POINT;
                 break;
         }
 
         return true;
+    }
+
+    public boolean isRotatingGesturesEnabled() {
+        return mRotatingGesturesEnabled;
+    }
+
+    public void setRotatingGesturesEnabled(boolean enableRotatingGestures) {
+        mRotatingGesturesEnabled = enableRotatingGestures;
+    }
+
+    public boolean isDiagonalGesturesEnabled() {
+        return mDiagonalGesturesEnabled;
+    }
+
+    public void setDiagonalGesturesEnabled(boolean enableDiagonalGestures) {
+        mDiagonalGesturesEnabled = enableDiagonalGestures;
     }
 
     /**

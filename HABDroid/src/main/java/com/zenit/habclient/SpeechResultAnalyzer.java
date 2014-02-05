@@ -17,14 +17,14 @@ public class SpeechResultAnalyzer {
     private RoomProvider mRoomProvider;
     private OpenHABWidgetProvider mOpenHABWidgetProvider;
     private RoomFlipper mRoomFlipper;
-    private TextToSpeech mTextToSpeech;
+    private TextToSpeechProvider mTextToSpeechProvider;
 
-    public TextToSpeech getTextToSpeech() {
-        return mTextToSpeech;
+    public TextToSpeechProvider getTextToSpeechProvider() {
+        return mTextToSpeechProvider;
     }
 
-    public void setTextToSpeech(TextToSpeech textToSpeech) {
-        mTextToSpeech = textToSpeech;
+    public void setTextToSpeechProvider(TextToSpeechProvider textToSpeechProvider) {
+        mTextToSpeechProvider = textToSpeechProvider;
     }
 
     public RoomFlipper getRoomFlipper() {
@@ -68,6 +68,8 @@ public class SpeechResultAnalyzer {
                     Log.d(HABApplication.getLogTag(), "showRoom() - Show room<" + roomToShow.getId() + ">");
                     if(mRoomFlipper != null)
                         mRoomFlipper.showRoom(roomToShow);
+
+                    mTextToSpeechProvider.speakText(roomToShow.getName());
                 }
             }
         }

@@ -8,7 +8,8 @@ public enum UnitType {
     Dimmer(1),
     RoomHeater(2),
     Vent(3),
-    Socket(4);
+    Socket(4),
+    Group(5);
 
     public final int Value;
 

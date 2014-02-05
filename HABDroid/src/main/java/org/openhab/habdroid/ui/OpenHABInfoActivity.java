@@ -83,37 +83,37 @@ public class OpenHABInfoActivity extends Activity {
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
-        Log.d(TAG, "url = " + mOpenHABBaseUrl + "static/version");
+        Log.d(TAG, "[AsyncHttpClient] url = " + mOpenHABBaseUrl + "static/version");
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/version", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "Got version = " + content);
+                Log.d(TAG, "[AsyncHttpClient] Got version = " + content);
                 mOpenHABVersionText.setText(content);
             }
 
             @Override
             public void onFailure(Throwable error, String content) {
                 mOpenHABVersionText.setText("Unknown");
-                Log.e(TAG, error.getMessage());
+                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
             }
         });
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/uuid", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "Got uuid = " + content);
+                Log.d(TAG, "[AsyncHttpClient] Got uuid = " + content);
                 mOpenHABUUIDText.setText(content);
             }
 
             @Override
             public void onFailure(Throwable error, String content) {
                 mOpenHABUUIDText.setText("Unknown");
-                Log.e(TAG, error.getMessage());
+                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
             }
         });
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/secret", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "Got secret = " + content);
+                Log.d(TAG, "[AsyncHttpClient] Got secret = " + content);
                 mOpenHABSecretText.setVisibility(View.VISIBLE);
                 mOpenHABSecretLabel.setVisibility(View.VISIBLE);
                 mOpenHABSecretText.setText(content);
@@ -123,7 +123,7 @@ public class OpenHABInfoActivity extends Activity {
             public void onFailure(Throwable error, String content) {
                 mOpenHABSecretText.setVisibility(View.GONE);
                 mOpenHABSecretLabel.setVisibility(View.GONE);
-                Log.e(TAG, error.getMessage());
+                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
             }
         });
     }

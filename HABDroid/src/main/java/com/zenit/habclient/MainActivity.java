@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
@@ -155,8 +156,6 @@ public class MainActivity extends Activity
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
             mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());
-
-            ((HABApplication) getApplication()).getTextToSpeechProvider().speakText(((HABApplication) getApplication()).getFlipperRoom().getGroupItemName());
 
             super.onActivityResult(requestCode, resultCode, data);
         }

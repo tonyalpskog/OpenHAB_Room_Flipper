@@ -242,6 +242,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		if (getIntent() != null) {
             if (getIntent().getAction() != null) {
                 if (getIntent().getAction().equals("org.openhab.habdroid.ui.OpwnHABWidgetListActivity")) {
+                    Log.d(HABApplication.getLogTag(), String.format("Found intent =>/ndisplayPageUrl = '%s'/nopenHABBaseUrl = '%s'/nsitemapRootUrl = '%s'", getIntent().getExtras().getString("displayPageUrl"), getIntent().getExtras().getString("openHABBaseUrl"), getIntent().getExtras().getString("sitemapRootUrl")));
                     displayPageUrl = getIntent().getExtras().getString("displayPageUrl");
                     openHABBaseUrl = getIntent().getExtras().getString("openHABBaseUrl");
                     sitemapRootUrl = getIntent().getExtras().getString("sitemapRootUrl");
@@ -351,7 +352,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 * to start connection with local openHAB instance
 	 */
 	public void onServiceResolved(ServiceInfo serviceInfo) {
-		Log.i(TAG, "Service resolved: "
+		Log.i(TAG, "[AsyncHttpClient] Service resolved: "
                 + serviceInfo.getHostAddresses()[0]
                 + " port:" + serviceInfo.getPort());
 		openHABBaseUrl = "https://" + serviceInfo.getHostAddresses()[0] + ":" +
@@ -362,7 +363,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		asyncHttpClient.get(openHABBaseUrl + "static/uuid", new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {
-				Log.i(TAG, "Got openHAB UUID = " + content);
+				Log.i(TAG, "[AsyncHttpClient] Got openHAB UUID = " + content);
 				SharedPreferences settings = 
 						PreferenceManager.getDefaultSharedPreferences(OpenHABWidgetListActivity.this);
 				if (settings.contains("openhab_uuid")) {
@@ -804,6 +805,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			homeIntent.putExtra("displayPageUrl", sitemapRootUrl);
 			homeIntent.putExtra("openHABBaseUrl", openHABBaseUrl);
 			homeIntent.putExtra("sitemapRootUrl", sitemapRootUrl);
+            Log.d(HABApplication.getLogTag(), String.format("openPage intent =>/ndisplayPageUrl = '%s'/nopenHABBaseUrl = '%s'/nsitemapRootUrl = '%s'", sitemapRootUrl, openHABBaseUrl, sitemapRootUrl));
 			// Finish current activity
 			finish();
 			// Start launch activity
@@ -854,6 +856,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	    asyncHttpClient.get(baseURL + "rest/sitemaps", new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {
+                Log.d(TAG, "[AsyncHttpClient] onSuccess()");
 				List<OpenHABSitemap> sitemapList = parseSitemapList(content);
 				if (sitemapList.size() == 0) {
 					// Got an empty sitemap list!
@@ -907,6 +910,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			@Override
 	    	public void onFailure(Throwable e, String errorResponse) {
+                Log.d(TAG, "[AsyncHttpClient] onFailure()");
 				if (e.getMessage() != null) {
 					if (e.getMessage().equals("Unauthorized")) {
 						showAlertDialog(getString(R.string.error_authentication_failed));

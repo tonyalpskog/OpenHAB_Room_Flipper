@@ -22,9 +22,37 @@ public class TextToSpeechProvider {
                 } else {
                     Log.e(HABApplication.getLogTag(), "Text-To-Speech initialization failed");
                 }
-
             }
         });
+
+//        speakText("Available TTS engines, before");
+        speakText("Tillgängliga TTS maskiner");
+
+        String availableEnginesLogText = "Available TTS engines: ";
+        for(TextToSpeech.EngineInfo ei : mTextToSpeech.getEngines()) {
+            availableEnginesLogText += "/n-> " + ei.toString();
+        }
+        Log.i(HABApplication.getLogTag(), availableEnginesLogText);
+
+//        setExternalTTSEngine("com.svox.classic");//com.svox.pico
+//
+//        speakText("Tillgängliga TTS maskiner");
+//
+//        availableEnginesLogText = "Available TTS engines AFTER: ";
+//        for(TextToSpeech.EngineInfo ei : mTextToSpeech.getEngines()) {
+//            availableEnginesLogText += "/n-> " + ei.toString();
+//        }
+//        Log.i(HABApplication.getLogTag(), availableEnginesLogText);
+    }
+
+
+    public boolean setExternalTTSEngine(String ttsPackageName) {
+        int result = mTextToSpeech.setEngineByPackageName(ttsPackageName);
+        if( result == TextToSpeech.ERROR ) {
+            Log.e(HABApplication.getLogTag(), String.format("Could not find Text-To-Speech package '%s'", ttsPackageName));
+            return false;
+        } else
+        return true;
     }
 
     public boolean setLanguage(Locale locale) {

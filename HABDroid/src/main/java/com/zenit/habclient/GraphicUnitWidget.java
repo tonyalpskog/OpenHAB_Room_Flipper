@@ -2,6 +2,7 @@ package com.zenit.habclient;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +16,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.habdroid.ui.OpenHABMainActivity;
+import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
 /**
@@ -23,7 +27,6 @@ import org.openhab.habdroid.util.AutoRefreshImageView;
 public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnClickListener, View.OnLongClickListener {
 
     GraphicUnit gUnit;
-    Bitmap originalBitmap;
 
     public GraphicUnitWidget(Context context) {
         super(context);
@@ -36,10 +39,6 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
         setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
         setOnLongClickListener(this);
         setOnClickListener(this);
-    }
-
-    public void setOriginalBitmap(Bitmap bitmap) {
-        originalBitmap = bitmap;
     }
 
     @Override
@@ -60,7 +59,26 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             gUnit.setSelected(!gUnit.isSelected());
             Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
         } else if(HABApplication.getAppMode() == ApplicationMode.RoomFlipper) {
-            Toast.makeText(getContext(), "A unit action dialog will be shown here", Toast.LENGTH_LONG).show();
+//            if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
+                // Get launch intent for application
+                Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);
+//                widgetListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                widgetListIntent.setAction("org.openhab.habdroid.ui.OpenHABWidgetListActivity");
+                widgetListIntent.setAction("SHOW_PAGE");
+                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/GF_Kitchen" /*"https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen"*/);
+
+//                widgetListIntent.putExtra("displayPageUrl", "https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen");
+//                widgetListIntent.putExtra("openHABBaseUrl", "https://demo.openhab.org:8443/");
+//                widgetListIntent.putExtra("sitemapRootUrl", (String) null);
+
+                // Finish current activity
+//                finish();
+
+                // Start launch activity
+                getContext().startActivity(widgetListIntent);
+//                Util.overridePendingTransition(this, true);
+//            } else
+//                Toast.makeText(getContext(), "A unit action dialog will be shown here", Toast.LENGTH_LONG).show();
         }
     }
 

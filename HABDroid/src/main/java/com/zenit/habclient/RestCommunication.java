@@ -28,7 +28,7 @@ public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, String sitemapId, OpenHABWidget widget) {
         if(sitemapId == null || sitemapId.isEmpty()) {
-            Log.w(HABApplication.getLogTag(), String.format("\n%s\nRequested sitemap name is %s", HABApplication.getLogTag(2), (sitemapId == null? "NULL": "empty")));
+            Log.w(HABApplication.getLogTag(), String.format("\n%s\n[AsyncHttpClient] Requested sitemap name is %s", HABApplication.getLogTag(2), (sitemapId == null? "NULL": "empty")));
             sitemapId = null;
         }
 
@@ -49,17 +49,17 @@ public class RestCommunication {
             @Override
             public void onSuccess(Document document) {
                 if(document != null) {
-                    Log.d(HABApplication.getLogTag(), "DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
+                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.getTextContent() + "'");
                     Node rootNode = document.getFirstChild();
 
                     HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode): new OpenHABWidgetDataSource(rootNode, finalWidget));
                 } else {
-                    Log.e(HABApplication.getLogTag(), RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
+                    Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
                 }
             }
             @Override
             public void onFailure(Throwable e, String errorResponse) {
-                Log.e(HABApplication.getLogTag(), RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
+                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
             }
         });
     }
