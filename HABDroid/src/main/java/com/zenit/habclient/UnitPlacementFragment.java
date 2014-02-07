@@ -45,7 +45,7 @@ public class UnitPlacementFragment extends Fragment {
 
     private View fragmentView;
     private UnitContainerView roomView;
-    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color);
+    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     /**
@@ -74,13 +74,12 @@ public class UnitPlacementFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d("LifeCycle", "UnitPlacementFragment.onAttach(" + (getArguments()!=null? getArguments().getInt(ARG_SECTION_NUMBER): "?") + ")");
-        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+//        ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));//TODO - remove?
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        HABApplication.setAppMode(ApplicationMode.UnitPlacement);
         Log.d("LifeCycle", "UnitPlacementFragment.onCreateView() room<" + ((HABApplication) getActivity().getApplication()).getConfigRoom().getId() + ">");
 
         fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
@@ -91,7 +90,7 @@ public class UnitPlacementFragment extends Fragment {
         //TODO - Make DragListener internal in UnitContainerView and control the usage of it by layout parameters (DragNDrop on/off)
         roomView.setOnDragListener(dropListener);
 
-        textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
+//        textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));//TODO - Fix this
 
         setHasOptionsMenu(true);
 
@@ -247,8 +246,8 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-            roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item)), 150, 150);
-            Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
+                roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item)), 50, 50);
+                Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
         });
@@ -338,12 +337,13 @@ public class UnitPlacementFragment extends Fragment {
                     Log.i("DragEvent", "Drop target at TOP = " + v.getTop() + "   LEFT = " + v.getLeft());
 //                    droppedView.setX(Math.round(event.getX() + dragXDiff + v.getLeft() - 70));
 //                    droppedView.setY(Math.round(event.getY() + dragYDiff/* + v.getTop()*/ - 50));
+                    //TODO - Fix this temporary hard coded adjustment
                     droppedView.setX(Math.round(event.getX())-30);
-                    droppedView.setY(Math.round(event.getY())+20);
+                    droppedView.setY(Math.round(event.getY())-30);
+
                     droppedView.setVisibility(View.VISIBLE);
 
-                    droppedView.gUnit.setRoomRelativeX(roomView.getScaledBitmapWidth() / (droppedView.getX() - roomView.getScaledBitmapX()));
-                    droppedView.gUnit.setRoomRelativeY(roomView.getScaledBitmapHeight() / (droppedView.getY() - roomView.getScaledBitmapY()));
+                    setRoomRelativePositions(droppedView);
 
                     Log.d("Unit", "Dropped view pos X/Y = " + droppedView.getX() + "/" + droppedView.getY());
                     Log.d("UnitPos", "dropped REL: " + droppedView.gUnit.getRoomRelativeX() + "/" + droppedView.gUnit.getRoomRelativeY() + "   Calc: X=(" + roomView.getScaledBitmapWidth() + "/(" + droppedView.getX() + "-" + roomView.getScaledBitmapX() + ")  Y=(" + roomView.getScaledBitmapHeight() + "/(" + droppedView.getY() + "-" + roomView.getScaledBitmapY() + ")");
@@ -352,6 +352,23 @@ public class UnitPlacementFragment extends Fragment {
             return true;
         }
     };
+
+//    private int getRoomRelativeX(int percentOfX) {
+//        return (((roomView.getScaledBitmapWidth() / 100) * percentOfX) + roomView.getScaledBitmapX());
+//    }
+//
+//    private int getRoomRelativeY(int percentOfY) {
+//        return (((roomView.getScaledBitmapHeight() / 100) * percentOfY) + roomView.getScaledBitmapY());
+//    }
+
+    private void setRoomRelativePositions(GraphicUnitWidget graphicUnitView) {
+        setRoomRelativePositions(graphicUnitView.gUnit, graphicUnitView);
+    }
+
+    private void setRoomRelativePositions(GraphicUnit gUnit, View unitView) {
+        gUnit.setRoomRelativeX(roomView.getScaledBitmapWidth() / (unitView.getX() - roomView.getScaledBitmapX()));
+        gUnit.setRoomRelativeY(roomView.getScaledBitmapHeight() / (unitView.getY() - roomView.getScaledBitmapY()));
+    }
 
     private void multiUnitSelection(boolean doSelect) {
         Iterator iterator = roomView.getRoom().getUnitIterator();

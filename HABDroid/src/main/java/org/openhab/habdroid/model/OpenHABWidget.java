@@ -398,4 +398,8 @@ public class OpenHABWidget {
     public void removeAllChildren() {
         children.clear();
     }
+
+    public String toString() {
+        return getLabel();
+    }
 }

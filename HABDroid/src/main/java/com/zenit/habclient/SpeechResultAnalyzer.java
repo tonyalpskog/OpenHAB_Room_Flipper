@@ -69,7 +69,10 @@ public class SpeechResultAnalyzer {
                     if(mRoomFlipper != null)
                         mRoomFlipper.showRoom(roomToShow);
 
-                    mTextToSpeechProvider.speakText(roomToShow.getName());
+                    if(mTextToSpeechProvider != null)
+                        mTextToSpeechProvider.speakText(roomToShow.getName());
+                    else
+                        Log.e(HABApplication.getLogTag(), "TextToSpeechProvider is NULL!");
                 }
             }
         }

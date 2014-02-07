@@ -59,26 +59,16 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             gUnit.setSelected(!gUnit.isSelected());
             Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
         } else if(HABApplication.getAppMode() == ApplicationMode.RoomFlipper) {
-//            if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
+            if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
                 // Get launch intent for application
                 Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);
-//                widgetListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                widgetListIntent.setAction("org.openhab.habdroid.ui.OpenHABWidgetListActivity");
-                widgetListIntent.setAction("SHOW_PAGE");
-                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/GF_Kitchen" /*"https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen"*/);
-
-//                widgetListIntent.putExtra("displayPageUrl", "https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen");
-//                widgetListIntent.putExtra("openHABBaseUrl", "https://demo.openhab.org:8443/");
-//                widgetListIntent.putExtra("sitemapRootUrl", (String) null);
-
-                // Finish current activity
-//                finish();
+                widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
+                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + gUnit.getOpenHABWidget().getLinkedPage().getId() /*GF_Kitchen"*/ /*"https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen"*/);
 
                 // Start launch activity
                 getContext().startActivity(widgetListIntent);
-//                Util.overridePendingTransition(this, true);
-//            } else
-//                Toast.makeText(getContext(), "A unit action dialog will be shown here", Toast.LENGTH_LONG).show();
+            } else
+                Toast.makeText(getContext(), "Unit action is not supported yet", Toast.LENGTH_SHORT).show();
         }
     }
 

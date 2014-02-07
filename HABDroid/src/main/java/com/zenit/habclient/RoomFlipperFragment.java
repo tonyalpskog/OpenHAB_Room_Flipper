@@ -17,8 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.ui.OpenHABMainActivity;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -51,7 +53,6 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        HABApplication.setAppMode(ApplicationMode.RoomFlipper);
         View rootView = inflater.inflate(R.layout.fragment_room_flipper, container, false);
         mRoomLabel = (TextView) rootView.findViewById(R.id.room_flipper_section_label);
         mRoomViewFlipper = (RoomFlipper) rootView.findViewById(R.id.flipper);
@@ -96,20 +97,44 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 Room roomToEdit = mApplication.getFlipperRoom();
                 Log.d("Edit Room", "onOptionsItemSelected() - Edit room action on room<" + roomToEdit.getId() + ">");
                 mApplication.setConfigRoom(roomToEdit);
-                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
+
+                Intent intent = new Intent(getActivity(), RoomConfigActivity.class);
+                startActivity(intent);
+//                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
                 return true;
             case R.id.action_add_room_from_flipper:
                 Room roomToAdd = mApplication.getRoomProvider().createNewRoom();
                 Log.d("Add Room", "onOptionsItemSelected() - Add room<" + roomToAdd.getId() + ">");
                 mApplication.setConfigRoom(roomToAdd);
-                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
+
+                intent = new Intent(getActivity(), RoomConfigActivity.class);
+                startActivity(intent);
+//                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
                 return true;
             case R.id.action_speak_room_from_flipper:
                 ((MainActivity) getActivity()).startVoiceRecognition(mRoomViewFlipper);
                 return true;
+            case R.id.action_go_to_list_view:
+                // Get launch intent for application
+                Intent widgetListIntent = new Intent(getActivity().getApplicationContext(), OpenHABMainActivity.class);
+                widgetListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
+                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mApplication.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
+
+                // Start launch activity
+                mApplication.getApplicationContext().startActivity(widgetListIntent);
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        HABApplication.setAppMode(ApplicationMode.RoomFlipper);
+        mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
     }
 
     @Override

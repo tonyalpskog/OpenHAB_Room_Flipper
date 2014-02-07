@@ -196,4 +196,8 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         flipperImages[1] = (UnitContainerView) findViewById(R.id.flipper_image_2);
         flipperImages[getDisplayedChild()].setRoom(application.getFlipperRoom());
     }
+
+    public UnitContainerView getCurrentUnitContainer() {
+        return flipperImages[getDisplayedChild()];
+    }
 }

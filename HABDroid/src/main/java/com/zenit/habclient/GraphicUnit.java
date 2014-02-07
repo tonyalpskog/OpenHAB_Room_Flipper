@@ -41,6 +41,10 @@ public class GraphicUnit {
         this.id = UUID.randomUUID();
     }
 
+    public GraphicUnitWidget getGraphicUnitWidget() {
+        return view;
+    }
+
     public ImageView getView(Context context) {
         if(view == null) {
             view = new GraphicUnitWidget(context, this);

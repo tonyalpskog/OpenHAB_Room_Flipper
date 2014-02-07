@@ -18,7 +18,8 @@ public class GestureListener implements View.OnTouchListener {
 
     final float MIN_PINCH_DISTANCE = 100;
     final float MIN_SWIPE_DISTANCE = 100;
-    final float DIAGONAL_FACTOR = 2;
+    final double DIAGONAL_FACTOR = 2.25;// Corresponds to 45/2.25 = 20 degree margin deviation.
+
     //Touch event related variables
     final int IDLE = 0;
     final int SINGLE_POINT = 1;
@@ -38,13 +39,13 @@ public class GestureListener implements View.OnTouchListener {
     private View mView;
 
     public GestureListener(View view) {
-        this(view, false, false);
+        this(view, false/*, false*/);
     }
 
-    public GestureListener(View view, boolean enableDiagonalGestures, boolean enableRotatingGestures) {
+    public GestureListener(View view, boolean enableDiagonalGestures/*, boolean enableRotatingGestures*/) {
         mView = view;
         setDiagonalGesturesEnabled(enableDiagonalGestures);
-        setRotatingGesturesEnabled(enableRotatingGestures);
+        setRotatingGesturesEnabled(false);
     }
 
     @Override
@@ -137,18 +138,18 @@ public class GestureListener implements View.OnTouchListener {
                     if(xDistance > yDistance? xDistance / yDistance > DIAGONAL_FACTOR : yDistance / xDistance > DIAGONAL_FACTOR) {
                         if(xDistance > yDistance && xDistance > MIN_SWIPE_DISTANCE) {
                             //Horizontal swipe
-                            if (initialX > finalX) {
-                                fireGestureEvent(Gesture.SWIPE_LEFT);
-                            } else {
-                                fireGestureEvent(Gesture.SWIPE_RIGHT);
-                            }
+                            fireGestureEvent(initialX > finalX? Gesture.SWIPE_LEFT : Gesture.SWIPE_RIGHT);
                         } else if(yDistance > xDistance && yDistance > MIN_SWIPE_DISTANCE) {
                             //Vertical swipe
-                            if (initialY > finalY) {
-                                fireGestureEvent(Gesture.SWIPE_UP);
-                            } else {
-                                fireGestureEvent(Gesture.SWIPE_DOWN);
-                            }
+                            fireGestureEvent(initialY > finalY? Gesture.SWIPE_UP : Gesture.SWIPE_DOWN);
+                        }
+                    } else if(xDistance > MIN_SWIPE_DISTANCE && yDistance > MIN_SWIPE_DISTANCE) {//Diagonal swipe
+                        if(initialX > finalX) {
+                            //Diagonal swipe to the left
+                            fireGestureEvent(initialY > finalY? Gesture.SWIPE_UP_LEFT : Gesture.SWIPE_DOWN_LEFT);
+                        } else {
+                            //Diagonal swipe to the right
+                            fireGestureEvent(initialY > finalY? Gesture.SWIPE_UP_RIGHT : Gesture.SWIPE_DOWN_RIGHT);
                         }
                     }
                 }
@@ -199,6 +200,7 @@ public class GestureListener implements View.OnTouchListener {
     }
 
     private boolean fireGestureEvent(Gesture gesture) {
+        Log.v(HABApplication.getLogTag(), String.format("Gesture event = %s", gesture.name()));
         if(mOnGestureListener != null) {
             mOnGestureListener.onGesture(mView, gesture);
             return true;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <!-- General app strings -->
     <string name="app_name">openHAB</string>
     <string name="openhab_service_type">_openhab-server-ssl._tcp.local.</string>
@@ -67,7 +68,6 @@
     <string name="mtm_decision_abort">Abort</string>
     <string name="mtm_notification">Certificate verification</string>
 
-
     <!-- Flipper -->
     <string name="title_section1">Room Flipper</string>
     <string name="title_section2">Unit Placement</string>
@@ -96,5 +96,8 @@
     <string name="mainmenu_openhab_flipper">Flipper Activity</string>
     <string name="action_speak_room">Speak room</string>
     <string name="service_name">openHAB service</string>
+    <string name="title_activity_room_config">RoomConfigActivity</string>
+    <string name="hab_group">HAB group</string>
+    <string name="action_list_view">List view</string>
 
 </resources>

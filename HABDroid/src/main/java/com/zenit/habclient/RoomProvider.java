@@ -55,17 +55,17 @@ public class RoomProvider {
     private void createRooms() {
         //Initializing basement
         Room roomBasementLaundry = addRoom(new Room("FF_Bath", "Tvättstuga", getBitmap(R.drawable.basement_laundry)));
-        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Trapphus källare", getBitmap(R.drawable.basement_staircase)));
-        Room roomBasementBath = addRoom(new Room("FF_Child", "Bad källare", getBitmap(R.drawable.basement_bath)));
+        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källarhall", getBitmap(R.drawable.basement_staircase)));
+        Room roomBasementBath = addRoom(new Room("FF_Child", "Källarbad", getBitmap(R.drawable.basement_bath)));
         Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum källare", getBitmap(R.drawable.basement_hobby)));
         Room roomBasementSauna = addRoom(new Room("GF_Kitchen", "Bastu", getBitmap(R.drawable.basement_sauna)));
-        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Förråd källare", getBitmap(R.drawable.basement_storage)));
+        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källarförråd", getBitmap(R.drawable.basement_storage)));
         Room roomBasementSouth = addRoom(new Room("GF_Toilet", "Krypgrund", getBitmap(R.drawable.basement_south)));
 
         //Initializing ground floor
-        Room roomGroundFloorHallway = addRoom(new Room("FF_Bath", "Hall markplan", getBitmap(R.drawable.groundfloor_hallway)));
+        Room roomGroundFloorHallway = addRoom(new Room("FF_Bath", "Hall", getBitmap(R.drawable.groundfloor_hallway)));
         Room roomGroundFloorBath = addRoom(new Room("FF_Child", "Gästtoa", getBitmap(R.drawable.groundfloor_bath)));
-        Room roomGroundFloorStorage = addRoom(new Room("GF_Living", "Förråd markplan", getBitmap(R.drawable.groundfloor_storage)));
+        Room roomGroundFloorStorage = addRoom(new Room("GF_Living", "Förråd", getBitmap(R.drawable.groundfloor_storage)));
         Room roomGroundFloorCleaning = addRoom(new Room("GF_Kitchen", "Städskrubb", getBitmap(R.drawable.groundfloor_cleaning)));
         Room roomGroundFloorKitchen = addRoom(new Room("FF_Bed", "Kök", getBitmap(R.drawable.groundfloor_kitchen)));
         Room roomGroundFloorLivingroom = addRoom(new Room("GF_Toilet", "Vardagsrum", getBitmap(R.drawable.groundfloor_livingroom)));

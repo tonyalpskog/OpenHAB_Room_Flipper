@@ -13,4 +13,8 @@
         android:icon="@android:drawable/ic_btn_speak_now"
         android:title="@string/action_speak_room"
         android:showAsAction="always"/>
+    <item android:id="@+id/action_go_to_list_view"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="@string/action_list_view"
+        android:showAsAction="always"/>
 </menu>

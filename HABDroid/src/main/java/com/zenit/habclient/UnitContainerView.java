@@ -116,13 +116,21 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         drawUnitInRoom(gUnit, x, y);
     }
 
-    public void addNewUnitToRoom(GraphicUnit gUnit, int x, int y) {
+    public void addNewUnitToRoom(GraphicUnit gUnit, int percentOfX, int percentOfY) {
         mRoom.addUnit(gUnit);
         Log.d("Add unit", "addNewUnitToRoom() add unit<" + gUnit.getId() + "> to mRoom<" + mRoom.getId() + ">");
-        drawUnitInRoom(gUnit, x, y);
+
+        int x = ((getScaledBitmapWidth() / 100) * percentOfX) + getScaledBitmapX();
+        int y = ((getScaledBitmapHeight() / 100) * percentOfY) + getScaledBitmapY();
+
+        //TODO - Fix initial unit placement mismatch
+        gUnit.setRoomRelativeX(getScaledBitmapWidth() / (x - getScaledBitmapX()));
+        gUnit.setRoomRelativeY(getScaledBitmapHeight() / (y - getScaledBitmapY()));
+
+        View addedView = drawUnitInRoom(gUnit, x, y);
     }
 
-    private void drawUnitInRoom(GraphicUnit gUnit, int x, int y) {
+    private View drawUnitInRoom(GraphicUnit gUnit, int x, int y) {
         //TODO - This is a horrible work-around for a FrameLayout problem.
         RelativeLayout layout = new RelativeLayout(getContext());
 
@@ -141,6 +149,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         layout.addView(gView, params);
         addedUnitViews.add(layout);
         addView(layout);
+        return gView;
     }
 
     public void setRoom(Room nextRoom) {

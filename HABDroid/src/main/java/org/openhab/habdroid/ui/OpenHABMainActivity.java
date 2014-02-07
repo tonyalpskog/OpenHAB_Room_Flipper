@@ -162,7 +162,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         isDeveloper = true;
 
         startService(new Intent(this, HABService.class));
-        startService(new Intent(this, SpeechService.class));
+        //startService(new Intent(this, SpeechService.class));//TODO - Temporary disabled
 
         // Set default values, false means do it one time during the very first launch
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -261,7 +261,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                     }
                 } else if (getIntent().getAction().equals("org.openhab.notification.selected")) {
                     onNotificationSelected(getIntent());
-                } else if(getIntent().getAction().equalsIgnoreCase("SHOW_PAGE") && getIntent().getStringExtra("pageUrl") != null) {
+                } else if(getIntent().getAction().equalsIgnoreCase("SHOW_PAGE_AS_LIST") && getIntent().getStringExtra("pageUrl") != null) {
                     mNfcData = getIntent().getStringExtra("pageUrl");
                 }
 
