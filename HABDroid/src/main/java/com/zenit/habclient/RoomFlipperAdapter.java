@@ -66,6 +66,30 @@ public class RoomFlipperAdapter {
                 Log.d(TAG, "Swipe to UPPER view");
                 nextRoom = currentRoom.getRoomByAlignment(Direction.UP);
                 break;
+
+            case SWIPE_UP_LEFT:
+                //Swipe to DOWN_RIGHT view
+                Log.d(TAG, "Swipe to DOWN_RIGHT view");
+                nextRoom = currentRoom.getRoomByAlignment(Direction.DOWN_RIGHT);
+                break;
+
+            case SWIPE_UP_RIGHT:
+                //Swipe to DOWN_LEFT view
+                Log.d(TAG, "Swipe to DOWN_LEFT view");
+                nextRoom = currentRoom.getRoomByAlignment(Direction.DOWN_LEFT);
+                break;
+
+            case SWIPE_DOWN_LEFT:
+                //Swipe to UPPER_RIGHT view
+                Log.d(TAG, "Swipe to UPPER_RIGHT view");
+                nextRoom = currentRoom.getRoomByAlignment(Direction.UP_RIGHT);
+                break;
+
+            case SWIPE_DOWN_RIGHT:
+                //Swipe to UPPER_LEFT view
+                Log.d(TAG, "Swipe to UPPER_LEFT view");
+                nextRoom = currentRoom.getRoomByAlignment(Direction.UP_LEFT);
+                break;
         }
 
         if(nextRoom != null) {

@@ -92,9 +92,57 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
                 }
                 break;
 
+            case SWIPE_UP_LEFT:
+                //Swipe to DOWN_RIGHT view
+                Log.d(TAG, "Swipe to DOWN_RIGHT view");
+                if(doBounce) {
+                    setInAnimation(getContext(), R.anim.in_bounce_left);
+                    setOutAnimation(getContext(), R.anim.out_bounce_left);
+                } else {
+                    setInAnimation(getContext(), R.anim.in_right);
+                    setOutAnimation(getContext(), R.anim.out_left);
+                }
+                break;
+
+            case SWIPE_DOWN_LEFT:
+                //Swipe to UP_RIGHT view
+                Log.d(TAG, "Swipe to UP_RIGHT view");
+                if(doBounce) {
+                    setInAnimation(getContext(), R.anim.in_bounce_left);
+                    setOutAnimation(getContext(), R.anim.out_bounce_left);
+                } else {
+                    setInAnimation(getContext(), R.anim.in_right);
+                    setOutAnimation(getContext(), R.anim.out_left);
+                }
+                break;
+
             case SWIPE_RIGHT:
                 //Swipe to LEFT view
                 Log.d(TAG, "Swipe to LEFT view");
+                if(doBounce) {
+                    setInAnimation(getContext(), R.anim.in_bounce_right);
+                    setOutAnimation(getContext(), R.anim.out_bounce_right);
+                } else {
+                    setInAnimation(getContext(), R.anim.in_left);
+                    setOutAnimation(getContext(), R.anim.out_right);
+                }
+                break;
+
+            case SWIPE_UP_RIGHT:
+                //Swipe to DOWN_LEFT view
+                Log.d(TAG, "Swipe to DOWN_LEFT view");
+                if(doBounce) {
+                    setInAnimation(getContext(), R.anim.in_bounce_right);
+                    setOutAnimation(getContext(), R.anim.out_bounce_right);
+                } else {
+                    setInAnimation(getContext(), R.anim.in_left);
+                    setOutAnimation(getContext(), R.anim.out_right);
+                }
+                break;
+
+            case SWIPE_DOWN_RIGHT:
+                //Swipe to UP_LEFT view
+                Log.d(TAG, "Swipe to UP_LEFT view");
                 if(doBounce) {
                     setInAnimation(getContext(), R.anim.in_bounce_right);
                     setOutAnimation(getContext(), R.anim.out_bounce_right);

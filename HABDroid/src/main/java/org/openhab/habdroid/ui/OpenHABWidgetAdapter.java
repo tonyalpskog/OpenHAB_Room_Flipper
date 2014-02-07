@@ -90,7 +90,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
 	private static final String TAG = "OpenHABWidgetAdapter";
-	private String openHABBaseUrl = "http://demo.openhab.org:8080/";
+	private String openHABBaseUrl = "http://demo.openhab.org:8443/";
 	private String openHABUsername = "";
 	private String openHABPassword = "";
 	private ArrayList<VideoView> videoWidgetList;

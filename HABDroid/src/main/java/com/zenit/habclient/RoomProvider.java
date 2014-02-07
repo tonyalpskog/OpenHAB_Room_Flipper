@@ -55,11 +55,11 @@ public class RoomProvider {
     private void createRooms() {
         //Initializing basement
         Room roomBasementLaundry = addRoom(new Room("FF_Bath", "Tvättstuga", getBitmap(R.drawable.basement_laundry)));
-        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källarhall", getBitmap(R.drawable.basement_staircase)));
-        Room roomBasementBath = addRoom(new Room("FF_Child", "Källarbad", getBitmap(R.drawable.basement_bath)));
-        Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum källare", getBitmap(R.drawable.basement_hobby)));
+        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källar hall", getBitmap(R.drawable.basement_staircase)));
+        Room roomBasementBath = addRoom(new Room("FF_Child", "Källar bad", getBitmap(R.drawable.basement_bath)));
+        Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum", getBitmap(R.drawable.basement_hobby)));
         Room roomBasementSauna = addRoom(new Room("GF_Kitchen", "Bastu", getBitmap(R.drawable.basement_sauna)));
-        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källarförråd", getBitmap(R.drawable.basement_storage)));
+        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källar förråd", getBitmap(R.drawable.basement_storage)));
         Room roomBasementSouth = addRoom(new Room("GF_Toilet", "Krypgrund", getBitmap(R.drawable.basement_south)));
 
         //Initializing ground floor
@@ -76,69 +76,95 @@ public class RoomProvider {
         //Aligning basement
         roomBasementLaundry.setAlignment(roomBasementStaircase, Direction.RIGHT);
         roomBasementLaundry.setAlignment(roomBasementHobby, Direction.UP);
+        roomBasementLaundry.setAlignment(roomBasementHobby, Direction.UP_RIGHT);
         roomBasementLaundry.setAlignment(roomGroundFloorBath, Direction.ABOVE);
 
         roomBasementStaircase.setAlignment(roomBasementHobby, Direction.UP);
+        roomBasementStaircase.setAlignment(roomBasementHobby, Direction.UP_LEFT);
         roomBasementStaircase.setAlignment(roomBasementLaundry, Direction.LEFT);
         roomBasementStaircase.setAlignment(roomBasementBath, Direction.RIGHT);
+        roomBasementStaircase.setAlignment(roomBasementSauna, Direction.UP_RIGHT);
         roomBasementStaircase.setAlignment(roomGroundFloorHallway, Direction.ABOVE);
 
         roomBasementBath.setAlignment(roomBasementStaircase, Direction.LEFT);
         roomBasementBath.setAlignment(roomBasementSauna, Direction.UP);
+        roomBasementBath.setAlignment(roomBasementHobby, Direction.UP_LEFT);
         roomBasementBath.setAlignment(roomGroundFloorHallway, Direction.ABOVE);
 
         roomBasementHobby.setAlignment(roomBasementSouth, Direction.UP);
+        roomBasementHobby.setAlignment(roomBasementStorage, Direction.UP_RIGHT);
         roomBasementHobby.setAlignment(roomBasementStaircase, Direction.DOWN);
-        roomBasementHobby.setAlignment(roomBasementStorage, Direction.RIGHT);
+        roomBasementHobby.setAlignment(roomBasementSauna, Direction.RIGHT);
+        roomBasementHobby.setAlignment(roomBasementLaundry, Direction.DOWN_LEFT);
+        roomBasementHobby.setAlignment(roomBasementBath, Direction.DOWN_RIGHT);
         roomBasementHobby.setAlignment(roomGroundFloorKitchen, Direction.ABOVE);
 
         roomBasementSauna.setAlignment(roomBasementStorage, Direction.UP);
+        roomBasementSauna.setAlignment(roomBasementStorage, Direction.UP_LEFT);
         roomBasementSauna.setAlignment(roomBasementHobby, Direction.LEFT);
         roomBasementSauna.setAlignment(roomBasementBath, Direction.DOWN);
+        roomBasementSauna.setAlignment(roomBasementStaircase, Direction.DOWN_LEFT);
         roomBasementSauna.setAlignment(roomGroundFloorLivingroom, Direction.ABOVE);
 
         roomBasementStorage.setAlignment(roomBasementHobby, Direction.LEFT);
         roomBasementStorage.setAlignment(roomBasementSouth, Direction.UP);
+        roomBasementStorage.setAlignment(roomBasementSouth, Direction.UP_LEFT);
         roomBasementStorage.setAlignment(roomBasementSauna, Direction.DOWN);
+        roomBasementStorage.setAlignment(roomBasementHobby, Direction.DOWN_LEFT);
         roomBasementStorage.setAlignment(roomGroundFloorLivingroom, Direction.ABOVE);
 
         roomBasementSouth.setAlignment(roomBasementHobby, Direction.DOWN);
+        roomBasementSouth.setAlignment(roomBasementHobby, Direction.DOWN_LEFT);
+        roomBasementSouth.setAlignment(roomBasementStorage, Direction.DOWN_RIGHT);
         roomBasementSouth.setAlignment(roomGroundFloorDiningroom, Direction.ABOVE);
 
         //Aligning ground floor
-        roomGroundFloorHallway.setAlignment(roomGroundFloorCleaning, Direction.DOWN);
-        roomGroundFloorHallway.setAlignment(roomGroundFloorBath, Direction.LEFT);
+        roomGroundFloorHallway.setAlignment(roomGroundFloorCleaning, Direction.LEFT);
+        roomGroundFloorHallway.setAlignment(roomGroundFloorBath, Direction.DOWN_LEFT);
+        roomGroundFloorHallway.setAlignment(roomGroundFloorKitchen, Direction.UP_LEFT);
+        roomGroundFloorHallway.setAlignment(roomGroundFloorLivingroom, Direction.UP_RIGHT);
         roomGroundFloorHallway.setAlignment(roomGroundFloorStorage, Direction.UP);
         roomGroundFloorHallway.setAlignment(roomBasementStaircase, Direction.BELOW);
 
         roomGroundFloorBath.setAlignment(roomGroundFloorHallway, Direction.UP);
+        roomGroundFloorBath.setAlignment(roomGroundFloorHallway, Direction.UP_RIGHT);
         roomGroundFloorBath.setAlignment(roomGroundFloorCleaning, Direction.RIGHT);
         roomGroundFloorBath.setAlignment(roomBasementLaundry, Direction.BELOW);
 
         roomGroundFloorCleaning.setAlignment(roomGroundFloorBath, Direction.LEFT);
         roomGroundFloorCleaning.setAlignment(roomGroundFloorHallway, Direction.UP);
+        roomGroundFloorCleaning.setAlignment(roomGroundFloorHallway, Direction.UP_RIGHT);
+        roomGroundFloorCleaning.setAlignment(roomGroundFloorHallway, Direction.UP_LEFT);
         roomGroundFloorCleaning.setAlignment(roomGroundFloorHallway, Direction.RIGHT);
         roomGroundFloorCleaning.setAlignment(roomBasementLaundry, Direction.BELOW);
 
         roomGroundFloorStorage.setAlignment(roomGroundFloorKitchen, Direction.LEFT);
         roomGroundFloorStorage.setAlignment(roomGroundFloorDiningroom, Direction.UP);
+        roomGroundFloorStorage.setAlignment(roomGroundFloorDiningroom, Direction.UP_LEFT);
+        roomGroundFloorStorage.setAlignment(roomGroundFloorDiningroom, Direction.UP_RIGHT);
         roomGroundFloorStorage.setAlignment(roomGroundFloorLivingroom, Direction.RIGHT);
         roomGroundFloorStorage.setAlignment(roomGroundFloorHallway, Direction.DOWN);
+        roomGroundFloorStorage.setAlignment(roomGroundFloorHallway, Direction.DOWN_LEFT);
+        roomGroundFloorStorage.setAlignment(roomGroundFloorHallway, Direction.DOWN_RIGHT);
         roomGroundFloorStorage.setAlignment(roomBasementHobby, Direction.BELOW);
 
         roomGroundFloorKitchen.setAlignment(roomGroundFloorDiningroom, Direction.UP);
+        roomGroundFloorKitchen.setAlignment(roomGroundFloorDiningroom, Direction.UP_RIGHT);
         roomGroundFloorKitchen.setAlignment(roomGroundFloorStorage, Direction.RIGHT);
         roomGroundFloorKitchen.setAlignment(roomGroundFloorHallway, Direction.DOWN);
+        roomGroundFloorKitchen.setAlignment(roomGroundFloorHallway, Direction.DOWN_RIGHT);
         roomGroundFloorKitchen.setAlignment(roomBasementHobby, Direction.BELOW);
 
         roomGroundFloorDiningroom.setAlignment(roomGroundFloorStorage, Direction.DOWN);
-        roomGroundFloorDiningroom.setAlignment(roomGroundFloorKitchen, Direction.LEFT);
-        roomGroundFloorDiningroom.setAlignment(roomGroundFloorLivingroom, Direction.RIGHT);
+        roomGroundFloorDiningroom.setAlignment(roomGroundFloorKitchen, Direction.DOWN_LEFT);
+        roomGroundFloorDiningroom.setAlignment(roomGroundFloorLivingroom, Direction.DOWN_RIGHT);
         roomGroundFloorDiningroom.setAlignment(roomBasementSouth, Direction.BELOW);
 
         roomGroundFloorLivingroom.setAlignment(roomGroundFloorDiningroom, Direction.UP);
+        roomGroundFloorLivingroom.setAlignment(roomGroundFloorDiningroom, Direction.UP_LEFT);
         roomGroundFloorLivingroom.setAlignment(roomGroundFloorStorage, Direction.LEFT);
         roomGroundFloorLivingroom.setAlignment(roomGroundFloorHallway, Direction.DOWN);
+        roomGroundFloorLivingroom.setAlignment(roomGroundFloorHallway, Direction.DOWN_LEFT);
         roomGroundFloorLivingroom.setAlignment(roomBasementStorage, Direction.BELOW);
 
         //Demo

@@ -1,6 +1,7 @@
 package com.zenit.habclient;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.util.Log;
 
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -140,5 +141,53 @@ public class Room {
             return mLocalWidget;
 
         return HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
+    }
+
+    public void setPointAsAlfa(int x, int y) {
+        mBackgroundImage = setPointAsAlfa(x, y, mBackgroundImage);
+    }
+
+    public Bitmap setPointAsAlfa(int x, int y, Bitmap source) {
+        int pixelColor = source.getPixel(x, y);
+
+        Bitmap target = Bitmap.createBitmap(source.getWidth(), source.getHeight(), source.getConfig());
+
+        int height = source.getHeight();
+        int width = source.getWidth();
+
+        for (int yPos = 0; yPos < height; yPos++) {
+            for (int xPos = 0; xPos < width; xPos++) {
+                target.setPixel(xPos, yPos, Color.alpha(pixelColor));
+            }
+        }
+
+        return target;
+    }
+
+    public void invertRoomImage() {
+        mBackgroundImage = invertBitmap(mBackgroundImage);
+    }
+
+    private Bitmap invertBitmap(Bitmap source) {
+        Bitmap target = Bitmap.createBitmap(source.getWidth(), source.getHeight(), source.getConfig());
+        int A, R, G, B;
+        int pixelColor;
+        int height = source.getHeight();
+        int width = source.getWidth();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                pixelColor = source.getPixel(x, y);
+                A = Color.alpha(pixelColor);
+
+                R = 255 - Color.red(pixelColor);
+                G = 255 - Color.green(pixelColor);
+                B = 255 - Color.blue(pixelColor);
+
+                target.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+
+        return target;
     }
 }

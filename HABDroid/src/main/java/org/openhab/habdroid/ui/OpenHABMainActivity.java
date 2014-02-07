@@ -237,7 +237,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
         HABApplication.getOpenHABSetting().setUsername(openHABUsername);
         HABApplication.getOpenHABSetting().setPassword(openHABPassword);
-        HABApplication.getOpenHABSetting().setBaseUrl("http://demo.openhab.org:8080/");//Added by TA
+        HABApplication.getOpenHABSetting().setBaseUrl("http://demo.openhab.org:8443/");//Added by TA
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
