@@ -103,9 +103,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 //                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
                 return true;
             case R.id.action_add_room_from_flipper:
-                Room roomToAdd = mApplication.getRoomProvider().createNewRoom();
-                Log.d("Add Room", "onOptionsItemSelected() - Add room<" + roomToAdd.getId() + ">");
-                mApplication.setConfigRoom(roomToAdd);
+                Log.d("Add Room", "onOptionsItemSelected() - Add room");
+                mApplication.setConfigRoom(mApplication.getRoomProvider().createNewRoom());
 
                 intent = new Intent(getActivity(), RoomConfigActivity.class);
                 startActivity(intent);

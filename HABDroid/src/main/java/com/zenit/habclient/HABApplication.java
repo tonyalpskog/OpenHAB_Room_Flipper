@@ -79,15 +79,21 @@ public class HABApplication extends Application {
     }
 
     public Room getConfigRoom() {
-        Room room = getRoom(currentConfigRoom);
-        currentConfigRoom = room.getId();
-        Log.d(getLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
-        return room;
+        if(currentConfigRoom == null)
+            return null;
+
+        return getRoom(currentConfigRoom);
+//        Log.d(getLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
     }
 
     public void setConfigRoom(Room room) {
-        Log.d(getLogTag(), String.format("Setting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
-        currentConfigRoom = room.getId();
+        if(room != null) {
+            Log.d(getLogTag(), String.format("Setting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
+            currentConfigRoom = room.getId();
+        } else {
+            Log.d(getLogTag(), "Setting config room: New Room");
+            currentConfigRoom = null;
+        }
     }
 
     public Room getFlipperRoom() {

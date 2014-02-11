@@ -111,7 +111,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
     	int widgetLayout;
     	preparedViewData.openHABWidget = getItem(position);
     	int screenWidth = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
-    	widgetLayout = getItem(position).getType().LayoutId;
+    	widgetLayout = getItem(position).getType().WidgetLayoutId;
 
     	if (convertView == null) {
             preparedViewData.widgetView = new RelativeLayout(getContext());

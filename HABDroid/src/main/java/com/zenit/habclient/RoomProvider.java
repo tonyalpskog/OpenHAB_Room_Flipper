@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import org.openhab.habdroid.R;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -16,6 +17,7 @@ public class RoomProvider {
     HashMap<UUID, Room> roomHash;
     UUID initialRoomId;
     private Context mContext = null;
+    private Room mNewRoom = null;
 
     public RoomProvider(Context context) {
         mContext = context;
@@ -23,13 +25,39 @@ public class RoomProvider {
         createRooms();
     }
 
-    public boolean add(Room room) {
+    private boolean add(Room room) {
         roomHash.put(room.getId(), room);
         return true;
     }
 
+
+    public void saveRoom(Room room) {
+        if(!roomHash.containsValue(room)) {
+            if(room == mNewRoom) {
+                addRoom(room.shallowClone());
+                mNewRoom = null;//Reset temporary instance.//TODO - Fix this temporary solution when adding DB support
+            }
+        }
+    }
+
+    private boolean remove(Room room) {
+        roomHash.remove(room.getId());
+        Iterator iterator = roomHash.values().iterator();
+        while(iterator.hasNext()) {
+            Room tempRoom = (Room) iterator.next();
+            tempRoom.removeAlignment(room);
+        }
+        return true;
+    }
+
     public Room get(UUID uuid) {
-        return roomHash.get(uuid);
+        Room room = roomHash.get(uuid);
+        if(room != null)
+            return room;
+        else if(mNewRoom.getId().equals(uuid))
+            return mNewRoom;
+
+        return null;
     }
 
     public Room getInitialRoom() {
@@ -41,10 +69,9 @@ public class RoomProvider {
     }
 
     public Room createNewRoom() {
-        //TA: TODO - Fix name problem. (now sitemapID)
-        Room room = new Room(null, "New room", getBitmap(R.drawable.empty_room));
-        add(room);
-        return room;
+        mNewRoom = new Room(null, "New room", getBitmap(R.drawable.empty_room));
+//        add(room);
+        return mNewRoom;
     }
 
     public Room addRoom(Room room) {
@@ -52,24 +79,29 @@ public class RoomProvider {
         return room;
     }
 
+    public Room removeRoom(Room room) {
+        remove(room);
+        return room;
+    }
+
     private void createRooms() {
         //Initializing basement
-        Room roomBasementLaundry = addRoom(new Room("FF_Bath", "Tvättstuga", getBitmap(R.drawable.basement_laundry)));
-        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källar hall", getBitmap(R.drawable.basement_staircase)));
-        Room roomBasementBath = addRoom(new Room("FF_Child", "Källar bad", getBitmap(R.drawable.basement_bath)));
-        Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum", getBitmap(R.drawable.basement_hobby)));
-        Room roomBasementSauna = addRoom(new Room("GF_Kitchen", "Bastu", getBitmap(R.drawable.basement_sauna)));
-        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källar förråd", getBitmap(R.drawable.basement_storage)));
-        Room roomBasementSouth = addRoom(new Room("GF_Toilet", "Krypgrund", getBitmap(R.drawable.basement_south)));
+        Room roomBasementLaundry = addRoom(new Room("FF_Bath", "Tvättstuga", R.drawable.basement_laundry, mContext));
+        Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källar hall", R.drawable.basement_staircase, mContext));
+        Room roomBasementBath = addRoom(new Room("FF_Child", "Källar bad", R.drawable.basement_bath, mContext));
+        Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum", R.drawable.basement_hobby, mContext));
+        Room roomBasementSauna = addRoom(new Room("GF_Kitchen", "Bastu", R.drawable.basement_sauna, mContext));
+        Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källar förråd", R.drawable.basement_storage, mContext));
+        Room roomBasementSouth = addRoom(new Room("GF_Toilet", "Krypgrund", R.drawable.basement_south, mContext));
 
         //Initializing ground floor
-        Room roomGroundFloorHallway = addRoom(new Room("FF_Bath", "Hall", getBitmap(R.drawable.groundfloor_hallway)));
-        Room roomGroundFloorBath = addRoom(new Room("FF_Child", "Gästtoa", getBitmap(R.drawable.groundfloor_bath)));
-        Room roomGroundFloorStorage = addRoom(new Room("GF_Living", "Förråd", getBitmap(R.drawable.groundfloor_storage)));
-        Room roomGroundFloorCleaning = addRoom(new Room("GF_Kitchen", "Städskrubb", getBitmap(R.drawable.groundfloor_cleaning)));
-        Room roomGroundFloorKitchen = addRoom(new Room("FF_Bed", "Kök", getBitmap(R.drawable.groundfloor_kitchen)));
-        Room roomGroundFloorLivingroom = addRoom(new Room("GF_Toilet", "Vardagsrum", getBitmap(R.drawable.groundfloor_livingroom)));
-        Room roomGroundFloorDiningroom = addRoom(new Room("GF_Toilet", "Matsal", getBitmap(R.drawable.groundfloor_diningroom)));
+        Room roomGroundFloorHallway = addRoom(new Room("FF_Bath", "Hall", R.drawable.groundfloor_hallway, mContext));
+        Room roomGroundFloorBath = addRoom(new Room("FF_Child", "Gästtoa", R.drawable.groundfloor_bath, mContext));
+        Room roomGroundFloorStorage = addRoom(new Room("GF_Living", "Förråd", R.drawable.groundfloor_storage, mContext));
+        Room roomGroundFloorCleaning = addRoom(new Room("GF_Kitchen", "Städskrubb", R.drawable.groundfloor_cleaning, mContext));
+        Room roomGroundFloorKitchen = addRoom(new Room("FF_Bed", "Kök", R.drawable.groundfloor_kitchen, mContext));
+        Room roomGroundFloorLivingroom = addRoom(new Room("GF_Toilet", "Vardagsrum", R.drawable.groundfloor_livingroom, mContext));
+        Room roomGroundFloorDiningroom = addRoom(new Room("GF_Toilet", "Matsal", R.drawable.groundfloor_diningroom, mContext));
 
         initialRoomId = roomBasementStaircase.getId();
 

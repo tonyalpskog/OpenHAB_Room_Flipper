@@ -7,6 +7,7 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -38,6 +39,8 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
      */
     ViewPager mViewPager;
 
+    private Room mConfigRoom;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +53,7 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager(), this);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -77,6 +80,11 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -118,6 +126,28 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    public boolean isNewRoom() {
+        return ((HABApplication)getApplication()).getConfigRoom() == null;
+    }
+
+    public Room getConfigRoom() {
+        if(mConfigRoom != null)
+            return mConfigRoom;
+
+        Room roomToBeEdited = ((HABApplication)getApplication()).getConfigRoom();
+
+        if(roomToBeEdited == null)
+            mConfigRoom = ((HABApplication)getApplication()).getRoomProvider().createNewRoom();
+        else if(roomToBeEdited != null)
+            mConfigRoom = roomToBeEdited;
+
+        return mConfigRoom;
+    }
+
+    public void setConfigRoom(Room configRoom) {
+        mConfigRoom = configRoom;
+    }
+
 //    @Override
 //    public void onTabChanged(String tabId) {
 //        Log.d(TAG, "onTabChanged(): tabId=" + tabId);
@@ -148,17 +178,20 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private RoomConfigActivity mActivity;
+
+        public SectionsPagerAdapter(FragmentManager fm, RoomConfigActivity activity) {
             super(fm);
+            mActivity = activity;
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new RoomConfigFragment(((HABApplication)getApplication()).getRoomProvider(), ((HABApplication)getApplication()).getConfigRoom());
+                    return new RoomConfigFragment(((HABApplication)getApplication()).getRoomProvider(), mActivity);
                 case 1:
-                    return new UnitPlacementFragment(((HABApplication)getApplication()).getConfigRoom());
+                    return new UnitPlacementFragment(mActivity);
             }
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).

@@ -2,7 +2,6 @@ package com.zenit.habclient;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,8 +10,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABItemType;
+import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +33,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private Room mRoom;
     private List<View> addedUnitViews;
     private boolean mBlockUnitRedraw = false;
+    private OpenHABWidgetControl mOpenHABWidgetControl;
+    private View mAddedControlView = null;
 
     public UnitContainerView(Context context) {
         this(context, null);
@@ -38,6 +42,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
     public UnitContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mOpenHABWidgetControl = new OpenHABWidgetControl(context);
 
         addedUnitViews = new ArrayList<View>();
 
@@ -115,6 +121,16 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         int x = Math.round(getScaledBitmapX() + (getScaledBitmapWidth() / gUnit.getRoomRelativeX()));
         int y = Math.round(getScaledBitmapY() + (getScaledBitmapHeight() / gUnit.getRoomRelativeY()));
         drawUnitInRoom(gUnit, x, y);
+        if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Text)
+            drawControlInRoom(gUnit, x, y);
+//        else
+//            drawControlInRoom(gUnit, x-50, y-150);
+    }
+
+    public void drawControlInRoom(GraphicUnit gUnit) {
+        int x = Math.round(getScaledBitmapX() + (getScaledBitmapWidth() / gUnit.getRoomRelativeX()));
+        int y = Math.round(getScaledBitmapY() + (getScaledBitmapHeight() / gUnit.getRoomRelativeY()));
+        drawControlInRoom(gUnit, x, y);
     }
 
     public void addNewUnitToRoom(GraphicUnit gUnit, int percentOfX, int percentOfY) {
@@ -128,32 +144,61 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         gUnit.setRoomRelativeX(getScaledBitmapWidth() / (x - getScaledBitmapX()));
         gUnit.setRoomRelativeY(getScaledBitmapHeight() / (y - getScaledBitmapY()));
 
-        View addedView = drawUnitInRoom(gUnit, x, y);
+        drawUnitInRoom(gUnit, x, y);
     }
 
-    private View drawUnitInRoom(GraphicUnit gUnit, int x, int y) {
-        //TODO - This is a horrible work-around for a FrameLayout problem.
-        RelativeLayout layout = new RelativeLayout(getContext());
+    private void drawUnitInRoom(GraphicUnit gUnit, int x, int y) {
+        //TODO - This is probably a horrible RelativeLayout work-around for a FrameLayout problem.
 
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.room_layout_relative, layout, true);
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        RelativeLayout layout = (RelativeLayout)inflater.inflate(R.layout.room_layout_relative, this, false);
 
-        //RelativeLayout layout = (RelativeLayout) findViewById(R.layout.room_layout_relative);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
         params.setMargins(x, y, 0, 0);
         Log.d("UnitPos", params.leftMargin + "/" + params.topMargin);
+
         ImageView gView = gUnit.getView(getContext());
         layout.addView(gView, params);
         addedUnitViews.add(layout);
         addView(layout);
-        return gView;
+    }
+
+    private void drawControlInRoom(GraphicUnit gUnit, int x, int y) {
+        if(gUnit.getOpenHABWidget().getType().ControlLayoutId == -1)//No available layout
+            return;
+
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View inflatedView = inflater.inflate(gUnit.getOpenHABWidget().getType().ControlLayoutId, this, false);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        Log.d("ControlPos", params.leftMargin + "/" + params.topMargin);
+        View controlView = null;
+
+        if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Switch) {
+            removeControlView();
+            controlView = mOpenHABWidgetControl.initializeSwitchWidget(gUnit.getOpenHABWidget(), inflatedView);
+            params.setMargins(x - 30, y + 64, 0, 0);
+            mAddedControlView = inflatedView;
+        } else if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Text) {
+            addedUnitViews.add(inflatedView);
+            controlView = mOpenHABWidgetControl.initializeTextWidget(gUnit.getOpenHABWidget(), inflatedView);
+            params.setMargins(x - 10, y + 64, 0, 0);
+        }
+
+        controlView.setLayoutParams(params);
+        addView(inflatedView);
     }
 
     public void setRoom(Room nextRoom) {
+        if(mRoom != null)
+            mRoom.dispose();
+
         mRoom = nextRoom;
         mBlockUnitRedraw = true;
         setImageBitmap(mRoom.getRoomImage());
@@ -177,7 +222,18 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
             vg.removeAllViewsInLayout();
             removeView(vg);
         }
+
+        removeControlView();
+
         addedUnitViews.clear();
         Log.d("Remove unit views", "Room<" + getRoom().getId() + ">  Child count = " + getChildCount());
+    }
+
+    private void removeControlView() {
+        if(mAddedControlView != null) {
+            removeView(mAddedControlView);
+        }
+
+        mAddedControlView = null;
     }
 }

@@ -96,11 +96,11 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
                 //Swipe to DOWN_RIGHT view
                 Log.d(TAG, "Swipe to DOWN_RIGHT view");
                 if(doBounce) {
-                    setInAnimation(getContext(), R.anim.in_bounce_left);
-                    setOutAnimation(getContext(), R.anim.out_bounce_left);
+                    setInAnimation(getContext(), R.anim.in_bounce_up_left);
+                    setOutAnimation(getContext(), R.anim.out_bounce_up_left);
                 } else {
-                    setInAnimation(getContext(), R.anim.in_right);
-                    setOutAnimation(getContext(), R.anim.out_left);
+                    setInAnimation(getContext(), R.anim.in_down_right);
+                    setOutAnimation(getContext(), R.anim.out_up_left);
                 }
                 break;
 
@@ -108,11 +108,11 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
                 //Swipe to UP_RIGHT view
                 Log.d(TAG, "Swipe to UP_RIGHT view");
                 if(doBounce) {
-                    setInAnimation(getContext(), R.anim.in_bounce_left);
-                    setOutAnimation(getContext(), R.anim.out_bounce_left);
+                    setInAnimation(getContext(), R.anim.in_bounce_down_left);
+                    setOutAnimation(getContext(), R.anim.out_bounce_down_left);
                 } else {
-                    setInAnimation(getContext(), R.anim.in_right);
-                    setOutAnimation(getContext(), R.anim.out_left);
+                    setInAnimation(getContext(), R.anim.in_up_right);
+                    setOutAnimation(getContext(), R.anim.out_down_left);
                 }
                 break;
 
@@ -132,11 +132,11 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
                 //Swipe to DOWN_LEFT view
                 Log.d(TAG, "Swipe to DOWN_LEFT view");
                 if(doBounce) {
-                    setInAnimation(getContext(), R.anim.in_bounce_right);
-                    setOutAnimation(getContext(), R.anim.out_bounce_right);
+                    setInAnimation(getContext(), R.anim.in_bounce_up_right);
+                    setOutAnimation(getContext(), R.anim.out_bounce_up_right);
                 } else {
-                    setInAnimation(getContext(), R.anim.in_left);
-                    setOutAnimation(getContext(), R.anim.out_right);
+                    setInAnimation(getContext(), R.anim.in_down_left);
+                    setOutAnimation(getContext(), R.anim.out_up_right);
                 }
                 break;
 
@@ -144,11 +144,11 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
                 //Swipe to UP_LEFT view
                 Log.d(TAG, "Swipe to UP_LEFT view");
                 if(doBounce) {
-                    setInAnimation(getContext(), R.anim.in_bounce_right);
-                    setOutAnimation(getContext(), R.anim.out_bounce_right);
+                    setInAnimation(getContext(), R.anim.in_bounce_down_right);
+                    setOutAnimation(getContext(), R.anim.out_bounce_down_right);
                 } else {
-                    setInAnimation(getContext(), R.anim.in_left);
-                    setOutAnimation(getContext(), R.anim.out_right);
+                    setInAnimation(getContext(), R.anim.in_up_left);
+                    setOutAnimation(getContext(), R.anim.out_down_right);
                 }
                 break;
 

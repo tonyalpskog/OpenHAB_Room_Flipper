@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -34,17 +35,23 @@ public class RoomConfigFragment extends Fragment {
     private final OpenHABWidget NULL_GROUP_WIDGET = new OpenHABWidget();
     private final Room NULL_ROOM = new Room(null, "<Undefined room>", null);//TA: TODO - Fix name problem. (now sitemapID)
     HashMap<Direction, Spinner> mSpinnerHashMap;
+    private RoomConfigActivity mActivity;
 
 //    private OnFragmentInteractionListener mListener;
 
-    public static RoomConfigFragment newInstance(RoomProvider roomProvider, Room roomToBeEdited) {
-        RoomConfigFragment fragment = new RoomConfigFragment(roomProvider, roomToBeEdited);
+    public static RoomConfigFragment newInstance(RoomProvider roomProvider) {
+        RoomConfigFragment fragment = new RoomConfigFragment(roomProvider);
         return fragment;
     }
 
-    public RoomConfigFragment(RoomProvider roomProvider, Room roomToBeEdited) {
+    public RoomConfigFragment(RoomProvider roomProvider) {
         mRoomProvider = roomProvider;
-        mCurrentRoom = roomToBeEdited;
+    }
+
+    public RoomConfigFragment(RoomProvider roomProvider, RoomConfigActivity activity) {
+        this(roomProvider);
+        mActivity = activity;
+        mCurrentRoom = mActivity.getConfigRoom();
     }
 
     @Override
@@ -58,12 +65,16 @@ public class RoomConfigFragment extends Fragment {
         Log.d("LifeCycle", "RoomConfigFragment.onCreateView()");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_room_config, container, false);
-        mRoomNameText = (EditText) view.findViewById(R.id.edittext_room_name);
+        mRoomNameText = (EditText) view.findViewById(R.id.edittext_room_alias);
         mHABGroupSpinner = (Spinner) view.findViewById(R.id.spinner_hab_group);
-        Spinner leftRoomSpinner = (Spinner) view.findViewById(R.id.spinner_left_room);
-        Spinner rightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_right_room);
         Spinner upRoomSpinner = (Spinner) view.findViewById(R.id.spinner_up_room);
+        Spinner upRightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_up_right_room);
+        Spinner rightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_right_room);
+        Spinner downRightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_down_right_room);
         Spinner downRoomSpinner = (Spinner) view.findViewById(R.id.spinner_down_room);
+        Spinner downLeftRoomSpinner = (Spinner) view.findViewById(R.id.spinner_down_left_room);
+        Spinner leftRoomSpinner = (Spinner) view.findViewById(R.id.spinner_left_room);
+        Spinner upLeftRoomSpinner = (Spinner) view.findViewById(R.id.spinner_up_left_room);
         Spinner aboveRoomSpinner = (Spinner) view.findViewById(R.id.spinner_above_room);
         Spinner belowRoomSpinner = (Spinner) view.findViewById(R.id.spinner_below_room);
         mSaveButton = (Button) view.findViewById(R.id.room_edit_save_button);
@@ -108,10 +119,14 @@ public class RoomConfigFragment extends Fragment {
         //Set adapters for spinners
         mHABGroupSpinner.setAdapter(habGroupSpinnerAdapter);
 
-        leftRoomSpinner.setAdapter(roomSpinnerAdapter);
-        rightRoomSpinner.setAdapter(roomSpinnerAdapter);
         upRoomSpinner.setAdapter(roomSpinnerAdapter);
+        upRightRoomSpinner.setAdapter(roomSpinnerAdapter);
+        rightRoomSpinner.setAdapter(roomSpinnerAdapter);
+        downRightRoomSpinner.setAdapter(roomSpinnerAdapter);
         downRoomSpinner.setAdapter(roomSpinnerAdapter);
+        downLeftRoomSpinner.setAdapter(roomSpinnerAdapter);
+        leftRoomSpinner.setAdapter(roomSpinnerAdapter);
+        upLeftRoomSpinner.setAdapter(roomSpinnerAdapter);
         aboveRoomSpinner.setAdapter(roomSpinnerAdapter);
         belowRoomSpinner.setAdapter(roomSpinnerAdapter);
 
@@ -123,10 +138,14 @@ public class RoomConfigFragment extends Fragment {
 
         if(mSpinnerHashMap == null)
             mSpinnerHashMap = new HashMap<Direction, Spinner>();
-        mSpinnerHashMap.put(Direction.LEFT, leftRoomSpinner);
-        mSpinnerHashMap.put(Direction.RIGHT, rightRoomSpinner);
         mSpinnerHashMap.put(Direction.UP, upRoomSpinner);
+        mSpinnerHashMap.put(Direction.UP_RIGHT, upRightRoomSpinner);
+        mSpinnerHashMap.put(Direction.RIGHT, rightRoomSpinner);
+        mSpinnerHashMap.put(Direction.DOWN_RIGHT, downRightRoomSpinner);
         mSpinnerHashMap.put(Direction.DOWN, downRoomSpinner);
+        mSpinnerHashMap.put(Direction.DOWN_LEFT, downLeftRoomSpinner);
+        mSpinnerHashMap.put(Direction.LEFT, leftRoomSpinner);
+        mSpinnerHashMap.put(Direction.UP_LEFT, upLeftRoomSpinner);
         mSpinnerHashMap.put(Direction.ABOVE, aboveRoomSpinner);
         mSpinnerHashMap.put(Direction.BELOW, belowRoomSpinner);
 
@@ -233,20 +252,34 @@ public class RoomConfigFragment extends Fragment {
     private void saveRoomConfig() {
         Log.d(TAG, "saveRoomConfig()");
 
-        if(mRoomNameText.getText().toString().length() > 0)
-            mCurrentRoom.setName(mRoomNameText.getText().toString());
+        if(mHABGroupSpinner.getSelectedItem() == NULL_GROUP_WIDGET) {
+            Toast.makeText(mActivity.getApplicationContext(),  "Unsuccessful! HAB Group item must be selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        if(mHABGroupSpinner.getSelectedItem() != null)
-            mCurrentRoom.setGroupItemName(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getItem().getName());
-
+        boolean hasAlignment = false;
         Iterator iterator = mSpinnerHashMap.keySet().iterator();
         while(iterator.hasNext()) {
             Direction direction = (Direction) iterator.next();
             Spinner spinner = mSpinnerHashMap.get(direction);
             if(spinner.getSelectedItem() == NULL_ROOM)
                 mCurrentRoom.setAlignment(null, direction);
-            else
+            else {
                 mCurrentRoom.setAlignment((Room) spinner.getSelectedItem(), direction);
+                hasAlignment = true;
+            }
         }
+
+        if(!hasAlignment) {
+            Toast.makeText(mActivity.getApplicationContext(),  "Unsuccessful! At least one room alignment must be selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mCurrentRoom.setGroupItemName(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getItem().getName());
+
+        if(mRoomNameText.getText().toString().length() > 0)
+            mCurrentRoom.setName(mRoomNameText.getText().toString());
+
+        mRoomProvider.saveRoom(mCurrentRoom);
     }
 }

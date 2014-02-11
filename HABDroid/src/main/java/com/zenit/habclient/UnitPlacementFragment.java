@@ -43,6 +43,7 @@ public class UnitPlacementFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "UnitPlacementFragment";
 
+    private RoomConfigActivity mActivity;
     private View fragmentView;
     private UnitContainerView roomView;
     private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
@@ -52,16 +53,21 @@ public class UnitPlacementFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static UnitPlacementFragment newInstance(int sectionNumber, Room room) {
-        UnitPlacementFragment fragment = new UnitPlacementFragment(room);
+    public static UnitPlacementFragment newInstance(int sectionNumber) {
+        UnitPlacementFragment fragment = new UnitPlacementFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public UnitPlacementFragment(Room room) {
+    public UnitPlacementFragment() {
         Log.d("LifeCycle", "UnitPlacementFragment(" + (getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : "?") + ") <constructor>");
+    }
+
+    public UnitPlacementFragment(RoomConfigActivity activity) {
+        this();
+        mActivity = activity;
     }
 
     @Override
@@ -80,13 +86,14 @@ public class UnitPlacementFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("LifeCycle", "UnitPlacementFragment.onCreateView() room<" + ((HABApplication) getActivity().getApplication()).getConfigRoom().getId() + ">");
+        Room room = mActivity.getConfigRoom();
+        Log.d("LifeCycle", "UnitPlacementFragment.onCreateView() room<" + (room == null? "NULL": room.getId()) + ">");
 
         fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
         TextView textView = (TextView) fragmentView.findViewById(R.id.room_config_section_label);
         roomView = (UnitContainerView) fragmentView.findViewById(R.id.room_layout);
 
-        roomView.setRoom(((HABApplication) getActivity().getApplication()).getConfigRoom());
+        roomView.setRoom(room);
         //TODO - Make DragListener internal in UnitContainerView and control the usage of it by layout parameters (DragNDrop on/off)
         roomView.setOnDragListener(dropListener);
 
@@ -246,7 +253,7 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item)), 50, 50);
+                roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item), roomView), 50, 50);
                 Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }

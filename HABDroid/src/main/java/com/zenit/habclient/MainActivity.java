@@ -71,12 +71,12 @@ public class MainActivity extends Activity
                     break;
             case 1:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, UnitPlacementFragment.newInstance(position + 1, ((HABApplication) getApplication()).getConfigRoom()))
+                        .replace(R.id.container, UnitPlacementFragment.newInstance(position + 1))
                         .commit();
                 break;
             default:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, RoomConfigFragment.newInstance(((HABApplication) getApplication()).getRoomProvider(), ((HABApplication) getApplication()).getConfigRoom()))
+                        .replace(R.id.container, RoomConfigFragment.newInstance(((HABApplication) getApplication()).getRoomProvider()))
                         .commit();
                 break;
 

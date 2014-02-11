@@ -68,7 +68,10 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
                 // Start launch activity
                 getContext().startActivity(widgetListIntent);
             } else
-                Toast.makeText(getContext(), "Unit action is not supported yet", Toast.LENGTH_SHORT).show();
+                if(gUnit.getOpenHABWidget().getType().HasDynamicControl)
+                    gUnit.getUnitContainerView().drawControlInRoom(gUnit);
+                else
+                    Toast.makeText(getContext(), "Unit action is not (yet) supported for this unit type", Toast.LENGTH_SHORT).show();
         }
     }
 

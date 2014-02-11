@@ -2,20 +2,20 @@
 
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:rowCount="11" android:columnCount="3"
+    android:rowCount="15" android:columnCount="3"
     android:useDefaultMargins="true">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Room name"
+        android:text="Room alias"
         android:layout_gravity="center_vertical"
         android:id="@+id/label_" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/edittext_room_name"
+        android:id="@+id/edittext_room_alias"
         android:layout_columnSpan="2"
         android:layout_gravity="fill_horizontal"
         android:textSize="12dp"
@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:src="@android:drawable/ic_dialog_alert"
+        android:src="@android:drawable/ic_menu_gallery"
         android:layout_gravity="center" />
 
     <TextView
@@ -62,46 +62,8 @@
         android:id="@+id/imageView2"
         android:layout_row="4"
         android:layout_column="0"
-        android:src="@android:drawable/ic_dialog_dialer"
-        android:layout_rowSpan="2"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Left"
-        android:layout_gravity="center_vertical"
-        android:id="@+id/textView" />
-
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner_left_room"
-        android:layout_gravity="fill_horizontal" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Right"
-        android:layout_row="5"
-        android:layout_column="1"
-        android:layout_gravity="center_vertical"
-        android:id="@+id/textView" />
-
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner_right_room"
-        android:layout_gravity="fill_horizontal" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView3"
-        android:layout_row="6"
-        android:layout_column="0"
-        android:src="@android:drawable/ic_dialog_map"
-        android:layout_rowSpan="2"
+        android:src="@android:drawable/ic_menu_add"
+        android:layout_rowSpan="4"
         android:layout_gravity="center" />
 
     <TextView
@@ -120,8 +82,23 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Right"
+        android:layout_row="5"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_right_room"
+        android:layout_gravity="fill_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Down"
-        android:layout_row="7"
+        android:layout_row="6"
         android:layout_column="1"
         android:layout_gravity="center_vertical"
         android:id="@+id/textView" />
@@ -131,14 +108,95 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_down_room"
         android:layout_gravity="fill_horizontal" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Left"
+        android:layout_row="7"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_left_room"
+        android:layout_gravity="fill_horizontal" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView3"
+        android:layout_row="8"
+        android:layout_column="0"
+        android:src="@android:drawable/ic_notification_clear_all"
+        android:layout_rowSpan="4"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Up Right"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_up_right_room"
+        android:layout_gravity="fill_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Down Right"
+        android:layout_row="9"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_down_right_room"
+        android:layout_gravity="fill_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Down Left"
+        android:layout_row="10"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_down_left_room"
+        android:layout_gravity="fill_horizontal" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Up Left"
+        android:layout_row="11"
+        android:layout_column="1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/textView" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_up_left_room"
+        android:layout_gravity="fill_horizontal" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView4"
-        android:layout_row="8"
+        android:layout_row="12"
         android:layout_column="0"
-        android:src="@android:drawable/ic_lock_idle_lock"
+        android:src="@android:drawable/ic_menu_compass"
         android:layout_gravity="center"
         android:layout_rowSpan="2" />
 
@@ -161,7 +219,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Below"
-        android:layout_row="9"
+        android:layout_row="13"
         android:layout_column="1"
         android:layout_gravity="center_vertical"
         android:id="@+id/textView" />
@@ -177,7 +235,7 @@
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/room_edit_save_button"
-        android:layout_row="10"
+        android:layout_row="14"
         android:layout_column="2"
         android:layout_gravity="fill_horizontal|top"
         android:textAlignment="center"
