@@ -228,13 +228,13 @@ public class OpenHABWidgetListFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Log.d(TAG, "onAttach()");
+        Log.d(HABApplication.getLogTag(), "onAttach()");
         if (activity instanceof OnWidgetSelectedListener) {
             widgetSelectedListener = (OnWidgetSelectedListener)activity;
             mActivity = (OpenHABMainActivity)activity;
             mAsyncHttpClient = mActivity.getAsyncHttpClient();
         } else {
-            Log.e("TAG", "Attached to incompatible activity");
+            Log.e(HABApplication.getLogTag(), "Attached to incompatible activity");
         }
     }
 
@@ -242,14 +242,14 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.i(TAG, "onCreateView");
+        Log.i(HABApplication.getLogTag(), "onCreateView");
         return inflater.inflate(R.layout.openhabwidgetlist_fragment, container, false);
     }
 
     @Override
     public void onPause () {
         super.onPause();
-        Log.d(TAG, "onPause() " + displayPageUrl);
+        Log.d(HABApplication.getLogTag(), "onPause() " + displayPageUrl);
         mAsyncHttpClient.cancelRequests(mActivity, mTag, true);
         if (openHABWidgetAdapter != null) {
             openHABWidgetAdapter.stopImageRefresh();
@@ -261,17 +261,17 @@ public class OpenHABWidgetListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume() " + displayPageUrl);
+        Log.d(HABApplication.getLogTag(), "onResume() " + displayPageUrl);
         if (displayPageUrl != null) {
-            Log.d(TAG, "onResume() - Calling showPage() displayPageUrl = " + displayPageUrl);
+            Log.d(HABApplication.getLogTag(), "onResume() - Calling showPage() displayPageUrl = " + displayPageUrl);
             showPage(displayPageUrl, false);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.d(TAG, "onSaveInstanceState");
-        Log.d(TAG, String.format("onSave current selected item = %d", getListView().getCheckedItemPosition()));
+        Log.d(HABApplication.getLogTag(), "onSaveInstanceState");
+        Log.d(HABApplication.getLogTag(), String.format("onSave current selected item = %d", getListView().getCheckedItemPosition()));
         savedInstanceState.putString("displayPageUrl", displayPageUrl);
         savedInstanceState.putString("openHABBaseUrl", openHABBaseUrl);
         savedInstanceState.putString("sitemapRootUrl", sitemapRootUrl);
@@ -286,12 +286,12 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public void setUserVisibleHint (boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         mIsVisible = isVisibleToUser;
-        Log.d(TAG, String.format("isVisibleToUser(%B)", isVisibleToUser));
+        Log.d(HABApplication.getLogTag(), String.format("isVisibleToUser(%B)", isVisibleToUser));
     }
 
     public static OpenHABWidgetListFragment withPage(String pageUrl, String baseUrl, String rootUrl,
                                                      String username, String password, int position) {
-        Log.d(TAG, "withPage(" + pageUrl + ")");
+        Log.d(HABApplication.getLogTag(), "withPage(" + pageUrl + ")");
         OpenHABWidgetListFragment fragment = new OpenHABWidgetListFragment();
         Bundle args = new Bundle();
         args.putString("displayPageUrl", pageUrl);
@@ -312,7 +312,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
-        Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] showPage(...) - showPage for " + pageUrl + " longPolling = " + longPolling);
+        Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + pageUrl + "   longPolling = " + longPolling);
         // Cancel any existing http request to openHAB (typically ongoing long poll)
         Header[] headers = {};
         if (!longPolling)
@@ -325,12 +325,12 @@ public class OpenHABWidgetListFragment extends ListFragment {
             @Override
             public void onSuccess(Document document) {
                 if (document != null) {
-                    Log.d(TAG, "[AsyncHttpClient] Response: "  + document.toString());
+                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Response: "  + document.toString());
                     if (!longPolling)
                         stopProgressIndicator();
                     processContent(document, longPolling);
                 } else {
-                    Log.e(TAG, "[AsyncHttpClient] Got a null response from openHAB");
+                    Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Got a null response from openHAB");
                 }
             }
             @Override
@@ -342,13 +342,13 @@ public class OpenHABWidgetListFragment extends ListFragment {
 //                    return;
 //                }
                 if (error instanceof SocketTimeoutException) {
-                    Log.d(TAG, "[AsyncHttpClient] Connection timeout, reconnecting");
-                    Log.d(TAG, "[AsyncHttpClient] showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
+                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Connection timeout, reconnecting");
+                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
                     showPage(displayPageUrl, longPolling);
                     return;
                 }
-                Log.e(TAG, error.getClass().toString());
-                Log.e(TAG, "[AsyncHttpClient] Connection error = " + error.getClass().toString() + ", cycle aborted");
+                Log.e(HABApplication.getLogTag(), error.getClass().toString());
+                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Connection error = " + error.getClass().toString() + ", cycle aborted");
             }
         }, mTag);
     }

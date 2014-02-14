@@ -46,7 +46,7 @@ public class UnitPlacementFragment extends Fragment {
     private RoomConfigActivity mActivity;
     private View fragmentView;
     private UnitContainerView roomView;
-    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
+    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     /**
@@ -198,7 +198,7 @@ public class UnitPlacementFragment extends Fragment {
         List<OpenHABWidget> list = HABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
         Iterator<OpenHABWidget> iter = list.iterator();
         while(iter.hasNext())
-            Log.d("WidgetProvider data", iter.next().getId());
+            Log.d(HABApplication.getLogTag(), "WidgetProvider data ID = " + iter.next().getId());
 
 //        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
         //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
@@ -233,8 +233,8 @@ public class UnitPlacementFragment extends Fragment {
             else
                 strLogRemoved += next.getId() + ", ";
         }
-        Log.d(TAG, strLogAll);
-        Log.d(TAG, strLogRemoved);
+        Log.d(HABApplication.getLogTag(), strLogAll);
+        Log.d(HABApplication.getLogTag(), strLogRemoved);
 
         if(itemsList.size() < 1) {
             Toast.makeText(context, "There are no more items for this room.", Toast.LENGTH_SHORT).show();

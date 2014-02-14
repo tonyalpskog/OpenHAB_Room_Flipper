@@ -64,6 +64,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
                 Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);
                 widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
                 widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + gUnit.getOpenHABWidget().getLinkedPage().getId() /*GF_Kitchen"*/ /*"https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen"*/);
+                Log.d(HABApplication.getLogTag(), "SHOW_PAGE_AS_LIST  Intent for: " + "openhab://sitemaps/demo/" + gUnit.getOpenHABWidget().getLinkedPage().getId());
 
                 // Start launch activity
                 getContext().startActivity(widgetListIntent);

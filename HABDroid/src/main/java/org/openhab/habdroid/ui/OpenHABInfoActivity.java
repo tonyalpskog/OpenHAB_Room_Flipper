@@ -36,6 +36,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.zenit.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
@@ -74,46 +75,46 @@ public class OpenHABInfoActivity extends Activity {
             mPassword = getIntent().getStringExtra("password");
             mAsyncHttpClient.setBasicAuth(mUsername, mPassword);
         } else {
-            Log.e(TAG, "No openHABBaseURl parameter passed, can't fetch openHAB info from nowhere");
+            Log.e(HABApplication.getLogTag(), "No openHABBaseURl parameter passed, can't fetch openHAB info from nowhere");
             finish();
         }
     }
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume()");
+        Log.d(HABApplication.getLogTag(), "onResume()");
         super.onResume();
-        Log.d(TAG, "[AsyncHttpClient] url = " + mOpenHABBaseUrl + "static/version");
+        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] url = " + mOpenHABBaseUrl + "static/version");
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/version", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "[AsyncHttpClient] Got version = " + content);
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Got version = " + content);
                 mOpenHABVersionText.setText(content);
             }
 
             @Override
             public void onFailure(Throwable error, String content) {
                 mOpenHABVersionText.setText("Unknown");
-                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
+                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + error.getMessage());
             }
         });
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/uuid", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "[AsyncHttpClient] Got uuid = " + content);
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Got uuid = " + content);
                 mOpenHABUUIDText.setText(content);
             }
 
             @Override
             public void onFailure(Throwable error, String content) {
                 mOpenHABUUIDText.setText("Unknown");
-                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
+                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + error.getMessage());
             }
         });
         mAsyncHttpClient.get(mOpenHABBaseUrl + "static/secret", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
-                Log.d(TAG, "[AsyncHttpClient] Got secret = " + content);
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Got secret = " + content);
                 mOpenHABSecretText.setVisibility(View.VISIBLE);
                 mOpenHABSecretLabel.setVisibility(View.VISIBLE);
                 mOpenHABSecretText.setText(content);
@@ -123,7 +124,7 @@ public class OpenHABInfoActivity extends Activity {
             public void onFailure(Throwable error, String content) {
                 mOpenHABSecretText.setVisibility(View.GONE);
                 mOpenHABSecretLabel.setVisibility(View.GONE);
-                Log.e(TAG, "[AsyncHttpClient] " + error.getMessage());
+                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + error.getMessage());
             }
         });
     }

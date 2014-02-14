@@ -237,7 +237,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
         HABApplication.getOpenHABSetting().setUsername(openHABUsername);
         HABApplication.getOpenHABSetting().setPassword(openHABPassword);
-        HABApplication.getOpenHABSetting().setBaseUrl("http://demo.openhab.org:8443/");//Added by TA
+        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);//Added by TA
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -364,13 +364,14 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
      */
 
     private void selectSitemap(final String baseUrl, final boolean forceSelect) {
-        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Loading sitemap list from " + baseUrl + "rest/sitemaps");
+        String restURL = baseUrl + "rest/sitemaps";
+        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request from: " + restURL);
         startProgressIndicator();
-        mAsyncHttpClient.get(baseUrl + "rest/sitemaps", new DocumentHttpResponseHandler() {
+        mAsyncHttpClient.get(restURL, new DocumentHttpResponseHandler() {
             @Override
             public void onSuccess(Document document) {
                 stopProgressIndicator();
-                Log.d(TAG, "[AsyncHttpClient] Response: " + document.toString());
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Response: " + document.toString());
 
                 //Remove all sitemap items in navigator drawer.
                 Iterator<OpenHABSitemap> iterator = mSitemapList.iterator();
@@ -382,7 +383,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                 mSitemapList.addAll(Util.parseSitemapList(document));
                 if (mSitemapList.size() == 0) {
                     // Got an empty sitemap list!
-                    Log.e(TAG, "[AsyncHttpClient] openHAB returned empty sitemap list");
+                    Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] openHAB returned empty sitemap list");
                     showAlertDialog(getString(R.string.error_empty_sitemap_list));
                     return;
                 }
@@ -399,20 +400,20 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                     if (configuredSitemap.length() > 0) {
                         // Configured sitemap is on the list we got, open it!
                         if (Util.sitemapExists(mSitemapList, configuredSitemap)) {
-                            Log.d(TAG, "Configured sitemap is on the list");
+                            Log.d(HABApplication.getLogTag(), "Configured sitemap is on the list");
                             OpenHABSitemap selectedSitemap = Util.getSitemapByName(mSitemapList, configuredSitemap);
                             openSitemap(selectedSitemap.getHomepageLink());
                             // Configured sitemap is not on the list we got!
                         } else {
-                            Log.d(TAG, "Configured sitemap is not on the list");
+                            Log.d(HABApplication.getLogTag(), "Configured sitemap is not on the list");
                             if (mSitemapList.size() == 1) {
-                                Log.d(TAG, "Got only one sitemap");
+                                Log.d(HABApplication.getLogTag(), "Got only one sitemap");
                                 SharedPreferences.Editor preferencesEditor = settings.edit();
                                 preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
                                 preferencesEditor.commit();
                                 openSitemap(mSitemapList.get(0).getHomepageLink());
                             } else {
-                                Log.d(TAG, "Got multiply sitemaps, user have to select one");
+                                Log.d(HABApplication.getLogTag(), "Got multiply sitemaps, user have to select one");
                                 showSitemapSelectionDialog(mSitemapList);
                             }
                         }
@@ -420,13 +421,13 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                     } else {
                         // We got only one single sitemap from openHAB, use it
                         if (mSitemapList.size() == 1) {
-                            Log.d(TAG, "Got only one sitemap");
+                            Log.d(HABApplication.getLogTag(), "Got only one sitemap");
                             SharedPreferences.Editor preferencesEditor = settings.edit();
                             preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
                             preferencesEditor.commit();
                             openSitemap(mSitemapList.get(0).getHomepageLink());
                         } else {
-                            Log.d(TAG, "Got multiply sitemaps, user have to select one");
+                            Log.d(HABApplication.getLogTag(), "Got multiply sitemaps, user have to select one");
                             showSitemapSelectionDialog(mSitemapList);
                         }
                     }
@@ -441,27 +442,27 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                             showAlertDialog(getString(R.string.error_authentication_failed));
                             break;
                         default:
-                            Log.e(TAG, String.format("Http code = %d", ((HttpResponseException) error).getStatusCode()));
+                            Log.e(HABApplication.getLogTag(), String.format("Http code = %d", ((HttpResponseException) error).getStatusCode()));
                             break;
                     }
                 } else if (error instanceof org.apache.http.conn.HttpHostConnectException) {
                     Log.e(TAG, "Error connecting to host");
                     if (error.getMessage() != null) {
-                        Log.e(TAG, error.getMessage());
+                        Log.e(HABApplication.getLogTag(), error.getMessage());
                         showAlertDialog(error.getMessage());
                     } else {
                         showAlertDialog(getString(R.string.error_connection_failed));
                     }
                 } else if (error instanceof java.net.UnknownHostException) {
-                    Log.e(TAG, "Unable to resolve hostname");
+                    Log.e(HABApplication.getLogTag(), "Unable to resolve hostname");
                     if (error.getMessage() != null) {
-                        Log.e(TAG, error.getMessage());
+                        Log.e(HABApplication.getLogTag(), error.getMessage());
                         showAlertDialog(error.getMessage());
                     } else {
                         showAlertDialog(getString(R.string.error_connection_failed));
                     }
                 } else {
-                    Log.e(TAG, error.getClass().toString());
+                    Log.e(HABApplication.getLogTag(), error.getClass().toString());
                 }
             }
         });
@@ -748,21 +749,23 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     public void sendItemCommand(String itemName, String command) {
         try {
             StringEntity se = new StringEntity(command);
-            mAsyncHttpClient.post(this, openHABBaseUrl + "rest/items/" + itemName, se, "text/plain", new AsyncHttpResponseHandler() {
+            String restURL = openHABBaseUrl + "rest/items/" + itemName;
+            Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] POST Request for: " + restURL);
+            mAsyncHttpClient.post(this, restURL, se, "text/plain", new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(String response) {
-                    Log.d(TAG, "Command was sent successfully");
+                    Log.d(HABApplication.getLogTag(), "Command was sent successfully");
                 }
                 @Override
                 public void onFailure(Throwable error, String errorResponse) {
-                    Log.e(TAG, "Got command error " + error.getMessage());
+                    Log.e(HABApplication.getLogTag(), "Got command error " + error.getMessage());
                     if (errorResponse != null)
-                        Log.e(TAG, "Error response = " + errorResponse);
+                        Log.e(HABApplication.getLogTag(), "Error response = " + errorResponse);
                 }
             });
         } catch (UnsupportedEncodingException e) {
             if (e.getMessage() != null)
-                Log.e(TAG, e.getMessage());
+                Log.e(HABApplication.getLogTag(), e.getMessage());
         }
     }
 
@@ -946,21 +949,22 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                     String deviceId = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
                     String regUrl = "https://my.openhab.org/addAndroidRegistration?deviceId=" + deviceId +
                             "&deviceModel=" + deviceModel + "&regId=" + regId;
+                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + regUrl);
                     mAsyncHttpClient.get(getApplicationContext(), regUrl, new AsyncHttpResponseHandler() {
                         @Override
                         public void onSuccess(String response) {
-                            Log.d(TAG, "[AsyncHttpClient] GCM reg id success");
+                            Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] GCM reg id success");
                         }
                         @Override
                         public void onFailure(Throwable error, String errorResponse) {
-                            Log.e(TAG, "[AsyncHttpClient] GCM reg id error: " + error.getMessage());
+                            Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] GCM reg id error: " + error.getMessage());
                             if (errorResponse != null)
-                                Log.e(TAG, "[AsyncHttpClient] Error response = " + errorResponse);
+                                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Error response = " + errorResponse);
                         }
                     });
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e(TAG, e.getMessage());
+                    Log.e(HABApplication.getLogTag(), e.getMessage());
                 }
                 return regId;
             }

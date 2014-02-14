@@ -360,19 +360,21 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 //		progressDialog.hide();
 		progressDialog.dismiss();
 		AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(this);
-		asyncHttpClient.get(openHABBaseUrl + "static/uuid", new AsyncHttpResponseHandler() {
+        String restURL = openHABBaseUrl + "static/uuid";
+        Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + restURL);
+		asyncHttpClient.get(restURL, new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {
-				Log.i(TAG, "[AsyncHttpClient] Got openHAB UUID = " + content);
+				Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] Got openHAB UUID = " + content);
 				SharedPreferences settings = 
 						PreferenceManager.getDefaultSharedPreferences(OpenHABWidgetListActivity.this);
 				if (settings.contains("openhab_uuid")) {
 					String openHABUUID = settings.getString("openhab_uuid", "");
 					if (openHABUUID.equals(content)) {
-						Log.i(TAG, "openHAB UUID does match the saved one");
+						Log.i(HABApplication.getLogTag(), "openHAB UUID does match the saved one");
 						showTime();
 					} else {
-						Log.i(TAG, "openHAB UUID doesn't match the saved one");
+						Log.i(HABApplication.getLogTag(), "openHAB UUID doesn't match the saved one");
 						// TODO: need to add some user prompt here
 /*						Toast.makeText(getApplicationContext(), 
 								"openHAB UUID doesn't match the saved one!",
@@ -380,7 +382,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 						showTime();
 					}
 				} else {
-					Log.i(TAG, "No recorded openHAB UUID, saving the new one");
+					Log.i(HABApplication.getLogTag(), "No recorded openHAB UUID, saving the new one");
 					Editor preferencesEditor = settings.edit();
 					preferencesEditor.putString("openhab_uuid", content);
 					preferencesEditor.commit();
@@ -402,14 +404,14 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void onServiceResolveFailed() {
 		if (progressDialog.isShowing())
 			progressDialog.dismiss();
-		Log.i(TAG, "Service resolve failed, switching to remote URL");
+		Log.i(HABApplication.getLogTag(), "Service resolve failed, switching to remote URL");
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		openHABBaseUrl = normalizeUrl(settings.getString("default_openhab_alturl", ""));
 		// If remote URL is configured
 		if (openHABBaseUrl.length() > 0) {
 			Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),
 					Toast.LENGTH_SHORT).show();
-			Log.i(TAG, "Connecting to remote URL " + openHABBaseUrl);
+			Log.i(HABApplication.getLogTag(), "Connecting to remote URL " + openHABBaseUrl);
 			showTime();
 		} else {
 			Toast.makeText(getApplicationContext(), getString(R.string.error_no_url),
@@ -422,7 +424,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onNewIntent(Intent newIntent) {
-		Log.d(TAG, "New intent received = " + newIntent.toString());
+		Log.d(HABApplication.getLogTag(), "New intent received = " + newIntent.toString());
 		if (newIntent.getDataString() != null) {
 			onNfcTag(newIntent.getDataString(), true);
 		}
@@ -435,16 +437,16 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	public void onNfcTag(String nfcData, boolean pushCurrentToStack) {
 		Uri openHABURI = Uri.parse(nfcData);
-		Log.d(TAG, openHABURI.getScheme());
-		Log.d(TAG, openHABURI.getHost());
-		Log.d(TAG, openHABURI.getPath());
+		Log.d(HABApplication.getLogTag(), openHABURI.getScheme());
+		Log.d(HABApplication.getLogTag(), openHABURI.getHost());
+		Log.d(HABApplication.getLogTag(), openHABURI.getPath());
 		if (openHABURI.getHost().equals("sitemaps")) {
-			Log.d(TAG, "Tag indicates a sitemap link");
+			Log.d(HABApplication.getLogTag(), "Tag indicates a sitemap link");
 			String newPageUrl = this.openHABBaseUrl + "rest/sitemaps" + openHABURI.getPath();
 			String widgetId = openHABURI.getQueryParameter("widget");
 			String command = openHABURI.getQueryParameter("command");
-			Log.d(TAG, "widgetId = " + widgetId);
-			Log.d(TAG, "command = " + command);
+			Log.d(HABApplication.getLogTag(), "widgetId = " + widgetId);
+			Log.d(HABApplication.getLogTag(), "command = " + command);
 			if (widgetId != null && command != null) {
 				this.nfcWidgetId = widgetId;
 				this.nfcCommand = command;
@@ -455,7 +457,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 				if (!pushCurrentToStack)
 					this.nfcAutoClose = true;
 			}
-			Log.d(TAG, "Should go to " + newPageUrl);
+			Log.d(HABApplication.getLogTag(), "Should go to " + newPageUrl);
 			if (pushCurrentToStack)
 				navigateToPage(newPageUrl, "");
 			else
@@ -856,7 +858,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	    asyncHttpClient.get(baseURL + "rest/sitemaps", new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(String content) {
-                Log.d(TAG, "[AsyncHttpClient] onSuccess()");
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] onSuccess()");
 				List<OpenHABSitemap> sitemapList = parseSitemapList(content);
 				if (sitemapList.size() == 0) {
 					// Got an empty sitemap list!
@@ -875,20 +877,20 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					if (configuredSitemap.length() > 0) {
 						// Configured sitemap is on the list we got, open it!
 						if (sitemapExists(sitemapList, configuredSitemap)) {
-							Log.d(TAG, "Configured sitemap is on the list");
+							Log.d(HABApplication.getLogTag(), "Configured sitemap is on the list");
 							OpenHABSitemap selectedSitemap = getSitemapByName(sitemapList, configuredSitemap);
 							openSitemap(selectedSitemap.getHomepageLink());
 						// Configured sitemap is not on the list we got!
 						} else {
-							Log.d(TAG, "Configured sitemap is not on the list");
+							Log.d(HABApplication.getLogTag(), "Configured sitemap is not on the list");
 							if (sitemapList.size() == 1) {
-								Log.d(TAG, "Got only one sitemap");
+								Log.d(HABApplication.getLogTag(), "Got only one sitemap");
 								Editor preferencesEditor = settings.edit();
 								preferencesEditor.putString("default_openhab_sitemap", sitemapList.get(0).getName());
 									preferencesEditor.commit();
 								openSitemap(sitemapList.get(0).getHomepageLink());								
 							} else {
-								Log.d(TAG, "Got multiply sitemaps, user have to select one");
+								Log.d(HABApplication.getLogTag(), "Got multiply sitemaps, user have to select one");
 								showSitemapSelectionDialog(sitemapList);
 							}
 						}
@@ -896,13 +898,13 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					} else {
 						// We got only one single sitemap from openHAB, use it
 						if (sitemapList.size() == 1) {
-							Log.d(TAG, "Got only one sitemap");
+							Log.d(HABApplication.getLogTag(), "Got only one sitemap");
 							Editor preferencesEditor = settings.edit();
 							preferencesEditor.putString("default_openhab_sitemap", sitemapList.get(0).getName());
 								preferencesEditor.commit();
 							openSitemap(sitemapList.get(0).getHomepageLink());
 						} else {
-							Log.d(TAG, "Got multiply sitemaps, user have to select one");
+							Log.d(HABApplication.getLogTag(), "Got multiply sitemaps, user have to select one");
 							showSitemapSelectionDialog(sitemapList);
 						}
 					}
@@ -910,7 +912,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			@Override
 	    	public void onFailure(Throwable e, String errorResponse) {
-                Log.d(TAG, "[AsyncHttpClient] onFailure()");
+                Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] onFailure()");
 				if (e.getMessage() != null) {
 					if (e.getMessage().equals("Unauthorized")) {
 						showAlertDialog(getString(R.string.error_authentication_failed));

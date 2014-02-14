@@ -176,6 +176,7 @@ public class OpenHABWidget {
 	}
 
     public void setType(String type) {
+        //Check if widget type is any of the two special types "Switch with mappings" or "Switch with RollershutterItem"
         if (type.equals(OpenHABWidgetType.Switch.Name)) {
             if (hasMappings()) {
                 setType(OpenHABWidgetType.SelectionSwitch);

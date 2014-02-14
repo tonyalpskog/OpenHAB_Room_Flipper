@@ -65,7 +65,7 @@ public class OpenHABWidgetControl {
     }
 
     public View initializeSwitchWidget(OpenHABWidget openHABWidget, View inflatedView) {
-        Switch switchView = (Switch)inflatedView.findViewById(R.id.switchswitch);
+        final Switch switchView = (Switch)inflatedView.findViewById(R.id.switchswitch);
 
         if(switchView == null || openHABWidget.getItem() == null) {
             Log.e(HABApplication.getLogTag(), switchView == null? "switchView": "openHABItem" + " = NULL");

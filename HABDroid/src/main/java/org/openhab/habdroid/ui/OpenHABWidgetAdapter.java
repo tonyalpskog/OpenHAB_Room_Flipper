@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.habdroid.R;
@@ -45,7 +47,9 @@ import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetMapping;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.widget.ColorPickerDialog;
+import org.openhab.habdroid.ui.widget.IHABWidgetCommunication;
 import org.openhab.habdroid.ui.widget.OnColorChangedListener;
+import org.openhab.habdroid.ui.widget.SetpointWidget;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
@@ -80,6 +84,7 @@ import org.openhab.habdroid.ui.widget.SegmentedControlButton;
 
 import com.crittercism.app.Crittercism;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.zenit.habclient.HABApplication;
 
 /**
  * This class provides openHAB widgets adapter for list view.
@@ -88,9 +93,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
  *
  */
 
-public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
+public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements IHABWidgetCommunication {
 	private static final String TAG = "OpenHABWidgetAdapter";
-	private String openHABBaseUrl = "http://demo.openhab.org:8443/";
+	private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	private String openHABUsername = "";
 	private String openHABPassword = "";
 	private ArrayList<VideoView> videoWidgetList;
@@ -169,7 +174,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
                 widgetView = getSelectionWidget(preparedViewData);
                 break;
             case Setpoint:
-                widgetView = getSetpointWidget(preparedViewData);
+                widgetView = new SetpointWidget(this, preparedViewData).getWidget();
                 break;
             default:
                 if (preparedViewData.labelTextView != null)
@@ -464,6 +469,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
 
     private View getTextWidget(ViewData viewData) {
         viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
+
         if (viewData.labelTextView != null)
             if (viewData.splitString.length > 0) {
                 viewData.labelTextView.setText(viewData.splitString[0]);
@@ -670,51 +676,6 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
         return viewData.widgetView;
     }
 
-    private View getSetpointWidget(ViewData viewData) {
-        viewData.splitString = viewData.openHABWidget.getLabel().split("\\[|\\]");
-        if (viewData.labelTextView != null)
-            viewData.labelTextView.setText(viewData.splitString[0]);
-        if (viewData.valueTextView != null)
-            if (viewData.splitString.length > 1) {
-                // If value is not empty, show TextView
-                viewData.valueTextView.setVisibility(View.VISIBLE);
-                viewData.valueTextView.setText(viewData.splitString[1]);
-            }
-        Button setPointMinusButton = (Button)viewData.widgetView.findViewById(R.id.setpointbutton_minus);
-        Button setPointPlusButton = (Button)viewData.widgetView.findViewById(R.id.setpointbutton_plus);
-        setPointMinusButton.setTag(viewData.openHABWidget);
-        setPointPlusButton.setTag(viewData.openHABWidget);
-        setPointMinusButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Log.d(TAG, "Minus");
-                OpenHABWidget setPointWidget = (OpenHABWidget)v.getTag();
-                float currentValue = Float.valueOf(setPointWidget.getItem().getState()).floatValue();
-                currentValue = currentValue - setPointWidget.getStep();
-                if (currentValue < setPointWidget.getMinValue())
-                    currentValue = setPointWidget.getMinValue();
-                if (currentValue > setPointWidget.getMaxValue())
-                    currentValue = setPointWidget.getMaxValue();
-                sendItemCommand(setPointWidget.getItem(), String.valueOf(currentValue));
-
-            }
-        });
-        setPointPlusButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Log.d(TAG,"Plus");
-                OpenHABWidget setPointWidget = (OpenHABWidget)v.getTag();
-                float currentValue = Float.valueOf(setPointWidget.getItem().getState()).floatValue();
-                currentValue = currentValue + setPointWidget.getStep();
-                if (currentValue < setPointWidget.getMinValue())
-                    currentValue = setPointWidget.getMinValue();
-                if (currentValue > setPointWidget.getMaxValue())
-                    currentValue = setPointWidget.getMaxValue();
-                sendItemCommand(setPointWidget.getItem(), String.valueOf(currentValue));
-            }
-        });
-
-        return viewData.widgetView;
-    }
-
     @Override
     public int getViewTypeCount() {
         return OpenHABWidgetType.values().length;
@@ -743,27 +704,43 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
     
     public void sendItemCommand(OpenHABItem item, String command) {
         try {
-            Log.d(TAG, String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
+            Log.d(HABApplication.getLogTag(), String.format("[AsyncHttpClient] POST Request for OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
             StringEntity se = new StringEntity(command);
             mAsyncHttpClient.post(getContext(), item.getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(String response) {
-                    Log.d(TAG, "Command was sent successfully");
+                    Log.d(HABApplication.getLogTag(), "Command was sent successfully");
                 }
                 @Override
                 public void onFailure(Throwable error, String errorResponse) {
-                    Log.e(TAG, "Got command error " + error.getMessage());
+                    Log.e(HABApplication.getLogTag(), "Got command error " + error.getMessage());
                     if (errorResponse != null)
-                        Log.e(TAG, "Error response = " + errorResponse);
+                        Log.e(HABApplication.getLogTag(), "Error response = " + errorResponse);
                 }
             });
         } catch (UnsupportedEncodingException e) {
             if (e != null)
-            Log.e(TAG, e.getMessage());
+            Log.e(HABApplication.getLogTag(), e.getMessage());
         }
     }
 
-	public String getOpenHABUsername() {
+    @Override
+    public String getNewValueAsFullText(String currentFullTextValue, float value) {
+        String textValue = getRegExMatch(currentFullTextValue, Pattern.compile("\\d*\\[.,]?\\d*"));
+        return currentFullTextValue.replaceFirst("\\d*\\[.,]?\\d*", Float.toString(value));
+    }
+
+    private String getRegExMatch(String source, Pattern pattern) {
+        String result = "";
+
+        Matcher matcher = pattern.matcher(source);
+        if(matcher.find())
+            result = (matcher.group().subSequence(1, matcher.group().length()-1)).toString();
+
+        return result;
+    }
+
+    public String getOpenHABUsername() {
 		return openHABUsername;
 	}
 
@@ -816,7 +793,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> {
         return true;
     }
 
-    private class ViewData {
+    public class ViewData {
         public RelativeLayout widgetView;
         public OpenHABWidget openHABWidget;
         public String[] splitString;

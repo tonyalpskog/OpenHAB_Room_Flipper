@@ -61,6 +61,9 @@ public class OpenHABWidgetProvider {
     }
 
     public void setOpenHABWidgets(OpenHABWidgetDataSource openHABWidgetDataSource) {
+        if(openHABWidgetDataSource.getRootWidget() == null)
+            return;
+
         clearData();
         addOpenHABWidget(openHABWidgetDataSource.getRootWidget());
     }
@@ -77,20 +80,30 @@ public class OpenHABWidgetProvider {
     }
 
     private void addOpenHABWidget(OpenHABWidget widget) {
+        if(widget == null)
+            return;
+
         widget.setUpdateUUID(mUpdateSetUUID);
+        String widgetName;
 
-        if(widget.getItem() == null)
-        {
-            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' of type '%s' doesn't have an item instance and cannot be added to the Widget Provider.", widget.getId(), widget.getType()));
-        } else {
-            mOpenHABWidgetItemNameMap.put(widget.getItem().getName(), widget);
-            Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getItem().getName(), widget.getType()));
+        widgetName = (widget.getItem() == null? widget.getId() : widget.getItem().getName());
 
+        boolean widgetExists = mOpenHABWidgetItemNameMap.containsKey(widgetName);
+
+        //Overwrite / Update widget if it already exists.
+        mOpenHABWidgetItemNameMap.put(widgetName, widget);
+
+        if(widget.getType() == OpenHABWidgetType.Group)
+            Log.d(HABApplication.getLogTag(), String.format("Setting data for Group widget '%s'", widgetName));
+
+        Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widgetName, widget.getType()));
+
+        if(widgetExists) { //Don't add existing widgets to the type<->name_list mapping.
             if(!mOpenHABWidgetTypeMap.containsKey(widget.getType()))
                 mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
 
             List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
-            widgetList.add(widget.getItem().getName());
+            widgetList.add(widgetName);
         }
 
         if(widget.hasChildren()) {
