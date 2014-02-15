@@ -8,4 +8,7 @@ import org.openhab.habdroid.model.OpenHABItem;
 public interface IHABWidgetCommunication {
     public void sendItemCommand(OpenHABItem item, String command);
     public String getNewValueAsFullText(String currentFullTextValue, float value);
+    public String getOpenHABBaseUrl();
+    public String getOpenHABUsername();
+    public String getOpenHABPassword();
 }

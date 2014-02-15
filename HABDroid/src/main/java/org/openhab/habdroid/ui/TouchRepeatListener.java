@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 
 import com.zenit.habclient.HABApplication;
@@ -12,7 +11,7 @@ import com.zenit.habclient.HABApplication;
 /**
  * A class, that can be used as a TouchListener on any view (e.g. a Button).
  * It cyclically fires a OnRepeatClickListener.onRepeat event, used by Views to emulate keyboard-like behaviour.
- * First click is fired immediately, next after mInitialInterval, and subsequent after mNormalInterval.
+ * First click is fired immediately, next after mInitialInterval, and subsequent after mRepeatInterval.
  *
  * <p>Interval is scheduled after the onClick completes, so it has to run fast.
  * If it runs slow, it does not generate skipped onClicks.
@@ -22,14 +21,17 @@ public class TouchRepeatListener implements OnTouchListener {
     private Handler handler = new Handler();
 
     private int mInitialInterval;
-    private final int mNormalInterval;
+    private final int mRepeatInterval;
     private View mDownView;
+    private boolean mIsRepeating = false;
 
-    private Runnable mHandlerRunnable = new Runnable() {
+    private Runnable mRunnableLooper = new Runnable() {
         @Override
         public void run() {
-            handler.postDelayed(this, mNormalInterval);
-            fireRepeatEvent(mDownView, RepeatClickEvent.RepeatClick);
+            if(mIsRepeating) {
+                fireRepeatEvent(mDownView, RepeatClickEvent.RepeatClick);
+                handler.postDelayed(mRunnableLooper, mRepeatInterval);
+            }
         }
     };
 
@@ -45,20 +47,24 @@ public class TouchRepeatListener implements OnTouchListener {
             throw new IllegalArgumentException("negative or zero interval");
 
         mInitialInterval = initialInterval;
-        mNormalInterval = normalInterval;
+        mRepeatInterval = normalInterval;
         mOnRepeatClickListener = repeatClickListener;
     }
 
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                handler.removeCallbacks(mHandlerRunnable);
-                handler.postDelayed(mHandlerRunnable, mInitialInterval);
+                Log.d(HABApplication.getLogTag(), "[TouchRepeat] ACTION_DOWN => handler.removeCallbacks(mRunnableLooper)");
+                handler.removeCallbacks(mRunnableLooper);
                 mDownView = view;
+                handler.postDelayed(mRunnableLooper, mInitialInterval);
                 fireRepeatEvent(mDownView, RepeatClickEvent.InitialClick);
+                mIsRepeating = true;
                 break;
             case MotionEvent.ACTION_UP:
-                handler.removeCallbacks(mHandlerRunnable);
+                Log.d(HABApplication.getLogTag(), "[TouchRepeat] ACTION_UP => handler.removeCallbacks(mRunnableLooper)");
+                mIsRepeating = false;
+                handler.removeCallbacks(mRunnableLooper);
                 fireRepeatEvent(mDownView, RepeatClickEvent.Done);
                 mDownView = null;
                 break;
@@ -93,6 +99,7 @@ public class TouchRepeatListener implements OnTouchListener {
     }
 
     private boolean fireRepeatEvent(View view, RepeatClickEvent event) {
+        Log.d(HABApplication.getLogTag(), "[TouchRepeat] Fire new RepeatClickEvent: " + event.name());
         Log.v(HABApplication.getLogTag(), String.format("RepeatClickEvent event = %s", event.name()));
         if(mOnRepeatClickListener != null) {
             mOnRepeatClickListener.onRepeat(view, event);
