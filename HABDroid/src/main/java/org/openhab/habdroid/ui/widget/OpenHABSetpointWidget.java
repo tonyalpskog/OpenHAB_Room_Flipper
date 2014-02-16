@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.Button;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 import org.openhab.habdroid.ui.TouchRepeatListener;
 
 /**
@@ -12,7 +12,7 @@ import org.openhab.habdroid.ui.TouchRepeatListener;
  */
 public class OpenHABSetpointWidget extends OpenHABWidgetBase {
 
-    public OpenHABSetpointWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetAdapter.ViewData viewData) {
+    public OpenHABSetpointWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
     }
 

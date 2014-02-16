@@ -107,7 +107,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	// Datasource, providing list of openHAB widgets
 	private OpenHABWidgetDataSource openHABWidgetDataSource;
 	// List adapter for list view of openHAB widgets
-	private OpenHABWidgetAdapter openHABWidgetAdapter;
+	private OpenHABWidgetArrayAdapter openHABWidgetAdapter;
 	// Url of current sitemap page displayed
 	private String displayPageUrl ="";
 	// sitemap root url
@@ -223,7 +223,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 
 		// Create new data source and adapter and set it to list view
 		openHABWidgetDataSource = new OpenHABWidgetDataSource();
-		openHABWidgetAdapter = new OpenHABWidgetAdapter(OpenHABWidgetListActivity.this,
+		openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(OpenHABWidgetListActivity.this,
 				R.layout.openhabwidgetlist_genericitem, widgetList);
 		getListView().setAdapter(openHABWidgetAdapter);
 		// Set adapter parameters

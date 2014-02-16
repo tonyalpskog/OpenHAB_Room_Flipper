@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.zenit.habclient.HABApplication;
 
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 import org.openhab.habdroid.ui.TouchRepeatListener;
 
 /**
@@ -14,10 +14,10 @@ import org.openhab.habdroid.ui.TouchRepeatListener;
 public class SetpointRepeatClickListener implements TouchRepeatListener.OnRepeatClickListener {
     private Float currentUnsentValue;
     private boolean mIsMinusButton;
-    private OpenHABWidgetAdapter.ViewData mViewData;
+    private OpenHABWidgetArrayAdapter.ViewData mViewData;
     private IHABWidgetCommunication mHABWidgetCommunication;
 
-    public SetpointRepeatClickListener(OpenHABWidgetAdapter.ViewData viewData, boolean isMinusButton, IHABWidgetCommunication habWidgetCommunication) {
+    public SetpointRepeatClickListener(OpenHABWidgetArrayAdapter.ViewData viewData, boolean isMinusButton, IHABWidgetCommunication habWidgetCommunication) {
         mViewData = viewData;
         mIsMinusButton = isMinusButton;
         mHABWidgetCommunication = habWidgetCommunication;

@@ -25,14 +25,14 @@ public enum OpenHABWidgetType {
 
     public final String Name;
     public final int Id;
-    public final int WidgetLayoutId;
+    public final int RowLayoutId;
     public final int ControlLayoutId;
     public final boolean HasDynamicControl;
 
     private OpenHABWidgetType(int id, String name, int widgetLayoutId, int controlLayoutId, boolean hasDynamicControl) {
         Id = id;
         Name = name;
-        WidgetLayoutId = widgetLayoutId;
+        RowLayoutId = widgetLayoutId;
         ControlLayoutId = controlLayoutId;
         HasDynamicControl = hasDynamicControl;
     }

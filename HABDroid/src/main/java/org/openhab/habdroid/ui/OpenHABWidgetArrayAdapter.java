@@ -30,25 +30,18 @@
 package org.openhab.habdroid.ui;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetMapping;
 import org.openhab.habdroid.model.OpenHABWidgetType;
-import org.openhab.habdroid.ui.widget.ColorPickerDialog;
 import org.openhab.habdroid.ui.widget.IHABWidgetCommunication;
-import org.openhab.habdroid.ui.widget.OnColorChangedListener;
+import org.openhab.habdroid.ui.widget.OpenHABChartWidget;
 import org.openhab.habdroid.ui.widget.OpenHABColorWidget;
 import org.openhab.habdroid.ui.widget.OpenHABFrameWidget;
 import org.openhab.habdroid.ui.widget.OpenHABGroupWidget;
@@ -60,6 +53,8 @@ import org.openhab.habdroid.ui.widget.OpenHABSetpointWidget;
 import org.openhab.habdroid.ui.widget.OpenHABSliderWidget;
 import org.openhab.habdroid.ui.widget.OpenHABSwitchWidget;
 import org.openhab.habdroid.ui.widget.OpenHABTextWidget;
+import org.openhab.habdroid.ui.widget.OpenHABVideoWidget;
+import org.openhab.habdroid.ui.widget.OpenHABWebWidget;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
@@ -67,27 +62,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.VideoView;
-import org.openhab.habdroid.ui.widget.SegmentedControlButton;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.zenit.habclient.HABApplication;
@@ -99,8 +81,7 @@ import com.zenit.habclient.HABApplication;
  *
  */
 
-public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements IHABWidgetCommunication {
-	private static final String TAG = "OpenHABWidgetAdapter";
+public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> implements IHABWidgetCommunication {
 	private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	private String openHABUsername = "";
 	private String openHABPassword = "";
@@ -108,8 +89,8 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
 	private ArrayList<AutoRefreshImageView> refreshImageList;
     private MyAsyncHttpClient mAsyncHttpClient;
 
-	public OpenHABWidgetAdapter(Context context, int resource,
-			List<OpenHABWidget> objects) {
+	public OpenHABWidgetArrayAdapter(Context context, int resource,
+                                     List<OpenHABWidget> objects) {
 		super(context, resource, objects);
 		// Initialize video view array
 		videoWidgetList = new ArrayList<VideoView>();
@@ -121,8 +102,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
         ViewData preparedViewData = new ViewData();
     	int widgetLayout;
     	preparedViewData.openHABWidget = getItem(position);
-    	int screenWidth = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
-    	widgetLayout = getItem(position).getType().WidgetLayoutId;
+    	widgetLayout = getItem(position).getType().RowLayoutId;
 
     	if (convertView == null) {
             preparedViewData.widgetView = new RelativeLayout(getContext());
@@ -168,13 +148,14 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
                 widgetView = new OpenHABImageWidget(refreshImageList, this, preparedViewData).getWidget();
                 break;
             case Chart:
-                widgetView = getChartWidget(preparedViewData, screenWidth);
+                int screenWidth = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
+                widgetView = new OpenHABChartWidget(screenWidth, refreshImageList, this, preparedViewData).getWidget();
                 break;
             case Video:
-                widgetView = getVideoWidget(preparedViewData);
+                widgetView = new OpenHABVideoWidget(this.getContext(), videoWidgetList, this, preparedViewData).getWidget();
                 break;
             case Web:
-                widgetView = getWebWidget(preparedViewData);
+                widgetView = new OpenHABWebWidget(this, preparedViewData).getWidget();
                 break;
             case Selection:
                 widgetView = new OpenHABSelectionWidget(this.getContext(), this, preparedViewData).getWidget();
@@ -209,7 +190,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
         TextView valueTextView = (TextView) widgetView.findViewById(R.id.widgetvalue);
 
         if (valueColor != null && valueTextView != null) {
-            Log.d(TAG, String.format("Setting value color to %d", valueColor));
+            Log.d(HABApplication.getLogTag(), String.format("Setting value color to %d", valueColor));
             valueTextView.setTextColor(valueColor);
         } else if (valueTextView != null) {
             TextView defaultTextView = new TextView(widgetView.getContext());
@@ -225,7 +206,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
         TextView labelTextView = (TextView) widgetView.findViewById(R.id.widgetlabel);
 
         if(labelColor != null && labelTextView != null) {
-            Log.d(TAG, String.format("Setting label color to %d", labelColor));
+            Log.d(HABApplication.getLogTag(), String.format("Setting label color to %d", labelColor));
             labelTextView.setTextColor(labelColor);
         } else if (labelTextView != null) {
             TextView defaultTextView = new TextView(widgetView.getContext());
@@ -254,77 +235,6 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
                     widgetImage.clearColorFilter();
             }
         }
-    }
-
-    private View getChartWidget(ViewData viewData, int screenWidth) {
-        AutoRefreshImageView chartImage = (AutoRefreshImageView)viewData.widgetView.findViewById(R.id.chartimage);
-        OpenHABItem chartItem = viewData.openHABWidget.getItem();
-        Random random = new Random();
-        String chartUrl = "";
-        if (chartItem != null) {
-            if (chartItem.getType() == OpenHABItemType.Group) {
-                chartUrl = openHABBaseUrl + "rrdchart.png?groups=" + chartItem.getName() +
-                        "&period=" + viewData.openHABWidget.getPeriod() + "&random=" +
-                        String.valueOf(random.nextInt());
-            } else {
-                chartUrl = openHABBaseUrl + "rrdchart.png?items=" + chartItem.getName() +
-                        "&period=" + viewData.openHABWidget.getPeriod() + "&random=" +
-                        String.valueOf(random.nextInt());
-            }
-        }
-        Log.d(TAG, "Chart url = " + chartUrl);
-        if (chartImage == null)
-            Log.e(TAG, "chartImage == null !!!");
-        //    		if (openHABUsername != null && openHABPassword != null)
-        chartImage.setImageUrl(chartUrl, false, openHABUsername, openHABPassword);
-        //    		else
-        //    			chartImage.setImageUrl(chartUrl, false);
-        // TODO: This is quite dirty fix to make charts look full screen width on all displays
-        ViewGroup.LayoutParams chartLayoutParams = chartImage.getLayoutParams();
-        chartLayoutParams.height = (int) (screenWidth/1.88);
-        chartImage.setLayoutParams(chartLayoutParams);
-        if (viewData.openHABWidget.getRefresh() > 0) {
-            chartImage.setRefreshRate(viewData.openHABWidget.getRefresh());
-            refreshImageList.add(chartImage);
-        }
-        Log.d(TAG, "chart size = " + chartLayoutParams.width + " " + chartLayoutParams.height);
-
-        return viewData.widgetView;
-    }
-
-    private View getVideoWidget(ViewData viewData) {
-        VideoView videoVideo = (VideoView)viewData.widgetView.findViewById(R.id.videovideo);
-        Log.d(TAG, "Opening video at " + viewData.openHABWidget.getUrl());
-        // TODO: This is quite dirty fix to make video look maximum available size on all screens
-        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        ViewGroup.LayoutParams videoLayoutParams = videoVideo.getLayoutParams();
-        videoLayoutParams.height = (int)(wm.getDefaultDisplay().getWidth()/1.77);
-        videoVideo.setLayoutParams(videoLayoutParams);
-        // We don't have any event handler to know if the VideoView is on the screen
-        // so we manage an array of all videos to stop them when user leaves the page
-        if (!videoWidgetList.contains(videoVideo))
-            videoWidgetList.add(videoVideo);
-        // Start video
-        if (!videoVideo.isPlaying()) {
-            videoVideo.setVideoURI(Uri.parse(viewData.openHABWidget.getUrl()));
-            videoVideo.start();
-        }
-        Log.d(TAG, "Video height is " + videoVideo.getHeight());
-
-        return viewData.widgetView;
-    }
-
-    private View getWebWidget(ViewData viewData) {
-        WebView webWeb = (WebView)viewData.widgetView.findViewById(R.id.webweb);
-        if (viewData.openHABWidget.getHeight() > 0) {
-            ViewGroup.LayoutParams webLayoutParams = webWeb.getLayoutParams();
-            webLayoutParams.height = viewData.openHABWidget.getHeight() * 80;
-            webWeb.setLayoutParams(webLayoutParams);
-        }
-        webWeb.setWebViewClient(new WebViewClient());
-        webWeb.loadUrl(viewData.openHABWidget.getUrl());
-
-        return viewData.widgetView;
     }
 
     @Override
@@ -400,7 +310,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
 	}
 	
 	public void stopVideoWidgets() {
-		Log.d(TAG, "Stopping video for " + videoWidgetList.size() + " widgets");
+		Log.d(HABApplication.getLogTag(), "Stopping video for " + videoWidgetList.size() + " widgets");
 		for (int i=0; i<videoWidgetList.size(); i++) {
 			if (videoWidgetList.get(i) != null)
 				videoWidgetList.get(i).stopPlayback();
@@ -409,7 +319,7 @@ public class OpenHABWidgetAdapter extends ArrayAdapter<OpenHABWidget> implements
 	}
 	
 	public void stopImageRefresh() {
-		Log.d(TAG, "Stopping image refresh for " + refreshImageList.size() + " widgets");
+		Log.d(HABApplication.getLogTag(), "Stopping image refresh for " + refreshImageList.size() + " widgets");
 		for (int i=0; i<refreshImageList.size(); i++) {
 			if (refreshImageList.get(i) != null)
 				refreshImageList.get(i).cancelRefresh();

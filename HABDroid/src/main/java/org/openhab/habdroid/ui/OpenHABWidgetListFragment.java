@@ -78,7 +78,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
     // Datasource, providing list of openHAB widgets
     private OpenHABWidgetDataSource openHABWidgetDataSource;
     // List adapter for list view of openHAB widgets
-    private OpenHABWidgetAdapter openHABWidgetAdapter;
+    private OpenHABWidgetArrayAdapter openHABWidgetAdapter;
     // Url of current sitemap page displayed
     // Url of current sitemap page displayed
     private String displayPageUrl;
@@ -146,7 +146,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
         Log.d(TAG, "onActivityCreated()");
         mActivity = (OpenHABMainActivity)getActivity();
         openHABWidgetDataSource = new OpenHABWidgetDataSource();
-        openHABWidgetAdapter = new OpenHABWidgetAdapter(getActivity(),
+        openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(getActivity(),
                 R.layout.openhabwidgetlist_genericitem, widgetList);
         getListView().setAdapter(openHABWidgetAdapter);
         openHABBaseUrl = mActivity.getOpenHABBaseUrl();

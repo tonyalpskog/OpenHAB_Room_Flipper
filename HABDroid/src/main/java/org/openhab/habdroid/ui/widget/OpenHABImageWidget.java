@@ -3,7 +3,7 @@ package org.openhab.habdroid.ui.widget;
 import android.view.View;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
 import java.net.MalformedURLException;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class OpenHABImageWidget extends OpenHABWidgetBase {
     ArrayList<AutoRefreshImageView> mRefreshImageList;
 
-    public OpenHABImageWidget(ArrayList<AutoRefreshImageView> refreshImageList, IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetAdapter.ViewData viewData) {
+    public OpenHABImageWidget(ArrayList<AutoRefreshImageView> refreshImageList, IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
         mRefreshImageList = refreshImageList;
     }

@@ -2,14 +2,14 @@ package org.openhab.habdroid.ui.widget;
 
 import android.view.View;
 
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABFrameWidget extends OpenHABWidgetBase {
 
-    public OpenHABFrameWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetAdapter.ViewData viewData) {
+    public OpenHABFrameWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
     }
 

@@ -12,7 +12,7 @@ import com.zenit.habclient.HABApplication;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetMapping;
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,7 +23,7 @@ import java.util.Iterator;
 public class OpenHABSelectionWidget extends OpenHABWidgetBase {
     private Context mContext;
 
-    public OpenHABSelectionWidget(Context context, IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetAdapter.ViewData viewData) {
+    public OpenHABSelectionWidget(Context context, IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
         mContext = context;
     }

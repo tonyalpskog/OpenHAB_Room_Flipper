@@ -93,10 +93,10 @@
     <string name="title_activity_rule">RuleActivity</string>
     <string name="rule_tab_if">IF</string>
     <string name="rule_tab_then">THEN</string>
-    <string name="mainmenu_openhab_flipper">Flipper Activity</string>
+    <string name="mainmenu_openhab_flipper">Flipper Navigation</string>
     <string name="action_speak_room">Speak room</string>
     <string name="service_name">openHAB service</string>
-    <string name="title_activity_room_config">RoomConfigActivity</string>
+    <string name="title_activity_room_config">Room Configuration</string>
     <string name="hab_group">HAB group</string>
     <string name="action_list_view">List view</string>
 

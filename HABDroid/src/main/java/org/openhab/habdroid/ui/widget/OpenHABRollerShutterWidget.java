@@ -6,14 +6,14 @@ import android.widget.ImageButton;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.ui.OpenHABWidgetAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABRollerShutterWidget extends OpenHABWidgetBase {
 
-    public OpenHABRollerShutterWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetAdapter.ViewData viewData) {
+    public OpenHABRollerShutterWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
     }
 
