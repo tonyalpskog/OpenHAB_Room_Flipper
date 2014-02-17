@@ -165,16 +165,20 @@ public class UnitPlacementFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_add:
                 showAddUnitDialog(getActivity());
-                return true;
+                break;
             case R.id.action_remove:
                 removeSelectedUnits();
-                return true;
+                break;
             case R.id.action_selection:
                 unitSelectionDialog(getActivity());
-                return true;
+                break;
+            case R.id.action_clone:
+                //TODO: Create and draw a new copy of any current selection.
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     private void removeSelectedUnits() {
@@ -273,7 +277,7 @@ public class UnitPlacementFragment extends Fragment {
 
     private void unitSelectionDialog(Context context) {
         //TODO - Create dialog choices dynamically.
-        final CharSequence[] items = {"Select all", "Deselect all", "Select all of current type(s)"};
+        final CharSequence[] items = {"Select all", "Deselect all", "Select all of current type(s)", "Select all clones"};
 
         AlertDialog selectUnitDialog;
         // Creating and Building the Dialog
@@ -291,19 +295,22 @@ public class UnitPlacementFragment extends Fragment {
                         multiUnitSelection(false);
                         break;
                     case 2:
-                        ArrayList<OpenHABWidgetType> selectedTypes = new ArrayList<OpenHABWidgetType>();
+                        ArrayList<OpenHABWidgetType> selectedTypes = getSelectedWidgetsType();
 
                         Iterator iterator = roomView.getRoom().getUnitIterator();
                         while(iterator.hasNext()) {
                             GraphicUnit gu = (GraphicUnit) iterator.next();
-                            if(gu.isSelected() && !selectedTypes.contains(gu.getType()))
-                                selectedTypes.add(gu.getType());
+                            if(!gu.isSelected() && selectedTypes.contains(gu.getType()))
+                                gu.setSelected(true);
                         }
+                        break;
+                    case 3:
+                        ArrayList<String> selectedId = getSelectedWidgetsId();
 
                         iterator = roomView.getRoom().getUnitIterator();
                         while(iterator.hasNext()) {
                             GraphicUnit gu = (GraphicUnit) iterator.next();
-                            if(!gu.isSelected() && selectedTypes.contains(gu.getType()))
+                            if(!gu.isSelected() && selectedId.contains(gu.getOpenHABWidget().getId()))
                                 gu.setSelected(true);
                         }
                         break;
@@ -313,6 +320,32 @@ public class UnitPlacementFragment extends Fragment {
         });
         selectUnitDialog = builder.create();
         selectUnitDialog.show();
+    }
+
+    private ArrayList<OpenHABWidgetType> getSelectedWidgetsType() {
+        ArrayList<OpenHABWidgetType> selectedTypeList = new ArrayList<OpenHABWidgetType>();
+
+        Iterator iterator = roomView.getRoom().getUnitIterator();
+        while(iterator.hasNext()) {
+            GraphicUnit gu = (GraphicUnit) iterator.next();
+            if(gu.isSelected() && !selectedTypeList.contains(gu.getType()))
+                selectedTypeList.add(gu.getType());
+        }
+
+        return selectedTypeList;
+    }
+
+    private ArrayList<String> getSelectedWidgetsId() {
+        ArrayList<String> selectedIdList = new ArrayList<String>();
+
+        Iterator iterator = roomView.getRoom().getUnitIterator();
+        while(iterator.hasNext()) {
+            GraphicUnit gu = (GraphicUnit) iterator.next();
+            if(gu.isSelected() && !selectedIdList.contains(gu.getOpenHABWidget().getId()))
+                selectedIdList.add(gu.getOpenHABWidget().getId());
+        }
+
+        return selectedIdList;
     }
 
     View.OnDragListener dropListener = new View.OnDragListener() {
@@ -388,6 +421,21 @@ public class UnitPlacementFragment extends Fragment {
     private void setSelected(GraphicUnit gu, boolean selected) {
         if(gu != null && gu.isSelected() != selected)
             gu.setSelected(selected);
+    }
+
+    private boolean cloneSelectedWidgets() {
+        ArrayList<String> selectedWidgetsIdList = new ArrayList<String>();
+
+        Iterator iterator = roomView.getRoom().getUnitIterator();
+        while(iterator.hasNext()) {
+            GraphicUnit gu = (GraphicUnit) iterator.next();
+            if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
+                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget().getItem().getName(), roomView), 50, 50);
+                selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());
+            }
+        }
+
+        return selectedWidgetsIdList.size() > 0;
     }
 }
 

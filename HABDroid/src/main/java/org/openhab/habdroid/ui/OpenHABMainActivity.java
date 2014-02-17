@@ -230,7 +230,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         if (savedInstanceState != null) {
             openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
+            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
             sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
+            HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
         }
         mSitemapList = new ArrayList<OpenHABSitemap>();
         mNavDrawerItemList = new ArrayList<INavDrawerItem>();
@@ -331,8 +333,8 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         Toast.makeText(getApplicationContext(), message,
                 Toast.LENGTH_LONG).show();
         openHABBaseUrl = baseUrl;
-        pagerAdapter.setOpenHABBaseUrl(openHABBaseUrl);
         HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+        pagerAdapter.setOpenHABBaseUrl(openHABBaseUrl);
         if (!TextUtils.isEmpty(mNfcData)) {
             onNfcTag(mNfcData);
             openNFCPageIfPending();
@@ -498,6 +500,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     public void openSitemap(String sitemapUrl) {
         Log.i(TAG, "Opening sitemap at " + sitemapUrl);
         sitemapRootUrl = sitemapUrl;
+        HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
         pagerAdapter.clearFragmentList();
         pagerAdapter.openPage(sitemapRootUrl);
         pager.setCurrentItem(0);
@@ -900,6 +903,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     public void setOpenHABBaseUrl(String openHABBaseUrl) {
         this.openHABBaseUrl = openHABBaseUrl;
+        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
     }
 
     public String getOpenHABUsername() {

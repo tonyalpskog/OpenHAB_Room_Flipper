@@ -19,7 +19,7 @@ public class GraphicUnit {
 //    private OpenHABWidgetType type;
     private float roomRelativeX = 0;
     private float roomRelativeY = 0;
-    private GraphicUnitWidget view;
+    private GraphicUnitWidget mView;
     UnitContainerView mRoomView;
     private String mItemName;
     private UUID mLatestWidgetUpdateUUID;
@@ -30,7 +30,7 @@ public class GraphicUnit {
         mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider().getUpdateUUID();
         mRoomView = roomView;
 
-        this.view = null;
+        mView = null;
         isSelected = false;
         this.id = UUID.randomUUID();
 
@@ -39,31 +39,31 @@ public class GraphicUnit {
     }
 
     public GraphicUnitWidget getGraphicUnitWidget() {
-        return view;
+        return mView;
     }
 
     public ImageView getView(Context context) {
-        if(view == null) {
-            view = new GraphicUnitWidget(context, this);
+        if(mView == null) {
+            mView = new GraphicUnitWidget(context, this);
 
-//            view.setTop(relativeTop);
-//            view.setLeft(relativeLeft);
+//            mView.setTop(relativeTop);
+//            mView.setLeft(relativeLeft);
 //            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 //                    RelativeLayout.LayoutParams.WRAP_CONTENT,
 //                    RelativeLayout.LayoutParams.WRAP_CONTENT
 //            );
 //            params.setMargins(relativeLeft, relativeTop, 0, 0);
-//            view.setLayoutParams(params);
-            view.setMinimumWidth(UNIT_SIZE);
-            view.setMinimumHeight(UNIT_SIZE);
-            view.setTag(id);
-            view.setSelected(isSelected);
+//            mView.setLayoutParams(params);
+            mView.setMinimumWidth(UNIT_SIZE);
+            mView.setMinimumHeight(UNIT_SIZE);
+            mView.setTag(id);
+            mView.setSelected(isSelected);
         }
-        return view;
+        return mView;
     }
 
     public void resetView() {
-        view = null;
+        mView = null;
     }
 
     public boolean isSelected() {
@@ -72,9 +72,9 @@ public class GraphicUnit {
 
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
-        if(view != null) {
-            view.setSelected(isSelected);
-            view.drawSelection(isSelected);
+        if(mView != null) {
+            mView.setSelected(isSelected);
+            mView.drawSelection(isSelected);
         }
     }
 

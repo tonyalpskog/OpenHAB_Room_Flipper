@@ -102,8 +102,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 
 public class OpenHABWidgetListActivity extends ListActivity implements AsyncServiceResolverListener {
-	// Logging TAG
-	private static final String TAG = "OpenHABWidgetListActivity";
 	// Datasource, providing list of openHAB widgets
 	private OpenHABWidgetDataSource openHABWidgetDataSource;
 	// List adapter for list view of openHAB widgets
@@ -175,7 +173,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					getPackageManager().getPackageInfo(getPackageName(), 0).versionName).commit();
 		} catch (NameNotFoundException e1) {
             if (e1 != null)
-                Log.d(TAG, e1.getMessage());
+                Log.d(HABApplication.getLogTag(), e1.getMessage());
 		}
 		// Set the theme to one from preferences
 		Util.setActivityTheme(this);
@@ -191,9 +189,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			crittercismConfig.put("shouldCollectLogcat", true);
 		} catch (JSONException e) {
 			if (e.getMessage() != null)
-				Log.e(TAG, e.getMessage());
+				Log.e(HABApplication.getLogTag(), e.getMessage());
 			else
-				Log.e(TAG, "Crittercism JSON exception");
+				Log.e(HABApplication.getLogTag(), "Crittercism JSON exception");
 		}
 		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
 		// Initialize activity view
@@ -253,12 +251,12 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		}
 		// If yes, then just go to it (means restore activity from it's saved state)
 		if (displayPageUrl.length() > 0) {
-			Log.d(TAG, "onCreate() calling showPage(...)  displayPageUrl = " + displayPageUrl);
+			Log.d(HABApplication.getLogTag(), "onCreate() calling showPage(...)  displayPageUrl = " + displayPageUrl);
 			showPage(displayPageUrl, false);
 		// If not means it is a clean start
 		} else {
 			if (getIntent() != null) {
-				Log.i(TAG, "Launch intent = " + getIntent().getAction());
+				Log.i(HABApplication.getLogTag(), "Launch intent = " + getIntent().getAction());
 				// If this is a launch through NFC tag reading
                 if (getIntent().getAction() != null) {
                     if (getIntent().getAction().equals("android.nfc.action.NDEF_DISCOVERED")) {
@@ -269,40 +267,43 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			// If we are in demo mode, ignore all settings and use demo url from strings
 			if (settings.getBoolean("default_openhab_demomode", false)) {
-				openHABBaseUrl = getString(R.string.openhab_demo_url);
-				Log.i(TAG, "Demo mode, connecting to " + openHABBaseUrl);
+                HABApplication.getOpenHABSetting().setBaseUrl(getString(R.string.openhab_demo_url));
+				openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
+				Log.i(HABApplication.getLogTag(), "Demo mode, connecting to " + openHABBaseUrl);
 				Toast.makeText(getApplicationContext(), getString(R.string.info_demo_mode),
 					Toast.LENGTH_LONG).show();
-				showTime();
+				showWidgetList();
 			} else {
-				openHABBaseUrl = normalizeUrl(settings.getString("default_openhab_url", ""));
+                HABApplication.getOpenHABSetting().setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
+				openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
 				// Check if we have a direct URL in preferences, if yes - use it
 				if (openHABBaseUrl.length() > 0) {
-					Log.i(TAG, "Connecting to configured URL = " + openHABBaseUrl);
+					Log.i(HABApplication.getLogTag(), "Connecting to configured URL = " + openHABBaseUrl);
 					Toast.makeText(getApplicationContext(), getString(R.string.info_conn_url),
 							Toast.LENGTH_SHORT).show();
-					showTime();
+					showWidgetList();
 				} else {
 					// Get current network information
 					ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(
 							Context.CONNECTIVITY_SERVICE);
 					NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 					if (activeNetworkInfo != null) {
-						Log.i(TAG, "Network is connected");
+						Log.i(HABApplication.getLogTag(), "Network is connected");
 						// If network is mobile, try to use remote URL
 						if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE || serviceDiscoveryEnabled == false) {
 							if (!serviceDiscoveryEnabled) {
-								Log.i(TAG, "openHAB discovery is disabled");
+								Log.i(HABApplication.getLogTag(), "openHAB discovery is disabled");
 							} else {
-								Log.i(TAG, "Network is Mobile (" + activeNetworkInfo.getSubtypeName() + ")");
+								Log.i(HABApplication.getLogTag(), "Network is Mobile (" + activeNetworkInfo.getSubtypeName() + ")");
 							}
-							openHABBaseUrl = normalizeUrl(settings.getString("default_openhab_alturl", ""));
+                            HABApplication.getOpenHABSetting().setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
+                            openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
 							// If remote URL is configured
 							if (openHABBaseUrl.length() > 0) {
 								Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),
 										Toast.LENGTH_SHORT).show();
-								Log.i(TAG, "Connecting to remote URL " + openHABBaseUrl);
-								showTime();
+								Log.i(HABApplication.getLogTag(), "Connecting to remote URL " + openHABBaseUrl);
+								showWidgetList();
 							} else {
 								Toast.makeText(getApplicationContext(), getString(R.string.error_no_url),
 										Toast.LENGTH_LONG).show();		
@@ -310,7 +311,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 						// If network is WiFi or Ethernet
 						} if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI
 								|| activeNetworkInfo.getType() == ConnectivityManager.TYPE_ETHERNET) {
-							Log.i(TAG, "Network is WiFi or Ethernet");
+							Log.i(HABApplication.getLogTag(), "Network is WiFi or Ethernet");
 							// Start service discovery
 							this.serviceResolver = new AsyncServiceResolver(this, openHABServiceType);
 							progressDialog = ProgressDialog.show(this, "", 
@@ -318,11 +319,11 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 							this.serviceResolver.start();
 						// We don't know how to handle this network type
 						} else {
-							Log.i(TAG, "Network type (" + activeNetworkInfo.getTypeName() + ") is unsupported");
+							Log.i(HABApplication.getLogTag(), "Network type (" + activeNetworkInfo.getTypeName() + ") is unsupported");
 						}
 					// Network is not available
 					} else {
-						Log.i(TAG, "Network is not available");
+						Log.i(HABApplication.getLogTag(), "Network is not available");
 						Toast.makeText(getApplicationContext(), getString(R.string.error_network_not_available),
 								Toast.LENGTH_LONG).show();						
 					}
@@ -332,18 +333,18 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	}
 	
 	// Start openHAB browsing!
-	public void showTime() {
-        Log.d(TAG, "showTime() - openHABBaseUrl = '" + openHABBaseUrl + "'");
+	public void showWidgetList() {
+        Log.d(HABApplication.getLogTag(), "showWidgetList() - openHABBaseUrl = '" + openHABBaseUrl + "'");
 		if (openHABBaseUrl != null) {
 			openHABWidgetAdapter.setOpenHABBaseUrl(openHABBaseUrl);
 			if (nfcTagData.length() > 0) {
-				Log.d(TAG, "We have NFC tag data");
+				Log.d(HABApplication.getLogTag(), "We have NFC tag data");
 				onNfcTag(nfcTagData, false);
 			} else {
 				selectSitemap(openHABBaseUrl, false);
 			}
 		} else {
-			Log.e(TAG, "No base URL!");
+			Log.e(HABApplication.getLogTag(), "No base URL!");
 		}
 	}
 
@@ -352,7 +353,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 * to start connection with local openHAB instance
 	 */
 	public void onServiceResolved(ServiceInfo serviceInfo) {
-		Log.i(TAG, "[AsyncHttpClient] Service resolved: "
+		Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] Service resolved: "
                 + serviceInfo.getHostAddresses()[0]
                 + " port:" + serviceInfo.getPort());
 		openHABBaseUrl = "https://" + serviceInfo.getHostAddresses()[0] + ":" +
@@ -372,21 +373,21 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					String openHABUUID = settings.getString("openhab_uuid", "");
 					if (openHABUUID.equals(content)) {
 						Log.i(HABApplication.getLogTag(), "openHAB UUID does match the saved one");
-						showTime();
+						showWidgetList();
 					} else {
 						Log.i(HABApplication.getLogTag(), "openHAB UUID doesn't match the saved one");
 						// TODO: need to add some user prompt here
 /*						Toast.makeText(getApplicationContext(), 
 								"openHAB UUID doesn't match the saved one!",
 								Toast.LENGTH_LONG).show();*/
-						showTime();
+						showWidgetList();
 					}
 				} else {
 					Log.i(HABApplication.getLogTag(), "No recorded openHAB UUID, saving the new one");
 					Editor preferencesEditor = settings.edit();
 					preferencesEditor.putString("openhab_uuid", content);
 					preferencesEditor.commit();
-					showTime();
+					showWidgetList();
 				}
 			}
 			@Override
@@ -412,7 +413,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),
 					Toast.LENGTH_SHORT).show();
 			Log.i(HABApplication.getLogTag(), "Connecting to remote URL " + openHABBaseUrl);
-			showTime();
+			showWidgetList();
 		} else {
 			Toast.makeText(getApplicationContext(), getString(R.string.error_no_url),
 					Toast.LENGTH_LONG).show();		
@@ -470,15 +471,15 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onResume() {
-		Log.d(TAG, "onResume()");
-		Log.d(TAG, "displayPageUrl = " + this.displayPageUrl);
+		Log.d(HABApplication.getLogTag(), "onResume()");
+		Log.d(HABApplication.getLogTag(), "displayPageUrl = " + this.displayPageUrl);
 		super.onResume();
 		PendingIntent pendingIntent = PendingIntent.getActivity(
 				  this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 		if (NfcAdapter.getDefaultAdapter(this) != null)
 			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pendingIntent, null, null);
 		if (this.displayPageUrl.length() > 0) {
-			Log.d(TAG, "OnResume() calling showPage(...) displayPageUrl > 0, resuming");
+			Log.d(HABApplication.getLogTag(), "OnResume() calling showPage(...) displayPageUrl > 0, resuming");
 			showPage(displayPageUrl, false);
 		}
 	}
@@ -488,7 +489,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onPause() {
-		Log.d(TAG, "onPause()");
+		Log.d(HABApplication.getLogTag(), "onPause()");
 		super.onPause();
         if (NfcAdapter.getDefaultAdapter(this) != null)
             NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
@@ -516,7 +517,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		Log.d(TAG, "onDestroy() for " + this.displayPageUrl);
+		Log.d(HABApplication.getLogTag(), "onDestroy() for " + this.displayPageUrl);
 		if (this.progressDialog != null)
 			this.progressDialog.dismiss();
 		if (this.serviceResolver != null)
@@ -542,11 +543,11 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.d(TAG, "onActivityResult " + String.valueOf(requestCode) + " " + String.valueOf(resultCode));
+		Log.d(HABApplication.getLogTag(), "onActivityResult " + String.valueOf(requestCode) + " " + String.valueOf(resultCode));
 		if (resultCode == -1) {
 			// Right now only PreferencesActivity returns -1
 			// Restart app after preferences
-			Log.d(TAG, "Restarting");
+			Log.d(HABApplication.getLogTag(), "Restarting");
 			// Get launch intent for application
 			Intent restartIntent = getBaseContext().getPackageManager()
 		             .getLaunchIntentForPackage( getBaseContext().getPackageName() );
@@ -566,7 +567,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
      * @return      void
      */
 	public void showPage(String pageUrl, boolean longPolling) {
-		Log.i(TAG, "showPage() for " + pageUrl + " longPolling = " + longPolling);
+		Log.i(HABApplication.getLogTag(), "showPage() for " + pageUrl + " longPolling = " + longPolling);
 		// Cancel any existing http request to openHAB (typically ongoing long poll)
 		if (!longPolling)
 			setProgressBarIndeterminateVisibility(true);
@@ -593,9 +594,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			@Override
 		     public void onFailure(Throwable e, String errorResponse) {
-				Log.e(TAG, "http request failed");
+				Log.e(HABApplication.getLogTag(), "http request failed");
 				if (e.getMessage() != null) {
-					Log.e(TAG, e.getMessage());
+					Log.e(HABApplication.getLogTag(), e.getMessage());
 					if (e.getMessage().equals("Unauthorized")) {
 						showAlertDialog(getString(R.string.error_authentication_failed));
 					}
@@ -617,7 +618,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
                 document = builder.parse(new ByteArrayInputStream(XMLContent.getBytes("UTF-8")));
                 rootNode = document.getFirstChild();
             } else {
-                Log.e(TAG, "getNode: XMLContent == null");
+                Log.e(HABApplication.getLogTag(), "getNode: XMLContent == null");
             }
         } catch (ParserConfigurationException e) {
             // TODO Auto-generated catch block
@@ -658,7 +659,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         // Set widget list index to saved or zero position
         // This would mean we got widget and command from nfc tag, so we need to do some automatic actions!
         if (this.nfcWidgetId != null && this.nfcCommand != null) {
-            Log.d(TAG, "Have widget and command, NFC action!");
+            Log.d(HABApplication.getLogTag(), "Have widget and command, NFC action!");
             OpenHABWidget nfcWidget = this.openHABWidgetDataSource.getWidgetById(this.nfcWidgetId);
             OpenHABItem nfcItem = nfcWidget.getItem();
             // Found widget with id from nfc tag and it has an item
@@ -689,7 +690,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         getListView().setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position,
                     long id) {
-                Log.d(TAG, "Widget clicked " + String.valueOf(position));
+                Log.d(HABApplication.getLogTag(), "Widget clicked " + String.valueOf(position));
                 OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
                 if (openHABWidget.hasLinkedPage()) {
                     // Widget have a page linked to it
@@ -703,9 +704,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                     int position, long id) {
-                Log.d(TAG, "Widget long-clicked " + String.valueOf(position));
+                Log.d(HABApplication.getLogTag(), "Widget long-clicked " + String.valueOf(position));
                 OpenHABWidget openHABWidget = openHABWidgetAdapter.getItem(position);
-                Log.d(TAG, "Widget type = " + openHABWidget.getType());
+                Log.d(HABApplication.getLogTag(), "Widget type = " + openHABWidget.getType());
                 switch (openHABWidget.getType()) {
                     case Switch:
                     case Selection:
@@ -734,7 +735,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
             }
         });
 
-        Log.d(TAG, "processContent() - Calling showPage() displayPageUrl = " + displayPageUrl);
+        Log.d(HABApplication.getLogTag(), "processContent() - Calling showPage() displayPageUrl = " + displayPageUrl);
 		showPage(displayPageUrl, true);
 	}
 
@@ -742,7 +743,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 * Put current page and current widget list position into the stack and go to new page
 	 */
 	private void navigateToPage(String pageLink, String pageTitle) {
-        Log.d(TAG, "navigateToPage(): pageTitle = '" + pageTitle + "'  pageLink = '" + pageLink + "'");
+        Log.d(HABApplication.getLogTag(), "navigateToPage(): pageTitle = '" + pageTitle + "'  pageLink = '" + pageLink + "'");
 		// We don't want to put current page to stack if navigateToPage is trying to go to the same page
 		if (!pageLink.equals(displayPageUrl)) {
             Intent drillDownIntent = new Intent(OpenHABWidgetListActivity.this.getApplicationContext(),
@@ -759,15 +760,15 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        Log.d(TAG, event.toString());
-        Log.d(TAG, String.format("event action = %d", event.getAction()));
+        Log.d(HABApplication.getLogTag(), event.toString());
+        Log.d(HABApplication.getLogTag(), String.format("event action = %d", event.getAction()));
         return super.dispatchTouchEvent(event);
     }
 
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        Log.d(TAG, "keyCode = " + String.format("%d", keyCode));
-        Log.d(TAG, "event = " + event.toString());
+        Log.d(HABApplication.getLogTag(), "keyCode = " + String.format("%d", keyCode));
+        Log.d(HABApplication.getLogTag(), "event = " + event.toString());
         if (keyCode == 4) {
             return true;
         } else {
@@ -798,7 +799,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
     		selectSitemap(openHABBaseUrl, true);
     		return true;
         case android.R.id.home:
-            Log.d(TAG, "Home selected - " + sitemapRootUrl);
+            Log.d(HABApplication.getLogTag(), "Home selected - " + sitemapRootUrl);
 			// Get launch intent for application
 			Intent homeIntent = getBaseContext().getPackageManager()
 		             .getLaunchIntentForPackage( getBaseContext().getPackageName() );
@@ -815,7 +816,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			Util.overridePendingTransition(this, true);		
             return true;
         case R.id.mainmenu_openhab_clearcache:
-			Log.d(TAG, "Restarting");
+			Log.d(HABApplication.getLogTag(), "Restarting");
 			// Get launch intent for application
 			Intent restartIntent = getBaseContext().getPackageManager()
 		             .getLaunchIntentForPackage( getBaseContext().getPackageName() );
@@ -851,7 +852,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
      */
 
 	private void selectSitemap(final String baseURL, final boolean forceSelect) {
-		Log.d(TAG, "Loding sitemap list from " + baseURL + "rest/sitemaps");
+		Log.d(HABApplication.getLogTag(), "Loding sitemap list from " + baseURL + "rest/sitemaps");
 	    AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(this);
 		// If authentication is needed
 	    asyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
@@ -965,13 +966,13 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 				}
 			}
 		} catch (ParserConfigurationException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(HABApplication.getLogTag(), e.getMessage());
 		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(HABApplication.getLogTag(), e.getMessage());
 		} catch (SAXException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(HABApplication.getLogTag(), e.getMessage());
 		} catch (IOException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(HABApplication.getLogTag(), e.getMessage());
 		}
 		return sitemapList;
 	}
@@ -988,7 +989,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	}
 	
 	private void showSitemapSelectionDialog(final List<OpenHABSitemap> sitemapList) {
-		Log.d(TAG, "Opening sitemap selection dialog");
+		Log.d(HABApplication.getLogTag(), "Opening sitemap selection dialog");
 		final List<String> sitemapNameList = new ArrayList<String>();;
 		for (int i=0; i<sitemapList.size(); i++) {
 			sitemapNameList.add(sitemapList.get(i).getName());
@@ -999,7 +1000,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		dialogBuilder.setItems(sitemapNameList.toArray(new CharSequence[sitemapNameList.size()]),
 			new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-					Log.d(TAG, "Selected sitemap " + sitemapNameList.get(item));
+					Log.d(HABApplication.getLogTag(), "Selected sitemap " + sitemapNameList.get(item));
 					SharedPreferences settings = 
 						PreferenceManager.getDefaultSharedPreferences(OpenHABWidgetListActivity.this);
 					Editor preferencesEditor = settings.edit();
@@ -1014,7 +1015,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	}
 	
 	private void openSitemap(String sitemapUrl) {
-		Log.i(TAG, "openSitemap() - Calling showPage(...) Opening sitemap at " + sitemapUrl);
+		Log.i(HABApplication.getLogTag(), "openSitemap() - Calling showPage(...) Opening sitemap at " + sitemapUrl);
 		displayPageUrl = sitemapUrl;
 		sitemapRootUrl = sitemapUrl;
 		showPage(displayPageUrl, false);
@@ -1031,7 +1032,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			if (!normalizedUrl.endsWith("/"))
 				normalizedUrl = normalizedUrl + "/";
 		} catch (MalformedURLException e) {
-			Log.d(TAG, "normalizeUrl: invalid URL");
+			Log.d(HABApplication.getLogTag(), "normalizeUrl: invalid URL");
 		}
 		return normalizedUrl;
 	}

@@ -17,9 +17,8 @@ import org.w3c.dom.Node;
  */
 public class RestCommunication {
 
-
     public void requestOpenHABSitemap(Context context, OpenHABWidget widget) {
-        requestOpenHABSitemap(context, widget.getItem().getName(), widget);
+        requestOpenHABSitemap(context, widget.getLinkedPage().getLink(), widget);
     }
 
     public void requestOpenHABSitemap(Context context, String sitemapId) {
@@ -44,7 +43,7 @@ public class RestCommunication {
 //        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler()
 
         AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
-        final String RESTaddress = HABApplication.getOpenHABSetting().getBaseUrl() + "rest/sitemaps/demo" + (sitemapId == null? "": "/" + sitemapId);
+        final String RESTaddress = HABApplication.getOpenHABSetting().getSitemapRootUrl() + (sitemapId == null? "": "/" + sitemapId);
         Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
         asyncHttpClient.get(context, RESTaddress, headers, null, new DocumentHttpResponseHandler() {
             @Override

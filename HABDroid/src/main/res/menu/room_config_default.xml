@@ -9,6 +9,10 @@
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/action_remove_unit"
         android:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_clone"
+        android:icon="@drawable/ic_menu_copy"
+        android:title="@string/action_remove_unit"
+        android:showAsAction="ifRoom"/>
     <item android:id="@+id/action_selection"
         android:icon="@drawable/ic_action_item_selection"
         android:title="@string/action_selection"
