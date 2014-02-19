@@ -138,7 +138,8 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
             case RollerShutter:
                 widgetView = new OpenHABRollerShutterWidget(this, preparedViewData).getWidget();
                 break;
-            case Text:
+            case ItemText:
+            case SitemapText:
                 widgetView = new OpenHABTextWidget(this, preparedViewData).getWidget();
                 break;
             case Slider:
@@ -244,6 +245,8 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
     
     @Override
     public int getItemViewType(int position) {
+        if(getItem(position) ==  null || getItem(position).getType() == null)
+            Log.e(HABApplication.getLogTag(), getItem(position) ==  null? "getItem(position) ==  null" : "getItem(position).getType() == null");
         return getItem(position).getType().Id;
     }
 	

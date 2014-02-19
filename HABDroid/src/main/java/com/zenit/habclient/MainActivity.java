@@ -16,6 +16,7 @@ import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 
+import java.util.EnumSet;
 import java.util.Locale;
 
 public class MainActivity extends Activity
@@ -58,8 +59,8 @@ public class MainActivity extends Activity
         Fragment newFragment = null;
 
         HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
-        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetType.Group)) {
-            if(!widget.hasChildren())
+        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+            if(widget.hasChildren())
                 HABApplication.getRestCommunication().requestOpenHABSitemap(this,  widget);
         }
 

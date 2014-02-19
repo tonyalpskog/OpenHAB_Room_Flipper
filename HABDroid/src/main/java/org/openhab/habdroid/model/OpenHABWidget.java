@@ -32,6 +32,8 @@ package org.openhab.habdroid.model;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.zenit.habclient.HABApplication;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -130,7 +132,20 @@ public class OpenHABWidget {
                 }
 			}
 		}
-		this.parent.addChildWidget(this);
+
+        if(getType() == OpenHABWidgetType.ItemText || getType() == OpenHABWidgetType.SitemapText) {
+            if(hasItem())
+                setType(OpenHABWidgetType.ItemText);
+            else if(hasLinkedPage())
+                setType(OpenHABWidgetType.SitemapText);
+            else {
+                //Unknown widget type found => Generic
+                Log.e(HABApplication.getLogTag(), String.format("Unknown openHABWidget type '%s'. Widget ID = %s", getType().name(), getId()));
+                setType(OpenHABWidgetType.GenericItem);
+            }
+        }
+
+        this.parent.addChildWidget(this);
 	}
 	
 	public void addChildWidget(OpenHABWidget child) {
@@ -176,8 +191,9 @@ public class OpenHABWidget {
 	}
 
     public void setType(String type) {
+
         //Check if widget type is any of the two special types "Switch with mappings" or "Switch with RollershutterItem"
-        if (type.equals(OpenHABWidgetType.Switch.Name)) {
+        if (type.equalsIgnoreCase(OpenHABWidgetType.Switch.Name)) {
             if (hasMappings()) {
                 setType(OpenHABWidgetType.SelectionSwitch);
             } else if (getItem() != null) {
@@ -194,14 +210,14 @@ public class OpenHABWidget {
             return;
         } else {
             for(int i = 0; i < OpenHABWidgetType.values().length; i++) {
-                if(type.equals(OpenHABWidgetType.values()[i].Name)) {
+                if(type.equalsIgnoreCase(OpenHABWidgetType.values()[i].Name)) {
                     setType(OpenHABWidgetType.values()[i]);
                     return;
                 }
             }
 
             //Type not found by name => Generic
-            Log.w("OpenHABWidget", "Unknown widget type: '" + type + "'");
+            Log.e(HABApplication.getLogTag(), String.format("Unknown openHABWidget type '%s'. Widget ID = %s", type, getId()));
             setType(OpenHABWidgetType.GenericItem);
         }
     }

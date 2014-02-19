@@ -10,10 +10,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
@@ -121,7 +119,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         int x = Math.round(getScaledBitmapX() + (getScaledBitmapWidth() / gUnit.getRoomRelativeX()));
         int y = Math.round(getScaledBitmapY() + (getScaledBitmapHeight() / gUnit.getRoomRelativeY()));
         drawUnitInRoom(gUnit, x, y);
-        if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Text)
+        if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.ItemText)
             drawControlInRoom(gUnit, x, y);
 //        else
 //            drawControlInRoom(gUnit, x-50, y-150);
@@ -185,7 +183,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
             controlView = mOpenHABWidgetControl.initializeSwitchWidget(gUnit.getOpenHABWidget(), inflatedView);
             params.setMargins(x - 30, y + 64, 0, 0);
             mAddedControlView = inflatedView;
-        } else if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Text) {
+        } else if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.ItemText/* || gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.SitemapText*/) {
             addedUnitViews.add(inflatedView);
             controlView = mOpenHABWidgetControl.initializeTextWidget(gUnit.getOpenHABWidget(), inflatedView);
             params.setMargins(x - 10, y + 64, 0, 0);

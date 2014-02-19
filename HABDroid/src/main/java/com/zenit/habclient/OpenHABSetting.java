@@ -11,7 +11,7 @@ import org.openhab.habdroid.util.MyAsyncHttpClient;
  */
 public class OpenHABSetting {
     private String mBaseUrl = "https://demo.openhab.org:8443/";
-    private String mSitemapRootUrl = "";
+    private String mSitemapRootUrl = "https://192.168.0.29:8443/rest/sitemaps/ekafallet/Ekafallet";
     private String mUsername = "";
     private String mPassword = "";
 

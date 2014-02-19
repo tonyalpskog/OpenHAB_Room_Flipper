@@ -18,22 +18,26 @@ import org.w3c.dom.Node;
 public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, OpenHABWidget widget) {
-        requestOpenHABSitemap(context, widget.getLinkedPage().getLink(), widget);
+        if(widget.hasItem() || widget.hasLinkedPage())
+            requestOpenHABSitemap(context, widget.hasItem()? widget.getItem().getLink() : widget.getLinkedPage().getLink(), widget);
+        else
+            Log.w(HABApplication.getLogTag(2), "Sitemap cannot be requested due to missing sitemap data.");
     }
 
-    public void requestOpenHABSitemap(Context context, String sitemapId) {
-        requestOpenHABSitemap(context, sitemapId, null);
+    public void requestOpenHABSitemap(Context context, String sitemapUrl) {
+        requestOpenHABSitemap(context, sitemapUrl, null);
     }
 
-    public void requestOpenHABSitemap(Context context, String sitemapId, OpenHABWidget widget) {
-        if(sitemapId == null || sitemapId.isEmpty()) {
-            Log.w(HABApplication.getLogTag(), String.format("\n%s\n[AsyncHttpClient] Requested sitemap name is %s", HABApplication.getLogTag(2), (sitemapId == null? "NULL": "empty")));
-            sitemapId = null;
+    public void requestOpenHABSitemap(Context context, String sitemapUrl, OpenHABWidget widget) {
+        if(sitemapUrl == null || sitemapUrl.isEmpty()) {
+            Log.w(HABApplication.getLogTag(), String.format("\n%s\n[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
+            return;
         }
 
         final OpenHABWidget finalWidget = widget;
 
         Header[] headers = {};
+
 //        if (!longPolling)
 //            startProgressIndicator();
 //        if (longPolling) {
@@ -43,7 +47,7 @@ public class RestCommunication {
 //        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler()
 
         AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
-        final String RESTaddress = HABApplication.getOpenHABSetting().getSitemapRootUrl() + (sitemapId == null? "": "/" + sitemapId);
+        final String RESTaddress = sitemapUrl;
         Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
         asyncHttpClient.get(context, RESTaddress, headers, null, new DocumentHttpResponseHandler() {
             @Override

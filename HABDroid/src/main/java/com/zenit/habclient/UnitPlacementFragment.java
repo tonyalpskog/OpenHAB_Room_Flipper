@@ -46,7 +46,7 @@ public class UnitPlacementFragment extends Fragment {
     private RoomConfigActivity mActivity;
     private View fragmentView;
     private UnitContainerView roomView;
-    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.Text, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
+    private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.ItemText, OpenHABWidgetType.SitemapText, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     /**
