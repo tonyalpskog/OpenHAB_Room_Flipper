@@ -2,9 +2,11 @@ package org.openhab.habdroid.ui.widget;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
+import org.openhab.habdroid.ui.SecondaryTouchListener;
 import org.openhab.habdroid.ui.TouchRepeatListener;
 
 /**
@@ -40,6 +42,17 @@ public class OpenHABSetpointWidget extends OpenHABWidgetBase {
 
         TouchRepeatListener.OnRepeatClickListener plusButtonOnRepeatClickListener = new SetpointRepeatClickListener(mViewData, false, mHABWidgetCommunication);
         setPointPlusButton.setOnTouchListener(new TouchRepeatListener(400, 150, plusButtonOnRepeatClickListener));
+
+        SecondaryTouchListener.OnSecondaryClickListener valueTextOnSecondaryClickListener = new SecondaryTouchListener.OnSecondaryClickListener() {
+            @Override
+            public boolean onSecondary(View v, SecondaryTouchListener.SecondaryClickEvent event) {
+                if(event == SecondaryTouchListener.SecondaryClickEvent.Down)
+                    Toast.makeText(getWidget().getContext(), "A numeric input dialog will show...", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        };
+
+        mViewData.valueTextView.setOnTouchListener(new SecondaryTouchListener(valueTextOnSecondaryClickListener));
 
         return mViewData.widgetView;
     }

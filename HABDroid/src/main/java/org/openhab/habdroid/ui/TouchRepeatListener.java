@@ -61,15 +61,21 @@ public class TouchRepeatListener implements OnTouchListener {
                 fireRepeatEvent(mDownView, RepeatClickEvent.InitialClick);
                 mIsRepeating = true;
                 break;
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                Log.d(HABApplication.getLogTag(), "[TouchRepeat] ACTION_UP => handler.removeCallbacks(mRunnableLooper)");
+                Log.d(HABApplication.getLogTag(), String.format("[TouchRepeat] %s => handler.removeCallbacks(mRunnableLooper)"
+                        , motionEvent.getAction() == MotionEvent.ACTION_CANCEL? "ACTION_CANCEL" : "ACTION_UP"));
                 mIsRepeating = false;
                 handler.removeCallbacks(mRunnableLooper);
+                mRunnableLooper = null;//TODO - Better? but still not bug free.
                 fireRepeatEvent(mDownView, RepeatClickEvent.Done);
                 mDownView = null;
                 break;
+//            case MotionEvent.AXIS_PRESSURE:
+//                Log.v(HABApplication.getLogTag(), "[TouchRepeat]  AXIS_PRESSURE = " +  motionEvent.getPressure());
+//                break;
         }
-        return false;
+        return true;
     }
 
     public enum RepeatClickEvent {
