@@ -20,6 +20,7 @@ import org.openhab.habdroid.model.OpenHABWidgetType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +60,15 @@ public class RoomConfigFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+//    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
+//    {
+//        @Override
+//        public String toString() {
+//            return String.format("(%s) %s", getType().name(), getLabel());
+//
+//        }
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,7 +91,10 @@ public class RoomConfigFragment extends Fragment {
 
         mRoomNameText.setText(mCurrentRoom.getName() != null? mCurrentRoom.getName(): "");
 
-        List<OpenHABWidget> habGroupArrayList = HABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetType.Group);
+        List<OpenHABWidget> habGroupArrayList = HABApplication.getOpenHABWidgetProvider().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText));
+        if(habGroupArrayList.size() == 0)
+            Log.e(HABApplication.getLogTag(), "No OpenHABWidget groups found in OpenHABWidgetProvider.");
+
         NULL_GROUP_WIDGET.setLabel("<Undefined HAB group>");
         habGroupArrayList.add(NULL_GROUP_WIDGET);
 
@@ -90,16 +103,17 @@ public class RoomConfigFragment extends Fragment {
                 android.R.layout.simple_spinner_item, habGroupArrayList);
         habGroupSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-
         //Create adapter for Room spinners
         List<Room> roomArrayList = new ArrayList<Room>(mRoomProvider.roomHash.size());
         Iterator iterator = mRoomProvider.roomHash.values().iterator();
         while(iterator.hasNext()) {
             Room room = (Room) iterator.next();
 
-//TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
-//            if(room.getGroupItemName() == null)
-//                HABApplication.getRestCommunication().requestOpenHABSitemap(inflater.getContext(), room.getSitemapId());
+            //TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
+            if(room.getGroupWidgetId() == null) {
+                OpenHABWidget groupWidget = HABApplication.getOpenHABWidgetProvider().getWidget(room.getRoomWidget().getId());
+                HABApplication.getRestCommunication().requestOpenHABSitemap(inflater.getContext(), groupWidget);
+            }
 
             roomArrayList.add(room);
         }
@@ -114,6 +128,7 @@ public class RoomConfigFragment extends Fragment {
 
         ArrayAdapter<Room> roomSpinnerAdapter = new ArrayAdapter<Room>(this.getActivity().getApplicationContext(),
                 android.R.layout.simple_spinner_item, roomArrayList);
+
         roomSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //Set adapters for spinners
@@ -131,10 +146,10 @@ public class RoomConfigFragment extends Fragment {
         belowRoomSpinner.setAdapter(roomSpinnerAdapter);
 
         //Set selection for spinners
-        if(mCurrentRoom.getGroupItemName() == null || mCurrentRoom.getGroupItemName().isEmpty())
+        if(mCurrentRoom.getGroupWidgetId() == null || mCurrentRoom.getGroupWidgetId().isEmpty())
             mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(NULL_GROUP_WIDGET));
         else
-            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(HABApplication.getOpenHABWidgetProvider().getWidget(mCurrentRoom.getGroupItemName())));
+            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(HABApplication.getOpenHABWidgetProvider().getWidget(mCurrentRoom.getGroupWidgetId())));
 
         if(mSpinnerHashMap == null)
             mSpinnerHashMap = new HashMap<Direction, Spinner>();
@@ -275,7 +290,7 @@ public class RoomConfigFragment extends Fragment {
             return;
         }
 
-        mCurrentRoom.setGroupItemName(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getItem().getName());
+        mCurrentRoom.setGroupWidgetId(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getId());
 
         if(mRoomNameText.getText().toString().length() > 0)
             mCurrentRoom.setName(mRoomNameText.getText().toString());

@@ -1,15 +1,16 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 import android.util.Log;
+
+import com.zenit.habclient.DataSourceType;
+import com.zenit.habclient.UnitEntityDataType;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public abstract class RuleUnitEntity<T> extends UnitEntityDataType<T> {
 
-    private String mName;
     private RuleOperation mOperation;
-    private T mValue;
 
     public RuleUnitEntity(String name) {
         super(name);
@@ -40,9 +41,7 @@ public abstract class RuleUnitEntity<T> extends UnitEntityDataType<T> {
     }
 
     @Override
-    public T getValue() {
-        return mValue;
-    }
+    public T getValue() { return mValue; }
 
     @Override
     public void setValue(T value) {

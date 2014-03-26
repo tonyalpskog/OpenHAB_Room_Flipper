@@ -24,6 +24,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.zenit.habclient.rule.RuleActivity;
+
 import org.openhab.habdroid.R;
 
 /**

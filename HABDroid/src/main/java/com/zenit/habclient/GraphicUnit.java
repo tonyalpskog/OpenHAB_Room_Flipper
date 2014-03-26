@@ -21,12 +21,12 @@ public class GraphicUnit {
     private float roomRelativeY = 0;
     private GraphicUnitWidget mView;
     UnitContainerView mRoomView;
-    private String mItemName;
+    private String mWidgetId;
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
-    public GraphicUnit(String itemName, UnitContainerView roomView) {
-        mItemName = itemName;
+    public GraphicUnit(String widgetId, UnitContainerView roomView) {
+        mWidgetId = widgetId;
         mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider().getUpdateUUID();
         mRoomView = roomView;
 
@@ -107,11 +107,11 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return HABApplication.getOpenHABWidgetProvider().getWidget(mItemName);
+        return HABApplication.getOpenHABWidgetProvider().getWidget(mWidgetId);
     }
 
     public void setOpenHABWidget(String itemName) {
-        mItemName = itemName;
+        mWidgetId = itemName;
     }
 
     public UnitContainerView getUnitContainerView() {

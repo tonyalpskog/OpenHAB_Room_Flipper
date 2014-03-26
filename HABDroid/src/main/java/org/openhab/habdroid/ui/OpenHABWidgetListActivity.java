@@ -183,17 +183,17 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setProgressBarIndeterminateVisibility(true);
-		// Initialize crittercism reporting
-		JSONObject crittercismConfig = new JSONObject();
-		try {
-			crittercismConfig.put("shouldCollectLogcat", true);
-		} catch (JSONException e) {
-			if (e.getMessage() != null)
-				Log.e(HABApplication.getLogTag(), e.getMessage());
-			else
-				Log.e(HABApplication.getLogTag(), "Crittercism JSON exception");
-		}
-		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
+//		// Initialize crittercism reporting
+//		JSONObject crittercismConfig = new JSONObject();
+//		try {
+//			crittercismConfig.put("shouldCollectLogcat", true);
+//		} catch (JSONException e) {
+//			if (e.getMessage() != null)
+//				Log.e(HABApplication.getLogTag(), e.getMessage());
+//			else
+//				Log.e(HABApplication.getLogTag(), "Crittercism JSON exception");
+//		}
+//		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
 		// Initialize activity view
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.openhabwidgetlist);
@@ -651,7 +651,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         // before going to the new page. This is quite dirty, but is the only
         // way to do that...
         for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
-            widgetList.add(w);
+            widgetList.add(w);//TA: TODO - Let the getOpenHABWidgetProvider provide this class with data instead of the local widgetList.
         }
         openHABWidgetAdapter.notifyDataSetChanged();
         setTitle(openHABWidgetDataSource.getTitle());
@@ -836,7 +836,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
             Util.overridePendingTransition(this, false);
     		return true;
         case R.id.mainmenu_openhab_changedate:
-            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidget("Date").getItem(), "2014-02-06T21:42:28");
+            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidget("Date").getItem(), "2014-02-06T21:42:28");//TODO - getWidget("Date") ???
             return true;
         default:
     		return super.onOptionsItemSelected(item);
@@ -952,7 +952,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
-		Crittercism.leaveBreadcrumb("parseSitemapList");
+//		Crittercism.leaveBreadcrumb("parseSitemapList");
 		try {
 			builder = factory.newDocumentBuilder();
 			Document document;
@@ -1010,7 +1010,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 				}
 			}).show();
 		} catch (BadTokenException e) {
-			Crittercism.logHandledException(e);
+            Log.e(HABApplication.getLogTag(), "Error while showing sitemap selection dialog.", e);
+//			Crittercism.logHandledException(e);
 		}
 	}
 	

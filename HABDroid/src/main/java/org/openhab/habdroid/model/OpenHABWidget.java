@@ -417,6 +417,6 @@ public class OpenHABWidget {
     }
 
     public String toString() {
-        return getLabel();
+        return String.format("(%s) %s", getType() != null? getType().name() : "NULL", getLabel());/*getLabel();*/
     }
 }

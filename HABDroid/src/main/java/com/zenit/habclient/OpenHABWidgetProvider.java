@@ -53,7 +53,7 @@ public class OpenHABWidgetProvider {
             Iterator<OpenHABWidget> widgetIterator = widgetList.iterator();
             while (widgetIterator.hasNext()) {
                 OpenHABWidget widget = widgetIterator.next();
-                mOpenHABWidgetItemNameMap.put(widget.getItem().getName(), widget);
+                mOpenHABWidgetItemNameMap.put(widget.getId(), widget);
                 stringList.add(widget.getItem().getName());
             }
             mOpenHABWidgetTypeMap.put(type, stringList);
@@ -84,26 +84,27 @@ public class OpenHABWidgetProvider {
             return;
 
         widget.setUpdateUUID(mUpdateSetUUID);
-        String widgetName;
 
-        widgetName = (widget.getItem() == null? widget.getId() : widget.getItem().getName());
+        boolean widgetExists = mOpenHABWidgetItemNameMap.containsKey(widget.getId());
 
-        boolean widgetExists = mOpenHABWidgetItemNameMap.containsKey(widgetName);
+        if(widget.getType() != null) {
+            //Overwrite / Update widget if it already exists.
+            mOpenHABWidgetItemNameMap.put(widget.getId(), widget);
 
-        //Overwrite / Update widget if it already exists.
-        mOpenHABWidgetItemNameMap.put(widgetName, widget);
+            if(widget.getType() == OpenHABWidgetType.Group || widget.getType() == OpenHABWidgetType.SitemapText) {
+                String widgetName = (widget.hasLinkedPage()? widget.getLinkedPage().getTitle() : widget.getId());
+                Log.d(HABApplication.getLogTag(), String.format("Setting data for group widget '%s' of type '%s'", widgetName, widget.getType().name()));
+            }
 
-        if(widget.getType() == OpenHABWidgetType.Group)
-            Log.d(HABApplication.getLogTag(), String.format("Setting data for Group widget '%s'", widgetName));
+            Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getId(), widget.getType()));
 
-        Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widgetName, widget.getType()));
+            if(!widgetExists) { //Don't add existing widgets to the type<->name_list mapping.
+                if(widget.getType() != null && !mOpenHABWidgetTypeMap.containsKey(widget.getType()))
+                    mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
 
-        if(widgetExists) { //Don't add existing widgets to the type<->name_list mapping.
-            if(!mOpenHABWidgetTypeMap.containsKey(widget.getType()))
-                mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
-
-            List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
-            widgetList.add(widgetName);
+                List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
+                widgetList.add(widget.getId());
+            }
         }
 
         if(widget.hasChildren()) {

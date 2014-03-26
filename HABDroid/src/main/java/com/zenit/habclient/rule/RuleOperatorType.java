@@ -1,4 +1,4 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -13,7 +13,11 @@ public enum RuleOperatorType {
     Between(6, 3, 3, "between", " between %s and %s"),
     Within(7, 3, 3, "within", " within %s and %s"),
     And(8, 2, Integer.MAX_VALUE, "AND", " AND %s"),
-    Or(9, 2, 2, "OR", " OR %s");
+    Or(9, 2, 2, "OR", " OR %s"),
+    Before(10, 2, 2, "before", " before %s"),
+    After(11, 2, 2, "after", " after %s"),
+    BeforeOrEqual(12, 2, 2, "before or equal", " before or equal to %s"),
+    AfterOrEqual(13, 2, 2, "after or equal", " after or equal to %s");
 
     public final int Value;
     private final int minimumNumberOfSupportedOperationArgs;

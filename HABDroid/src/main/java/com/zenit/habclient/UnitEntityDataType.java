@@ -1,5 +1,7 @@
 package com.zenit.habclient;
 
+import com.zenit.habclient.rule.IUnitEntityDataType;
+
 /**
  * Created by Tony Alpskog in 2014.
  */

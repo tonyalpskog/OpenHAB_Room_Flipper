@@ -18,10 +18,10 @@ import org.w3c.dom.Node;
 public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, OpenHABWidget widget) {
-        if(widget.hasItem() || widget.hasLinkedPage())
-            requestOpenHABSitemap(context, widget.hasItem()? widget.getItem().getLink() : widget.getLinkedPage().getLink(), widget);
+        if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
+            requestOpenHABSitemap(context, /*"https://192.168.137.1:8443/rest/sitemaps/ekafallet/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getItem().getLink()), widget);
         else
-            Log.w(HABApplication.getLogTag(2), "Sitemap cannot be requested due to missing sitemap data.");
+            Log.e(HABApplication.getLogTag(2), "[AsyncHttpClient] Sitemap cannot be requested due to missing sitemap data.");
     }
 
     public void requestOpenHABSitemap(Context context, String sitemapUrl) {
@@ -30,9 +30,11 @@ public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, String sitemapUrl, OpenHABWidget widget) {
         if(sitemapUrl == null || sitemapUrl.isEmpty()) {
-            Log.w(HABApplication.getLogTag(), String.format("\n%s\n[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
-            return;
+            Log.w(HABApplication.getLogTag(), String.format("\n\r%s\n\r[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
+            sitemapUrl = "https://169.254.2.2:8443/rest/sitemaps/ekafallet/ekafallet";
         }
+
+        Log.d(HABApplication.getLogTag(2), String.format("\n\r[AsyncHttpClient] Requested sitemap URL is '%s'", sitemapUrl));
 
         final OpenHABWidget finalWidget = widget;
 

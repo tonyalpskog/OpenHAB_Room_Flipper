@@ -1,4 +1,4 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +11,12 @@ public class RuleOperation implements IRuleChild, IOperationResult {
     private List<IUnitEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mName;
+    private String mDescription;
+
+    public RuleOperation(RuleOperator ruleOperator, List<IUnitEntityDataType> operands) {
+        mRuleOperator = ruleOperator;
+        mOperands = operands;
+    }
 
     @Override
     public String toString() {
@@ -24,7 +30,7 @@ public class RuleOperation implements IRuleChild, IOperationResult {
         while(iterator.hasNext()) {
             operandsAsStringArray[index++] = iterator.next().toString();
         }
-        return mLeftOperand.getName() + " " + mRuleOperator.getType().getFormattedString(operandsAsStringArray);
+        return mLeftOperand.getName() + mRuleOperator.getType().getFormattedString(operandsAsStringArray);
     }
 
     @Override
@@ -38,19 +44,15 @@ public class RuleOperation implements IRuleChild, IOperationResult {
     }
 
     @Override
-    public String getDescription() {
-        return "Test-RuleOperation";
-    }
+    public String getDescription() { return mDescription; }
 
     @Override
-    public void setDescription(String description) {
-
-    }
+    public void setDescription(String description) { mDescription = description; }
 
     @Override
     public boolean getResult() {
         try {
-            return mRuleOperator.getOperationResult(mOperands.get(0).getValue(), mRuleOperator.parseValue("10"));
+            return mRuleOperator.getOperationResult(mOperands);
         } catch (Exception e) {
             return false;
         }

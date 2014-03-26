@@ -34,7 +34,7 @@ public class OpenHABSliderWidget extends OpenHABWidgetBase {
                 sliderState = (int)Float.parseFloat(mViewData.openHABWidget.getItem().getState());
             } catch (NumberFormatException e) {
                 if (e != null) {
-                    Crittercism.logHandledException(e);
+//                    Crittercism.logHandledException(e);
                     Log.e(HABApplication.getLogTag(), e.getMessage());
                 }
                 if (mViewData.openHABWidget.getItem().getState().equals("OFF")) {

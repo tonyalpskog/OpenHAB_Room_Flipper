@@ -162,7 +162,7 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
                 widgetView = new OpenHABSelectionWidget(this.getContext(), this, preparedViewData).getWidget();
                 break;
             case Setpoint:
-                widgetView = new OpenHABSetpointWidget(this, preparedViewData).getWidget();
+                widgetView = new OpenHABSetpointWidget(this.getContext(), this, preparedViewData).getWidget();
                 break;
             default:
                 if (preparedViewData.labelTextView != null)

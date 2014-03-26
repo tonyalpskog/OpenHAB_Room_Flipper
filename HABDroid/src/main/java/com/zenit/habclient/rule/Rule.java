@@ -1,4 +1,7 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
+
+import com.zenit.habclient.rule.IUnitEntityDataType;
+import com.zenit.habclient.rule.RuleUnitEntity;
 
 /**
  * Created by Tony Alpskog in 2014.

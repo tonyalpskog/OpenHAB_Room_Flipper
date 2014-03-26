@@ -60,7 +60,9 @@ public class MainActivity extends Activity
 
         HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
         for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
-            if(widget.hasChildren())
+            if(widget == null)
+                Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
+            else if(widget.hasChildren())
                 HABApplication.getRestCommunication().requestOpenHABSitemap(this,  widget);
         }
 

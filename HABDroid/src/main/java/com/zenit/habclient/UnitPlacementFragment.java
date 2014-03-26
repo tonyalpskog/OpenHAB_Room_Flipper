@@ -28,6 +28,7 @@ import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -101,7 +102,7 @@ public class UnitPlacementFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        HABApplication.getRestCommunication().requestOpenHABSitemap(fragmentView.getContext(), roomView.getRoom().getGroupItemName());
+        HABApplication.getRestCommunication().requestOpenHABSitemap(fragmentView.getContext(), roomView.getRoom().getRoomWidget());
 
         return fragmentView;
     }
@@ -208,18 +209,19 @@ public class UnitPlacementFragment extends Fragment {
         //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
         List<CharSequence> itemsList = new ArrayList<CharSequence>();
         List<String> itemNameList = new ArrayList<String>();
+        final HashMap<Integer, OpenHABWidget> widgetMap = new HashMap<Integer, OpenHABWidget>();
         String strLogAll = "showAddUnitDialog() -> Full list: ";
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
 //TA: TODO - Not sure if this is needed.
-//        if(!HABApplication.getOpenHABWidgetProvider().hasWidget(roomView.getRoom().getGroupItemName()))
+//        if(!HABApplication.getOpenHABWidgetProvider().hasWidget(roomView.getRoom().getGroupWidgetId()))
 //            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
 
         if(roomView.getRoom().getRoomWidget() == null) {
             HABApplication.getRestCommunication().requestOpenHABSitemap(context, (String) null);
             if(roomView.getRoom().getRoomWidget() == null)
             {
-                Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with item name '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupItemName()));
+                Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with widget ID = '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupWidgetId()));
                 Toast.makeText(context, "Cannot get items for this room.", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -227,15 +229,19 @@ public class UnitPlacementFragment extends Fragment {
 
         List<OpenHABWidget> widgetList = roomView.getRoom().getRoomWidget().getChildren();
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
+        int i = 0;
         while(iterator.hasNext()) {
             OpenHABWidget next = iterator.next();
             strLogAll += next.getId() + ", ";
             if(mUnitTypes.contains(next.getType()) && !roomView.getRoom().contains(next)){
                 itemNameList.add(next.getItem().getName());
-                itemsList.add(next.getType().Name + ": " + next.getLabel()/* getItem().getName()*/);
+                widgetMap.put(i, next);
+                itemsList.add(i, String.format("(%s) %s", next.getType().Name, next.hasLinkedPage() ? next.getLinkedPage().getTitle() : next.getItem().getName()));
             }
             else
                 strLogRemoved += next.getId() + ", ";
+
+            i++;
         }
         Log.d(HABApplication.getLogTag(), strLogAll);
         Log.d(HABApplication.getLogTag(), strLogRemoved);
@@ -257,7 +263,7 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                roomView.addNewUnitToRoom(new GraphicUnit(finalItemNameList.get(item), roomView), 50, 50);
+                roomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item).getId(), roomView), 50, 50);
                 Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
@@ -430,7 +436,7 @@ public class UnitPlacementFragment extends Fragment {
         while(iterator.hasNext()) {
             GraphicUnit gu = (GraphicUnit) iterator.next();
             if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
-                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget().getItem().getName(), roomView), 50, 50);
+                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget().getId(), roomView), 50, 50);
                 selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());
             }
         }

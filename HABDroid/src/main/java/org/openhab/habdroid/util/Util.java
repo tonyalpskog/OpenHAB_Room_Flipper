@@ -90,19 +90,19 @@ public class Util {
         return normalizedUrl;
     }
 
-    public static void initCrittercism(Context ctx, String appKey) {
-        // Initialize crittercism reporting
-        JSONObject crittercismConfig = new JSONObject();
-        try {
-            crittercismConfig.put("shouldCollectLogcat", true);
-        } catch (JSONException e) {
-            if (e.getMessage() != null)
-                Log.e(TAG, e.getMessage());
-            else
-                Log.e(TAG, "Crittercism JSON exception");
-        }
-        Crittercism.init(ctx, appKey, crittercismConfig);
-    }
+//    public static void initCrittercism(Context ctx, String appKey) {
+//        // Initialize crittercism reporting
+//        JSONObject crittercismConfig = new JSONObject();
+//        try {
+//            crittercismConfig.put("shouldCollectLogcat", true);
+//        } catch (JSONException e) {
+//            if (e.getMessage() != null)
+//                Log.e(TAG, e.getMessage());
+//            else
+//                Log.e(TAG, "Crittercism JSON exception");
+//        }
+//        Crittercism.init(ctx, appKey, crittercismConfig);
+//    }
 
     public static List<OpenHABSitemap> parseSitemapList(Document document) {
         List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();

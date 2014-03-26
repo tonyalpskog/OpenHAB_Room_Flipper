@@ -1,5 +1,7 @@
 package com.zenit.habclient;
 
+import com.zenit.habclient.rule.RuleOperator;
+
 import java.util.List;
 
 /**

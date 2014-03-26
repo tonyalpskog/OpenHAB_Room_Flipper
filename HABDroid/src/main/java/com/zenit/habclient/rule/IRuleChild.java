@@ -1,10 +1,9 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public interface IRuleChild {
-    //TODO - Implement this class
     public String getName();
     public void setName(String name);
     public String getDescription();

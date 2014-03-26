@@ -89,8 +89,8 @@ public class AsyncServiceResolver extends Thread implements ServiceListener {
 		try {
 			mMulticastLock.acquire();
 		} catch (SecurityException e) {
-			Log.i(TAG, "Security exception during multicast lock");
-			Crittercism.logHandledException(e);
+			Log.e(TAG, "Security exception during multicast lock", e);
+//			Crittercism.logHandledException(e);
 		}
 		mSleepingThread = Thread.currentThread();
 		Log.i(TAG, "Discovering service " + mServiceType);

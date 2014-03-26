@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
 import android.util.Log;
 
@@ -25,7 +23,7 @@ public class Room {
     private String mName;
     private UUID id;
 
-    private String mGroupItemName;
+    private String mGroupWidgetId;
 //    private String mSitemapId;
     private HashMap<UUID, GraphicUnit> unitHash = null;
     private Bitmap mBackgroundImage = null;//TA: TODO - Add a resource member as an alternative to a Bitmap. Bitmap may still be used as external image input and later on be replaced by a path or URL to an image.
@@ -46,9 +44,9 @@ public class Room {
         mContext = context;
     }
 
-    public Room(String groupItemName, String name) {
-        mGroupItemName = groupItemName;
-        if(groupItemName == null || groupItemName.isEmpty())
+    public Room(String groupItemId, String name) {
+        mGroupWidgetId = groupItemId;
+        if(groupItemId == null || groupItemId.isEmpty())
             mLocalWidget = new OpenHABWidget();
         mName = name;
         id = UUID.randomUUID();
@@ -63,7 +61,7 @@ public class Room {
         copy.roomAlignment = (HashMap<Direction, Room>) this.roomAlignment.clone();
         copy.mName = this.mName;
         copy.id = this.id;
-        copy.mGroupItemName = this.mGroupItemName;
+        copy.mGroupWidgetId = this.mGroupWidgetId;
         copy.unitHash = (HashMap<UUID, GraphicUnit>) this.unitHash.clone();
         copy.mBackgroundImage = this.mBackgroundImage;
         copy.mLatestWidgetUpdateUUID = this.mLatestWidgetUpdateUUID;
@@ -110,12 +108,12 @@ public class Room {
         }
     }
 
-    public String getGroupItemName() {
-        return mGroupItemName;
+    public String getGroupWidgetId() {
+        return mGroupWidgetId;
     }
 
-    public void setGroupItemName(String groupItemName) {
-        mGroupItemName = groupItemName;
+    public void setGroupWidgetId(String groupWidgetId) {
+        mGroupWidgetId = groupWidgetId;
     }
 
 //    public String getSitemapId() {
@@ -188,17 +186,17 @@ public class Room {
 
     public String getName() {
         return mName;
-//        if(HABApplication.getOpenHABWidgetProvider().hasWidget(mGroupItemName)) {
-//            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
+//        if(HABApplication.getOpenHABWidgetProvider().hasWidget(mGroupWidgetId)) {
+//            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidget(mGroupWidgetId);
 //            if(widget.getLabel() == null) {
-//                Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.getLogTag(1), mGroupItemName));
+//                Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.getLogTag(1), mGroupWidgetId));
 //                return "<No label>";
 //            }
-//            Log.d(HABApplication.getLogTag(), String.format("Group ID '%s' got label: '%s'", mGroupItemName, widget.getLabel()));
+//            Log.d(HABApplication.getLogTag(), String.format("Group ID '%s' got label: '%s'", mGroupWidgetId, widget.getLabel()));
 //            return widget.getLabel();
 //        }
 //
-//        Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo Room widget found with ID '%s'", HABApplication.getLogTag(1), mGroupItemName));
+//        Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo Room widget found with ID '%s'", HABApplication.getLogTag(1), mGroupWidgetId));
 //        return "<No widget>";
     }
 
@@ -214,7 +212,7 @@ public class Room {
         if(mLocalWidget != null)
             return mLocalWidget;
 
-        return HABApplication.getOpenHABWidgetProvider().getWidget(mGroupItemName);
+        return HABApplication.getOpenHABWidgetProvider().getWidget(mGroupWidgetId);
     }
 
     private Bitmap adjustOpacity(Bitmap bitmap, int opacity) {

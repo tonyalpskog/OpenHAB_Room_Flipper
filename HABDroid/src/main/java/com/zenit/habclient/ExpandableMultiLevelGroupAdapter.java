@@ -1,4 +1,4 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 import android.content.Context;
 import android.util.Log;

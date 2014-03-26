@@ -1,8 +1,14 @@
 package org.openhab.habdroid.ui.widget;
 
+import android.content.Context;
+import android.text.method.DigitsKeyListener;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import com.zenit.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
@@ -13,9 +19,11 @@ import org.openhab.habdroid.ui.TouchRepeatListener;
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABSetpointWidget extends OpenHABWidgetBase {
+    private Context mActivityContext;
 
-    public OpenHABSetpointWidget(IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
+    public OpenHABSetpointWidget(Context activityContext, IHABWidgetCommunication habWidgetCommunication, OpenHABWidgetArrayAdapter.ViewData viewData) {
         super(habWidgetCommunication, viewData);
+        mActivityContext = activityContext;
     }
 
     public View getWidget() {
@@ -46,8 +54,19 @@ public class OpenHABSetpointWidget extends OpenHABWidgetBase {
         SecondaryTouchListener.OnSecondaryClickListener valueTextOnSecondaryClickListener = new SecondaryTouchListener.OnSecondaryClickListener() {
             @Override
             public boolean onSecondary(View v, SecondaryTouchListener.SecondaryClickEvent event) {
-                if(event == SecondaryTouchListener.SecondaryClickEvent.Down)
-                    Toast.makeText(getWidget().getContext(), "A numeric input dialog will show...", Toast.LENGTH_SHORT).show();
+                if(event == SecondaryTouchListener.SecondaryClickEvent.Down) {
+                    Toast.makeText(getWidget().getContext(), "A numeric input dialog will be shown...", Toast.LENGTH_LONG).show();
+//                    EditText txtName = new EditText(mActivityContext);
+//                    txtName.setKeyListener(DigitsKeyListener.getInstance("0123456789.,"));
+//                    txtName.requestFocus();
+
+                    InputMethodManager imm = (InputMethodManager) mActivityContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.RESULT_UNCHANGED_SHOWN);
+
+//                    ((InputMethodManager) mActivityContext.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(txtName, InputMethodManager.SHOW_FORCED);
+//                } else if(event == SecondaryTouchListener.SecondaryClickEvent.Up) {
+//                    ((InputMethodManager) mActivityContext.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(txtName.getWindowToken(), 0);
+                }
                 return false;
             }
         };

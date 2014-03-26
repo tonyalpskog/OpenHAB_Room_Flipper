@@ -3,6 +3,8 @@ package com.zenit.habclient;
 import android.app.Application;
 import android.util.Log;
 
+import com.zenit.habclient.rule.RuleOperationProvider;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
@@ -83,12 +85,12 @@ public class HABApplication extends Application {
             return null;
 
         return getRoom(currentConfigRoom);
-//        Log.d(getLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
+//        Log.d(getLogTag(), String.format("Getting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupWidgetId(), room.getId()));
     }
 
     public void setConfigRoom(Room room) {
         if(room != null) {
-            Log.d(getLogTag(), String.format("Setting config room: name = '%s'  item name = '%s'  UUID = '%s'", room.getName(), room.getGroupItemName(), room.getId()));
+            Log.d(getLogTag(), String.format("Setting config room: name = '%s'  widget UUID = '%s' room UUID = '%s'", room.getName(), room.getRoomWidget() != null? room.getRoomWidget().getId() : "<Widget is NULL>", room.getId()));
             currentConfigRoom = room.getId();
         } else {
             Log.d(getLogTag(), "Setting config room: New Room");

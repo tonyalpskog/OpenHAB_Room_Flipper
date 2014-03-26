@@ -1,4 +1,4 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -24,6 +24,9 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+
+import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.IRuleActivity;
 
 import org.openhab.habdroid.R;
 

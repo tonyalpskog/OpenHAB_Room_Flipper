@@ -196,8 +196,8 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         setProgressBarIndeterminateVisibility(true);
-        if (!isDeveloper)
-            Util.initCrittercism(getApplicationContext(), "5117659f59e1bd4ba9000004");
+//        if (!isDeveloper)
+//            Util.initCrittercism(getApplicationContext(), "5117659f59e1bd4ba9000004");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         gcmRegisterBackground();
@@ -493,7 +493,8 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                         }
                     }).show();
         } catch (WindowManager.BadTokenException e) {
-            Crittercism.logHandledException(e);
+            Log.e(HABApplication.getLogTag(), "Error while showing sitemap.", e);
+//            Crittercism.logHandledException(e);
         }
     }
 
