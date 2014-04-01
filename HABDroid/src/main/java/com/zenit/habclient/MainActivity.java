@@ -30,7 +30,7 @@ public class MainActivity extends Activity
     private UnitPlacementFragment configFragment = null;
     private RoomFlipperFragment flipperFragment = null;
 
-    private SpeechResultAnalyzer mSpeechResultAnalyzer;
+    private ISpeechResultAnalyzer mSpeechResultAnalyzer;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.

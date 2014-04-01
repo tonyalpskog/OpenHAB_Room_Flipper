@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="memorizingtrustmanager-1.1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/HABDroid/libs/memorizingtrustmanager-1.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -17,4 +17,8 @@
         android:icon="@android:drawable/ic_menu_sort_by_size"
         android:title="@string/action_list_view"
         android:showAsAction="always"/>
+    <item android:id="@+id/action_start_wear_app"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/action_launch_wear_app"
+        android:showAsAction="always"/>
 </menu>

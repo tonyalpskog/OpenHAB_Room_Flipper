@@ -8,16 +8,12 @@ import com.zenit.habclient.UnitEntityDataType;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public abstract class RuleUnitEntity<T> extends UnitEntityDataType<T> {
+public class RuleUnitEntity extends UnitEntityDataType<Boolean> {
 
-    private RuleOperation mOperation;
+    protected RuleOperation mOperation;
 
     public RuleUnitEntity(String name) {
         super(name);
-    }
-
-    public RuleUnitEntity(String name, T value) {
-        super(name, value);
     }
 
     @Override
@@ -31,21 +27,34 @@ public abstract class RuleUnitEntity<T> extends UnitEntityDataType<T> {
     }
 
     @Override
+    public String getFormattedString(){
+        return getValue()? "Sant": "Falskt";//TODO - Language independent
+    }
+
+    @Override
     public DataSourceType getSourceType() {
         return DataSourceType.RULE;
     }
 
     @Override
-    public Class<?> getDataType() {
-        return mValue.getClass();
+    public Class<Boolean> getDataType() {
+        return Boolean.class;
     }
 
     @Override
-    public T getValue() { return mValue; }
+    public Boolean valueOf(String input) {
+        return Boolean.valueOf(input);
+    }
 
     @Override
-    public void setValue(T value) {
-        mValue = value;
+    public Boolean getValue() {
+        Boolean currentValue = Boolean.valueOf(getOperation().getResult());
+        if(mValue != currentValue) {
+            setValue(currentValue);
+            //TODO - Send broadcast intent
+        }
+
+        return mValue;
     }
 
     public RuleOperation getOperation() {

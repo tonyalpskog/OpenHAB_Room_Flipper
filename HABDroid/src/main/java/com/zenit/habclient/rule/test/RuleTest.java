@@ -15,7 +15,10 @@ import com.zenit.habclient.rule.RuleOperatorType;
 import com.zenit.habclient.rule.RuleUnitEntity;
 
 import java.sql.Date;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -569,7 +572,7 @@ public class RuleTest extends InstrumentationTestCase {
     }
 
     public void test_Verify_value_in_UnitEntityDataType() {
-        RuleUnitEntity rue = new RuleUnitEntity<Double>("Test Value", 50.7) {
+        UnitEntityDataType rue = new UnitEntityDataType("Test Value", 50.7) {
             @Override
             public Double valueOf(String input) {
                 return Double.valueOf(input);
@@ -584,7 +587,7 @@ public class RuleTest extends InstrumentationTestCase {
         List<IUnitEntityDataType> operands = new ArrayList<IUnitEntityDataType>();
         operands.add(_unitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
-        RuleUnitEntity rue = new RuleUnitEntity<Double>("Test Value", 50.7) {
+        UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override
             public Double valueOf(String input) {
                 return Double.valueOf(input);
@@ -756,13 +759,13 @@ public class RuleTest extends InstrumentationTestCase {
         assertEquals(true, roA.getResult());
 
         //Second operation (Rule B)
-        RuleOperator<Number> operator =  ruleOperatorsNumeric.get(RuleOperatorType.LessThan);
+        RuleOperator<Number> operator2 =  ruleOperatorsNumeric.get(RuleOperatorType.LessThan);
 
-        RuleOperation roB = new RuleOperation(operator, operands);
+        RuleOperation roB = new RuleOperation(operator2, operands);
         assertEquals("Humidity percentage < 50.7", roB.toString());
         assertEquals(false, roB.getResult());
 
-        assertEquals(false, );
+        assertEquals(false, roA.getResult() && roB.getResult());
     }
 
     //mRuleOperator.getOperationResult(mOperands.get(0).getValue(), mRuleOperator.parseValue("10"));
@@ -771,7 +774,7 @@ public class RuleTest extends InstrumentationTestCase {
         List<IUnitEntityDataType> operands = new ArrayList<IUnitEntityDataType>();
         operands.add(_unitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
-        RuleUnitEntity rue = new RuleUnitEntity<Double>("Test Value", 50.7) {
+        UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override
             public Double valueOf(String input) {
                 return Double.valueOf(input);
@@ -779,7 +782,7 @@ public class RuleTest extends InstrumentationTestCase {
         };
         operands.add(rue);
 
-        RuleUnitEntity rue2 = new RuleUnitEntity<Float>("Test Value2", 16.8f) {
+        UnitEntityDataType rue2 = new UnitEntityDataType<Float>("Test Value2", 16.8f) {
             @Override
             public Float valueOf(String input) {
                 return Float.valueOf(input);
@@ -807,6 +810,64 @@ public class RuleTest extends InstrumentationTestCase {
 
         //Float 12 within 10 and 13 = True
         assertTrue(roWithin.getOperationResult(Float.valueOf(12), Float.valueOf(10), Float.valueOf(13)));
+    }
+
+    private Calendar getCalendar(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second, Integer ms) {
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(new java.util.Date());
+        if(year != null) cal.set(Calendar.YEAR, year);
+        if(month != null) cal.set(Calendar.MONTH, month);
+        if(day != null) cal.set(Calendar.DAY_OF_MONTH, day);
+        if(hour != null) cal.set(Calendar.HOUR_OF_DAY, hour);
+        if(minute != null) cal.set(Calendar.MINUTE, minute);
+        if(second != null) cal.set(Calendar.SECOND, second);
+        if(ms != null) cal.set(Calendar.MILLISECOND, ms);
+        return cal;
+    }
+
+    public void testDateTimeParse() {
+        RuleOperator<java.util.Date> roAfter = ruleOperatorsDate.get(RuleOperatorType.After);
+
+        //ParseException shall be thrown if the value cannot be parsed.
+        try {
+            roAfter.parseValue("12.15");
+            assertFalse(true);
+        } catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+
+        //ParseException shall NOT be thrown.
+        try {
+            java.util.Date parsedDate = roAfter.parseValue("12:15");
+            assertEquals(getCalendar(1970, 0, 1, 12, 15, 0, 0).getTime(), parsedDate);
+        } catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+
+        //ParseException shall be thrown if the value cannot be parsed.
+        try {
+            roAfter.parseValue("2014/03/02");
+            assertFalse(true);
+        } catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+
+        //ParseException shall NOT be thrown.
+        try {
+            java.util.Date parsedDate = roAfter.parseValue("2014-03-02");
+            assertEquals(getCalendar(2014, 2, 2, 0, 0, 0, 0).getTime(), parsedDate);
+        } catch (Exception e) {
+            assertFalse(e instanceof ParseException);
+        }
+
+        //ParseException shall NOT be thrown.
+        try {
+            java.util.Date parsedDate = roAfter.parseValue("20:39 2014-03-02");
+            assertEquals(getCalendar(2014, 2, 2, 20, 39, 0, 0).getTime(), parsedDate);
+        } catch (Exception e) {
+            assertFalse(e instanceof ParseException);
+        }
+
     }
 
     public void testDateAfter() {
@@ -844,28 +905,28 @@ public class RuleTest extends InstrumentationTestCase {
 
         //Date Mon 11:30 after Tue 10:15 = False
         try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("Mon 11:30"), roAfter.parseValue("Tue 10:15")));
+            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-24"), roAfter.parseValue("10:15 2014-03-25")));
         } catch (Exception e) {
             assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
         }
 
         //Date Sun 11:30 after Mon 10:15 = False
         try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("Sun 11:30"), roAfter.parseValue("Mon 10:15")));
+            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-23"), roAfter.parseValue("10:15 2014-03-24")));
         } catch (Exception e) {
             assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
         }
 
         //Date Sat 11:30 after Mon 10:15 = False
         try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("Sat 11:30"), roAfter.parseValue("Mon 10:15")));
+            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-22"), roAfter.parseValue("10:15 2014-03-24")));
         } catch (Exception e) {
             assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
         }
 
         //Date Mon 10:30 after Sun 11:15 = False
         try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("Mon 10:30"), roAfter.parseValue("Sun 11:15")));
+            assertFalse(roAfter.getOperationResult(roAfter.parseValue("10:30 2014-03-24"), roAfter.parseValue("11:15 2014-03-23")));
         } catch (Exception e) {
             assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
         }

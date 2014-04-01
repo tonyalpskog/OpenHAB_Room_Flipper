@@ -99,5 +99,5 @@
     <string name="title_activity_room_config">Room Configuration</string>
     <string name="hab_group">HAB group</string>
     <string name="action_list_view">List view</string>
-
+    <string name="action_launch_wear_app">Android Wear</string>
 </resources>

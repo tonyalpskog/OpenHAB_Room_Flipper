@@ -12,25 +12,29 @@ import java.util.Map;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class SpeechResultAnalyzer {
+public class SpeechResultAnalyzer implements ISpeechResultAnalyzer {
 
     private RoomProvider mRoomProvider;
     private OpenHABWidgetProvider mOpenHABWidgetProvider;
     private RoomFlipper mRoomFlipper;
     private TextToSpeechProvider mTextToSpeechProvider;
 
+    @Override
     public TextToSpeechProvider getTextToSpeechProvider() {
         return mTextToSpeechProvider;
     }
 
+    @Override
     public void setTextToSpeechProvider(TextToSpeechProvider textToSpeechProvider) {
         mTextToSpeechProvider = textToSpeechProvider;
     }
 
+    @Override
     public RoomFlipper getRoomFlipper() {
         return mRoomFlipper;
     }
 
+    @Override
     public void setRoomFlipper(RoomFlipper roomFlipper) {
         mRoomFlipper = roomFlipper;
     }
@@ -40,11 +44,13 @@ public class SpeechResultAnalyzer {
         mOpenHABWidgetProvider = openHABWidgetProvider;
     }
 
-    public SpeechAnalyzerResult executeSpeech(ArrayList <String> speechResult, ApplicationMode applicationMode) {
+    @Override
+    public SpeechAnalyzerResult executeSpeech(ArrayList<String> speechResult, ApplicationMode applicationMode) {
         //
         return SpeechAnalyzerResult.ContinueListening;
     }
 
+    @Override
     public SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode) {
         // Fill the list view with the strings the recognizer thought it
         // could have heard

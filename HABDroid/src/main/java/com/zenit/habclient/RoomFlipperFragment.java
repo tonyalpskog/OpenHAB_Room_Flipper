@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zenit.habclient.wear.WearCommandHost;
+
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
@@ -34,6 +36,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
     private HABApplication mApplication;
+    private WearCommandHost mWearCommandHost;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -67,6 +70,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         setHasOptionsMenu(true);
 
         ((HABApplication) mApplication).getSpeechResultAnalyzer().setRoomFlipper(mRoomViewFlipper);
+
+        mWearCommandHost = new WearCommandHost(mApplication);
 
         return rootView;
     }
@@ -124,6 +129,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 mApplication.getApplicationContext().startActivity(widgetListIntent);
 
                 return true;
+            case R.id.action_start_wear_app:
+                mWearCommandHost.startSession();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -135,6 +143,13 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         HABApplication.setAppMode(ApplicationMode.RoomFlipper);
         mRoomLabel.setText(mApplication.getFlipperRoom().getName());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
+        mWearCommandHost.registerReceiver();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mWearCommandHost.unregisterReceiver();
     }
 
     @Override

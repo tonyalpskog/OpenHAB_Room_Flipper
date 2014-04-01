@@ -14,8 +14,12 @@ public abstract class DateTimeRuleOperator<T> extends RuleOperator<T> {
     public final SimpleDateFormat TimeSecondsFormat = new SimpleDateFormat("HH:mm:ss");
     public final SimpleDateFormat DateStringFormat = new SimpleDateFormat("yyyy-MM-dd");
     public final SimpleDateFormat WeekTimerStringFormat = new SimpleDateFormat("EE HH:mm");
+    public final SimpleDateFormat TimeMinuteDateStringFormat = new SimpleDateFormat("HH:mm yyyy-MM-dd");
+    public final SimpleDateFormat TimeSecondsDateFormat = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd");
 
-    protected final SimpleDateFormat[] DateStringFormatArray = new SimpleDateFormat[]{TimeMinuteStringFormat, TimeSecondsFormat, DateStringFormat, WeekTimerStringFormat};
+    protected final SimpleDateFormat[] DateStringFormatArray = new SimpleDateFormat[]{
+            TimeMinuteStringFormat, TimeSecondsFormat, DateStringFormat
+            , WeekTimerStringFormat, TimeMinuteDateStringFormat, TimeSecondsDateFormat};
 
     public DateTimeRuleOperator(RuleOperatorType type, Boolean supportsMultipleOperations) {
         super(type, supportsMultipleOperations);
@@ -24,6 +28,7 @@ public abstract class DateTimeRuleOperator<T> extends RuleOperator<T> {
     @Override
     public T parseValue(String valueAsString) throws ParseException {
         Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(new java.util.Date());
         boolean successfulParse = false;
         ParseException parseException = null;
         for(SimpleDateFormat sdf : DateStringFormatArray) {
