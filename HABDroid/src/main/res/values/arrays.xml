@@ -1,26 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string-array name="themeArray">
-   <item>Holo Dark</item>
-   <item>Holo Light</item>
-</string-array>
-<string-array name="themeValues">
-   <item>dark</item>
-   <item>light</item>
-</string-array>
-<string-array name="animationArray">
-   <item>Android (Dissolve)</item>
-   <item>iOS (Slide)</item>
-   <item>None</item>
-</string-array>
-<string-array name="animationValues">
-   <item>android</item>
-   <item>ios</item>
-   <item>none</item>
-</string-array>
-<string-array name="nfcActionValues">
-    <item>On</item>
-    <item>Off</item>
-    <item>Toggle</item>
-</string-array>
+    <string-array name="themeArray">
+       <item>Holo Dark</item>
+       <item>Holo Light</item>
+    </string-array>
+    <string-array name="themeValues">
+       <item>dark</item>
+       <item>light</item>
+    </string-array>
+    <string-array name="animationArray">
+       <item>Android (Dissolve)</item>
+       <item>iOS (Slide)</item>
+       <item>None</item>
+    </string-array>
+    <string-array name="animationValues">
+       <item>android</item>
+       <item>ios</item>
+       <item>none</item>
+    </string-array>
+    <string-array name="nfcActionValues">
+        <item>On</item>
+        <item>Off</item>
+        <item>Toggle</item>
+    </string-array>
+
+    <!-- Command phrases -->
+    <!--<string-array name="command_commands_switch_on">-->
+        <!--<item>Turn on</item>-->
+        <!--<item>Switch on</item>-->
+        <!--<item>On</item>-->
+        <!--<item>Turn off</item>-->
+        <!--<item>Switch off</item>-->
+        <!--<item>Off</item>-->
+        <!--<item>Toggle</item>-->
+        <!--<item>percent</item>-->
+        <!--<item>&lt;integer&gt;</item>-->
+        <!--<item>Set</item>-->
+        <!--<item>&lt;decimal&gt;</item>-->
+        <!--<item>color</item>-->
+        <!--<item>Roll down</item>-->
+        <!--<item>Expand</item>-->
+        <!--<item>Unfold</item>-->
+        <!--<item>Lower</item>-->
+        <!--<item>down</item>-->
+        <!--<item>Stop roller</item>-->
+        <!--<item>stop</item>-->
+        <!--<item>Roll up</item>-->
+        <!--<item>Fold</item>-->
+        <!--<item>Raise</item>-->
+        <!--<item>up</item>-->
+        <!--<item>Show</item>-->
+        <!--<item>View</item>-->
+        <!--<item>Play</item>-->
+        <!--<item>Pause</item>-->
+        <!--<item>Stop</item>-->
+        <!--<item>Listen</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="command_commands">-->
+        <!--<item>@array/command_commands_switch_on</item>-->
+        <!--<item>@array/command_commands_switch_off</item>-->
+        <!--<item>Switch on</item>-->
+        <!--<item>On</item>-->
+        <!--<item>Turn off</item>-->
+        <!--<item>Switch off</item>-->
+        <!--<item>Off</item>-->
+    <!--</string-array>-->
+
+
+    <string-array name="command_phrases_switch_on">
+        <item>Turn on &lt;room&gt; &lt;unit&gt;</item>
+        <item>Switch on &lt;room&gt; &lt;unit&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; on</item>
+    </string-array>
+    <string-array name="command_phrases_switch_off">
+        <item>Turn off &lt;room&gt; &lt;unit&gt;</item>
+        <item>Switch off &lt;room&gt; &lt;unit&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; off</item>
+    </string-array>
+
+    <string-array name="command_phrases_toggle">
+        <item>Toggle &lt;room&gt; &lt;unit&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_percent">
+        <item>Set &lt;room&gt; &lt;unit&gt; to &lt;integer&gt; percent</item>
+        <item>&lt;room&gt; &lt;unit&gt; &lt;integer&gt; percent</item>
+    </string-array>
+
+    <string-array name="command_phrases_setpoint">
+        <item>Set &lt;room&gt; &lt;unit&gt; to &lt;decimal&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; &lt;decimal&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_color">
+        <item>Set &lt;room&gt; &lt;unit&gt; color to &lt;color&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; &lt;color&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_text">
+        <item>Set &lt;room&gt; &lt;unit&gt; to &lt;text&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; &lt;text&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_selection">
+        <item>Set &lt;room&gt; &lt;unit&gt; to &lt;selection&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; &lt;selection&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_roller_down">
+        <item>Roll down &lt;room&gt; &lt;unit&gt;</item>
+        <item>Expand &lt;room&gt; &lt;unit&gt;</item>
+        <item>Unfold &lt;room&gt; &lt;unit&gt;</item>
+        <item>Lower &lt;room&gt; &lt;unit&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; down</item>
+    </string-array>
+    <string-array name="command_phrases_roller_stop">
+        <item>Stop roller &lt;room&gt; &lt;unit&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; stop</item>
+    </string-array>
+    <string-array name="command_phrases_roller_up">
+        <item>Roll up &lt;room&gt; &lt;unit&gt;</item>
+        <item>Fold &lt;room&gt; &lt;unit&gt;</item>
+        <item>Raise &lt;room&gt; &lt;unit&gt;</item>
+        <item>&lt;room&gt; &lt;unit&gt; up</item>
+    </string-array>
+
+    <string-array name="command_phrases_image">
+        <item>Show &lt;room&gt; &lt;unit&gt; on &lt;screen_device&gt;</item>
+        <item>View &lt;room&gt; &lt;unit&gt; on &lt;screen_device&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_video_start">
+        <item>Show &lt;room&gt; &lt;unit&gt; on &lt;screen_device&gt;</item>
+        <item>View &lt;room&gt; &lt;unit&gt; on &lt;screen_device&gt;</item>
+        <item>Play &lt;room&gt; &lt;unit&gt; on &lt;screen_device&gt;</item>
+    </string-array>
+    <string-array name="command_phrases_video_pause">
+        <item>Pause &lt;room&gt; &lt;unit&gt;</item>
+    </string-array>
+    <string-array name="command_phrases_video_stop">
+        <item>Stop &lt;room&gt; &lt;unit&gt;</item>
+    </string-array>
+
+    <string-array name="command_phrases_sound_start">
+        <item>Listen on &lt;room&gt; &lt;unit&gt; on &lt;speaker_device&gt;</item>
+        <item>Play &lt;room&gt; &lt;unit&gt; on &lt;speaker_device&gt;</item>
+    </string-array>
+    <string-array name="command_phrases_sound_pause">
+        <item>Pause &lt;room&gt; &lt;unit&gt;</item>
+    </string-array>
+    <string-array name="command_phrases_sound_stop">
+        <item>Stop &lt;room&gt; &lt;unit&gt;</item>
+    </string-array>
 </resources>

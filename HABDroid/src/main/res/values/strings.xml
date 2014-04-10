@@ -6,12 +6,14 @@
     <string name="openhab_service_type">_openhab-server-ssl._tcp.local.</string>
     <string name="openhab_demo_url">https://demo.openhab.org:8443/</string>
     <string name="app_preferences_name">Settings</string>
+
     <!-- Main menu items -->
     <string name="mainmenu_openhab_preferences">Settings</string>
     <string name="mainmenu_openhab_selectsitemap">Select default sitemap</string>
     <string name="mainmenu_openhab_writetag">Write NFC tag</string>
     <string name="mainmenu_openhab_info">openHAB info</string>
     <string name="mainmenu_openhab_clearcache">Clear images cache</string>
+
     <!-- App settings strings -->
     <string name="settings_title">HABDroid Settings</string>
     <string name="settings_openhab_url">openHAB URL</string>
@@ -33,6 +35,7 @@
     <string name="settings_openhab_sslcert_summary">Ignore certificate validation during SSL handshake</string>
     <string name="settings_openhab_sslhost">Ignore SSL hostname</string>
     <string name="settings_openhab_sslhost_summary">Ignore hostname check during SSL handshake</string>
+
     <!-- App messages strings -->
     <string name="info_demo_mode">HABDroid is running in demo mode. To connect to your openHAB please go to settings menu.</string>
     <string name="info_conn_url">Connecting to configured URL</string>
@@ -61,6 +64,7 @@
     <string name="action_settings">Settings</string>
     <string name="nfc_dialog_title">Please select NFC tag action</string>
     <string name="info_not_set">Not set</string>
+
     <!-- Strings for MemorizingTrustManager activity -->
     <string name="mtm_accept_cert">Accept unknown Certificate?</string>
     <string name="mtm_decision_always">Always</string>
@@ -100,4 +104,8 @@
     <string name="hab_group">HAB group</string>
     <string name="action_list_view">List view</string>
     <string name="action_launch_wear_app">Android Wear</string>
+
+    <!-- Command phrase -->
+    <string name="command_wakeup_listener">yo hab</string>
+    <string name="command_close_listener">bye hab</string>
 </resources>

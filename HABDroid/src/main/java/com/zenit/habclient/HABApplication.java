@@ -25,11 +25,11 @@ public class HABApplication extends Application {
     private static ApplicationMode mAppMode = ApplicationMode.Unknown;
     private TextToSpeechProvider mTextToSpeechProvider = null;
     private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
-    private static ISpeechResultAnalyzer mSpeechResultAnalyzer = null;
+    private static ICommandAnalyzer mSpeechResultAnalyzer = null;
 
-    public ISpeechResultAnalyzer getSpeechResultAnalyzer() {
+    public ICommandAnalyzer getSpeechResultAnalyzer() {
         if(mSpeechResultAnalyzer == null)
-            mSpeechResultAnalyzer = new SpeechResultAnalyzer(getRoomProvider(), getOpenHABWidgetProvider());
+            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(), getOpenHABWidgetProvider());
 
         mSpeechResultAnalyzer.setTextToSpeechProvider(getTextToSpeechProvider());
         return mSpeechResultAnalyzer;

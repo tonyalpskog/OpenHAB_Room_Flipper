@@ -34,7 +34,7 @@ public class SpeechService extends Service
     protected boolean mIsListening;
     protected volatile boolean mIsCountDownOn;
 
-    protected ISpeechResultAnalyzer mSpeechResultAnalyzer;
+    protected ICommandAnalyzer mSpeechResultAnalyzer;
 
     static final int MSG_RECOGNIZER_START_LISTENING = 1;
     static final int MSG_RECOGNIZER_CANCEL = 2;

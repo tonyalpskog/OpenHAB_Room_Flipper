@@ -14,8 +14,8 @@ import java.util.UUID;
  * Created by Tony Alpskog in 2013.
  */
 public class RoomProvider {
-    HashMap<UUID, Room> roomHash;
-    UUID initialRoomId;
+    public HashMap<UUID, Room> roomHash;
+    public UUID initialRoomId;
     private Context mContext = null;
     private Room mNewRoom = null;
 

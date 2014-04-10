@@ -29,23 +29,38 @@
 
 package org.openhab.habdroid.core;
 
+import android.content.Context;
 import android.os.Message;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.zenit.habclient.HABApplication;
 
 import org.apache.http.Header;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
+Context mContext = null;
+
+    public DocumentHttpResponseHandler(Context context) {
+        mContext = context;
+    }
+
+    public DocumentHttpResponseHandler() {
+    }
 
     public void onSuccess(Document response) {}
 
@@ -100,6 +115,7 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
     }
 
     protected Document parseResponse(String responseBody) throws ParserConfigurationException, IOException, SAXException {
+//        writeDataToFile(responseBody);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document document;
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -110,4 +126,20 @@ public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
             return null;
     }
 
+//    private void writeDataToFile(String stringData) {
+//        OutputStreamWriter outputStreamWriter = null;
+//        try {
+//            mContext.deleteFile("MyTestDataFile.txt");
+//            outputStreamWriter = new OutputStreamWriter(mContext.openFileOutput("MyTestDataFile.txt", mContext.MODE_PRIVATE));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            outputStreamWriter.write(stringData);
+//            outputStreamWriter.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -312,6 +312,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
+        pageUrl = "https://demo.openhab.org:8443/rest/sitemaps/demo";
         Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + pageUrl + "   longPolling = " + longPolling);
         // Cancel any existing http request to openHAB (typically ongoing long poll)
         Header[] headers = {};
@@ -321,7 +322,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
         }
         //TA - Calling REST Get method, requesting data from server.
-        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler() {
+        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mActivity) {
             @Override
             public void onSuccess(Document document) {
                 if (document != null) {

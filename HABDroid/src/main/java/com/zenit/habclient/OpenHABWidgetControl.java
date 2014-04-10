@@ -132,4 +132,16 @@ public class OpenHABWidgetControl {
 
         return result;
     }
+
+    private String getRegExReplaceMatch(String source, Pattern pattern, String replacement) {
+        String result = "";
+
+        Matcher matcher = pattern.matcher(source);
+        if(matcher.find()) {
+            matcher.replaceAll(replacement);
+            result = (matcher.group().subSequence(1, matcher.group().length() - 1)).toString();
+        }
+
+        return result;
+    }
 }

@@ -17,7 +17,6 @@ import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.EnumSet;
-import java.util.Locale;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -30,7 +29,7 @@ public class MainActivity extends Activity
     private UnitPlacementFragment configFragment = null;
     private RoomFlipperFragment flipperFragment = null;
 
-    private ISpeechResultAnalyzer mSpeechResultAnalyzer;
+    private ICommandAnalyzer mSpeechResultAnalyzer;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -155,7 +154,7 @@ public class MainActivity extends Activity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = new SpeechResultAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider());
+                mSpeechResultAnalyzer = new CommandAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider());
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
             mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());

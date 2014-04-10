@@ -29,12 +29,24 @@
 
 package org.openhab.habdroid.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import android.util.Log;
+
+import com.zenit.habclient.HABApplication;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class provides datasource for openHAB widgets from sitemap page.
@@ -94,7 +106,35 @@ public class OpenHABWidgetDataSource {
 			}
 		}
 	}
-	
+
+    private List<OpenHABSitemap> parseSitemapList(String xmlContent) {
+        List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try {
+            builder = factory.newDocumentBuilder();
+            Document document;
+            document = builder.parse(new ByteArrayInputStream(xmlContent.getBytes("UTF-8")));
+            NodeList sitemapNodes = document.getElementsByTagName("sitemap");
+            if (sitemapNodes.getLength() > 0) {
+                for (int i=0; i < sitemapNodes.getLength(); i++) {
+                    Node sitemapNode = sitemapNodes.item(i);
+                    OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode);
+                    sitemapList.add(openhabSitemap);
+                }
+            }
+        } catch (ParserConfigurationException e) {
+            Log.e(HABApplication.getLogTag(), e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            Log.e(HABApplication.getLogTag(), e.getMessage());
+        } catch (SAXException e) {
+            Log.e(HABApplication.getLogTag(), e.getMessage());
+        } catch (IOException e) {
+            Log.e(HABApplication.getLogTag(), e.getMessage());
+        }
+        return sitemapList;
+    }
+
 	public OpenHABWidget getRootWidget() {
 		return this.rootWidget;
 	}
@@ -210,5 +250,5 @@ public class OpenHABWidgetDataSource {
 	public void setLink(String link) {
 		this.link = link;
 	}
-	
+
 }

@@ -33,7 +33,7 @@ public class WearCommandHost {
     public WearCommandHost(HABApplication application) {
         mApplication = application;
         mTitleToWearable = "Room navigation";
-        mTextToWearable = "Please, response with the namne of a room";
+        mTextToWearable = "Please, response with the name of a room";
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -60,21 +60,27 @@ public class WearCommandHost {
 //    }
 
     private void showNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mApplication.getApplicationContext())
-                .setContentTitle(mTitleToWearable)
-                .setContentText(mTextToWearable);
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.bg_eliza));
-
+        // Create intent for reply action
         Intent intent = new Intent(ACTION_RESPONSE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mApplication, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
-        builder.setContentIntent(pendingIntent);
+
+        // Build the notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mApplication.getApplicationContext())
+                .setContentTitle(mTitleToWearable)
+                .setContentText(mTextToWearable)
+                .setContentIntent(pendingIntent);
+//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.bg_eliza));
+
+        //Create primary action
+        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY).setLabel("Command").setAllowFreeFormInput(true).build();
+
+        // Create wearable notification and add remote input
         Notification notification = new WearableNotifications.Builder(builder)
                 .setMinPriority()
-                .addRemoteInputForContentIntent(
-                        new RemoteInput.Builder(EXTRA_REPLY)
-                                .setLabel("Command").build())
+                .addRemoteInputForContentIntent(remoteInput)
                 .build();
+
         NotificationManagerCompat.from(mApplication).notify(0, notification);
     }
 
