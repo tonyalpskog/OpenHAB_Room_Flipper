@@ -1,25 +1,19 @@
 package com.zenit.habclient.command.test;
 
-import android.os.HandlerThread;
-
 import com.zenit.habclient.ApplicationMode;
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.Room;
+import com.zenit.habclient.command.OpenHABWidgetCommandType;
 
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +53,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         mHABApplication = getApplication();
 
         mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(), mHABApplication.getOpenHABWidgetProvider());
-        mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
+        //mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
 
 //        requestOpenHABData("https://localhost:8443/rest/sitemaps/demo/demo", false);
 
@@ -320,35 +313,44 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         testLoadingHttpDataFromString();
         assertTrue("The OpenHABWidgetProvider is NULL", mHABApplication.getOpenHABWidgetProvider() != null);
 
+        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+
         String result = "";
         for(OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null))
             result += (item.hasItem()? "Item-" + (item.getItem().getType() != null?item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName(): "Widget-" + (item.getType() != null? item.getType().Name + "-": "NULL-") + item.getId()) + ", ";
 
-        assertEquals("Item-NULL-Date, Item-GroupItem-gGF, Widget-Text-demo_3_0_1_2, Item-GroupItem-gC, Widget-Text-demo_3_0, Widget-Frame-demo_2, Widget-Frame-demo_3, Widget-Frame-demo_0, Widget-Frame-demo_1, Item-GroupItem-gFF, Item-NumberItem-Weather_Temperature, Item-GroupItem-Outdoor, Widget-Text-demo_3_0_1, ", result);
-        assertEquals(13, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        assertTrue(result.startsWith("Item-ContactItem-Window_GF_Frontdoor, Item-NumberItem-Temperature_GF_Corridor, Item-SwitchItem-Heating_GF_Corridor, Item-SwitchItem-Light_GF_Corridor_Wardrobe"));
     }
 
     public void testGettingUnitItemWidgetsLoadedFromDocument() {
         assertTrue("The OpenHABWidgetProvider is NULL", mHABApplication.getOpenHABWidgetProvider() != null);
 
+        assertEquals(92, mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem).size());
+
         String result = "";
         for(OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem))
             result += (item.hasItem()? "Item-" + (item.getItem().getType() != null?item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName(): "Widget-" + (item.getType() != null? item.getType().Name + "-": "NULL-") + item.getId()) + ", ";
 
-        assertEquals("Item-NumberItem-Weather_Temperature, Item-NULL-Date, Widget-Text-demo_3_0, Widget-Text-demo_3_0_1, Widget-Text-demo_3_0_1_2, ", result);
-        assertEquals(5, mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem).size());
+        assertTrue(result.startsWith("Widget--03020100_0, Item-SwitchItem-Light_FF_Bath_Ceiling, Item-SwitchItem-Light_FF_Bath_Mirror, Item-SwitchItem-Heating_FF_Bath, Item-RollershutterItem-Shutter_FF_Bath, Item-SwitchItem-Light_FF_Office_Ceiling, Item-SwitchItem-Heating_FF_Office"));
     }
 
     public void testMethod_getListOfWidgetsFromListOfRooms() {
+        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+
         assertFalse("getListOfWidgetsFromListOfRooms(null) returned an empty list of units", mCommandAnalyzer.getListOfWidgetsFromListOfRooms(null).isEmpty());
 //        assertFalse(mCommandAnalyzer.getListOfWidgetsFromListOfRooms(mCommandAnalyzer.getRoomsFromPhrases(mListOfTestPhrases2, ApplicationMode.RoomFlipper)).isEmpty());
         List<String> ls = new ArrayList<String>();
         ls.add("Terrace door");
+//        ls.add("Terrace door status");
 
         List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, ls, null);
-        assertEquals(1, resultingUnitList.size());
+        StringBuffer sb = new StringBuffer();
+        for(OpenHABWidget widget : resultingUnitList)
+            sb.append((sb.length() > 0? ", " : "") + widget.getId());
+        assertEquals("'" + ls.get(0) + "' was found in: " + sb.toString(), 1, resultingUnitList.size());
         OpenHABWidget foundOhw = resultingUnitList.get(0);
         assertFalse("Returned OpenHABWidget was NULL", foundOhw == null);
+        assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0), foundOhw.getLabel());
         assertEquals("First item name: " + (foundOhw.hasItem()? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
         assertFalse(mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, mListOfTestPhrases2, null).isEmpty());
     }
@@ -358,14 +360,157 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("Temperature", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "Temperature [20.1 °C] Something else [Joo% man]";
-        assertEquals("Temperature Something else", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "Temperature [20.1 °C] Something else [Joo% man] yeah";
-        assertEquals("Temperature Something else yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else  yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "[bas€) (#umba] Temperature [20.1 °C] Something else [Joo% man] yeah";
-        assertEquals("Temperature Something else yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else  yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
     }
+
+    public void testMatchUnitNamesWithCommandPhrases() {
+        String expectedUnitName = "Terrace door";
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add("Get " + expectedUnitName + " status");
+
+        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
+
+        List<OpenHABWidget> widgetList = mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem);
+        assertTrue(widgetList.get(58).getId(), widgetList.get(58).getLabel().startsWith("Terrace door ["));
+
+        Iterator<OpenHABWidget> iterator = widgetList.iterator();
+        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
+        List<String> widgetLabelList = new ArrayList<String>();
+        while (iterator.hasNext()) {
+            OpenHABWidget nextWidget = iterator.next();
+            if(!nextWidget.getLabel().isEmpty()) {
+                String popularName = mCommandAnalyzer.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase();
+                widgetLabelList.add(popularName);
+                widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */popularName, nextWidget);
+            }
+        }
+
+        assertTrue("'" + expectedUnitName + "' doesn't exist in list if widgets", widgetLabelList.contains(expectedUnitName.toUpperCase()));
+
+        StringBuffer sbMatchingWidgetLabels = new StringBuffer();
+        String[] widgetNameArray = widgetNameMap.keySet().toArray(new String[0]);
+//        String[] stringsToCompareWith = new String[] {"OUTSIDE TEMPERATURE", "DEMO", "WIDGET OVERVIEW", "OUTDOOR", "WEATHER", "MULTIMEDIA", "DATE", "CELLAR", "FIRST FLOOR", "GROUP DEMO", "GROUND FLOOR"};
+        //Look for match
+        int matchPoint = 0;
+        for(String match : commandPhrases.toArray(new String[0])) {
+//            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
+//            resultList.add(foundWidget);
+
+            for(int i = 0; i < widgetNameArray.length; i++) {
+//                assertEquals(stringsToCompareWith[i], widgetNameArray[i]);
+                if (match.toUpperCase().contains(widgetNameArray[i]) && matchPoint < widgetNameArray[i].length()) {
+//                    Log.v(mHABApplication.getLogTag(), "<" + match.toUpperCase() + "> contains <" + widgetNameArray[i] + ">");
+                    //Got a unit match.
+                    OpenHABWidget foundWidget = widgetNameMap.get(widgetNameArray[i]);
+                    matchPoint = widgetNameArray[i].length();
+                    resultList.add(foundWidget);
+                    sbMatchingWidgetLabels.append((sbMatchingWidgetLabels.length() > 0? ", " : "") + mCommandAnalyzer.getPopularNameFromWidgetLabel(foundWidget.getLabel()));
+                }
+            }
+        }
+
+        assertEquals(expectedUnitName, sbMatchingWidgetLabels.toString());
+    }
+
+    public void test_getCommandsFromPhrases() {
+        List<String> inputValue = new ArrayList<String>();
+        inputValue.add("Switch on kitchen ceiling lights");
+        Map<String, OpenHABWidgetCommandType> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals("Resulting Map size = " + result.size(), 1, result.size());
+        StringBuffer sb = new StringBuffer();
+        Iterator<String> iterator = result.keySet().iterator();
+        while(iterator.hasNext())
+            sb.append((sb.length() == 0? "": ", ") + iterator.next());
+        assertTrue("Value" + result.toString() + "   Keys = '" + sb.toString() + "'", result.containsKey("(2) -> kitcHen ceiling Lights".toUpperCase()));
+//        assertTrue("Size = " + result.size() + "    Keys = '" + sb.toString() + "'   Value = '" + result.get(key).toString() + "'", result.containsKey("kitcHen ceiling Lights".toUpperCase()));
+
+        inputValue.clear();
+        inputValue.add("Get terrace door status");
+        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals(2, result.size());
+        assertTrue(result.keySet().toArray(new String[0])[0] + "    First of " + result.size(), result.containsKey("(2) -> terrace door".toUpperCase()));
+        assertTrue(result.keySet().toArray(new String[0])[1] + "    First of " + result.size(), result.containsKey("(1) -> terrace door status".toUpperCase()));
+    }
+
+    public void test_replaceSubStrings() {
+        String result2 = mCommandAnalyzer.replaceSubStrings("Switch on <unit>", "<", ">", "(.+)");
+        assertEquals("Switch on (.+)", result2);
+
+        String result = mCommandAnalyzer.replaceSubStrings("One <two> three <four> five", "<", ">", "(.+)");
+        assertEquals("One (.+) three (.+) five", result);
+
+        assertEquals("kitchen ceiling lights", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("Switch on (.+)")));
+
+        assertEquals("Switch", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("(.+) on")));
+    }
+
+    public void test_getRegExMatch() {
+        String result2 = mCommandAnalyzer.getRegExMatch("Switch on <unit>".toUpperCase(), Pattern.compile("Switch on (.+)".toUpperCase()));
+        assertEquals("<UNIT>", result2);
+
+        String result = mCommandAnalyzer.getRegExMatch("One <two> three <four> five", Pattern.compile("One (.+) three (.+) five"));
+        assertEquals("<two> <four>", result);
+    }
+
+    public void test_RegExMatch() {
+        Matcher matcher = Pattern.compile("One (.+) three (.+) five").matcher("One <two> three <four> five");
+        assertTrue(matcher.find());
+        assertEquals(2, matcher.groupCount());
+        assertEquals("<two>", matcher.group(1));
+        assertEquals("<four>", matcher.group(2));
+
+        matcher = Pattern.compile("Switch on (.+)").matcher("Switch on kitchen ceiling lights");
+        assertTrue(matcher.find());
+        assertEquals(1, matcher.groupCount());
+        assertEquals("kitchen ceiling lights", matcher.group(1));
+
+        matcher = Pattern.compile("(.+) on").matcher("Switch on kitchen ceiling lights");
+        assertTrue(matcher.find());
+        assertEquals(1, matcher.groupCount());
+        assertEquals("Switch", matcher.group(1));
+    }
+
+    public void testLocal_getCommandsFromPhrases() {
+        getCommandsFromPhrases("Switch on kitchen ceiling lights");
+    }
+
+    private void getCommandsFromPhrases(String input) {
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add(input);
+        Map<String, OpenHABWidgetCommandType> resultingMap = new HashMap<String, OpenHABWidgetCommandType>();
+        StringBuffer sbAllArrayStrings = new StringBuffer();
+        StringBuffer sbAllMatch = new StringBuffer();
+        for(String phrase : commandPhrases.toArray(new String[0])) {
+            phrase = phrase.toUpperCase();
+            assertEquals(input.toUpperCase(), phrase);
+            for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
+                for(String commandAsText : commandType.getTextCommands(mContext)) {
+                    commandAsText = commandAsText.toUpperCase();
+                    sbAllArrayStrings.append((sbAllArrayStrings.length() > 0? ", " : "") + "'" + commandAsText + "'");
+                    String regexCommand = mCommandAnalyzer.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
+                    Pattern pattern = Pattern.compile(regexCommand);
+                    if(pattern.matcher(phrase).find()) {
+                        sbAllMatch.append((sbAllMatch.length() > 0? ", " : "") + "regex = '" + regexCommand + "' -> result = '" + mCommandAnalyzer.getRegExMatch(phrase, pattern) + "'");
+                        resultingMap.put(mCommandAnalyzer.getRegExMatch(phrase, pattern), commandType);
+                    }
+                }
+            }
+        }
+        String expectedSbResult = "'Get <unit>', 'Get <unit> status', 'Turn on <unit>', 'Switch on <unit>', '<unit> on', 'Turn off <unit>'"
+                + ", 'Switch off <unit>', '<unit> off', 'Roll down <unit>', 'Expand <unit>', 'Unfold <unit>', 'Lower <unit>', '<unit> down'"
+                + ", 'Roll up <unit>', 'Fold <unit>', 'Raise <unit>', '<unit> up', 'Stop roller <unit>', '<unit> stop'"
+                + ", 'Set <unit> to <integer> percent', '<unit> <integer> percent'";
+
+        assertEquals(expectedSbResult.toUpperCase(), sbAllArrayStrings.toString());
+        assertEquals("regex = 'SWITCH ON (.+)\\z' -> result = 'KITCHEN CEILING LIGHTS'", sbAllMatch.toString());
+    }
+
 
 //    private Document mResultingDocument;
 //    private String mResultDescription;

@@ -1,8 +1,10 @@
 package com.zenit.habclient;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.zenit.habclient.command.CommandAnalyzerResult;
+import com.zenit.habclient.command.OpenHABWidgetCommandType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -216,17 +218,53 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     protected String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
-        return getReplaceAllTags(openHABWidgetLabel);
+        return replaceSubStrings(openHABWidgetLabel, "[", "]", "");
     }
 
-    protected String getReplaceAllTags(String source) {
+    protected String replaceSubStrings(String source, String beginIncluded, String endIncluded, String replacement) {
         String result = source;
-        int firstBeginIndex = result.indexOf("[");
-        int firstEndIndex = result.indexOf("]");
+        int firstBeginIndex = result.indexOf(beginIncluded);
+        int firstEndIndex = result.indexOf(endIncluded);
         while(firstBeginIndex > -1 && firstEndIndex > -1  && firstBeginIndex < firstEndIndex) {
-            result = (firstBeginIndex > 1? result.substring(0, firstBeginIndex - 1) : "") + (firstEndIndex < result.length()? result.substring(firstEndIndex + 1) : "");
-            firstBeginIndex = result.indexOf("[");
-            firstEndIndex = result.indexOf("]");
+            result = (firstBeginIndex > 1? result.substring(0, firstBeginIndex) : "") + replacement + (firstEndIndex < result.length()? result.substring(firstEndIndex + 1) : "");
+            firstBeginIndex = result.indexOf(beginIncluded);
+            firstEndIndex = result.indexOf(endIncluded);
+        }
+        Log.d(HABApplication.getLogTag(), "Got unit popular name from label: " + source+ " => " + result.trim());
+        return result.trim();
+    }
+
+    /**
+     * Example commandPhrases = "Turn on Kitchen ceiling lights" will result in a single mapping
+     * of "KITCHEN CEILING LIGHTS" as key and OpenHABWidgetCommandType.SwitchOn as value.
+     * @param commandPhrases
+     * @return a Map of keys as upper case phrase strings with the command excluded and command types as values.
+     */
+    public Map<String, OpenHABWidgetCommandType> getCommandsFromPhrases(List<String> commandPhrases, Context context) {
+        Map<String, OpenHABWidgetCommandType> resultingMap = new HashMap<String, OpenHABWidgetCommandType>();
+        for(String phrase : commandPhrases.toArray(new String[0])) {
+            phrase = phrase.toUpperCase();
+            for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
+                for(String commandAsText : commandType.getTextCommands(context)) {
+                    commandAsText = commandAsText.toUpperCase();
+                    int matchPoints = replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
+                    String regexCommand = replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
+                    Pattern pattern = Pattern.compile(regexCommand);
+                    if(pattern.matcher(phrase).find())
+                        resultingMap.put("(" + matchPoints + ") -> " + getRegExMatch(phrase, pattern), commandType);
+                }
+            }
+        }
+        return  resultingMap;
+    }
+
+    protected String getRegExMatch(String source, Pattern pattern) {
+        String result = "";
+
+        Matcher matcher = pattern.matcher(source);
+        if(matcher.find()) {
+            for (int i = 1; i <= matcher.groupCount(); i++)
+                result += matcher.group(i) + " ";
         }
         return result.trim();
     }

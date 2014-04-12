@@ -34,11 +34,11 @@ import android.util.Log;
 
 import com.zenit.habclient.HABApplication;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * This is a class to hold basic information about openHAB widget.
@@ -86,7 +86,7 @@ public class OpenHABWidget {
 				if (childNode.getNodeName().equals("item")) {
 					this.setItem(new OpenHABItem(childNode));
 				} else if (childNode.getNodeName().equals("linkedPage")) {					
-					this.setLinkedPage(new OpenHABLinkedPage(childNode));
+					this.setLinkedPage(new OpenHABLinkedPage(this, childNode));
 				} else if (childNode.getNodeName().equals("widget")) {
 					new OpenHABWidget(this, childNode);
 				} else if (childNode.getNodeName().equals("type")) {
@@ -94,6 +94,8 @@ public class OpenHABWidget {
                 } else if (childNode.getNodeName().equals("widgetId")) {
                     this.setId(childNode.getTextContent());
                 } else if (childNode.getNodeName().equals("label")) {
+                    Log.v(HABApplication.getLogTag(), String.format("Creating openHABWidget (label): '%s'. Widget ID = %s", childNode.getTextContent(), getId()));
+//                    Washing
                     this.setLabel(childNode.getTextContent());
                 } else if (childNode.getNodeName().equals("icon")) {
                     this.setIcon(childNode.getTextContent());
@@ -196,22 +198,17 @@ public class OpenHABWidget {
         if (type.equalsIgnoreCase(OpenHABWidgetType.Switch.Name)) {
             if (hasMappings()) {
                 setType(OpenHABWidgetType.SelectionSwitch);
-            } else if (getItem() != null) {
-                if (getItem().getType()!= null) {
-                    if (getItem().getType() == OpenHABItemType.Rollershutter)
-                        setType(OpenHABWidgetType.RollerShutter);
-                    else
-                        setType(OpenHABWidgetType.Switch);
-                } else
-                    setType(OpenHABWidgetType.Switch);
+            } else if (getItem() != null && getItem().getType()!= null && getItem().getType() == OpenHABItemType.Rollershutter) {
+                setType(OpenHABWidgetType.RollerShutter);
             } else {
                 setType(OpenHABWidgetType.Switch);
             }
             return;
         } else {
-            for(int i = 0; i < OpenHABWidgetType.values().length; i++) {
-                if(type.equalsIgnoreCase(OpenHABWidgetType.values()[i].Name)) {
-                    setType(OpenHABWidgetType.values()[i]);
+            for(OpenHABWidgetType oType : OpenHABWidgetType.values()) {
+                if(type.equalsIgnoreCase(oType.Name)) {
+                    setType(oType);
+                    Log.v(HABApplication.getLogTag(), String.format("Found openHABWidget type '%s'. Widget ID = %s", oType.Name, getId()));
                     return;
                 }
             }

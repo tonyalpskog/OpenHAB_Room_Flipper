@@ -46,7 +46,7 @@ public class OpenHABLinkedPage {
 	private String link;
 	private static final String TAG = "OpenHABLinkedPage";
 	
-	public OpenHABLinkedPage(Node startNode) {
+	public OpenHABLinkedPage(OpenHABWidget parentWidget, Node startNode) {
 		if (startNode.hasChildNodes()) {
 			NodeList childNodes = startNode.getChildNodes();
 			for (int i = 0; i < childNodes.getLength(); i ++) {
@@ -59,6 +59,8 @@ public class OpenHABLinkedPage {
 					this.setIcon(childNode.getTextContent());
 				} else if (childNode.getNodeName().equals("link")) {
 					this.setLink(childNode.getTextContent());
+                } else if (childNode.getNodeName().equals("widget")) {
+                    new OpenHABWidget(parentWidget, childNode);
 				}
 			}
 		}
