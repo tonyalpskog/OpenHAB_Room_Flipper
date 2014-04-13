@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.zenit.habclient.command.CommandAnalyzerResult;
+import com.zenit.habclient.command.CommandPhraseMatchResult;
 import com.zenit.habclient.command.OpenHABWidgetCommandType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -240,8 +241,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
      * @param commandPhrases
      * @return a Map of keys as upper case phrase strings with the command excluded and command types as values.
      */
-    public Map<String, OpenHABWidgetCommandType> getCommandsFromPhrases(List<String> commandPhrases, Context context) {
-        Map<String, OpenHABWidgetCommandType> resultingMap = new HashMap<String, OpenHABWidgetCommandType>();
+    public List<CommandPhraseMatchResult> getCommandsFromPhrases(List<String> commandPhrases, Context context) {
+        List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
         for(String phrase : commandPhrases.toArray(new String[0])) {
             phrase = phrase.toUpperCase();
             for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
@@ -250,13 +251,37 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                     int matchPoints = replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
                     String regexCommand = replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
                     Pattern pattern = Pattern.compile(regexCommand);
-                    if(pattern.matcher(phrase).find())
-                        resultingMap.put("(" + matchPoints + ") -> " + getRegExMatch(phrase, pattern), commandType);
+                    Matcher matcher = pattern.matcher(phrase);
+                    if(matcher.find()) {
+                        List<String> tagPhrases = new ArrayList<String>();
+                        for(int i = 1; i <= matcher.groupCount(); i++)
+                            tagPhrases.add(matcher.group(i));
+
+                        Pattern pattern2 = Pattern.compile(regexCommand);
+                        Matcher matcher2 = pattern2.matcher(commandAsText);
+                        List<String> tags = new ArrayList<String>();
+                        if(matcher2.find()) {
+                            tags = new ArrayList<String>();
+                            for (int i = 1; i <= matcher2.groupCount(); i++)
+                                tags.add(matcher2.group(i));
+                        }
+                        int listIndex = 0;
+                        if(commandPhraseMatchResultList.size() > 0) {
+                            for(; listIndex < commandPhraseMatchResultList.size();) {
+                                if(commandPhraseMatchResultList.get(listIndex).getPoint() < matchPoints)
+                                    break;
+                                listIndex++;
+                            }
+                        }
+                        commandPhraseMatchResultList.add(listIndex, new CommandPhraseMatchResult(commandType, tags.toArray(new String[0]), tagPhrases.toArray(new String[0]), matchPoints));
+                    }
                 }
             }
         }
-        return  resultingMap;
+        return  commandPhraseMatchResultList;
     }
+
+//    public String getValue
 
     protected String getRegExMatch(String source, Pattern pattern) {
         String result = "";

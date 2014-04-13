@@ -107,7 +107,7 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return HABApplication.getOpenHABWidgetProvider().getWidget(mWidgetId);
+        return HABApplication.getOpenHABWidgetProvider().getWidgetByID(mWidgetId);
     }
 
     public void setOpenHABWidget(String itemName) {

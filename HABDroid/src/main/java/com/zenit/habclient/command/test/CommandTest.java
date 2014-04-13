@@ -3,8 +3,10 @@ package com.zenit.habclient.command.test;
 import com.zenit.habclient.ApplicationMode;
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.Room;
+import com.zenit.habclient.command.CommandPhraseMatchResult;
 import com.zenit.habclient.command.OpenHABWidgetCommandType;
 
+import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -54,6 +56,8 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(), mHABApplication.getOpenHABWidgetProvider());
         //mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
+
+        loadHttpDataFromString();
 
 //        requestOpenHABData("https://localhost:8443/rest/sitemaps/demo/demo", false);
 
@@ -253,7 +257,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 //        });
     }
 
-    public void testLoadingHttpDataFromString() {
+    private void loadHttpDataFromString() {
         StringBuffer htmlResponseData = new StringBuffer();
 
 //        htmlResponseData.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><page><id>demo</id><title>Main Menu</title><link>https://localhost:8443/rest/sitemaps/demo/demo</link><leaf>false</leaf><widget><widgetId>demo_0</widgetId><type>Frame</type><label></label><icon>frame</icon><widget><widgetId>demo_0_0</widgetId><type>Group</type><label>First Floor</label><icon>firstfloor</icon><item><type>GroupItem</type><name>gFF</name><state>Undefined</state><link>https://localhost:8443/rest/items/gFF</link></item><linkedPage><id>0000</id><title>First Floor</title><icon>firstfloor</icon><link>https://localhost:8443/rest/sitemaps/demo/0000</link><leaf>false</leaf></linkedPage></widget><widget><widgetId>demo_0_0_1</widgetId><type>Group</type><label>Ground Floor</label><icon>groundfloor</icon><item><type>GroupItem</type><name>gGF</name><state>Undefined</state><link>https://localhost:8443/rest/items/gGF</link></item><linkedPage><id>0001</id><title>Ground Floor</title><icon>groundfloor</icon><link>https://localhost:8443/rest/sitemaps/demo/0001</link><leaf>false</leaf></linkedPage></widget><widget><widgetId>demo_0_0_1_2</widgetId><type>Group</type><label>Cellar</label><icon>cellar</icon><item><type>GroupItem</type><name>gC</name><state>Undefined</state><link>https://localhost:8443/rest/items/gC</link></item><linkedPage><id>0002</id><title>Cellar</title><icon>cellar</icon><link>https://localhost:8443/rest/sitemaps/demo/0002</link><leaf>true</leaf></linkedPage></widget><widget><widgetId>demo_0_0_1_2_3</widgetId><type>Group</type><label>Outdoor</label><icon>garden</icon><item><type>GroupItem</type><name>Outdoor</name><state>Undefined</state><link>https://localhost:8443/rest/items/Outdoor</link></item><linkedPage><id>0003</id><title>Outdoor</title><icon>garden</icon><link>https://localhost:8443/rest/sitemaps/demo/0003</link><leaf>true</leaf></linkedPage></widget></widget><widget><widgetId>demo_1</widgetId><type>Frame</type><label>Weather</label><icon>frame</icon><widget><widgetId>demo_1_0</widgetId><type>Text</type><label>Outside Temperature [10,0 °C]</label><icon>temperature</icon><item><type>NumberItem</type><name>Weather_Temperature</name><state>10</state><link>https://localhost:8443/rest/items/Weather_Temperature</link></item><linkedPage><id>0100</id><title>Outside Temperature [10,0 °C]</title><icon>temperature</icon><link>https://localhost:8443/rest/sitemaps/demo/0100</link><leaf>false</leaf></linkedPage></widget></widget><widget><widgetId>demo_2</widgetId><type>Frame</type><label>Date</label><icon>frame</icon><widget><widgetId>demo_2_0</widgetId><type>Text</type><label>Date [lördag, 05.04.2014]</label><icon>calendar</icon><item><type>DateTimeItem</type><name>Date</name><state>2014-04-05T22:33:25</state><link>https://localhost:8443/rest/items/Date</link></item></widget></widget><widget><widgetId>demo_3</widgetId><type>Frame</type><label>Demo</label><icon>frame</icon><widget><widgetId>demo_3_0</widgetId><type>Text</type><label>Group Demo</label><icon>firstfloor</icon><linkedPage><id>0300</id><title>Group Demo</title><icon>firstfloor</icon><link>https://localhost:8443/rest/sitemaps/demo/0300</link><leaf>false</leaf></linkedPage></widget><widget><widgetId>demo_3_0_1</widgetId><type>Text</type><label>Widget Overview</label><icon>chart</icon><linkedPage><id>0301</id><title>Widget Overview</title><icon>chart</icon><link>https://localhost:8443/rest/sitemaps/demo/0301</link><leaf>false</leaf></linkedPage></widget><widget><widgetId>demo_3_0_1_2</widgetId><type>Text</type><label>Multimedia</label><icon>video</icon><linkedPage><id>0302</id><title>Multimedia</title><icon>video</icon><link>https://localhost:8443/rest/sitemaps/demo/0302</link><leaf>false</leaf></linkedPage></widget></widget></page>");
@@ -310,7 +314,6 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     }
 
     public void testGettingAllWidgetsLoadedFromDocument() {
-        testLoadingHttpDataFromString();
         assertTrue("The OpenHABWidgetProvider is NULL", mHABApplication.getOpenHABWidgetProvider() != null);
 
         assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
@@ -421,21 +424,60 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     public void test_getCommandsFromPhrases() {
         List<String> inputValue = new ArrayList<String>();
         inputValue.add("Switch on kitchen ceiling lights");
-        Map<String, OpenHABWidgetCommandType> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
-        assertEquals("Resulting Map size = " + result.size(), 1, result.size());
-        StringBuffer sb = new StringBuffer();
-        Iterator<String> iterator = result.keySet().iterator();
-        while(iterator.hasNext())
-            sb.append((sb.length() == 0? "": ", ") + iterator.next());
-        assertTrue("Value" + result.toString() + "   Keys = '" + sb.toString() + "'", result.containsKey("(2) -> kitcHen ceiling Lights".toUpperCase()));
-//        assertTrue("Size = " + result.size() + "    Keys = '" + sb.toString() + "'   Value = '" + result.get(key).toString() + "'", result.containsKey("kitcHen ceiling Lights".toUpperCase()));
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals("Resulting List size = " + result.size(), 1, result.size());
+        assertEquals(OpenHABWidgetCommandType.SwitchOn, result.get(0).getCommandType());
+        assertEquals(2, result.get(0).getPoint());
+        assertTrue(result.get(0).getTags().length == 1);
+        assertEquals("<unit>".toUpperCase(), result.get(0).getTags()[0]);
+        assertTrue(result.get(0).getTagPhrases().length == 1);
+        assertEquals("kitchen ceiling lights".toUpperCase(), result.get(0).getTagPhrases()[0]);
 
         inputValue.clear();
         inputValue.add("Get terrace door status");
         result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
-        assertEquals(2, result.size());
-        assertTrue(result.keySet().toArray(new String[0])[0] + "    First of " + result.size(), result.containsKey("(2) -> terrace door".toUpperCase()));
-        assertTrue(result.keySet().toArray(new String[0])[1] + "    First of " + result.size(), result.containsKey("(1) -> terrace door status".toUpperCase()));
+        assertEquals("Resulting List size = " + result.size(), 2, result.size());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, result.get(0).getCommandType());
+        assertEquals(2, result.get(0).getPoint());
+        assertTrue(result.get(0).getTags().length == 1);
+        assertEquals("<unit>".toUpperCase(), result.get(0).getTags()[0]);
+        assertTrue(result.get(0).getTagPhrases().length == 1);
+        assertEquals("terrace door".toUpperCase(), result.get(0).getTagPhrases()[0]);
+
+        assertEquals(OpenHABWidgetCommandType.GetStatus, result.get(1).getCommandType());
+        assertEquals(1, result.get(1).getPoint());
+        assertTrue(result.get(1).getTags().length == 1);
+        assertEquals("<unit>".toUpperCase(), result.get(1).getTags()[0]);
+        assertTrue(result.get(1).getTagPhrases().length == 1);
+        assertEquals("terrace door status".toUpperCase(), result.get(1).getTagPhrases()[0]);
+    }
+
+    public void testExecuteCommandAsPhrase() {
+        List<String> inputValue = new ArrayList<String>();
+        inputValue.add("Get terrace door status");
+        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+
+        inputValue.clear();
+        inputValue.add("Get terrace door");
+        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+
+        inputValue.clear();
+        inputValue.add("Get outside temperature");
+        ExecuteCommandAsPhrase(inputValue, 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number);
+
+//        inputValue.clear();
+//        inputValue.add("Switch on kitchen ceiling lights");
+//        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+    }
+
+    private void ExecuteCommandAsPhrase(List<String> inputValue, int resultingUnitMatches, String resultingWidgetID, String resultingValue, OpenHABItemType resultingItemType) {
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        List<OpenHABWidget> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0]);
+        assertEquals(resultingUnitMatches, resultList.size());
+        assertEquals(resultingWidgetID, resultList.get(0).getId());
+        assertEquals(resultingValue, resultList.get(0).getLabel());
+        assertEquals(resultingItemType, resultList.get(0).getItem().getType());
     }
 
     public void test_replaceSubStrings() {

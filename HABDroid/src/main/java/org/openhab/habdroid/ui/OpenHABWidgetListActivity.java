@@ -43,8 +43,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import android.view.*;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;
 import org.openhab.habdroid.model.OpenHABItemType;
@@ -61,7 +60,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.crittercism.app.Crittercism;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -836,7 +834,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
             Util.overridePendingTransition(this, false);
     		return true;
         case R.id.mainmenu_openhab_changedate:
-            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidget("Date").getItem(), "2014-02-06T21:42:28");//TODO - getWidget("Date") ???
+            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidgetByID("Date").getItem(), "2014-02-06T21:42:28");//TODO - getWidgetByID("Date") ???
             return true;
         default:
     		return super.onOptionsItemSelected(item);

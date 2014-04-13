@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -119,6 +117,7 @@ public class OpenHABWidgetControl {
         return itemValueTextView;
     }
 
+    @Deprecated //Use method in OpenHABWidget class.
     private String getShortOpenHABWidgetLabelValue(String openHABWidgetLabel) {
         return getRegExMatch(openHABWidgetLabel, Pattern.compile("\\[.*\\]"));
     }

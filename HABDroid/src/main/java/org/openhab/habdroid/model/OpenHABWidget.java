@@ -39,6 +39,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is a class to hold basic information about openHAB widget.
@@ -419,5 +421,19 @@ public class OpenHABWidget {
 
     public String getItemName() {
         return hasItem()? getItem().getName() : getLabel();
+    }
+
+    public String getLabelValue() {
+        return getRegExMatch(getLabel(), Pattern.compile("\\[.*\\]"));
+    }
+
+    private String getRegExMatch(String source, Pattern pattern) {
+        String result = "";
+
+        Matcher matcher = pattern.matcher(source);
+        if(matcher.find())
+            result = (matcher.group().subSequence(1, matcher.group().length()-1)).toString();
+
+        return result;
     }
 }
