@@ -1,12 +1,10 @@
 package com.zenit.habclient;
 
+import android.content.Context;
+
 import com.zenit.habclient.command.CommandAnalyzerResult;
 
-import org.openhab.habdroid.model.OpenHABWidget;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -28,5 +26,5 @@ public interface ICommandAnalyzer {
 
     SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode);
 
-    CommandAnalyzerResult analyzeCommand(ArrayList<String> speechResult, ApplicationMode applicationMode);
+    CommandAnalyzerResult analyzeCommand(ArrayList<String> speechResult, ApplicationMode applicationMode, Context context);
 }

@@ -1,23 +1,19 @@
 package com.zenit.habclient.command.test;
 
-import android.util.Log;
-
 import com.zenit.habclient.ApplicationMode;
 import com.zenit.habclient.CommandAnalyzer;
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OpenHABWidgetProvider;
 import com.zenit.habclient.Room;
 import com.zenit.habclient.RoomProvider;
+import com.zenit.habclient.command.CommandPhraseMatchResult;
+import com.zenit.habclient.command.WidgetPhraseMatchResult;
 
 import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -45,37 +41,38 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //    }
 
     public List<OpenHABWidget> getUnitsFromPhrases(HABApplication habApplication, List<String> commandPhrases, List<Room> listOfRooms) {
-        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
-
-        // Fill the list view with the strings the recognizer thought it
-        // could have heard
-        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
-//        if(widgetList.size() == 0) {
-            widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+        return super.getUnitsFromPhrases2(commandPhrases, listOfRooms, habApplication);
+//        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
+//
+//        // Fill the list view with the strings the recognizer thought it
+//        // could have heard
+//        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
+////        if(widgetList.size() == 0) {
+//            widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+////        }
+//        //Create widget name Map
+//        Iterator<OpenHABWidget> iterator = widgetList.iterator();
+//        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
+//        while (iterator.hasNext()) {
+//            OpenHABWidget nextWidget = iterator.next();
+//            widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
 //        }
-        //Create widget name Map
-        Iterator<OpenHABWidget> iterator = widgetList.iterator();
-        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
-        while (iterator.hasNext()) {
-            OpenHABWidget nextWidget = iterator.next();
-            widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
-        }
-
-        //Look for match
-        for(String match : commandPhrases.toArray(new String[0])) {
-//            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
-//            resultList.add(foundWidget);
-            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
-                if (match.toUpperCase().contains(unitName)) {
-                    //Got a unit match.
-                    OpenHABWidget foundWidget = widgetNameMap.get(unitName);
-                    resultList.add(foundWidget);
-                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
-                }
-            }
-        }
-
-        return resultList;
+//
+//        //Look for match
+//        for(String match : commandPhrases.toArray(new String[0])) {
+////            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
+////            resultList.add(foundWidget);
+//            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
+//                if (match.toUpperCase().contains(unitName)) {
+//                    //Got a unit match.
+//                    OpenHABWidget foundWidget = widgetNameMap.get(unitName);
+//                    resultList.add(foundWidget);
+//                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
+//                }
+//            }
+//        }
+//
+//        return resultList;
     }
 
 //    public List<OpenHABWidget> getUnitsFromPhrases(HABApplication habApplication, List<String> commandPhrases) {
@@ -119,6 +116,11 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
     @Override
     public String replaceSubStrings(String source, String beginIncluded, String endIncluded, String replacement) {
         return super.replaceSubStrings(source, beginIncluded, endIncluded, replacement);
+    }
+
+    @Override
+    public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
+        return super.getHighestWidgetsFromCommandMatchResult(listOfCommandResult);
     }
 
     @Override

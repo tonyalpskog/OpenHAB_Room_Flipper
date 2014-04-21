@@ -2,6 +2,8 @@ package com.zenit.habclient;
 
 import android.util.Log;
 
+import com.zenit.habclient.command.WidgetPhraseMatchResult;
+
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -153,11 +155,19 @@ public class OpenHABWidgetProvider {
         return resultList;
     }
 
-    public List<OpenHABWidget> getWidgetByLabel(String searchLabel) {
-        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
+    public List<WidgetPhraseMatchResult> getWidgetByLabel(String searchLabel, CommandAnalyzer commandAnalyzer) {
+        String[] splittedSearchLabel = searchLabel.split(" ");
+        List<String> sourceWordsList = new ArrayList<String>();
+        for(String sourceWord : splittedSearchLabel)
+            sourceWordsList.add(sourceWord.toUpperCase());
+
+        String regExString = commandAnalyzer.getRegExStringForMatchAccuracySource(splittedSearchLabel);
+
+        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
         for(OpenHABWidget widget : mOpenHABWidgetIdMap.values().toArray(new OpenHABWidget[0])) {
-            if(widget.getLabel().toUpperCase().contains(searchLabel.toUpperCase()))
-                resultList.add(widget);
+            double accuracy = commandAnalyzer.getStringMatchAccuracy(searchLabel, sourceWordsList, regExString, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
+            if(accuracy > 0.5)
+                resultList.add(new WidgetPhraseMatchResult(Double.valueOf(accuracy * 100).intValue(), widget));
         }
         return resultList;
     }

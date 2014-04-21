@@ -5,6 +5,8 @@ import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.Room;
 import com.zenit.habclient.command.CommandPhraseMatchResult;
 import com.zenit.habclient.command.OpenHABWidgetCommandType;
+import com.zenit.habclient.command.WidgetPhraseMatchResult;
+import com.zenit.habclient.util.RegExResult;
 
 import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -16,6 +18,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,10 +50,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     public CommandTest() {
         super(HABApplication.class);
     }
+
     public void setUp() {
         try {
             super.setUp();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         createApplication();
         mHABApplication = getApplication();
 
@@ -99,27 +104,27 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertFalse("No MapOfRoomNames items available.", mCommandAnalyzer.getMapOfRoomNamesFromProvider().isEmpty());
 
         String availableRooms = "";
-        for(String roomName : mCommandAnalyzer.getMapOfRoomNamesFromProvider().keySet().toArray(new String[0])) {
+        for (String roomName : mCommandAnalyzer.getMapOfRoomNamesFromProvider().keySet().toArray(new String[0])) {
             availableRooms += roomName + " , ";
         }
 
         String availableRoomsResult = "";
         String unavailableRoomsResult = "";
-        for(String roomName : mFullRoomNameArray) {
-            if(!mRoomNameMap.keySet().contains(roomName.toUpperCase()))
+        for (String roomName : mFullRoomNameArray) {
+            if (!mRoomNameMap.keySet().contains(roomName.toUpperCase()))
                 unavailableRoomsResult += roomName.toUpperCase() + " , ";
             else
                 availableRoomsResult += roomName.toUpperCase() + " , ";
         }
 
         assertEquals("Some tested rooms doesn't match actual rooms: ", "", unavailableRoomsResult);
-        if(unavailableRoomsResult.length() > 0)
+        if (unavailableRoomsResult.length() > 0)
             assertEquals("Tested rooms doesn't match actual rooms: ", availableRooms, availableRoomsResult);
     }
 
     public void testThatAllTestedRoomsCanBeFoundInTheTestPhrases() {
         //Test that all rooms can be found inside a phrase
-        for(int i = 0; i < mTestedRoomsNameArray.length; i++) {
+        for (int i = 0; i < mTestedRoomsNameArray.length; i++) {
             assertTrue(mListOfTestPhrases.get(i).toUpperCase().contains(mTestedRoomsNameArray[i].toUpperCase()));
         }
     }
@@ -127,8 +132,8 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     private String getAllStringItemsInOneString(List items) {
         String result = "";
         boolean firstItem = true;
-        for(Object item : items.toArray()) {
-            result += firstItem? item.toString() : ", " + item.toString();
+        for (Object item : items.toArray()) {
+            result += firstItem ? item.toString() : ", " + item.toString();
             firstItem = false;
         }
 
@@ -140,10 +145,10 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals(mTestedRoomsNameArray.length + mDoubles, roomList.size());
 
         List<String> roomNameResultList = new ArrayList<String>();
-        for(Room room : roomList.toArray(new Room[0]))
+        for (Room room : roomList.toArray(new Room[0]))
             roomNameResultList.add(room.getName().toUpperCase());
 
-        for(int i = 0; i < mTestedRoomsNameArray.length; i++) {
+        for (int i = 0; i < mTestedRoomsNameArray.length; i++) {
             assertTrue("MapOfRoomNames does not contain <" + mTestedRoomsNameArray[i].toUpperCase() + ">: " + mCommandAnalyzer.getMapOfRoomNamesFromProvider().keySet().toString(), mCommandAnalyzer.getMapOfRoomNamesFromProvider().containsKey(mTestedRoomsNameArray[i].toUpperCase()));
 
             assertTrue("Room name nr " + i + " <" + mTestedRoomsNameArray[i].toUpperCase() + "> could not be found in the result: " + getAllStringItemsInOneString(roomNameResultList)
@@ -151,10 +156,10 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         }
 
         List<UUID> uuidResultList = new ArrayList<UUID>();
-        for(Room room : roomList.toArray(new Room[0]))
+        for (Room room : roomList.toArray(new Room[0]))
             uuidResultList.add(room.getId());
 
-        for(int i = 0; i < mTestedRoomsNameArray.length; i++) {
+        for (int i = 0; i < mTestedRoomsNameArray.length; i++) {
             assertTrue("Room UUID nr " + i + " <" + mCommandAnalyzer.getMapOfRoomNamesFromProvider().get(mTestedRoomsNameArray[i].toUpperCase()).getId()
                     + "> could not be found in the result: " + getAllStringItemsInOneString(uuidResultList)
                     , uuidResultList.contains(mCommandAnalyzer.getMapOfRoomNamesFromProvider().get(mTestedRoomsNameArray[i].toUpperCase()).getId()));
@@ -163,7 +168,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     //-------------------------- UNITS -------------------------------
 
-//    private void requestOpenHABData(String pageUrl, final boolean longPolling) {
+    //    private void requestOpenHABData(String pageUrl, final boolean longPolling) {
     private void requestOpenHABData(String htmlResponseData) {
         DocumentHttpResponseHandlerWrapper documentHandler = new DocumentHttpResponseHandlerWrapper();
         Document document = null;
@@ -192,7 +197,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource();
 
-        for(int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
+        for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
             Node childNode = rootNode.getChildNodes().item(i);
             if (childNode.getNodeName().equals("widget")) {
                 childWidgetsFound++;
@@ -319,8 +324,8 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
 
         String result = "";
-        for(OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null))
-            result += (item.hasItem()? "Item-" + (item.getItem().getType() != null?item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName(): "Widget-" + (item.getType() != null? item.getType().Name + "-": "NULL-") + item.getId()) + ", ";
+        for (OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null))
+            result += (item.hasItem() ? "Item-" + (item.getItem().getType() != null ? item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName() : "Widget-" + (item.getType() != null ? item.getType().Name + "-" : "NULL-") + item.getId()) + ", ";
 
         assertTrue(result.startsWith("Item-ContactItem-Window_GF_Frontdoor, Item-NumberItem-Temperature_GF_Corridor, Item-SwitchItem-Heating_GF_Corridor, Item-SwitchItem-Light_GF_Corridor_Wardrobe"));
     }
@@ -331,8 +336,8 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals(92, mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem).size());
 
         String result = "";
-        for(OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem))
-            result += (item.hasItem()? "Item-" + (item.getItem().getType() != null?item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName(): "Widget-" + (item.getType() != null? item.getType().Name + "-": "NULL-") + item.getId()) + ", ";
+        for (OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem))
+            result += (item.hasItem() ? "Item-" + (item.getItem().getType() != null ? item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName() : "Widget-" + (item.getType() != null ? item.getType().Name + "-" : "NULL-") + item.getId()) + ", ";
 
         assertTrue(result.startsWith("Widget--03020100_0, Item-SwitchItem-Light_FF_Bath_Ceiling, Item-SwitchItem-Light_FF_Bath_Mirror, Item-SwitchItem-Heating_FF_Bath, Item-RollershutterItem-Shutter_FF_Bath, Item-SwitchItem-Light_FF_Office_Ceiling, Item-SwitchItem-Heating_FF_Office"));
     }
@@ -348,14 +353,33 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, ls, null);
         StringBuffer sb = new StringBuffer();
-        for(OpenHABWidget widget : resultingUnitList)
-            sb.append((sb.length() > 0? ", " : "") + widget.getId());
-        assertEquals("'" + ls.get(0) + "' was found in: " + sb.toString(), 1, resultingUnitList.size());
+        for (OpenHABWidget widget : resultingUnitList)
+            sb.append((sb.length() > 0 ? ", " : "") + widget.getId());
+        assertEquals("'" + ls.get(0) + "' was found in: " + sb.toString() + " as => " + getAllStringItemsInOneString(resultingUnitList), 1, resultingUnitList.size());
         OpenHABWidget foundOhw = resultingUnitList.get(0);
         assertFalse("Returned OpenHABWidget was NULL", foundOhw == null);
         assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0), foundOhw.getLabel());
-        assertEquals("First item name: " + (foundOhw.hasItem()? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
+        assertEquals("First item name: " + (foundOhw.hasItem() ? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
         assertFalse(mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, mListOfTestPhrases2, null).isEmpty());
+    }
+
+    private String getCommandPhraseMatchResultStringData(CommandPhraseMatchResult commandMatchResult) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Points = " + commandMatchResult.getPoint());
+        sb.append("   Tags: ");
+        for (String tag : commandMatchResult.getTags())
+            sb.append(tag + ", ");
+        sb.append("   Phrases: ");
+        for (String phrase : commandMatchResult.getTagPhrases())
+            sb.append("'" + phrase + "', ");
+        return sb.toString();
+    }
+
+    private String getStringArrayAsString(String[] stringArray) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : stringArray)
+            sb.append(str + ", ");
+        return sb.toString();
     }
 
     public void testGetSubStringsFromWidgetLabel() {
@@ -370,6 +394,13 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         testLabel = "[bas€) (#umba] Temperature [20.1 °C] Something else [Joo% man] yeah";
         assertEquals("Temperature  Something else  yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+    }
+
+    public void testGetWidgetByLabel() {
+        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel("TERRACE DOOR", mCommandAnalyzer);
+        assertEquals(getAllStringItemsInOneString(resultList), 2, resultList.size());
+        assertEquals(100, resultList.get(0).getMatchPercent());
+        assertEquals("GF_Living_4", resultList.get(0).getWidget().getId());
     }
 
     public void testMatchUnitNamesWithCommandPhrases() {
@@ -387,7 +418,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         List<String> widgetLabelList = new ArrayList<String>();
         while (iterator.hasNext()) {
             OpenHABWidget nextWidget = iterator.next();
-            if(!nextWidget.getLabel().isEmpty()) {
+            if (!nextWidget.getLabel().isEmpty()) {
                 String popularName = mCommandAnalyzer.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase();
                 widgetLabelList.add(popularName);
                 widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */popularName, nextWidget);
@@ -401,11 +432,11 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 //        String[] stringsToCompareWith = new String[] {"OUTSIDE TEMPERATURE", "DEMO", "WIDGET OVERVIEW", "OUTDOOR", "WEATHER", "MULTIMEDIA", "DATE", "CELLAR", "FIRST FLOOR", "GROUP DEMO", "GROUND FLOOR"};
         //Look for match
         int matchPoint = 0;
-        for(String match : commandPhrases.toArray(new String[0])) {
+        for (String match : commandPhrases.toArray(new String[0])) {
 //            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
 //            resultList.add(foundWidget);
 
-            for(int i = 0; i < widgetNameArray.length; i++) {
+            for (int i = 0; i < widgetNameArray.length; i++) {
 //                assertEquals(stringsToCompareWith[i], widgetNameArray[i]);
                 if (match.toUpperCase().contains(widgetNameArray[i]) && matchPoint < widgetNameArray[i].length()) {
 //                    Log.v(mHABApplication.getLogTag(), "<" + match.toUpperCase() + "> contains <" + widgetNameArray[i] + ">");
@@ -413,7 +444,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
                     OpenHABWidget foundWidget = widgetNameMap.get(widgetNameArray[i]);
                     matchPoint = widgetNameArray[i].length();
                     resultList.add(foundWidget);
-                    sbMatchingWidgetLabels.append((sbMatchingWidgetLabels.length() > 0? ", " : "") + mCommandAnalyzer.getPopularNameFromWidgetLabel(foundWidget.getLabel()));
+                    sbMatchingWidgetLabels.append((sbMatchingWidgetLabels.length() > 0 ? ", " : "") + mCommandAnalyzer.getPopularNameFromWidgetLabel(foundWidget.getLabel()));
                 }
             }
         }
@@ -450,34 +481,267 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("<unit>".toUpperCase(), result.get(1).getTags()[0]);
         assertTrue(result.get(1).getTagPhrases().length == 1);
         assertEquals("terrace door status".toUpperCase(), result.get(1).getTagPhrases()[0]);
+
+        inputValue.clear();
+        inputValue.add("Just some mambo jumbo");
+        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals("Resulting List size = " + result.size(), 0, result.size());
+    }
+
+    public void testGetUnitPhrase() {
+        List<String> inputValue = new ArrayList<String>();
+        inputValue.add("Get terrace door status");
+        List<CommandPhraseMatchResult> listOfCommandResult = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals(2, listOfCommandResult.size());
+        assertEquals(2, listOfCommandResult.get(0).getPoint());
+        assertEquals(1, listOfCommandResult.get(1).getPoint());
+        assertEquals(1, listOfCommandResult.get(0).getTags().length);
+        assertEquals("<UNIT>", listOfCommandResult.get(0).getTags()[0]);
+        String result = mCommandAnalyzer.getUnitPhrase(listOfCommandResult.get(0));
+        assertEquals("TERRACE DOOR", result);
+    }
+
+    public void testGetWidgetFromCommandMatchResult() {
+        List<String> inputValue = new ArrayList<String>();
+        inputValue.add("Get terrace door status");
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        WidgetPhraseMatchResult widgetMatch = mCommandAnalyzer.getMostProbableWidgetFromCommandMatchResult(result.get(0));
+        assertEquals(100, widgetMatch.getMatchPercent());
+        assertEquals("GF_Living_4", widgetMatch.getWidget().getId());
+    }
+
+    public void testGetHighestWidgetsFromCommandMatchResult() {
+
+    }
+
+    public void testGetCommandAndUnit() {
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add(0, "Get outside temperature");
+        commandPhrases.add(1, "Just some mambo jumbo");
+        commandPhrases.add(2, "Get terrace door status");
+        commandPhrases.add(3, "Switch on kitchen ceiling lights");
+        commandPhrases.add(4, "Get outdoor temperature");
+
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+
+        assertEquals(5, commandMatchResultList.size());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(0).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.SwitchOn, commandMatchResultList.get(1).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(2).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(3).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(4).getCommandType());
+
+        assertEquals("Points = 2   Tags: <UNIT>,    Phrases: 'TERRACE DOOR', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(0)));
+        assertEquals("Points = 2   Tags: <UNIT>,    Phrases: 'KITCHEN CEILING LIGHTS', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(1)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTSIDE TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(2)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'TERRACE DOOR STATUS', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(3)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTDOOR TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(4)));
+
+        Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> unitMatchResult = mCommandAnalyzer.getHighestWidgetsFromCommandMatchResult(commandMatchResultList);
+
+        assertEquals(5, unitMatchResult.size());
+
+        assertEquals(100, unitMatchResult.get(commandMatchResultList.get(0)).getMatchPercent());
+        assertEquals("GF_Living_4", unitMatchResult.get(commandMatchResultList.get(0)).getWidget().getId());
+
+        assertEquals(true, unitMatchResult.get(commandMatchResultList.get(1)) == null);
+
+        assertEquals(100, unitMatchResult.get(commandMatchResultList.get(2)).getMatchPercent());
+        assertEquals("demo_1_0", unitMatchResult.get(commandMatchResultList.get(2)).getWidget().getId());
+
+        assertEquals(55, unitMatchResult.get(commandMatchResultList.get(3)).getMatchPercent());
+        assertEquals("GF_Living_4", unitMatchResult.get(commandMatchResultList.get(3)).getWidget().getId());
+
+        assertEquals("Item: " + commandMatchResultList.get(4).toString() + "\nList: " + getAllStringItemsInOneString(commandMatchResultList), true, unitMatchResult.get(commandMatchResultList.get(4)) == null);
     }
 
     public void testExecuteCommandAsPhrase() {
         List<String> inputValue = new ArrayList<String>();
         inputValue.add("Get terrace door status");
-        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
 
         inputValue.clear();
         inputValue.add("Get terrace door");
-        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
 
         inputValue.clear();
         inputValue.add("Get outside temperature");
-        ExecuteCommandAsPhrase(inputValue, 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number);
+        ExecuteCommandAsPhrase(inputValue, "OUTSIDE TEMPERATURE", 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number);
 
 //        inputValue.clear();
 //        inputValue.add("Switch on kitchen ceiling lights");
 //        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
     }
 
-    private void ExecuteCommandAsPhrase(List<String> inputValue, int resultingUnitMatches, String resultingWidgetID, String resultingValue, OpenHABItemType resultingItemType) {
+    public void test_getRegExStringForMatchAccuracySource() {
+        String[] input = {"hej", "hopp", "allihopa"};
+        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", mCommandAnalyzer.getRegExStringForMatchAccuracySource(input));
+    }
+
+    public void testMatchForGetPatternForMatchAccuracySource() {
+        String[] input = {"hej", "hopp", "allihopa"};
+        RegExResult result = mHABApplication.getRegularExpression().getAllNextMatchAsList(mCommandAnalyzer.getRegExStringForMatchAccuracySource(input), "hej hopp allihopa".toUpperCase());
+        assertEquals(3, result.GroupList.size());
+        assertEquals("HEJ", result.GroupList.get(0));
+        assertEquals("HOPP", result.GroupList.get(1));
+        assertEquals("ALLIHOPA", result.GroupList.get(2));
+    }
+
+    public void testGetStringMatchAccuracy() {
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+
+        assertEquals(1d, doTestGetStringMatchAccuracy("hej hopp allihopa", "hej hopp allihopa"));
+        assertEquals(0.56d, Double.valueOf(decimalFormat.format(doTestGetStringMatchAccuracy("hej hopp allihopa", "dfg hopp i hejallihopa då"))));
+    }
+
+    public double doTestGetStringMatchAccuracy(String source, String target) {
+        String[] splittedSource = source.split(" ");
+        List<String> sourceWordsList = new ArrayList<String>();
+        for(String sourceWord : splittedSource)
+            sourceWordsList.add(sourceWord.toUpperCase());
+
+        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
+
+//        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
+
+        return mCommandAnalyzer.getStringMatchAccuracy(source, sourceWordsList, regExString, target);
+    }
+
+    public void testSplittedStringAndWordsList2() {
+        String[] splittedSource = "Terrace door".split(" ");
+        List<String> sourceWordsList = new ArrayList<String>();
+        for(String sourceWord : splittedSource)
+            sourceWordsList.add(sourceWord.toUpperCase());
+
+        assertEquals(2, splittedSource.length);
+        assertEquals("Terrace", splittedSource[0]);
+        assertEquals("door", splittedSource[1]);
+
+        assertEquals(2, sourceWordsList.size());
+        assertEquals("TERRACE", sourceWordsList.get(0));
+        assertEquals("DOOR", sourceWordsList.get(1));
+
+        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
+        assertEquals("(TERRACE)|(DOOR)", regExString);
+
+        assertEquals(1d, doGetStringMatchAccuracy2("Terrace door", sourceWordsList, regExString, "Terrace door"));
+    }
+
+    public double doGetStringMatchAccuracy2(String source, List<String> sourceWordsList, String regEx, String target) {
+        double wordCountAccuracy = 0;
+        double orderAccuracy = 0;
+        double lengthDifferenceAccuracy = 0;
+        int totalMatchLength = 0;
+
+        target = target.toUpperCase();
+        assertEquals("(TERRACE)|(DOOR)", regEx);
+        assertEquals("TERRACE DOOR", target);
+        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target);
+        assertEquals(2, sourceWordsList.size());
+        assertEquals(2, regExResult.GroupList.size());
+        wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
+        assertEquals(1d, wordCountAccuracy);
+        int lastListMatchIndex = -1;
+        for (int i = 0; i < regExResult.GroupList.size(); i++) {
+            totalMatchLength += regExResult.GroupList.get(i).length() + 1;
+            assertEquals(sourceWordsList.get(i), regExResult.GroupList.get(i));
+            int listMatchIndex = sourceWordsList.indexOf(regExResult.GroupList.get(i));
+            if (listMatchIndex > lastListMatchIndex) {
+                lastListMatchIndex = listMatchIndex;
+                orderAccuracy++;
+                continue;
+            }
+        }
+        assertEquals(2d, orderAccuracy);
+        if (orderAccuracy > 0)
+            orderAccuracy = orderAccuracy / sourceWordsList.size();
+        assertEquals(1d, orderAccuracy);
+
+        totalMatchLength -= 1;
+        assertEquals(12, totalMatchLength);
+        assertEquals(12, target.length());
+        lengthDifferenceAccuracy = Math.abs(totalMatchLength - target.length());
+        if(lengthDifferenceAccuracy >= 0)
+            lengthDifferenceAccuracy = 1 - (lengthDifferenceAccuracy * 0.15);
+        if(lengthDifferenceAccuracy < 0)
+            lengthDifferenceAccuracy = 0;
+        assertEquals(1d, lengthDifferenceAccuracy);
+        return sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / 3 : 0;
+    }
+
+    public void testSplittedStringAndWordsList() {
+        String[] splittedSource = "hej hopp allihopa".split(" ");
+        List<String> sourceWordsList = new ArrayList<String>();
+        for(String sourceWord : splittedSource)
+            sourceWordsList.add(sourceWord.toUpperCase());
+
+        assertEquals(3, splittedSource.length);
+        assertEquals("hej", splittedSource[0]);
+        assertEquals("hopp", splittedSource[1]);
+        assertEquals("allihopa", splittedSource[2]);
+
+        assertEquals(3, sourceWordsList.size());
+        assertEquals("HEJ", sourceWordsList.get(0));
+        assertEquals("HOPP", sourceWordsList.get(1));
+        assertEquals("ALLIHOPA", sourceWordsList.get(2));
+
+        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
+        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regExString);
+
+        assertEquals(1d, doGetStringMatchAccuracy("hej hopp allihopa", sourceWordsList, regExString, "hej hopp allihopa"));
+    }
+
+    public double doGetStringMatchAccuracy(String source, List<String> sourceWordsList, String regEx, String target) {
+        double wordCountAccuracy = 0;
+        double orderAccuracy = 0;
+        double lengthDifferenceAccuracy = 0;
+        int totalMatchLength = 0;
+
+        target = target.toUpperCase();
+        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regEx);
+        assertEquals("HEJ HOPP ALLIHOPA", target);
+        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target);
+        assertEquals(3, sourceWordsList.size());
+        assertEquals(3, regExResult.GroupList.size());
+        wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
+        assertEquals(1d, wordCountAccuracy);
+        int lastListMatchIndex = -1;
+        for (int i = 0; i < regExResult.GroupList.size(); i++) {
+            totalMatchLength += regExResult.GroupList.get(i).length() + 1;
+            assertEquals(sourceWordsList.get(i), regExResult.GroupList.get(i));
+            int listMatchIndex = sourceWordsList.indexOf(regExResult.GroupList.get(i));
+            if (listMatchIndex > lastListMatchIndex) {
+                lastListMatchIndex = listMatchIndex;
+                orderAccuracy++;
+                continue;
+            }
+        }
+        assertEquals(3d, orderAccuracy);
+        if (orderAccuracy > 0)
+            orderAccuracy = orderAccuracy / sourceWordsList.size();
+        assertEquals(1d, orderAccuracy);
+
+        totalMatchLength -= 1;
+        assertEquals(17, totalMatchLength);
+        assertEquals(17, target.length());
+        lengthDifferenceAccuracy = Math.abs(totalMatchLength - target.length());
+        if(lengthDifferenceAccuracy >= 0)
+            lengthDifferenceAccuracy = 1 - (lengthDifferenceAccuracy * 0.15);
+        if(lengthDifferenceAccuracy < 0)
+            lengthDifferenceAccuracy = 0;
+        assertEquals(1d, lengthDifferenceAccuracy);
+        return sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / sourceWordsList.size() : 0;
+    }
+
+    private void ExecuteCommandAsPhrase(List<String> inputValue, String unitToMatch, int resultingUnitMatches, String resultingWidgetID, String resultingValue, OpenHABItemType resultingItemType) {
         List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
         assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
-        List<OpenHABWidget> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0]);
-        assertEquals(resultingUnitMatches, resultList.size());
-        assertEquals(resultingWidgetID, resultList.get(0).getId());
-        assertEquals(resultingValue, resultList.get(0).getLabel());
-        assertEquals(resultingItemType, resultList.get(0).getItem().getType());
+        assertEquals(unitToMatch, result.get(0).getTagPhrases()[0]);
+        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
+        assertEquals(getAllStringItemsInOneString(resultList), resultingUnitMatches, resultList.size());
+        assertEquals(resultingWidgetID, resultList.get(0).getWidget().getId());
+        assertEquals(resultingValue, resultList.get(0).getWidget().getLabel());
+        assertEquals(resultingItemType, resultList.get(0).getWidget().getItem().getType());
     }
 
     public void test_replaceSubStrings() {

@@ -6,7 +6,10 @@ import android.util.Log;
 import com.zenit.habclient.command.CommandAnalyzerResult;
 import com.zenit.habclient.command.CommandPhraseMatchResult;
 import com.zenit.habclient.command.OpenHABWidgetCommandType;
+import com.zenit.habclient.command.WidgetPhraseMatchResult;
+import com.zenit.habclient.util.RegExResult;
 
+import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
@@ -29,6 +32,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     protected OpenHABWidgetProvider mOpenHABWidgetProvider;
     protected RoomFlipper mRoomFlipper;
     protected TextToSpeechProvider mTextToSpeechProvider;
+    protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
+    protected Map<String, List<OpenHABItemType>> mItemTypeTagMapping = new HashMap<String, List<OpenHABItemType>>();
 
     @Override
     public TextToSpeechProvider getTextToSpeechProvider() {
@@ -63,6 +68,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
+
+        initializeWidgetTypeTagMapping();
     }
 
     @Override
@@ -116,13 +123,20 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     @Override
-    public CommandAnalyzerResult analyzeCommand(ArrayList<String> speechResult, ApplicationMode applicationMode) {
+    public CommandAnalyzerResult analyzeCommand(ArrayList<String> commandPhrases, ApplicationMode applicationMode, Context context) {
         CommandAnalyzerResult result = null;
 
-        List<Room> roomList = getRoomsFromPhrases(speechResult, applicationMode);
-        List<OpenHABWidget> unitList = getUnitsFromPhrases(speechResult, roomList);
+        List<CommandPhraseMatchResult> commandMatchResultList = getCommandsFromPhrases(commandPhrases, context);
+        Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> unitMatchResult = getHighestWidgetsFromCommandMatchResult(commandMatchResultList);
+
+        //TODO - Implement call to method that parses value tag data
+        //result.setMatchPoint();
+        List<Room> roomList = getRoomsFromPhrases(commandPhrases, applicationMode);
+        List<OpenHABWidget> unitList = getUnitsFromPhrases(commandPhrases, roomList);
 
         return result;
+
+        //For execution example see: OpenHABWidgetControl.sendItemCommand(OpenHABItem item, String command)
     }
 
     protected Map<String, Room> getMapOfRoomNamesFromProvider() {
@@ -218,6 +232,33 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return resultList;
     }
 
+    protected List<OpenHABWidget> getUnitsFromPhrases2(List<String> commandPhrases, List<Room> listOfRooms, HABApplication habApplication) {
+        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
+
+        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
+        widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+        Iterator<OpenHABWidget> iterator = widgetList.iterator();
+        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
+        while (iterator.hasNext()) {
+            OpenHABWidget nextWidget = iterator.next();
+            widgetNameMap.put(getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
+        }
+
+        //Look for match
+        for(String match : commandPhrases.toArray(new String[0])) {
+            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
+                if (match.toUpperCase().contains(unitName)) {
+                    //Got a unit match.
+                    OpenHABWidget foundWidget = widgetNameMap.get(unitName);
+                    resultList.add(foundWidget);
+                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
+                }
+            }
+        }
+
+        return resultList;
+    }
+
     protected String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
         return replaceSubStrings(openHABWidgetLabel, "[", "]", "");
     }
@@ -281,7 +322,95 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return  commandPhraseMatchResultList;
     }
 
-//    public String getValue
+    public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
+        //TODO - Compare the tag type with item and widget type. No tag<->type match = No unit result.
+
+        Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> resultMap = new HashMap<CommandPhraseMatchResult, WidgetPhraseMatchResult>();
+
+        Iterator<CommandPhraseMatchResult> iterator = listOfCommandResult.iterator();
+        while(iterator.hasNext()) {
+            CommandPhraseMatchResult commandPhraseMatchResult = iterator.next();
+            WidgetPhraseMatchResult widgetMatch = getMostProbableWidgetFromCommandMatchResult(commandPhraseMatchResult);
+            //TODO - Implement call to method that compares the tag type with item and widget type. No tag<->type match = No unit result
+            String[] valueTags = getValueTagType(commandPhraseMatchResult);
+            if(valueTags.length > 1)
+                Log.w(HABApplication.getLogTag(), "Command phrase contains more than one value tag: " + valueTags.length);
+
+            if((valueTags.length > 0 && doesTagTypeMatchWidgetType(valueTags[0], widgetMatch.getWidget())) || valueTags.length == 0)
+                resultMap.put(commandPhraseMatchResult, widgetMatch);
+        }
+
+        return resultMap;
+    }
+
+    protected String[] getValueTagType(CommandPhraseMatchResult commandPhraseMatchResult) {
+        List<String> tagList = new ArrayList<String>();
+        for(String tag : commandPhraseMatchResult.getTags()) {
+            if(!tag.equalsIgnoreCase("<unit>"))
+                tagList.add(tag);
+        }
+
+        return tagList.toArray(new String[0]);
+    }
+
+    public boolean doesTagTypeMatchWidgetType(String tag, OpenHABWidget widget) {
+        //TODO - What about if the tag is missing in the Map members? -> Third return value type.
+        if(widget.hasItem() && mItemTypeTagMapping.containsKey(tag))
+            return mItemTypeTagMapping.get(tag).contains(widget.getItem().getType());
+        else if(mWidgetTypeTagMapping.containsKey(tag))
+            return mWidgetTypeTagMapping.get(tag).contains(widget.getType());
+        return true;
+    }
+
+    public Map<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>> getAllWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
+        Map<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>> resultMap = new HashMap<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>>();
+
+        Iterator<CommandPhraseMatchResult> iterator = listOfCommandResult.iterator();
+        while(iterator.hasNext()) {
+            CommandPhraseMatchResult commandPhraseMatchResult = iterator.next();
+            resultMap.put(commandPhraseMatchResult, getWidgetsFromCommandMatchResult(commandPhraseMatchResult));
+        }
+
+        return resultMap;
+    }
+
+    public List<WidgetPhraseMatchResult> getWidgetsFromCommandMatchResult(CommandPhraseMatchResult commandPhraseMatchResult) {
+        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
+        String unitTagPhrase = getUnitPhrase(commandPhraseMatchResult);
+
+        //Add all found widgets no matter their match points.
+        return HABApplication.getOpenHABWidgetProvider().getWidgetByLabel(unitTagPhrase, this);
+    }
+
+    public WidgetPhraseMatchResult getMostProbableWidgetFromCommandMatchResult(CommandPhraseMatchResult commandPhraseMatchResult) {
+        String unitTagPhrase = getUnitPhrase(commandPhraseMatchResult);
+
+        //Only add the widget with the highest match point to the resulting list.
+        int matchPoint = 0;
+        WidgetPhraseMatchResult widgetMatch = null;
+        WidgetPhraseMatchResult matchResult = null;
+        List<WidgetPhraseMatchResult> widgetList = HABApplication.getOpenHABWidgetProvider().getWidgetByLabel(unitTagPhrase, this);
+        Iterator<WidgetPhraseMatchResult> widgetResultIterator = widgetList.iterator();
+        while(widgetResultIterator.hasNext()) {
+            matchResult = widgetResultIterator.next();
+            if (matchResult.getMatchPercent() > matchPoint) {
+                matchPoint = matchResult.getMatchPercent();
+                widgetMatch = new WidgetPhraseMatchResult(matchPoint, matchResult.getWidget());
+            }
+        }
+        return widgetMatch;
+    }
+
+    public String getUnitPhrase(CommandPhraseMatchResult commandPhraseMatchResult) {
+        String unitTagPhrase = null;
+        for(int i = 0; i < commandPhraseMatchResult.getTags().length; i++) {
+            if(commandPhraseMatchResult.getTags()[i].equalsIgnoreCase("<unit>")) {
+                unitTagPhrase = commandPhraseMatchResult.getTagPhrases()[i];
+                break;
+            }
+        }
+        return unitTagPhrase;
+    }
 
     protected String getRegExMatch(String source, Pattern pattern) {
         String result = "";
@@ -292,5 +421,64 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                 result += matcher.group(i) + " ";
         }
         return result.trim();
+    }
+
+    protected void initializeWidgetTypeTagMapping() {
+        List<OpenHABItemType> itemTypes = new ArrayList<OpenHABItemType>();
+        itemTypes.add(OpenHABItemType.Dimmer);
+        itemTypes.add(OpenHABItemType.Number);
+        mItemTypeTagMapping.put("<integer>", itemTypes);
+
+        itemTypes.clear();
+        itemTypes.add(OpenHABItemType.Number);
+        mItemTypeTagMapping.put("<decimal>", itemTypes);
+
+        itemTypes.clear();
+        itemTypes.add(OpenHABItemType.Color);
+        mItemTypeTagMapping.put("<color>", itemTypes);
+
+        itemTypes.clear();
+        itemTypes.add(OpenHABItemType.String);
+        mItemTypeTagMapping.put("<text>", itemTypes);
+    }
+
+    public String getRegExStringForMatchAccuracySource(String[] source) {
+        StringBuilder sb = new StringBuilder();
+        for(String partOfLabel : source)
+            sb.append((sb.length() > 1? "|" : "") + "(" + partOfLabel.toUpperCase() + ")");
+
+        return sb.toString();
+    }
+
+    public double getStringMatchAccuracy(String source, List<String> sourceWordsList, String regEx, String target) {
+        double wordCountAccuracy = 0;
+        double orderAccuracy = 0;
+        double lengthDifferenceAccuracy = 0;
+        int totalMatchLength = 0;
+
+        target = target.toUpperCase();
+        RegExResult regExResult = HABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target);
+        wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
+        int lastListMatchIndex = -1;
+        for (int i = 0; i < regExResult.GroupList.size(); i++) {
+            totalMatchLength += regExResult.GroupList.get(i).length() + 1;
+            int listMatchIndex = sourceWordsList.indexOf(regExResult.GroupList.get(i));
+            if (listMatchIndex > lastListMatchIndex) {
+                lastListMatchIndex = listMatchIndex;
+                orderAccuracy++;
+                continue;
+            }
+        }
+        if (orderAccuracy > 0)
+            orderAccuracy = orderAccuracy / sourceWordsList.size();
+
+        totalMatchLength -= 1;
+        lengthDifferenceAccuracy = Math.abs(totalMatchLength - target.length());
+        if(lengthDifferenceAccuracy >= 0)
+            lengthDifferenceAccuracy = 1 - (lengthDifferenceAccuracy * 0.15);
+        if(lengthDifferenceAccuracy < 0)
+            lengthDifferenceAccuracy = 0;
+
+        return sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / 3 : 0;
     }
 }

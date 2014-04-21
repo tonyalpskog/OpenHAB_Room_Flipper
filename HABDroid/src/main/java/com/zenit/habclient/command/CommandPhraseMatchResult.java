@@ -1,5 +1,7 @@
 package com.zenit.habclient.command;
 
+import com.zenit.habclient.util.StringHandler;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -46,5 +48,9 @@ public class CommandPhraseMatchResult {
 
     public void setPoint(int point) {
         this.point = point;
+    }
+
+    public String toString() {
+        return "[Point=" + getPoint() + ", Type=" + getCommandType().Name + ", Tags=" + StringHandler.getItemArrayAsString(getTags()) + ", Phrases=" + StringHandler.getItemArrayAsString(getTagPhrases()) + "]";
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.zenit.habclient.rule.RuleOperationProvider;
+import com.zenit.habclient.util.RegularExpression;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -26,6 +27,7 @@ public class HABApplication extends Application {
     private TextToSpeechProvider mTextToSpeechProvider = null;
     private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
     private static ICommandAnalyzer mSpeechResultAnalyzer = null;
+    private static RegularExpression mRegularExpression = null;
 
     public ICommandAnalyzer getSpeechResultAnalyzer() {
         if(mSpeechResultAnalyzer == null)
@@ -127,6 +129,13 @@ public class HABApplication extends Application {
             mRuleOperationProvider = new RuleOperationProvider();
 
         return mRuleOperationProvider;
+    }
+
+    public static RegularExpression getRegularExpression() {
+        if(mRegularExpression == null)
+            mRegularExpression = new RegularExpression();
+
+        return mRegularExpression;
     }
 
 }
