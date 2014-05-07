@@ -29,11 +29,21 @@
 
 package org.openhab.habdroid.ui;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.VideoView;
+
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.zenit.habclient.HABApplication;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.habdroid.R;
@@ -58,21 +68,11 @@ import org.openhab.habdroid.ui.widget.OpenHABWebWidget;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
-import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.VideoView;
-
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.zenit.habclient.HABApplication;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class provides openHAB widgets adapter for list view.
@@ -278,7 +278,7 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
 
     @Override
     public String getNewValueAsFullText(String currentFullTextValue, float value) {
-        String textValue = getRegExMatch(currentFullTextValue, Pattern.compile("\\d*\\[.,]?\\d*"));
+        String textValue = getRegExMatch(currentFullTextValue, Pattern.compile("\\d*\\[.,]?\\d*", Pattern.CASE_INSENSITIVE));
         return currentFullTextValue.replaceFirst("\\d*\\[.,]?\\d*", Float.toString(value));
     }
 

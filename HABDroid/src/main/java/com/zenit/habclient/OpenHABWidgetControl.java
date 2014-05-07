@@ -119,7 +119,7 @@ public class OpenHABWidgetControl {
 
     @Deprecated //Use method in OpenHABWidget class.
     private String getShortOpenHABWidgetLabelValue(String openHABWidgetLabel) {
-        return getRegExMatch(openHABWidgetLabel, Pattern.compile("\\[.*\\]"));
+        return getRegExMatch(openHABWidgetLabel, Pattern.compile("\\[.*\\]", Pattern.CASE_INSENSITIVE));
     }
 
     private String getRegExMatch(String source, Pattern pattern) {

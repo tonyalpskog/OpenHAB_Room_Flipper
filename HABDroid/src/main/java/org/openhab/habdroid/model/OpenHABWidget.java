@@ -169,6 +169,14 @@ public class OpenHABWidget {
 	public ArrayList<OpenHABWidget> getChildren() {
 		return this.children;
 	}
+
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    public OpenHABWidget getParent() {
+        return parent;
+    }
 	
 	public boolean hasItem() {
 		if (this.getItem() != null) {
@@ -416,7 +424,7 @@ public class OpenHABWidget {
     }
 
     public String toString() {
-        return String.format("(%s) %s", getType() != null? getType().name() : "NULL", getLabel());/*getLabel();*/
+        return String.format("(%s) %s::%s", getType() != null? getType().name() : "NULL", getId(), getLabel());/*getLabel();*/
     }
 
     public String getItemName() {
@@ -424,7 +432,10 @@ public class OpenHABWidget {
     }
 
     public String getLabelValue() {
-        return getRegExMatch(getLabel(), Pattern.compile("\\[.*\\]"));
+        String result = getRegExMatch(getLabel(), Pattern.compile("\\[.*\\]", Pattern.CASE_INSENSITIVE));
+        if(result.isEmpty())
+            result = getItem().getState();
+        return result;
     }
 
     private String getRegExMatch(String source, Pattern pattern) {

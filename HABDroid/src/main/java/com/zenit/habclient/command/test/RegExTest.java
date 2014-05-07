@@ -21,11 +21,17 @@ public class RegExTest extends InstrumentationTestCase {
 //        assertEquals(true, Matcher.);
 //        assertEquals("Found group = '" + Matcher.group() + "'", 4, Matcher.groupCount());
 //        assertEquals("HEJ HOPP ALLIHOPA", Matcher.group(0));
-        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList("(HEJ|HOPP|ALLIHOPA)", "sds HEJdf HOPP PÅ ALLIHOPA HEJ");
+        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList("(HEJ|HOPP|ALLIHOPA)", "sds HEJdf HOPP PÅ ALLIHOPA HEJ", true);
         assertEquals(4, regExResult.GroupList.size());
         assertEquals("HEJ", regExResult.GroupList.get(0));
         assertEquals("HOPP", regExResult.GroupList.get(1));
         assertEquals("ALLIHOPA", regExResult.GroupList.get(2));
         assertEquals("HEJ", regExResult.GroupList.get(3));
+    }
+
+    public void test_getAllNextMatchAsList2() {
+        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList("hello there (.+)!", "hello there <INTEGER>!", true);
+        assertEquals(1, regExResult.GroupList.size());
+        assertEquals("<INTEGER>", regExResult.GroupList.get(0));
     }
 }

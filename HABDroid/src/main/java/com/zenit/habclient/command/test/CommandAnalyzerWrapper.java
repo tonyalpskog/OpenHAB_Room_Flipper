@@ -1,5 +1,7 @@
 package com.zenit.habclient.command.test;
 
+import android.content.Context;
+
 import com.zenit.habclient.ApplicationMode;
 import com.zenit.habclient.CommandAnalyzer;
 import com.zenit.habclient.HABApplication;
@@ -20,8 +22,8 @@ import java.util.regex.Pattern;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
-    public CommandAnalyzerWrapper(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider) {
-        super(roomProvider, openHABWidgetProvider);
+    public CommandAnalyzerWrapper(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context) {
+        super(roomProvider, openHABWidgetProvider, context);
     }
 
     public Map<String, Room> getMapOfRoomNamesFromProvider() {
@@ -111,11 +113,6 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 
     public String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
         return super.getPopularNameFromWidgetLabel(openHABWidgetLabel);
-    }
-
-    @Override
-    public String replaceSubStrings(String source, String beginIncluded, String endIncluded, String replacement) {
-        return super.replaceSubStrings(source, beginIncluded, endIncluded, replacement);
     }
 
     @Override

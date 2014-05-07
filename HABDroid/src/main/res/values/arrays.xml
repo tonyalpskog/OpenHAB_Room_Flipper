@@ -103,6 +103,20 @@
         <item>&lt;unit&gt; &lt;color&gt;</item>
     </string-array>
 
+    <string-array name="command_colors">
+        <item>blue</item>
+        <item>green</item>
+        <item>red</item>
+        <item>black</item>
+        <item>white</item>
+        <item>yellow</item>
+        <item>brown</item>
+        <item>purple</item>
+        <item>pink</item>
+        <item>gray</item>
+        <item>orange</item>
+    </string-array>
+
     <string-array name="command_phrases_text">
         <item>Set &lt;unit&gt; to &lt;text&gt;</item>
         <item>&lt;unit&gt; &lt;text&gt;</item>

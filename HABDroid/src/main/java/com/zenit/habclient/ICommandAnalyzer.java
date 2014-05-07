@@ -5,6 +5,7 @@ import android.content.Context;
 import com.zenit.habclient.command.CommandAnalyzerResult;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -26,5 +27,5 @@ public interface ICommandAnalyzer {
 
     SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode);
 
-    CommandAnalyzerResult analyzeCommand(ArrayList<String> speechResult, ApplicationMode applicationMode, Context context);
+    CommandAnalyzerResult analyzeCommand(List<String> speechResult, ApplicationMode applicationMode, Context context);
 }

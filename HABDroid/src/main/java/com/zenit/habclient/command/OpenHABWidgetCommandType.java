@@ -15,7 +15,8 @@ public enum OpenHABWidgetCommandType {
     RollerShutterDown(3, "Roll down", R.array.command_phrases_roller_down, OpenHABWidgetType.RollerShutter),
     RollerShutterUp(4, "Roll up", R.array.command_phrases_roller_up, OpenHABWidgetType.RollerShutter),
     RollerShutterStop(5, "Stop roller", R.array.command_phrases_roller_stop, OpenHABWidgetType.RollerShutter),
-    SliderSetPercentage(6, "Set percentage", R.array.command_phrases_percent, OpenHABWidgetType.Slider);
+    SliderSetPercentage(6, "Set percentage", R.array.command_phrases_percent, OpenHABWidgetType.Slider),
+    AdjustSetpoint(7, "Adjust setpoint", R.array.command_phrases_setpoint, OpenHABWidgetType.Setpoint);
 
 
 //    Switch(4, "Switch", R.layout.openhabwidgetlist_switchitem, R.layout.openhabwidget_control_switchitem, true),

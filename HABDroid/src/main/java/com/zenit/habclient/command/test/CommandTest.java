@@ -3,9 +3,12 @@ package com.zenit.habclient.command.test;
 import com.zenit.habclient.ApplicationMode;
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.Room;
+import com.zenit.habclient.command.CommandAnalyzerResult;
 import com.zenit.habclient.command.CommandPhraseMatchResult;
 import com.zenit.habclient.command.OpenHABWidgetCommandType;
 import com.zenit.habclient.command.WidgetPhraseMatchResult;
+import com.zenit.habclient.util.DecimalHandler;
+import com.zenit.habclient.util.RegExAccuracyResult;
 import com.zenit.habclient.util.RegExResult;
 
 import org.openhab.habdroid.model.OpenHABItemType;
@@ -59,7 +62,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         createApplication();
         mHABApplication = getApplication();
 
-        mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(), mHABApplication.getOpenHABWidgetProvider());
+        mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(), mHABApplication.getOpenHABWidgetProvider(), mContext);
         //mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
 
         loadHttpDataFromString();
@@ -398,7 +401,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     public void testGetWidgetByLabel() {
         List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel("TERRACE DOOR", mCommandAnalyzer);
-        assertEquals(getAllStringItemsInOneString(resultList), 2, resultList.size());
+        assertEquals(getAllStringItemsInOneString(resultList), 3, resultList.size());
         assertEquals(100, resultList.get(0).getMatchPercent());
         assertEquals("GF_Living_4", resultList.get(0).getWidget().getId());
     }
@@ -514,97 +517,165 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     }
 
-    public void testGetCommandAndUnit() {
+    public void testThatCommandReallyMatch() {
         List<String> commandPhrases = new ArrayList<String>();
-        commandPhrases.add(0, "Get outside temperature");
-        commandPhrases.add(1, "Just some mambo jumbo");
-        commandPhrases.add(2, "Get terrace door status");
-        commandPhrases.add(3, "Switch on kitchen ceiling lights");
-        commandPhrases.add(4, "Get outdoor temperature");
+        commandPhrases.add("Get terrace door status");
+//        commandPhrases.add(0, "Get outside temperature");//0
+//        commandPhrases.add(1, "Just some mambo jumbo");
+//        commandPhrases.add(2, "Get terrace door status");//4
+//        commandPhrases.add(3, "Switch on kitchen ceiling lights");//6
+//        commandPhrases.add(4, "Get outdoor temperature");//8
+//        commandPhrases.add(5, "Set widget temperature to 15.0");//11
 
         List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
 
-        assertEquals(5, commandMatchResultList.size());
+        assertEquals(2, commandMatchResultList.size());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(0).getCommandType());
+    }
+
+    public void test_getCommandValue() {
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add("Set widget temperature to 15.0");
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+        assertEquals(2, commandMatchResultList.size());
+        assertEquals("15.0", mCommandAnalyzer.getCommandValue(commandMatchResultList.get(0)));
+    }
+
+    public void test_getCommandReply() {
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add("Get outside temperature");
+        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mHABApplication.getAppMode(), mContext);
+        assertEquals("Outside Temperature is 10.0 °C", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
+
+        commandPhrases.clear();
+        commandPhrases.add("Set toilet temperature to 15.0");
+        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mHABApplication.getAppMode(), mContext);
+        assertEquals("Toilet Temperature was set to 15.0", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
+    }
+
+    public void testGetCommandAndUnit() {
+        List<String> commandPhrases = new ArrayList<String>();
+        commandPhrases.add(0, "Get outside temperature");//0
+        commandPhrases.add(1, "Just some mambo jumbo");
+        commandPhrases.add(2, "Get terrace door status");//4
+        commandPhrases.add(3, "Switch on kitchen ceiling lights");//6
+        commandPhrases.add(4, "Get outdoor temperature");//8
+        commandPhrases.add(5, "Set widget temperature to 15.0");//11
+
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+
+        assertEquals(7, commandMatchResultList.size());
         assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(0).getCommandType());
         assertEquals(OpenHABWidgetCommandType.SwitchOn, commandMatchResultList.get(1).getCommandType());
-        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(2).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.AdjustSetpoint, commandMatchResultList.get(2).getCommandType());
         assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(3).getCommandType());
         assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(4).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(5).getCommandType());
+        assertEquals(OpenHABWidgetCommandType.AdjustSetpoint, commandMatchResultList.get(6).getCommandType());
 
         assertEquals("Points = 2   Tags: <UNIT>,    Phrases: 'TERRACE DOOR', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(0)));
         assertEquals("Points = 2   Tags: <UNIT>,    Phrases: 'KITCHEN CEILING LIGHTS', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(1)));
-        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTSIDE TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(2)));
-        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'TERRACE DOOR STATUS', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(3)));
-        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTDOOR TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(4)));
+        assertEquals("Points = 2   Tags: <UNIT>, <DECIMAL>,    Phrases: 'WIDGET TEMPERATURE', '15.0', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(2)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTSIDE TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(3)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'TERRACE DOOR STATUS', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(4)));
+        assertEquals("Points = 1   Tags: <UNIT>,    Phrases: 'OUTDOOR TEMPERATURE', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(5)));
+        assertEquals("Points = 1   Tags: <UNIT>, <DECIMAL>,    Phrases: 'SET WIDGET TEMPERATURE TO', '15.0', ", getCommandPhraseMatchResultStringData(commandMatchResultList.get(6)));
 
         Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> unitMatchResult = mCommandAnalyzer.getHighestWidgetsFromCommandMatchResult(commandMatchResultList);
 
-        assertEquals(5, unitMatchResult.size());
+        assertEquals(6, unitMatchResult.size());
 
         assertEquals(100, unitMatchResult.get(commandMatchResultList.get(0)).getMatchPercent());
         assertEquals("GF_Living_4", unitMatchResult.get(commandMatchResultList.get(0)).getWidget().getId());
 
-        assertEquals(true, unitMatchResult.get(commandMatchResultList.get(1)) == null);
+        assertEquals(76, unitMatchResult.get(commandMatchResultList.get(1)).getMatchPercent());
+        assertEquals("GF_Kitchen_0", unitMatchResult.get(commandMatchResultList.get(1)).getWidget().getId());
 
-        assertEquals(100, unitMatchResult.get(commandMatchResultList.get(2)).getMatchPercent());
-        assertEquals("demo_1_0", unitMatchResult.get(commandMatchResultList.get(2)).getWidget().getId());
+        assertEquals(91, unitMatchResult.get(commandMatchResultList.get(2)).getMatchPercent());
+        assertEquals("0301_1_0_1_2", unitMatchResult.get(commandMatchResultList.get(2)).getWidget().getId());
 
-        assertEquals(55, unitMatchResult.get(commandMatchResultList.get(3)).getMatchPercent());
-        assertEquals("GF_Living_4", unitMatchResult.get(commandMatchResultList.get(3)).getWidget().getId());
+        assertEquals(100, unitMatchResult.get(commandMatchResultList.get(3)).getMatchPercent());
+        assertEquals("demo_1_0", unitMatchResult.get(commandMatchResultList.get(3)).getWidget().getId());
 
-        assertEquals("Item: " + commandMatchResultList.get(4).toString() + "\nList: " + getAllStringItemsInOneString(commandMatchResultList), true, unitMatchResult.get(commandMatchResultList.get(4)) == null);
+        assertEquals(77, unitMatchResult.get(commandMatchResultList.get(4)).getMatchPercent());
+        assertEquals("GF_Living_4", unitMatchResult.get(commandMatchResultList.get(4)).getWidget().getId());
+
+        //commandMatchResultList.get(5) ==> Widget = NULL ????
+
+        assertEquals("Item: " + commandMatchResultList.get(5).toString() + "\nList: " + getAllStringItemsInOneString(commandMatchResultList), true, unitMatchResult.get(commandMatchResultList.get(5)) == null);
     }
 
     public void testExecuteCommandAsPhrase() {
         List<String> inputValue = new ArrayList<String>();
+        inputValue.add("Switch on kitchen ceiling lights");
+        ExecuteCommandAsPhrase(inputValue, "KITCHEN CEILING LIGHTS", 1, "GF_Kitchen_0", "Ceiling", OpenHABItemType.Switch, "OFF");
+
+        inputValue.clear();
         inputValue.add("Get terrace door status");
-        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 3, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact, "closed");
 
         inputValue.clear();
         inputValue.add("Get terrace door");
-        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
+        ExecuteCommandAsPhrase(inputValue, "TERRACE DOOR", 3, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact, "closed");
 
         inputValue.clear();
         inputValue.add("Get outside temperature");
-        ExecuteCommandAsPhrase(inputValue, "OUTSIDE TEMPERATURE", 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number);
+        ExecuteCommandAsPhrase(inputValue, "OUTSIDE TEMPERATURE", 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number, "10.0 °C");
+
+        inputValue.clear();
+        inputValue.add("Get temperature outside");
+        ExecuteCommandAsPhrase(inputValue, "TEMPERATURE OUTSIDE", 1, "demo_1_0", "Outside Temperature [10.0 °C]", OpenHABItemType.Number, "10.0 °C");
 
 //        inputValue.clear();
 //        inputValue.add("Switch on kitchen ceiling lights");
 //        ExecuteCommandAsPhrase(inputValue, 2, "GF_Living_4", "Terrace door [closed]", OpenHABItemType.Contact);
     }
 
+    private void ExecuteCommandAsPhrase(List<String> inputValue, String test_UnitToLookFor, int test_NoOfFoundUnitMatches, String test_WidgetID
+            , String test_WholeWidgetLabel, OpenHABItemType test_WidgetItemType, String test_WidgetLabelValue) {
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        assertEquals(test_UnitToLookFor, result.get(0).getTagPhrases()[0]);
+        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
+        assertEquals(getAllStringItemsInOneString(resultList), test_NoOfFoundUnitMatches, resultList.size());
+        assertEquals(test_WidgetID, resultList.get(0).getWidget().getId());
+        assertEquals(test_WholeWidgetLabel, resultList.get(0).getWidget().getLabel());
+        assertEquals(test_WidgetItemType, resultList.get(0).getWidget().getItem().getType());
+        assertEquals(test_WidgetLabelValue, resultList.get(0).getWidget().getLabelValue());
+
+        //OpenHABWidgetArrayAdapter.sendItemCommand(OpenHABItem item, String command)
+    }
+
     public void test_getRegExStringForMatchAccuracySource() {
         String[] input = {"hej", "hopp", "allihopa"};
-        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", mCommandAnalyzer.getRegExStringForMatchAccuracySource(input));
+        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(input));
     }
 
     public void testMatchForGetPatternForMatchAccuracySource() {
         String[] input = {"hej", "hopp", "allihopa"};
-        RegExResult result = mHABApplication.getRegularExpression().getAllNextMatchAsList(mCommandAnalyzer.getRegExStringForMatchAccuracySource(input), "hej hopp allihopa".toUpperCase());
+        RegExResult result = mHABApplication.getRegularExpression().getAllNextMatchAsList(mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(input), "hej hopp allihopa", true);
         assertEquals(3, result.GroupList.size());
-        assertEquals("HEJ", result.GroupList.get(0));
-        assertEquals("HOPP", result.GroupList.get(1));
-        assertEquals("ALLIHOPA", result.GroupList.get(2));
+        assertEquals("hej", result.GroupList.get(0));
+        assertEquals("hopp", result.GroupList.get(1));
+        assertEquals("allihopa", result.GroupList.get(2));
     }
 
     public void testGetStringMatchAccuracy() {
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
-        assertEquals(1d, doTestGetStringMatchAccuracy("hej hopp allihopa", "hej hopp allihopa"));
-        assertEquals(0.56d, Double.valueOf(decimalFormat.format(doTestGetStringMatchAccuracy("hej hopp allihopa", "dfg hopp i hejallihopa då"))));
+        assertEquals(1d, doTestGetStringMatchAccuracy("hej hopp allihopa", "hej hopp allihopa").getAccuracy());
+        assertEquals(0.78d, DecimalHandler.getFixNumberOfDecimals(doTestGetStringMatchAccuracy("hej hopp allihopa", "dfg hopp i hejallihopa då").getAccuracy(), 2));
     }
 
-    public double doTestGetStringMatchAccuracy(String source, String target) {
+    public RegExAccuracyResult doTestGetStringMatchAccuracy(String source, String target) {
         String[] splittedSource = source.split(" ");
         List<String> sourceWordsList = new ArrayList<String>();
         for(String sourceWord : splittedSource)
             sourceWordsList.add(sourceWord.toUpperCase());
 
-        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
-
 //        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
 
-        return mCommandAnalyzer.getStringMatchAccuracy(source, sourceWordsList, regExString, target);
+        return mHABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, target);
     }
 
     public void testSplittedStringAndWordsList2() {
@@ -621,7 +692,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("TERRACE", sourceWordsList.get(0));
         assertEquals("DOOR", sourceWordsList.get(1));
 
-        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
+        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
         assertEquals("(TERRACE)|(DOOR)", regExString);
 
         assertEquals(1d, doGetStringMatchAccuracy2("Terrace door", sourceWordsList, regExString, "Terrace door"));
@@ -636,7 +707,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         target = target.toUpperCase();
         assertEquals("(TERRACE)|(DOOR)", regEx);
         assertEquals("TERRACE DOOR", target);
-        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target);
+        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
         assertEquals(2, sourceWordsList.size());
         assertEquals(2, regExResult.GroupList.size());
         wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
@@ -685,7 +756,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("HOPP", sourceWordsList.get(1));
         assertEquals("ALLIHOPA", sourceWordsList.get(2));
 
-        String regExString = mCommandAnalyzer.getRegExStringForMatchAccuracySource(splittedSource);
+        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
         assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regExString);
 
         assertEquals(1d, doGetStringMatchAccuracy("hej hopp allihopa", sourceWordsList, regExString, "hej hopp allihopa"));
@@ -700,7 +771,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         target = target.toUpperCase();
         assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regEx);
         assertEquals("HEJ HOPP ALLIHOPA", target);
-        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target);
+        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
         assertEquals(3, sourceWordsList.size());
         assertEquals(3, regExResult.GroupList.size());
         wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
@@ -733,90 +804,170 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         return sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / sourceWordsList.size() : 0;
     }
 
-    private void ExecuteCommandAsPhrase(List<String> inputValue, String unitToMatch, int resultingUnitMatches, String resultingWidgetID, String resultingValue, OpenHABItemType resultingItemType) {
-        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
-        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
-        assertEquals(unitToMatch, result.get(0).getTagPhrases()[0]);
-        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
-        assertEquals(getAllStringItemsInOneString(resultList), resultingUnitMatches, resultList.size());
-        assertEquals(resultingWidgetID, resultList.get(0).getWidget().getId());
-        assertEquals(resultingValue, resultList.get(0).getWidget().getLabel());
-        assertEquals(resultingItemType, resultList.get(0).getWidget().getItem().getType());
-    }
-
-    public void test_replaceSubStrings() {
-        String result2 = mCommandAnalyzer.replaceSubStrings("Switch on <unit>", "<", ">", "(.+)");
-        assertEquals("Switch on (.+)", result2);
-
-        String result = mCommandAnalyzer.replaceSubStrings("One <two> three <four> five", "<", ">", "(.+)");
-        assertEquals("One (.+) three (.+) five", result);
-
-        assertEquals("kitchen ceiling lights", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("Switch on (.+)")));
-
-        assertEquals("Switch", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("(.+) on")));
-    }
-
     public void test_getRegExMatch() {
-        String result2 = mCommandAnalyzer.getRegExMatch("Switch on <unit>".toUpperCase(), Pattern.compile("Switch on (.+)".toUpperCase()));
+        assertEquals("kitchen ceiling lights", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("Switch on (.+)", Pattern.CASE_INSENSITIVE)));
+
+        assertEquals("Switch", mCommandAnalyzer.getRegExMatch("Switch on kitchen ceiling lights", Pattern.compile("(.+) on", Pattern.CASE_INSENSITIVE)));
+
+        String result2 = mCommandAnalyzer.getRegExMatch("Switch on <unit>".toUpperCase(), Pattern.compile("Switch on (.+)".toUpperCase(), Pattern.CASE_INSENSITIVE));
         assertEquals("<UNIT>", result2);
 
-        String result = mCommandAnalyzer.getRegExMatch("One <two> three <four> five", Pattern.compile("One (.+) three (.+) five"));
+        String result = mCommandAnalyzer.getRegExMatch("One <two> three <four> five", Pattern.compile("One (.+) three (.+) five", Pattern.CASE_INSENSITIVE));
         assertEquals("<two> <four>", result);
     }
 
     public void test_RegExMatch() {
-        Matcher matcher = Pattern.compile("One (.+) three (.+) five").matcher("One <two> three <four> five");
+        Matcher matcher = Pattern.compile("One (.+) three (.+) five", Pattern.CASE_INSENSITIVE).matcher("One <two> three <four> five");
         assertTrue(matcher.find());
         assertEquals(2, matcher.groupCount());
         assertEquals("<two>", matcher.group(1));
         assertEquals("<four>", matcher.group(2));
 
-        matcher = Pattern.compile("Switch on (.+)").matcher("Switch on kitchen ceiling lights");
+        matcher = Pattern.compile("Switch on (.+)", Pattern.CASE_INSENSITIVE).matcher("Switch on kitchen ceiling lights");
         assertTrue(matcher.find());
         assertEquals(1, matcher.groupCount());
         assertEquals("kitchen ceiling lights", matcher.group(1));
 
-        matcher = Pattern.compile("(.+) on").matcher("Switch on kitchen ceiling lights");
+        matcher = Pattern.compile("(.+) on", Pattern.CASE_INSENSITIVE).matcher("Switch on kitchen ceiling lights");
         assertTrue(matcher.find());
         assertEquals(1, matcher.groupCount());
         assertEquals("Switch", matcher.group(1));
+
+        matcher = Pattern.compile("GET (.+) STATUS", Pattern.CASE_INSENSITIVE).matcher("GET TERRACE DOOR STATUS");
+        assertTrue(matcher.find());
+        assertEquals(1, matcher.groupCount());
+        assertEquals("TERRACE DOOR", matcher.group(1));
+
+        matcher = Pattern.compile("\\AGET (.+)\\z", Pattern.CASE_INSENSITIVE).matcher("SET WIDGET TEMPERATURE TO 15.0");
+        assertFalse(matcher.find());
+
+        matcher = Pattern.compile("\\A(.+) ([0-9.,]+)\\z", Pattern.CASE_INSENSITIVE).matcher("SET WIDGET TEMPERATURE TO 15.0");
+        assertTrue(matcher.find());
+        assertEquals(2, matcher.groupCount());
+        assertEquals("SET WIDGET TEMPERATURE TO", matcher.group(1));
+        assertEquals("15.0", matcher.group(2));
     }
 
-    public void testLocal_getCommandsFromPhrases() {
-        getCommandsFromPhrases("Switch on kitchen ceiling lights");
-    }
+//    public void testLocal_getCommandsFromPhrases() {
+//        getCommandsFromPhrases("Switch on kitchen ceiling lights");
+//    }
+//
+//    private void getCommandsFromPhrases(String input) {
+//        List<String> commandPhrases = new ArrayList<String>();
+//        commandPhrases.add(input);
+//        Map<String, OpenHABWidgetCommandType> resultingMap = new HashMap<String, OpenHABWidgetCommandType>();
+//        StringBuffer sbAllArrayStrings = new StringBuffer();
+//        StringBuffer sbAllMatch = new StringBuffer();
+//        for(String phrase : commandPhrases.toArray(new String[0])) {
+//            phrase = phrase.toUpperCase();
+//            assertEquals(input.toUpperCase(), phrase);
+//            for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
+//                for(String commandAsText : commandType.getTextCommands(mContext)) {
+//                    commandAsText = commandAsText.toUpperCase();
+//                    sbAllArrayStrings.append((sbAllArrayStrings.length() > 0? ", " : "") + "'" + commandAsText + "'");
+//                    String regexCommand = mCommandAnalyzer.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
+//                    Pattern pattern = Pattern.compile(regexCommand, Pattern.CASE_INSENSITIVE);
+//                    if(pattern.matcher(phrase).find()) {
+//                        sbAllMatch.append((sbAllMatch.length() > 0? ", " : "") + "regex = '" + regexCommand + "' -> result = '" + mCommandAnalyzer.getRegExMatch(phrase, pattern) + "'");
+//                        resultingMap.put(mCommandAnalyzer.getRegExMatch(phrase, pattern), commandType);
+//                    }
+//                }
+//            }
+//        }
+//        String expectedSbResult = "'Get <unit>', 'Get <unit> status', 'Turn on <unit>', 'Switch on <unit>', '<unit> on', 'Turn off <unit>'"
+//                + ", 'Switch off <unit>', '<unit> off', 'Roll down <unit>', 'Expand <unit>', 'Unfold <unit>', 'Lower <unit>', '<unit> down'"
+//                + ", 'Roll up <unit>', 'Fold <unit>', 'Raise <unit>', '<unit> up', 'Stop roller <unit>', '<unit> stop'"
+//                + ", 'Set <unit> to <integer> percent', '<unit> <integer> percent', 'set <unit> to <decimal>', '<unit> <decimal>'";
+//
+//        assertEquals(expectedSbResult.toUpperCase(), sbAllArrayStrings.toString());
+//        assertEquals("regex = 'SWITCH ON (.+)\\z' -> result = 'KITCHEN CEILING LIGHTS'", sbAllMatch.toString());
+//    }
 
-    private void getCommandsFromPhrases(String input) {
-        List<String> commandPhrases = new ArrayList<String>();
-        commandPhrases.add(input);
-        Map<String, OpenHABWidgetCommandType> resultingMap = new HashMap<String, OpenHABWidgetCommandType>();
-        StringBuffer sbAllArrayStrings = new StringBuffer();
-        StringBuffer sbAllMatch = new StringBuffer();
-        for(String phrase : commandPhrases.toArray(new String[0])) {
-            phrase = phrase.toUpperCase();
-            assertEquals(input.toUpperCase(), phrase);
-            for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
-                for(String commandAsText : commandType.getTextCommands(mContext)) {
-                    commandAsText = commandAsText.toUpperCase();
-                    sbAllArrayStrings.append((sbAllArrayStrings.length() > 0? ", " : "") + "'" + commandAsText + "'");
-                    String regexCommand = mCommandAnalyzer.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
-                    Pattern pattern = Pattern.compile(regexCommand);
-                    if(pattern.matcher(phrase).find()) {
-                        sbAllMatch.append((sbAllMatch.length() > 0? ", " : "") + "regex = '" + regexCommand + "' -> result = '" + mCommandAnalyzer.getRegExMatch(phrase, pattern) + "'");
-                        resultingMap.put(mCommandAnalyzer.getRegExMatch(phrase, pattern), commandType);
-                    }
-                }
+    public void testGetWidgetParentWithAccuracy() {
+        //"Switch on kitchen ceiling lights" => "KITCHEN CEILING LIGHTS" => "KITCHEN LIGHTS"
+        OpenHABWidget resultingParentWidget = null;
+
+        String[] splittedSource = "KITCHEN LIGHTS".split(" ");
+        List<String> sourceWordsList = new ArrayList<String>();
+        for(String sourceWord : splittedSource)
+            sourceWordsList.add(sourceWord.toUpperCase());
+
+        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
+        assertEquals("(KITCHEN)|(LIGHTS)", regExString);
+        double maxResult = 0;
+        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
+        while(unit.hasParent()) {
+            unit = unit.getParent();
+            if(!unit.hasLinkedPage())
+                continue;
+            String linkTitle = unit.getLinkedPage().getTitle();
+//            double result = mCommandAnalyzer.getStringMatchAccuracy(sourceWordsList, regExString, linkTitle);
+            double result = doGetStringMatchAccuracy(sourceWordsList, regExString, linkTitle);
+            if (result > maxResult) {
+                maxResult = result;
+                resultingParentWidget = unit;
             }
         }
-        String expectedSbResult = "'Get <unit>', 'Get <unit> status', 'Turn on <unit>', 'Switch on <unit>', '<unit> on', 'Turn off <unit>'"
-                + ", 'Switch off <unit>', '<unit> off', 'Roll down <unit>', 'Expand <unit>', 'Unfold <unit>', 'Lower <unit>', '<unit> down'"
-                + ", 'Roll up <unit>', 'Fold <unit>', 'Raise <unit>', '<unit> up', 'Stop roller <unit>', '<unit> stop'"
-                + ", 'Set <unit> to <integer> percent', '<unit> <integer> percent'";
-
-        assertEquals(expectedSbResult.toUpperCase(), sbAllArrayStrings.toString());
-        assertEquals("regex = 'SWITCH ON (.+)\\z' -> result = 'KITCHEN CEILING LIGHTS'", sbAllMatch.toString());
+        assertTrue(resultingParentWidget != null);
+        assertEquals("Kitchen", resultingParentWidget.getLinkedPage().getTitle());
+        assertEquals("GF_Kitchen", resultingParentWidget.getLinkedPage().getId());
+        assertEquals("Kitchen", resultingParentWidget.getLabel());
+        assertEquals("0001_1",  resultingParentWidget.getId());
+        assertEquals(0.67, DecimalHandler.getFixNumberOfDecimals(maxResult, 2));
     }
 
+    private double doGetStringMatchAccuracy(List<String> sourceWordsList, String regEx, String target) {
+        double wordCountAccuracy = 0;
+        double orderAccuracy = 0;
+        double lengthDifferenceAccuracy = 0;
+        int totalMatchLength = 0;
+
+        target = target.toUpperCase();
+        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
+        if (target.equalsIgnoreCase("Kitchen"))
+            assertEquals(1, regExResult.GroupList.size());
+        assertEquals(2, sourceWordsList.size());
+        wordCountAccuracy = Double.valueOf(regExResult.GroupList.size()) / Double.valueOf(sourceWordsList.size());
+        if (target.equalsIgnoreCase("Kitchen"))
+            assertEquals(0.5, wordCountAccuracy);
+        int lastListMatchIndex = -1;
+        for (int i = 0; i < regExResult.GroupList.size(); i++) {
+            totalMatchLength += regExResult.GroupList.get(i).length() + 1;
+            int listMatchIndex = sourceWordsList.indexOf(regExResult.GroupList.get(i));
+            if (listMatchIndex > lastListMatchIndex) {
+                lastListMatchIndex = listMatchIndex;
+                orderAccuracy++;
+                continue;
+            }
+        }
+        if (orderAccuracy > 0)
+            orderAccuracy = orderAccuracy / sourceWordsList.size();
+
+        totalMatchLength -= 1;
+//        lengthDifferenceAccuracy = Math.abs(totalMatchLength - target.length());
+//        if(lengthDifferenceAccuracy >= 0)
+//            lengthDifferenceAccuracy = 1 - (lengthDifferenceAccuracy * 0.15);
+        if (target.length() > 0)
+            lengthDifferenceAccuracy = totalMatchLength > target.length() ? target.length() / totalMatchLength : totalMatchLength / target.length();
+        if (lengthDifferenceAccuracy < 0)
+            lengthDifferenceAccuracy = 0;
+
+        if (target.equalsIgnoreCase("Kitchen")) {
+            assertEquals(0.5, orderAccuracy);
+            assertEquals(1.0, lengthDifferenceAccuracy);
+        }
+
+        return sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / 3 : 0;
+    }
+
+    public void test_replaceCommandTagsWithRegEx() {
+        assertEquals("\\Ahello there ([0-9]+)\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("hello there <INTEGER>"));
+        assertEquals("\\AHow ([0-9.,]+) are you\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("How <DECIMAL> are you"));
+        assertEquals("\\APlease (.+) me\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("Please <text> me"));
+        assertEquals("\\A(.+) delta force\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("<UNIT> delta force"));
+        assertEquals("\\A(.+) ([0-9]+)\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("<selection> <integer>"));
+        assertEquals("\\Awhat is your (blue|green|red|black|white|yellow|brown|purple|pink|gray|orange)\\z", mCommandAnalyzer.replaceCommandTagsWithRegEx("what is your <color>"));
+    }
 
 //    private Document mResultingDocument;
 //    private String mResultDescription;

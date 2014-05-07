@@ -3,6 +3,8 @@ package com.zenit.habclient;
 import android.util.Log;
 
 import com.zenit.habclient.command.WidgetPhraseMatchResult;
+import com.zenit.habclient.util.RegExAccuracyResult;
+import com.zenit.habclient.util.StringHandler;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
@@ -155,21 +157,72 @@ public class OpenHABWidgetProvider {
         return resultList;
     }
 
+    private static final double APPROVED_UNIT_ACCURACY_VALUE = 0.75;
+    private static final double DENIED_UNIT_ACCURACY_VALUE = 0.4;
+    private static final double APPROVED_PARENT_ACCURACY_VALUE = 0.6;
+    private static final double COMBINED_ACCURACY_FACTOR = 1.6;
+
     public List<WidgetPhraseMatchResult> getWidgetByLabel(String searchLabel, CommandAnalyzer commandAnalyzer) {
         String[] splittedSearchLabel = searchLabel.split(" ");
         List<String> sourceWordsList = new ArrayList<String>();
         for(String sourceWord : splittedSearchLabel)
             sourceWordsList.add(sourceWord.toUpperCase());
 
-        String regExString = commandAnalyzer.getRegExStringForMatchAccuracySource(splittedSearchLabel);
-
         List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
         for(OpenHABWidget widget : mOpenHABWidgetIdMap.values().toArray(new OpenHABWidget[0])) {
-            double accuracy = commandAnalyzer.getStringMatchAccuracy(searchLabel, sourceWordsList, regExString, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
-            if(accuracy > 0.5)
-                resultList.add(new WidgetPhraseMatchResult(Double.valueOf(accuracy * 100).intValue(), widget));
+            RegExAccuracyResult regExResult = HABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
+            double accuracy = regExResult.getAccuracy();
+            if(accuracy < APPROVED_UNIT_ACCURACY_VALUE && accuracy > DENIED_UNIT_ACCURACY_VALUE) {
+                List<String> sitemapGroupWordList = StringHandler.getStringListDiff(sourceWordsList, regExResult.getMatchingWords());
+                double parentAccuracy = getHighestWidgetParentMatch(widget, sitemapGroupWordList);
+                if(parentAccuracy > APPROVED_PARENT_ACCURACY_VALUE) {
+                    Double combinedAccuracyPercent = Double.valueOf(((accuracy + parentAccuracy) / COMBINED_ACCURACY_FACTOR) * 100);
+                    if(combinedAccuracyPercent > 100)
+                        combinedAccuracyPercent = 100d;
+                    resultList = addWidgetPhraseMatchResultItemToSortedList(resultList, new WidgetPhraseMatchResult(combinedAccuracyPercent.intValue(), widget));
+                }
+            } else if(accuracy >= APPROVED_UNIT_ACCURACY_VALUE) resultList = addWidgetPhraseMatchResultItemToSortedList(resultList, new WidgetPhraseMatchResult(Double.valueOf(accuracy * 100).intValue(), widget));
         }
         return resultList;
+    }
+
+    private List<WidgetPhraseMatchResult> addWidgetPhraseMatchResultItemToSortedList(List<WidgetPhraseMatchResult> list, WidgetPhraseMatchResult itemToAdd) {
+        if(list.size() == 0)
+            list.add(itemToAdd);
+        else {
+            boolean isAdded = false;
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getMatchPercent() < itemToAdd.getMatchPercent()) {
+                    list.add(i, itemToAdd);
+                    isAdded = true;
+                    break;
+                }
+            }
+            if(!isAdded)
+                list.add(list.size(), itemToAdd);
+        }
+        return list;
+    }
+
+    public double getHighestWidgetParentMatch(OpenHABWidget unit, List<String> sourceWordsList) {
+        //"Switch on kitchen ceiling lights" => "KITCHEN CEILING LIGHTS" => "KITCHEN LIGHTS"
+//        OpenHABWidget resultingParentWidget = null;
+
+        double maxResult = 0;
+        while(unit.hasParent()) {
+            unit = unit.getParent();
+            if(!unit.hasLinkedPage())
+                continue;
+            String linkTitle = unit.getLinkedPage().getTitle();
+//            double result = mCommandAnalyzer.getStringMatchAccuracy(sourceWordsList, regExString, linkTitle);
+            double result = HABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, linkTitle).getAccuracy();
+            if (result > maxResult) {
+                maxResult = result;
+//                resultingParentWidget = unit;
+            }
+        }
+
+        return maxResult;
     }
 
     public OpenHABWidget getWidgetByID(String widgetID) {

@@ -6,18 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.preview.support.v4.app.NotificationManagerCompat;
 import android.preview.support.wearable.notifications.RemoteInput;
 import android.preview.support.wearable.notifications.WearableNotifications;
 import android.support.v4.app.NotificationCompat;
-import android.widget.TextView;
 
 import com.zenit.habclient.HABApplication;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -89,7 +85,9 @@ public class WearCommandHost {
         if (text != null && !text.equals("")) {
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
-            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
+//            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
+            mApplication.getSpeechResultAnalyzer().analyzeCommand(replyToBeAnalyzed, HABApplication.getAppMode(), mApplication.getApplicationContext());
+
             showNotification();
         }
     }

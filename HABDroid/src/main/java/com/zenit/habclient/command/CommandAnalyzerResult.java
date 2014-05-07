@@ -11,12 +11,14 @@ public class CommandAnalyzerResult {
     protected OpenHABWidget OpenHABWidget;
     protected int matchPoint;
     protected String openHABItemState;
+    protected OpenHABWidgetCommandType commandType;
 
-    public CommandAnalyzerResult(com.zenit.habclient.Room room, org.openhab.habdroid.model.OpenHABWidget openHABWidget, int matchPoint, String openHABItemState) {
+    public CommandAnalyzerResult(com.zenit.habclient.Room room, org.openhab.habdroid.model.OpenHABWidget openHABWidget, int matchPoint, String openHABItemState, OpenHABWidgetCommandType commandType) {
         Room = room;
         OpenHABWidget = openHABWidget;
         this.matchPoint = matchPoint;
         this.openHABItemState = openHABItemState;
+        this.commandType = commandType;
     }
 
     public Room getRoom() {
@@ -47,7 +49,9 @@ public class CommandAnalyzerResult {
         return openHABItemState;
     }
 
-    public void setOpenHABItemState(String openHABItemState) {
-        this.openHABItemState = openHABItemState;
-    }
+    public void setOpenHABItemState(String openHABItemState) { this.openHABItemState = openHABItemState; }
+
+    public OpenHABWidgetCommandType getCommandType() { return commandType; }
+
+    public void setCommandType(OpenHABWidgetCommandType commandType) { this.commandType = commandType; }
 }
