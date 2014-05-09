@@ -126,7 +126,7 @@ public class HABApplication extends Application {
 
     public RuleOperationProvider getRuleOperationProvider() {
         if(mRuleOperationProvider == null)
-            mRuleOperationProvider = new RuleOperationProvider();
+            mRuleOperationProvider = new RuleOperationProvider(this);
 
         return mRuleOperationProvider;
     }

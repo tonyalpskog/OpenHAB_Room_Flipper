@@ -312,7 +312,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
-        pageUrl = "https://demo.openhab.org:8443/rest/sitemaps/demo";
+//        pageUrl = "https://demo.openhab.org:8443/rest/sitemaps/demo";
         Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + pageUrl + "   longPolling = " + longPolling);
         // Cancel any existing http request to openHAB (typically ongoing long poll)
         Header[] headers = {};

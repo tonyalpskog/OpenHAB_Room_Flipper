@@ -21,15 +21,11 @@ import java.util.ArrayList;
 public class WearCommandHost {
     public static final String EXTRA_REPLY = "Command";
     private static final String ACTION_RESPONSE = "com.zenit.android.wearable.openhab.COMMAND";
-    private String mTextToWearable = null;
-    private String mTitleToWearable = null;
     private BroadcastReceiver mReceiver;
     private HABApplication mApplication;
 
     public WearCommandHost(HABApplication application) {
         mApplication = application;
-        mTitleToWearable = "Room navigation";
-        mTextToWearable = "Please, response with the name of a room";
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -48,14 +44,14 @@ public class WearCommandHost {
         mApplication.unregisterReceiver(mReceiver);
     }
 
-    public void startSession() {
-        showNotification();
+    public void startSession(String title, String message) {
+        showNotification(title, message);
     }
 
 //    public void endSession() {
 //    }
 
-    private void showNotification() {
+    private void showNotification(String title, String message) {
         // Create intent for reply action
         Intent intent = new Intent(ACTION_RESPONSE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mApplication, 0, intent,
@@ -63,8 +59,8 @@ public class WearCommandHost {
 
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mApplication.getApplicationContext())
-                .setContentTitle(mTitleToWearable)
-                .setContentText(mTextToWearable)
+                .setContentTitle(title)
+                .setContentText(message)
                 .setContentIntent(pendingIntent);
 //                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.bg_eliza));
 
@@ -88,7 +84,7 @@ public class WearCommandHost {
 //            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
             mApplication.getSpeechResultAnalyzer().analyzeCommand(replyToBeAnalyzed, HABApplication.getAppMode(), mApplication.getApplicationContext());
 
-            showNotification();
+            showNotification("Reply", "Hard coded message");
         }
     }
 }

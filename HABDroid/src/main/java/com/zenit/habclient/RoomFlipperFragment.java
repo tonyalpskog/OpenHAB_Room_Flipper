@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zenit.habclient.wear.WearCommandHost;
 
@@ -130,7 +128,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 return true;
             case R.id.action_start_wear_app:
-                mWearCommandHost.startSession();
+                mWearCommandHost.startSession("Room navigation", "Please, response with the name of a room");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

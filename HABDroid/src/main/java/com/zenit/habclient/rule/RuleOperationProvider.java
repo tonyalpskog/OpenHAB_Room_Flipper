@@ -1,8 +1,9 @@
 package com.zenit.habclient.rule;
 
-import android.util.Log;
+import com.zenit.habclient.HABApplication;
 
-import java.text.ParseException;
+import org.openhab.habdroid.model.OpenHABWidget;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,8 +13,10 @@ import java.util.List;
 public class RuleOperationProvider {
 //    private List<IOperatorValue> mValueTypes;
     public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
+    HABApplication mHABApplication;
 
-    public RuleOperationProvider() {
+    public RuleOperationProvider(HABApplication application) {
+        mHABApplication = application;
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
         createLogicOperators();
     }
@@ -283,5 +286,22 @@ public class RuleOperationProvider {
 //
 //        Date date = new Date();
 //
+    }
+
+    public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
+        HashMap<RuleOperatorType, RuleOperator<?>> result = null;
+
+        RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
+
+        switch(openHABWidget.getItem().getType()) {
+            case Switch:
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Boolean.class);
+                break;
+            case Number:
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Number.class);
+                break;
+        }
+
+        return result;
     }
 }
