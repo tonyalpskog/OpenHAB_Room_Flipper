@@ -2,6 +2,7 @@ package com.zenit.habclient;
 
 import android.util.Log;
 
+import com.zenit.habclient.command.CommandAnalyzer;
 import com.zenit.habclient.command.WidgetPhraseMatchResult;
 import com.zenit.habclient.util.RegExAccuracyResult;
 import com.zenit.habclient.util.StringHandler;

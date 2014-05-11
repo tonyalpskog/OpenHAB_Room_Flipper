@@ -1,16 +1,11 @@
 package com.zenit.habclient.rule;
 
-import com.zenit.habclient.rule.IUnitEntityDataType;
-import com.zenit.habclient.rule.RuleUnitEntity;
-
-import java.util.List;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class Rule {
-
-    protected RuleUnitEntity mDataSource;
+    private String mName;
+    protected RuleOperation mRuleOperation;
     //protected List<IRuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
 
     public Rule() {
@@ -18,22 +13,24 @@ public class Rule {
     }
 
     public Rule(String name) {
-        mDataSource = new RuleUnitEntity(name);
+        setName(name);
     }
 
-    public RuleUnitEntity getOperation() {
-        return mDataSource;
+    public RuleOperation getRuleOperation() {
+        return mRuleOperation;
     }
 
-    public void setDataSource(RuleUnitEntity dataSource) {
-        mDataSource = dataSource;
+    public void setRuleOperation(RuleOperation ruleOperation) {
+        mRuleOperation = ruleOperation;
     }
 
     public String getName() {
-        return mDataSource.getName();
+        return mName;
     }
 
     public void setName(String name) {
-        mDataSource.setName(name);
+        mName = name;
+        if(mRuleOperation != null)
+            mRuleOperation.setName(name);
     }
 }

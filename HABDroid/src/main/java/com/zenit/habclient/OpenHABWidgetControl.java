@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class OpenHABWidgetControl {
     private Context mContext;
 
-    OpenHABWidgetControl(Context context) {
+    public OpenHABWidgetControl(Context context) {
         mContext = context;
         mAsyncHttpClient = new MyAsyncHttpClient(context);
     }

@@ -1,12 +1,18 @@
-package com.zenit.habclient;
+package com.zenit.habclient.command;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.zenit.habclient.command.CommandAnalyzerResult;
-import com.zenit.habclient.command.CommandPhraseMatchResult;
-import com.zenit.habclient.command.OpenHABWidgetCommandType;
-import com.zenit.habclient.command.WidgetPhraseMatchResult;
+import com.zenit.habclient.ApplicationMode;
+import com.zenit.habclient.GraphicUnit;
+import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.OpenHABWidgetControl;
+import com.zenit.habclient.OpenHABWidgetProvider;
+import com.zenit.habclient.Room;
+import com.zenit.habclient.RoomFlipper;
+import com.zenit.habclient.RoomProvider;
+import com.zenit.habclient.SpeechAnalyzerResult;
+import com.zenit.habclient.TextToSpeechProvider;
 import com.zenit.habclient.util.StringHandler;
 
 import org.openhab.habdroid.R;
@@ -322,7 +328,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return resultList;
     }
 
-    protected String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
+    public String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
         return StringHandler.replaceSubStrings(openHABWidgetLabel, "[", "]", "");
     }
 

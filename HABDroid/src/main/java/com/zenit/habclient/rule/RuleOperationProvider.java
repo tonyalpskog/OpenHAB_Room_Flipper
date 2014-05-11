@@ -15,8 +15,13 @@ public class RuleOperationProvider {
     public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
     HABApplication mHABApplication;
 
-    public RuleOperationProvider(HABApplication application) {
-        mHABApplication = application;
+//    public RuleOperationProvider(HABApplication application) {
+//        mHABApplication = application;
+//        mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
+//        createLogicOperators();
+//    }
+//
+    public RuleOperationProvider() {
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
         createLogicOperators();
     }
@@ -291,7 +296,7 @@ public class RuleOperationProvider {
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
         HashMap<RuleOperatorType, RuleOperator<?>> result = null;
 
-        RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
+        RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
 
         switch(openHABWidget.getItem().getType()) {
             case Switch:

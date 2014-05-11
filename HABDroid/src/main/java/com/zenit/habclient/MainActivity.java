@@ -12,6 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
+import com.zenit.habclient.command.CommandAnalyzer;
+import com.zenit.habclient.command.ICommandAnalyzer;
+
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetType;

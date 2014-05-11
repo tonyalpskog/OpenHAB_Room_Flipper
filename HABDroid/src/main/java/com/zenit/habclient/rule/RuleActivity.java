@@ -1,16 +1,13 @@
 package com.zenit.habclient.rule;
 
-import java.util.HashMap;
-import java.util.Locale;
-
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,9 +23,14 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.zenit.habclient.HABApplication;
-import com.zenit.habclient.IRuleActivity;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABWidget;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class RuleActivity extends Activity implements ActionBar.TabListener, IRuleActivity {
 
@@ -252,30 +254,30 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                     // Toast.makeText(getApplicationContext(),
                     // "Group Clicked " + listDataHeader.get(groupPosition),
                     // Toast.LENGTH_SHORT).show();
-                    RuleOperationProvider rop = ((HABApplication)getActivity().getApplication()).getRuleOperationProvider();
-                    HashMap<RuleOperatorType, RuleOperator<Number>> ruleOperators = (HashMap<RuleOperatorType, RuleOperator<Number>>) rop.mOperatorHash.get(Number.class);
-                    RuleOperator<Number> ro =  ruleOperators.get(RuleOperatorType.Equal);
-
-                    Toast.makeText(mContext,
-                    "Integer 10 equals 10 = " + ro.getOperationResult(Integer.valueOf(10), Integer.valueOf(10)),
-                    Toast.LENGTH_LONG).show();
-
-                    ro =  ruleOperators.get(RuleOperatorType.Between);
-                    Toast.makeText(mContext,
-                            "Float 10 between 10 and 13 = " + ro.getOperationResult(Float.valueOf(10), Float.valueOf(10), Float.valueOf(13)),
-                            Toast.LENGTH_LONG).show();
-
-                    ro =  ruleOperators.get(RuleOperatorType.Within);
-                    Toast.makeText(mContext,
-                            "Float 10 within 10 and 13 = " + ro.getOperationResult(Float.valueOf(10), Float.valueOf(10), Float.valueOf(13)),
-                            Toast.LENGTH_LONG).show();
-
-                    HashMap<RuleOperatorType, RuleOperator<Boolean>> ruleOperators2 = (HashMap<RuleOperatorType, RuleOperator<Boolean>>) rop.mOperatorHash.get(Boolean.class);
-                    RuleOperator<Boolean> ro2 =  ruleOperators2.get(RuleOperatorType.And);
-
-                    Toast.makeText(mContext,
-                            "Boolean false AND false = " + ro2.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(false)),
-                            Toast.LENGTH_LONG).show();
+//                    RuleOperationProvider rop = ((HABApplication)getActivity().getApplication()).getRuleOperationProvider();
+//                    HashMap<RuleOperatorType, RuleOperator<Number>> ruleOperators = (HashMap<RuleOperatorType, RuleOperator<Number>>) rop.mOperatorHash.get(Number.class);
+//                    RuleOperator<Number> ro =  ruleOperators.get(RuleOperatorType.Equal);
+//
+//                    Toast.makeText(mContext,
+//                    "Integer 10 equals 10 = " + ro.getOperationResult(Integer.valueOf(10), Integer.valueOf(10)),
+//                    Toast.LENGTH_LONG).show();
+//
+//                    ro =  ruleOperators.get(RuleOperatorType.Between);
+//                    Toast.makeText(mContext,
+//                            "Float 10 between 10 and 13 = " + ro.getOperationResult(Float.valueOf(10), Float.valueOf(10), Float.valueOf(13)),
+//                            Toast.LENGTH_LONG).show();
+//
+//                    ro =  ruleOperators.get(RuleOperatorType.Within);
+//                    Toast.makeText(mContext,
+//                            "Float 10 within 10 and 13 = " + ro.getOperationResult(Float.valueOf(10), Float.valueOf(10), Float.valueOf(13)),
+//                            Toast.LENGTH_LONG).show();
+//
+//                    HashMap<RuleOperatorType, RuleOperator<Boolean>> ruleOperators2 = (HashMap<RuleOperatorType, RuleOperator<Boolean>>) rop.mOperatorHash.get(Boolean.class);
+//                    RuleOperator<Boolean> ro2 =  ruleOperators2.get(RuleOperatorType.And);
+//
+//                    Toast.makeText(mContext,
+//                            "Boolean false AND false = " + ro2.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(false)),
+//                            Toast.LENGTH_LONG).show();
 
                     return false;
                 }
@@ -388,7 +390,9 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             nowShowing.put(Integer.valueOf(5), new RuleTreeItem(5, "The Wolverine"));
 
             HashMap<Integer, RuleTreeItem> comingSoon = new HashMap<Integer, RuleTreeItem>();
-            comingSoon.put(Integer.valueOf(0), new RuleTreeItem(0, "2 Guns"));
+            RuleOperation ro = getRuleOperation();
+
+            comingSoon.put(Integer.valueOf(0), ro.getRuleTreeItem(0));
             comingSoon.put(Integer.valueOf(1), new RuleTreeItem(1, "The Smurfs 2"));
             comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now"));
             comingSoon.put(Integer.valueOf(3), new RuleTreeItem(3, "The Canyons"));
@@ -400,6 +404,82 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             mTreeData.put(Integer.valueOf(0), new RuleTreeItem(0, "Top 250", top250));
             mTreeData.put(Integer.valueOf(1), new RuleTreeItem(1, "Now Showing", nowShowing));
             mTreeData.put(Integer.valueOf(2), new RuleTreeItem(2, "Coming Soon...", comingSoon));
+        }
+
+        private RuleOperation getRuleOperation() {
+            RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
+            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0");
+            RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
+            return roA;
+        }
+
+        private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {
+            List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
+
+            switch(operandPairNumber) {
+                case 1:
+                    //Switch
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_1")));
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_6")));
+                    break;
+
+                case 2:
+                    //Number
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0")));//"demo_1_0"
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0")));//ekafallettest_1
+                    break;
+            }
+
+            return operands;
+        }
+
+        private UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget) {
+            UnitEntityDataType rue = null;
+
+            switch(openHABWidget.getItem().getType()) {
+                case Contact:
+                case Switch:
+                    Boolean aBoolean;
+                    if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                        aBoolean = null;
+                    else
+                        aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("On");
+
+                    rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                    {
+                        public String getFormattedString(){
+                            return mValue.booleanValue()? "On": "Off";//TODO - Language independent
+                        }
+
+                        @Override
+                        public Boolean valueOf(String input) {
+                            return Boolean.valueOf(input);
+                        }
+                    };
+                    break;
+                case Number:
+                case Dimmer:
+                    Double aNumber;
+                    if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                        aNumber = null;
+                    else
+                        aNumber = Double.valueOf(openHABWidget.getItem().getState());
+
+                    rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
+                    {
+                        public String getFormattedString(){
+                            return mValue.toString();
+                        }
+
+                        @Override
+                        public Double valueOf(String input) {
+                            return Double.valueOf(input);
+                        }
+                    };
+                    break;
+            }
+
+            return rue;
         }
     }
 

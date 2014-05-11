@@ -18,6 +18,8 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
+import com.zenit.habclient.command.ICommandAnalyzer;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 

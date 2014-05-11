@@ -1,14 +1,7 @@
 package com.zenit.habclient.rule;
 
-import android.app.Application;
-import android.util.Log;
-
-import com.zenit.habclient.HABApplication;
-
 import java.lang.reflect.ParameterizedType;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,9 +41,9 @@ public abstract class RuleOperator<T> implements com.zenit.habclient.rule.IOpera
     }
 
     @Override
-    public boolean getOperationResult(List<IUnitEntityDataType> operands) {
+    public boolean getOperationResult(List<IEntityDataType> operands) {
         List<T> operandList = new ArrayList<T>(operands.size());
-        for (IUnitEntityDataType operand : operands) {
+        for (IEntityDataType operand : operands) {
             operandList.add((T) operand.getValue());
         }
 

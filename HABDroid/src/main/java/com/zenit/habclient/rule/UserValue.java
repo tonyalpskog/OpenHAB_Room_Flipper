@@ -1,4 +1,4 @@
-package com.zenit.habclient;
+package com.zenit.habclient.rule;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -32,8 +32,8 @@ public class UserValue<T> {
 //    }
 //
 //    @Override
-//    public DataSourceType getSourceType() {
-//        return DataSourceType.USER;
+//    public EntityDataTypeSource getSourceType() {
+//        return EntityDataTypeSource.USER;
 //    }
 //
 //    @Override

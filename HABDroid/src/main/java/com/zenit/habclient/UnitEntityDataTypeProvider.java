@@ -1,5 +1,7 @@
 package com.zenit.habclient;
 
+import com.zenit.habclient.rule.UnitEntityDataType;
+
 import java.util.ArrayList;
 import java.util.List;
 

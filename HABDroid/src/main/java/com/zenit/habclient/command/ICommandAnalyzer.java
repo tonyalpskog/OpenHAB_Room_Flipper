@@ -1,7 +1,13 @@
-package com.zenit.habclient;
+package com.zenit.habclient.command;
 
 import android.content.Context;
 
+import com.zenit.habclient.ApplicationMode;
+import com.zenit.habclient.OpenHABWidgetProvider;
+import com.zenit.habclient.RoomFlipper;
+import com.zenit.habclient.RoomProvider;
+import com.zenit.habclient.SpeechAnalyzerResult;
+import com.zenit.habclient.TextToSpeechProvider;
 import com.zenit.habclient.command.CommandAnalyzerResult;
 
 import java.util.ArrayList;

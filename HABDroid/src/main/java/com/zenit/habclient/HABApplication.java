@@ -3,6 +3,8 @@ package com.zenit.habclient;
 import android.app.Application;
 import android.util.Log;
 
+import com.zenit.habclient.command.CommandAnalyzer;
+import com.zenit.habclient.command.ICommandAnalyzer;
 import com.zenit.habclient.rule.RuleOperationProvider;
 import com.zenit.habclient.util.RegularExpression;
 
@@ -21,7 +23,7 @@ public class HABApplication extends Application {
     private RoomProvider mRoomProvider = null;
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
-    private RuleOperationProvider mRuleOperationProvider = null;
+    private static RuleOperationProvider mRuleOperationProvider = null;
     private static RestCommunication mRestCommunication = null;
     private static ApplicationMode mAppMode = ApplicationMode.Unknown;
     private TextToSpeechProvider mTextToSpeechProvider = null;
@@ -124,9 +126,9 @@ public class HABApplication extends Application {
         return mRoomProvider;
     }
 
-    public RuleOperationProvider getRuleOperationProvider() {
+    public static RuleOperationProvider getRuleOperationProvider() {
         if(mRuleOperationProvider == null)
-            mRuleOperationProvider = new RuleOperationProvider(this);
+            mRuleOperationProvider = new RuleOperationProvider();
 
         return mRuleOperationProvider;
     }
