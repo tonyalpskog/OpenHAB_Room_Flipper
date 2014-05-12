@@ -390,12 +390,18 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             nowShowing.put(Integer.valueOf(5), new RuleTreeItem(5, "The Wolverine"));
 
             HashMap<Integer, RuleTreeItem> comingSoon = new HashMap<Integer, RuleTreeItem>();
-            RuleOperation ro = getRuleOperation();
+            RuleOperation ron = getRuleOperation();
 
-            comingSoon.put(Integer.valueOf(0), ro.getRuleTreeItem(0));
-            comingSoon.put(Integer.valueOf(1), new RuleTreeItem(1, "The Smurfs 2"));
+            List<RuleOperation> operandList = new ArrayList<RuleOperation>();
+            operandList.add(getRuleOperation());
+            operandList.add(getRuleOperation());
+            RuleOperator ror =  HABApplication.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+            RuleOperation ron2 = new RuleOperation(ror, operandList);
+
+            comingSoon.put(Integer.valueOf(0), operandList.get(0).getRuleTreeItem(0));
+            comingSoon.put(Integer.valueOf(1), operandList.get(1).getRuleTreeItem(1));
             comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now"));
-            comingSoon.put(Integer.valueOf(3), new RuleTreeItem(3, "The Canyons"));
+            comingSoon.put(Integer.valueOf(3), ron2.getRuleTreeItem(3));
             comingSoon.put(Integer.valueOf(4), new RuleTreeItem(4, "Europa Report"));
 
             if(mTreeData == null)
@@ -420,7 +426,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                 case 1:
                     //Switch
                     operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_1")));
-                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_6")));
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Corridor_1")));
                     break;
 
                 case 2:

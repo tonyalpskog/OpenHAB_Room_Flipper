@@ -47,4 +47,11 @@ public class RuleTreeItem extends HashMap<Integer, RuleTreeItem> {
 //        this.mRuleOperation = ruleOperation;
 //    }
 
+    public int getPosition() {
+        return mPosition;
+    }
+
+    public HashMap<Integer, RuleTreeItem> getChildren() {
+        return mChildren;
+    }
 }

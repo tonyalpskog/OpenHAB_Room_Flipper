@@ -49,8 +49,7 @@ public enum RuleOperatorType {
         if(args.length < (minimumNumberOfSupportedOperationArgs - 1) || args.length > (maximumNumberOfSupportedOperationArgs - 1))
             throw new IllegalArgumentException(args.length + " arguments passed when number of supported arguments = " + (minimumNumberOfSupportedOperationArgs == maximumNumberOfSupportedOperationArgs? (minimumNumberOfSupportedOperationArgs - 1): "between " + (minimumNumberOfSupportedOperationArgs - 1) + " and " + (maximumNumberOfSupportedOperationArgs - 1)));
 
-        String formattedString;
-        formattedString = String.format(stringFormat, (String[]) args);
+        String formattedString = String.format(stringFormat, (String[]) args);
 
         return formattedString;
     }

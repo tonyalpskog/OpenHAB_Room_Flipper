@@ -7,31 +7,49 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, IOperationResult, IRuleTree {
-
-    private List<IEntityDataType> mOperands;
+public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, IOperationResult {
+    private List<? extends IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mName;
     private String mDescription;
 
-    public RuleOperation(RuleOperator ruleOperator, List<IEntityDataType> operands) {
+    public RuleOperation(RuleOperator ruleOperator, List<? extends IEntityDataType> operands) {
         mRuleOperator = ruleOperator;
         mOperands = operands;
     }
 
+//    public RuleOperation(RuleOperator ruleOperator, List<RuleOperation> operands) {
+//        mRuleOperator = ruleOperator;
+//        mOperands = operands;
+//    }
+
     @Override
     public String toString() {
+        if(getName() != null && getName().length() > 0)
+            return getName();
+
         String[] operandsAsStringArray = new String[mOperands.size() - 1];
         int index = 0;
-        Iterator<IEntityDataType> iterator = mOperands.iterator();
+        Iterator<? extends IEntityDataType> iterator = mOperands.iterator();
         IEntityDataType mLeftOperand;
         if(iterator.hasNext())
-            mLeftOperand = iterator.next();//Just consume the leftmost operand
-        else return "Oooops!";//TODO - Change description
+            mLeftOperand = iterator.next();//Save the the leftmost operand for later.
+        else return "Oooops!";//TODO - Throw exception or change description
         while(iterator.hasNext()) {
-            operandsAsStringArray[index++] = iterator.next().toString();
+            IEntityDataType operand = iterator.next();
+            boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(operand);
+            String format = isRuleAndUseGeneratedString? "(%s)" : "%s";
+            operandsAsStringArray[index++] = String.format(format, isRuleAndUseGeneratedString? operand.toString() : operand.getName());
         }
-        return mLeftOperand.getName() + getRuleOperator().getType().getFormattedString(operandsAsStringArray);
+        boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(mLeftOperand);
+        String format = isRuleAndUseGeneratedString? "(%s)%s" : "%s%s";
+        return String.format(format, isRuleAndUseGeneratedString? mLeftOperand.toString() : mLeftOperand.getName(), getRuleOperator().getType().getFormattedString(operandsAsStringArray));
+    }
+
+    private boolean getIsRuleAndUseGeneratedString(IEntityDataType operand) {
+        boolean hasName = operand.getName() != null && operand.getName().length() > 0;
+        boolean isRuleAndUseGeneratedString = operand.getSourceType() == EntityDataTypeSource.RULE && !hasName;
+        return isRuleAndUseGeneratedString;
     }
 
     @Override
@@ -66,9 +84,11 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
         Integer integer = 0;
 
         for(IEntityDataType operand : mOperands.toArray(new IEntityDataType[0])) {
-            if(operand instanceof IRuleTree)
-                hm.put(integer, new RuleTreeItem(integer, operand.toString(), ((IRuleTree) operand).getRuleTreeItem(0)));
-            integer++;
+            RuleTreeItem rti = operand.getRuleTreeItem(integer);
+            if(rti != null) {
+                hm.put(integer, rti);
+                integer++;
+            }
         }
 
         return hm.isEmpty()? new RuleTreeItem(treeIndex, toString()) : new RuleTreeItem(treeIndex, toString(), hm);
@@ -108,4 +128,13 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public RuleOperator getRuleOperator() { return mRuleOperator; }
 
     public void setRuleOperator(RuleOperator ruleOperator) { mRuleOperator = ruleOperator; }
+
+
+//    public List<IEntityDataType> getOperands() {
+//        return mOperands;
+//    }
+//
+//    public void setOperands(List<IEntityDataType> operands) {
+//        mOperands = operands;
+//    }
 }

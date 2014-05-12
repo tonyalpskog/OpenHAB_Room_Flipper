@@ -56,4 +56,9 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
 
     @Override
     public abstract T valueOf(String input);
+
+    @Override
+    public RuleTreeItem getRuleTreeItem(int treeIndex) {
+        return null;
+    }
 }

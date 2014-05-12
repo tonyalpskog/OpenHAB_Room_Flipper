@@ -1,13 +1,14 @@
 package com.zenit.habclient.rule.test;
 
 import com.zenit.habclient.HABApplication;
-import com.zenit.habclient.rule.UnitEntityDataType;
 import com.zenit.habclient.UnitEntityDataTypeProvider;
 import com.zenit.habclient.rule.IEntityDataType;
 import com.zenit.habclient.rule.RuleOperation;
 import com.zenit.habclient.rule.RuleOperationProvider;
+import com.zenit.habclient.rule.RuleOperator;
 import com.zenit.habclient.rule.RuleOperatorType;
 import com.zenit.habclient.rule.RuleTreeItem;
+import com.zenit.habclient.rule.UnitEntityDataType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
@@ -161,8 +162,56 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", rt.toString());
     }
 
-//    public void test_toString() {
-//        RuleTreeItem rt = new RuleTreeItem(0, mock_getRuleOperation(1));
-//        assertEquals("Light_GF_Kitchen_Ceiling = Off", rt.toString());
-//    }
+    public void test_toString_from_a_two_operation_operands_operation() {
+        RuleOperation ron1 = mock_getRuleOperation(1);
+        RuleTreeItem rti1 = new RuleTreeItem(0, ron1.getRuleTreeItem(0).toString());
+        assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", rti1.toString());
+        assertEquals(0, rti1.getPosition());
+        assertEquals(0, rti1.getChildren().size());
+        assertEquals(true, ron1.getResult());
+
+        RuleOperation ron2 = mock_getRuleOperation(4);
+        RuleTreeItem rti2 = new RuleTreeItem(1, ron2.getRuleTreeItem(1).toString());
+        assertEquals("Temperature_FF_Bed > Temperature_GF_Toilet", rti2.toString());
+        assertEquals(1, rti2.getPosition());
+        assertEquals(0, rti2.getChildren().size());
+        assertEquals(false, ron2.getResult());
+
+        RuleOperator ror =  mHABApplication.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        List<RuleOperation> operandList = new ArrayList<RuleOperation>();
+        operandList.add(ron1);
+        operandList.add(ron2);
+        RuleOperation mainOperation = new RuleOperation(ror, operandList);
+        RuleTreeItem mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
+        assertEquals(3, mainRuleTreeItem.getPosition());
+        assertEquals(false, mainOperation.getResult());
+        assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainOperation.toString());
+        assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainRuleTreeItem.toString());
+        assertEquals(2, mainRuleTreeItem.getChildren().size());
+        assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", mainRuleTreeItem.getChildren().get(0).toString());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(0).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(0).getChildren().size());
+        assertEquals("Temperature_FF_Bed > Temperature_GF_Toilet", mainRuleTreeItem.getChildren().get(1).toString());
+        assertEquals(1, mainRuleTreeItem.getChildren().get(1).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(1).getChildren().size());
+
+        operandList.clear();
+        ron1.setName("First_Operation");
+        ron2.setName("Second_Operation");
+        operandList.add(ron1);
+        operandList.add(ron2);
+        mainOperation = new RuleOperation(ror, operandList);
+        mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
+        assertEquals(3, mainRuleTreeItem.getPosition());
+        assertEquals(false, mainOperation.getResult());
+        assertEquals("First_Operation AND Second_Operation", mainOperation.toString());
+        assertEquals("First_Operation AND Second_Operation", mainRuleTreeItem.toString());
+        assertEquals(2, mainRuleTreeItem.getChildren().size());
+        assertEquals("First_Operation", mainRuleTreeItem.getChildren().get(0).toString());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(0).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(0).getChildren().size());
+        assertEquals("Second_Operation", mainRuleTreeItem.getChildren().get(1).toString());
+        assertEquals(1, mainRuleTreeItem.getChildren().get(1).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(1).getChildren().size());
+    }
 }

@@ -309,4 +309,10 @@ public class RuleOperationProvider {
 
         return result;
     }
+
+    public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperatorHash(Class<?> operandClass) {
+        RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
+
+        return (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(operandClass);
+    }
 }

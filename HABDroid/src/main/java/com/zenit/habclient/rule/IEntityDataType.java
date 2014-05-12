@@ -3,7 +3,7 @@ package com.zenit.habclient.rule;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public interface IEntityDataType<T> {
+public interface IEntityDataType<T> extends IRuleTree {
     public EntityDataTypeSource getSourceType();
     public String getName();
     public Class<?> getDataType();
