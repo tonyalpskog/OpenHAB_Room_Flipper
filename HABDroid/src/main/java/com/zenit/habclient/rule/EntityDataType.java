@@ -1,5 +1,7 @@
 package com.zenit.habclient.rule;
 
+import com.zenit.habclient.OnOperandValueChangedListener;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -7,6 +9,9 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
 
     protected String mName;
     protected T mValue;
+    protected String mDataSourceId;
+    protected OnOperandValueChangedListener mOnOperandValueChangedListener;
+
 
     public EntityDataType() {
         this(null, null);
@@ -60,5 +65,9 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
     @Override
     public RuleTreeItem getRuleTreeItem(int treeIndex) {
         return null;
+    }
+
+    public void setOnOperandValueChangedListener(OnOperandValueChangedListener onOperandValueChangedListener) {
+        mOnOperandValueChangedListener = onOperandValueChangedListener;
     }
 }

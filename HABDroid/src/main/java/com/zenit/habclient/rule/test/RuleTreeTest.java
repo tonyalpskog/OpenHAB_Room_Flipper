@@ -168,14 +168,14 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", rti1.toString());
         assertEquals(0, rti1.getPosition());
         assertEquals(0, rti1.getChildren().size());
-        assertEquals(true, ron1.getResult());
+        assertEquals(true, ron1.getValue().booleanValue());
 
         RuleOperation ron2 = mock_getRuleOperation(4);
         RuleTreeItem rti2 = new RuleTreeItem(1, ron2.getRuleTreeItem(1).toString());
         assertEquals("Temperature_FF_Bed > Temperature_GF_Toilet", rti2.toString());
         assertEquals(1, rti2.getPosition());
         assertEquals(0, rti2.getChildren().size());
-        assertEquals(false, ron2.getResult());
+        assertEquals(false, ron2.getValue().booleanValue());
 
         RuleOperator ror =  mHABApplication.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         List<RuleOperation> operandList = new ArrayList<RuleOperation>();
@@ -184,7 +184,7 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         RuleOperation mainOperation = new RuleOperation(ror, operandList);
         RuleTreeItem mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         assertEquals(3, mainRuleTreeItem.getPosition());
-        assertEquals(false, mainOperation.getResult());
+        assertEquals(false, mainOperation.getValue().booleanValue());
         assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainOperation.toString());
         assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainRuleTreeItem.toString());
         assertEquals(2, mainRuleTreeItem.getChildren().size());
@@ -203,7 +203,7 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         mainOperation = new RuleOperation(ror, operandList);
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         assertEquals(3, mainRuleTreeItem.getPosition());
-        assertEquals(false, mainOperation.getResult());
+        assertEquals(false, mainOperation.getValue().booleanValue());
         assertEquals("First_Operation AND Second_Operation", mainOperation.toString());
         assertEquals("First_Operation AND Second_Operation", mainRuleTreeItem.toString());
         assertEquals(2, mainRuleTreeItem.getChildren().size());

@@ -63,4 +63,8 @@ public class StringHandler {
         }
         return result.trim();
     }
+
+    public static boolean isNullOrEmpty(String target) {
+        return target == null || target.isEmpty();
+    }
 }

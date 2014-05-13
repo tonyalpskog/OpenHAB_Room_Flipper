@@ -451,7 +451,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                     else
                         aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("On");
 
-                    rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                    rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean, null)//TODO - Change <null> to a listener provider
                     {
                         public String getFormattedString(){
                             return mValue.booleanValue()? "On": "Off";//TODO - Language independent
@@ -471,7 +471,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                     else
                         aNumber = Double.valueOf(openHABWidget.getItem().getState());
 
-                    rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
+                    rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber, null)//TODO - Change <null> to a listener provider
                     {
                         public String getFormattedString(){
                             return mValue.toString();

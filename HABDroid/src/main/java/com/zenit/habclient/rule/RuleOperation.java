@@ -1,5 +1,10 @@
 package com.zenit.habclient.rule;
 
+import android.util.Log;
+
+import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.OnOperandValueChangedListener;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -7,7 +12,7 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, IOperationResult {
+public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, OnOperandValueChangedListener {
     private List<? extends IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mName;
@@ -16,6 +21,10 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public RuleOperation(RuleOperator ruleOperator, List<? extends IEntityDataType> operands) {
         mRuleOperator = ruleOperator;
         mOperands = operands;
+        for (IEntityDataType operand : operands) {
+            operand.setOnOperandValueChangedListener(this);
+        }
+        runCalculation();
     }
 
 //    public RuleOperation(RuleOperator ruleOperator, List<RuleOperation> operands) {
@@ -48,8 +57,18 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
 
     private boolean getIsRuleAndUseGeneratedString(IEntityDataType operand) {
         boolean hasName = operand.getName() != null && operand.getName().length() > 0;
-        boolean isRuleAndUseGeneratedString = operand.getSourceType() == EntityDataTypeSource.RULE && !hasName;
-        return isRuleAndUseGeneratedString;
+        return operand.getSourceType() == EntityDataTypeSource.RULE && !hasName;
+    }
+
+    private void runCalculation() {
+        try {
+            Boolean oldValue = mValue;
+            mValue = getRuleOperator().getOperationResult(mOperands);
+            if(!oldValue.equals(mValue) && mOnOperandValueChangedListener != null)
+                mOnOperandValueChangedListener.onOperandValueChanged(this);
+        } catch (Exception e) {
+            Log.e(HABApplication.getLogTag(), e.toString());
+        }
     }
 
     @Override
@@ -67,15 +86,6 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
 
     @Override
     public void setDescription(String description) { mDescription = description; }
-
-    @Override
-    public boolean getResult() {
-        try {
-            return getRuleOperator().getOperationResult(mOperands);
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     @Override
     public RuleTreeItem getRuleTreeItem(int treeIndex) {
@@ -115,13 +125,11 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     @Override
+    /**
+     * The latest resulting value OR null.
+     */
     public Boolean getValue() {
-        Boolean currentValue = Boolean.valueOf(getResult());
-        if(mValue != currentValue) {
-            mValue = currentValue;
-            //TODO - Send broadcast intent
-        }
-
+        //Returns mValue instead of calling runCalculation() to prevent multiple calls to getResult().
         return mValue;
     }
 
@@ -129,12 +137,8 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
 
     public void setRuleOperator(RuleOperator ruleOperator) { mRuleOperator = ruleOperator; }
 
-
-//    public List<IEntityDataType> getOperands() {
-//        return mOperands;
-//    }
-//
-//    public void setOperands(List<IEntityDataType> operands) {
-//        mOperands = operands;
-//    }
+    @Override
+    public void onOperandValueChanged(IEntityDataType operand) {
+        runCalculation();
+    }
 }
