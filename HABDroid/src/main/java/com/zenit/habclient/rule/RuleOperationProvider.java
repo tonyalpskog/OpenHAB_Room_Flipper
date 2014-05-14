@@ -195,6 +195,31 @@ public class RuleOperationProvider {
 
         mOperatorHash.put(Boolean.class, booleanOperatorHash);
 
+        // ===============  String  ================
+
+        HashMap<RuleOperatorType, RuleOperator<String>> stringOperatorHash = new HashMap<RuleOperatorType, RuleOperator<String>>();
+
+        RuleOperator equalString = new DateTimeRuleOperator<String>(RuleOperatorType.Equal, false) {
+            @Override
+            public boolean getOperationResult2(List<String> args) {
+                validateArgumentNumber(args);
+
+                return args.get(0).equalsIgnoreCase(args.get(1));
+            }
+        };
+        stringOperatorHash.put(equalString.getType(), equalString);
+
+        RuleOperator notEqualString = new DateTimeRuleOperator<String>(RuleOperatorType.NotEqual, false) {
+            @Override
+            public boolean getOperationResult2(List<String> args) {
+                validateArgumentNumber(args);
+
+                return !args.get(0).equalsIgnoreCase(args.get(1));
+            }
+        };
+        stringOperatorHash.put(notEqualString.getType(), equalString);
+
+        mOperatorHash.put(String.class, stringOperatorHash);
 
         // ===============  Date  ================
 
@@ -280,17 +305,6 @@ public class RuleOperationProvider {
         };
         dateOperatorHash.put(withinDate.getType(), withinDate);
         mOperatorHash.put(java.util.Date.class, dateOperatorHash);
-
-
-//        NumberPicker joo;
-//        joo.
-//
-//        Number percentage;
-//
-////        NumberFormat.Field.PERCENT
-//
-//        Date date = new Date();
-//
     }
 
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
@@ -299,11 +313,18 @@ public class RuleOperationProvider {
         RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
 
         switch(openHABWidget.getItem().getType()) {
+            case Contact:
             case Switch:
                 result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Boolean.class);
                 break;
             case Number:
+            case Dimmer:
+            case Rollershutter:
                 result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Number.class);
+                break;
+            case String:
+            case Color:
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(String.class);
                 break;
         }
 

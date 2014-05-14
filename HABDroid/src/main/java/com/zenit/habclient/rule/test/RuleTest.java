@@ -42,8 +42,8 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         createApplication();
         mHABApplication = getApplication();
 
-        HttpDataSetup httpDataSetup = new HttpDataSetup();
-        httpDataSetup.loadHttpDataFromString(mHABApplication);
+        HttpDataSetup httpDataSetup = new HttpDataSetup(mHABApplication);
+        httpDataSetup.loadHttpDataFromString();
 
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
 
@@ -594,7 +594,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         assertFalse(roNotEqual.getOperationResult(Boolean.valueOf(true), Boolean.valueOf(true)));
     }
 
-    public void test_Verify_value_in_UnitEntityDataType() {
+    public void test_Verify_value_and_name_in_UnitEntityDataType() {
         UnitEntityDataType rue = new UnitEntityDataType("Test Value", 50.7) {
             @Override
             public Double valueOf(String input) {
@@ -604,6 +604,25 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
         assertTrue(rue.getValue() != null);
         assertEquals(50.7, rue.getValue());
+        assertEquals("50.7", rue.getFormattedString());
+        assertEquals("Test Value", rue.getName());
+
+        //Now with a custom getFormattedString() method.
+        rue = new UnitEntityDataType("Test Value", 50.7) {
+            @Override
+            public Double valueOf(String input) {
+                return Double.valueOf(input);
+            }
+            @Override
+            public String getFormattedString(){
+                return mValue.toString() + "%Rh";
+            }
+        };
+
+        assertTrue(rue.getValue() != null);
+        assertEquals(50.7, rue.getValue());
+        assertEquals("50.7%Rh", rue.getFormattedString());
+        assertEquals("Test Value", rue.getName());
     }
 
     private List<IEntityDataType> getOperandsAsList() {
@@ -778,14 +797,14 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         RuleOperator<Number> operator =  ruleOperatorsNumeric.get(RuleOperatorType.Equal);
 
         RuleOperation roA = new RuleOperation(operator, operands);
-        assertEquals("Humidity percentage = 50.7", roA.toString());
+        assertEquals("Humidity percentage [50.7%Rh] = Test Value [50.7]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
 
         //Second operation (Rule B)
         RuleOperator<Number> operator2 =  ruleOperatorsNumeric.get(RuleOperatorType.LessThan);
 
         RuleOperation roB = new RuleOperation(operator2, operands);
-        assertEquals("Humidity percentage < 50.7", roB.toString());
+        assertEquals("Humidity percentage [50.7%Rh] < Test Value [50.7]", roB.toString());
         assertEquals(false, roB.getValue().booleanValue());
 
         assertEquals(false, roA.getValue().booleanValue() && roB.getValue().booleanValue());
@@ -863,22 +882,22 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
         OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling = Off", roA.toString());//OFF
+        assertEquals("Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
 
         widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling != Off", roA.toString());//OFF
+        assertEquals("Light_GF_Kitchen_Ceiling [Off] != Light_FF_Bath_Mirror [Off]", roA.toString());
         assertEquals(false, roA.getValue().booleanValue());
 
         widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3");
         RuleOperation roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
-        assertEquals("Temperature_FF_Bed < 21.5", roB.toString());//19.2
+        assertEquals("Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]", roB.toString());
         assertEquals(true, roB.getValue().booleanValue());
 
         widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4");
         roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), getOperandsAsList3(2));
-        assertEquals("Temperature_FF_Bed > 21.5", roB.toString());//19.2
+        assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", roB.toString());
         assertEquals(false, roB.getValue().booleanValue());
 
         assertEquals(false, roA.getValue() && roB.getValue());

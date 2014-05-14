@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OnOperandValueChangedListener;
+import com.zenit.habclient.util.StringHandler;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,7 +16,6 @@ import java.util.List;
 public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, OnOperandValueChangedListener {
     private List<? extends IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
-    private String mName;
     private String mDescription;
 
     public RuleOperation(RuleOperator ruleOperator, List<? extends IEntityDataType> operands) {
@@ -34,8 +34,9 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
 
     @Override
     public String toString() {
-        if(getName() != null && getName().length() > 0)
-            return getName();
+        if(!StringHandler.isNullOrEmpty(getName())) {
+            return getName() + "[" + getFormattedString() + "]";
+        }
 
         String[] operandsAsStringArray = new String[mOperands.size() - 1];
         int index = 0;
@@ -48,16 +49,15 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
             IEntityDataType operand = iterator.next();
             boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(operand);
             String format = isRuleAndUseGeneratedString? "(%s)" : "%s";
-            operandsAsStringArray[index++] = String.format(format, isRuleAndUseGeneratedString? operand.toString() : operand.getName());
+            operandsAsStringArray[index++] = String.format(format, operand.toString());
         }
         boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(mLeftOperand);
         String format = isRuleAndUseGeneratedString? "(%s)%s" : "%s%s";
-        return String.format(format, isRuleAndUseGeneratedString? mLeftOperand.toString() : mLeftOperand.getName(), getRuleOperator().getType().getFormattedString(operandsAsStringArray));
+        return String.format(format, mLeftOperand.toString(), getRuleOperator().getType().getFormattedString(operandsAsStringArray));
     }
 
     private boolean getIsRuleAndUseGeneratedString(IEntityDataType operand) {
-        boolean hasName = operand.getName() != null && operand.getName().length() > 0;
-        return operand.getSourceType() == EntityDataTypeSource.RULE && !hasName;
+        return operand.getSourceType() == EntityDataTypeSource.RULE && !StringHandler.isNullOrEmpty(operand.getName());
     }
 
     private void runCalculation() {

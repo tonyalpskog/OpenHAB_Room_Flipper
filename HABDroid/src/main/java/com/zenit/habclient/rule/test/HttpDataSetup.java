@@ -2,6 +2,8 @@ package com.zenit.habclient.rule.test;
 
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.command.test.DocumentHttpResponseHandlerWrapper;
+import com.zenit.habclient.rule.IEntityDataType;
+import com.zenit.habclient.rule.UnitEntityDataType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
@@ -17,8 +19,14 @@ import javax.xml.parsers.ParserConfigurationException;
  * Created by Tony Alpskog in 2014.
  */
 public class HttpDataSetup {
+    HABApplication mHABApplication;
 
-    private void requestOpenHABData(String htmlResponseData, HABApplication habApplication) {
+    public HttpDataSetup(HABApplication habApplication) {
+        mHABApplication = habApplication;
+    }
+
+
+    private void requestOpenHABData(String htmlResponseData) {
         DocumentHttpResponseHandlerWrapper documentHandler = new DocumentHttpResponseHandlerWrapper();
         Document document = null;
         try {
@@ -59,11 +67,11 @@ public class HttpDataSetup {
 
         openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode);
 
-        habApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
+        mHABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
         return;
     }
 
-    public void loadHttpDataFromString(HABApplication habApplication) {
+    public void loadHttpDataFromString() {
         StringBuffer htmlResponseData = new StringBuffer();
 
         htmlResponseData.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sitemap><name>demo</name><label>Main Menu</label><link>https://demo.openhab.org:8443/rest/sitemaps/demo</link><homepage><id>demo</id><title>Main Menu</title><link>https://demo.openhab.org:8443/rest/sitemaps/demo/demo</link><leaf>false</leaf><widget><widgetId>demo_0</widgetId><type>Frame</type><label></label><icon>frame</icon><widget><widgetId>demo_0_0</widgetId><type>Group</type><label>First Floor</label><icon>firstfloor</icon><item><type>GroupItem</type><name>gFF</name><state>Undefined</state><link>https://demo.openhab.org:8443/rest/items/gFF</link></item><linkedPage><id>0000</id><title>First Floor</title><icon>firstfloor</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/0000</link><leaf>false</leaf><widget><widgetId>0000_0</widgetId><type>Group</type><label>Bathroom</label><icon>bath</icon><item><type>GroupItem</type><name>FF_Bath</name><state>Undefined</state><link>https://demo.openhab.org:8443/rest/items/FF_Bath</link></item><linkedPage><id>FF_Bath</id><title>Bathroom</title><icon>bath</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/FF_Bath</link><leaf>true</leaf><widget><widgetId>FF_Bath_0</widgetId><type>Switch</type><label>Ceiling</label><icon>switch-on</icon><item><type>SwitchItem</type><name>Light_FF_Bath_Ceiling</name><state>ON</state><link>https://demo.openhab.org:8443/rest/items/Light_FF_Bath_Ceiling</link></item></widget><widget><widgetId>FF_Bath_1</widgetId><type>Switch</type><label>Mirror</label><icon>switch-off</icon><item><type>SwitchItem</type><name>Light_FF_Bath_Mirror</name><state>OFF</state><link>https://demo.openhab.org:8443/rest/items/Light_FF_Bath_Mirror</link></item></widget><widget><widgetId>FF_Bath_2</widgetId><type>Switch</type><label>Bath</label><icon>heating-off</icon><item><type>SwitchItem</type><name>Heating_FF_Bath</name><state>OFF</state><link>https://demo.openhab.org:8443/rest/items/Heating_FF_Bath</link></item></widget><widget><widgetId>FF_Bath_3</widgetId><type>Switch</type><label>Bath</label><icon>rollershutter-100</icon><item><type>RollershutterItem</type><name>Shutter_FF_Bath</name><state>100</state><link>https://demo.openhab.org:8443/rest/items/Shutter_FF_Bath</link></item></widget><widget><widgetId>FF_Bath_4</widgetId><type>Text</type><label>Temperature [20.2 °C]</label><icon>temperature</icon><item><type>NumberItem</type><name>Temperature_FF_Bath</name><state>20.20000000</state><link>https://demo.openhab.org:8443/rest/items/Temperature_FF_Bath</link></item></widget><widget><widgetId>FF_Bath_5</widgetId><type>Text</type><label>Bath [closed]</label><icon>contact-closed</icon><item><type>ContactItem</type><name>Window_FF_Bath</name><state>CLOSED</state><link>https://demo.openhab.org:8443/rest/items/Window_FF_Bath</link></item></widget></linkedPage></widget><widget><widgetId>0000_1</widgetId><type>Group</type><label>Office</label><icon>office</icon><item><type>GroupItem</type><name>FF_Office</name><state>Undefined</state><link>https://demo.openhab.org:8443/rest/items/FF_Office</link></item><linkedPage><id>FF_Office</id><title>Office</title><icon>office</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/FF_Office</link><leaf>true</leaf><widget><widgetId>FF_Office_0</widgetId><type>Switch</type><label>Ceiling</label><icon>switch-on</icon><item><type>SwitchItem</type><name>Light_FF_Office_Ceiling</name><state>ON</state><link>https://demo.openhab.org:8443/rest/items/Light_FF_Office_Ceiling</link></item></widget><widget><widgetId>FF_Office_1</widgetId><type>Switch</type><label>Office</label><icon>heating-off</icon><item><type>SwitchItem</type><name>Heating_FF_Office</name><state>OFF</state>");
@@ -77,7 +85,79 @@ public class HttpDataSetup {
         htmlResponseData.append("<type>Text</type><label>Avg. Room Temperature [19.8 °C]</label><icon>temperature</icon><item><type>GroupItem</type><name>Temperature</name><state>19.77500000</state><link>https://demo.openhab.org:8443/rest/items/Temperature</link></item></widget></linkedPage></widget><widget><widgetId>demo_3_0_1</widgetId><type>Text</type><label>Widget Overview</label><icon>chart</icon><linkedPage><id>0301</id><title>Widget Overview</title><icon>chart</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/0301</link><leaf>false</leaf><widget><widgetId>0301_0</widgetId><type>Frame</type><label>Binary Widgets</label><icon>frame</icon><widget><widgetId>0301_0_0</widgetId><type>Switch</type><label>Toggle Switch</label><icon>switch-off</icon><item><type>SwitchItem</type><name>DemoSwitch</name><state>OFF</state><link>https://demo.openhab.org:8443/rest/items/DemoSwitch</link></item></widget><widget><widgetId>0301_0_0_1</widgetId><type>Switch</type><label>Button Switch</label><icon>switch-off</icon><mapping><command>ON</command><label>On</label></mapping><item><type>SwitchItem</type><name>DemoSwitch</name><state>OFF</state><link>https://demo.openhab.org:8443/rest/items/DemoSwitch</link></item></widget></widget><widget><widgetId>0301_1</widgetId><type>Frame</type><label>Discrete Widgets</label><icon>frame</icon><widget><widgetId>0301_1_0</widgetId><type>Selection</type><label>Scene Selection</label><icon>sofa</icon><mapping><command>0</command><label>off</label></mapping><mapping><command>1</command><label>TV</label></mapping><mapping><command>2</command><label>Dinner</label></mapping><mapping><command>3</command><label>Reading</label></mapping><item><type>NumberItem</type><name>Scene_General</name><state>3</state><link>https://demo.openhab.org:8443/rest/items/Scene_General</link></item></widget><widget><widgetId>0301_1_0_1</widgetId><type>Switch</type><label>Scene</label><icon>sofa</icon><mapping><command>1</command><label>TV</label></mapping><mapping><command>2</command><label>Dinner</label></mapping><mapping><command>3</command><label>Reading</label></mapping><item><type>NumberItem</type><name>Scene_General</name><state>3</state><link>https://demo.openhab.org:8443/rest/items/Scene_General</link></item></widget><widget><widgetId>0301_1_0_1_2</widgetId><type>Setpoint</type><label>Temperature [21.0 °C]</label><icon>temperature</icon><minValue>16</minValue><maxValue>28</maxValue><step>0.5</step><item><type>NumberItem</type><name>Temperature_Setpoint</name><state>21.0</state><link>https://demo.openhab.org:8443/rest/items/Temperature_Setpoint</link></item></widget></widget><widget><widgetId>0301_2</widgetId><type>Frame</type><label>Percent-based Widgets</label><icon>frame</icon><widget><widgetId>0301_2_0</widgetId><type>Slider</type><label>Dimmer [100 %]</label><icon>slider-100</icon><switchSupport>true</switchSupport><sendFrequency>0</sendFrequency><item><type>DimmerItem</type><name>DimmedLight</name><state>100</state><link>https://demo.openhab.org:8443/rest/items/DimmedLight</link></item></widget><widget><widgetId>0301_2_0_1</widgetId><type>Colorpicker</type><label>RGB Light</label><icon>slider-40</icon><item><type>ColorItem</type><name>RGBLight</name><state>125.51724,74.35898,45.882355</state><link>https://demo.openhab.org:8443/rest/items/RGBLight</link></item></widget><widget><widgetId>0301_2_0_1_2</widgetId><type>Switch</type><label>Roller Shutter</label><icon>rollershutter-100</icon><item><type>RollershutterItem</type><name>DemoShutter</name><state>100</state><link>https://demo.openhab.org:8443/rest/items/DemoShutter</link></item></widget><widget><widgetId>0301_2_0_1_2_3</widgetId><type>Slider</type><label>Blinds [100 %]</label>");
         htmlResponseData.append("<icon>rollershutter-100</icon><switchSupport>false</switchSupport><sendFrequency>0</sendFrequency><item><type>DimmerItem</type><name>DemoBlinds</name><state>100</state><link>https://demo.openhab.org:8443/rest/items/DemoBlinds</link></item></widget></widget></linkedPage></widget><widget><widgetId>demo_3_0_1_2</widgetId><type>Text</type><label>Multimedia</label><icon>video</icon><linkedPage><id>0302</id><title>Multimedia</title><icon>video</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/0302</link><leaf>false</leaf><widget><widgetId>0302_0</widgetId><type>Frame</type><label>Radio Control</label><icon>frame</icon><widget><widgetId>0302_0_0</widgetId><type>Selection</type><label>Radio</label><icon>network</icon><mapping><command>0</command><label>off</label></mapping><mapping><command>1</command><label>HR3</label></mapping><mapping><command>2</command><label>SWR3</label></mapping><mapping><command>3</command><label>FFH</label></mapping><item><type>NumberItem</type><name>Radio_Station</name><state>1</state><link>https://demo.openhab.org:8443/rest/items/Radio_Station</link></item></widget><widget><widgetId>0302_0_0_1</widgetId><type>Slider</type><label>Volume [62.0 %]</label><icon>slider-60</icon><switchSupport>false</switchSupport><sendFrequency>0</sendFrequency><item><type>DimmerItem</type><name>Volume</name><state>62</state><link>https://demo.openhab.org:8443/rest/items/Volume</link></item></widget></widget><widget><widgetId>0302_1</widgetId><type>Frame</type><label>Multimedia Widgets</label><icon>frame</icon><widget><widgetId>0302_1_0</widgetId><type>Image</type><label>openHAB</label><icon>image</icon><url>https://demo.openhab.org:8443/proxy?sitemap=demo.sitemap&amp;widgetId=03020100</url><linkedPage><id>03020100</id><title>openHAB</title><icon>image</icon><link>https://demo.openhab.org:8443/rest/sitemaps/demo/03020100</link><leaf>true</leaf><widget><widgetId>03020100_0</widgetId><type>Text</type><label>http://www.openHAB.org</label><icon>icon</icon></widget></linkedPage></widget><widget><widgetId>0302_1_0_1</widgetId><type>Video</type><label></label><icon>video</icon><url>https://demo.openhab.org:8443/proxy?sitemap=demo.sitemap&amp;widgetId=03020101</url></widget><widget><widgetId>0302_1_0_1_2</widgetId><type>Webview</type><label></label><icon>webview</icon><height>8</height><url>http://heise-online.mobi/</url></widget></widget></linkedPage></widget></widget></homepage></sitemap>");
 
-        requestOpenHABData(htmlResponseData.toString(), habApplication);
+        requestOpenHABData(htmlResponseData.toString());
     }
 
+    public UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget) {
+        UnitEntityDataType rue = null;
+
+        switch(openHABWidget.getItem().getType()) {
+            case Switch:
+                Boolean aBoolean;
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aBoolean = null;
+                else
+                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("ON");
+
+                rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                {
+                    public String getFormattedString(){
+                        return mValue.booleanValue()? "ON": "OFF";//TODO - Format value
+                    }
+
+                    @Override
+                    public Boolean valueOf(String input) {
+                        return Boolean.valueOf(input);
+                    }
+                };
+                break;
+
+            case Contact:
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aBoolean = null;
+                else
+                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("CLOSED");
+
+                rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                {
+                    public String getFormattedString(){
+                        return mValue.booleanValue()? "CLOSED": "OPEN";//TODO - Format value
+                    }
+
+                    @Override
+                    public Boolean valueOf(String input) {
+                        return Boolean.valueOf(input);
+                    }
+                };
+                break;
+
+            case Rollershutter:
+            case Dimmer:
+            case Number:
+                Double aNumber;
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aNumber = null;
+                else
+                    aNumber = Double.valueOf(openHABWidget.getItem().getState());
+
+                rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
+                {
+                    public String getFormattedString(){
+                        return mValue.toString();
+                    }
+
+                    @Override
+                    public Double valueOf(String input) {
+                        return Double.valueOf(input);
+                    }
+                };
+                break;
+        }
+
+        return rue;
+    }
+
+    public IEntityDataType getUnitEntityDataType(String widgetId) {
+        return getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID(widgetId));
+    }
 }

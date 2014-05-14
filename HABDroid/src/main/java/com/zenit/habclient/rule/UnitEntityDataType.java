@@ -9,8 +9,6 @@ import com.zenit.habclient.util.StringHandler;
  */
 public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements OnValueChangedListener {
 
-    protected String mName;
-    protected T mValue;
     protected UnitValueChangedListener mUnitValueChangedListener;
     protected boolean mIsRegistered = false;
 
@@ -49,7 +47,7 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
     public void setValue(T value) {
         boolean changed = mValue.equals(value);
         mValue = value;
-        if(changed)
+        if(changed && mOnOperandValueChangedListener != null)
             mOnOperandValueChangedListener.onOperandValueChanged(this);
     }
 

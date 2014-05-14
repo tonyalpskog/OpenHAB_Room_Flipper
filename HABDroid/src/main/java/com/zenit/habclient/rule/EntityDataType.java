@@ -1,6 +1,7 @@
 package com.zenit.habclient.rule;
 
 import com.zenit.habclient.OnOperandValueChangedListener;
+import com.zenit.habclient.util.StringHandler;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -55,8 +56,13 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
     }
 
     @Override
-    public String toString() {
-        return mName != null? mName : getFormattedString();
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        if(!StringHandler.isNullOrEmpty(mName))
+            sb.append(mName + " ");
+        sb.append("[" + getFormattedString() + "]");
+        return sb.toString();
     }
 
     @Override

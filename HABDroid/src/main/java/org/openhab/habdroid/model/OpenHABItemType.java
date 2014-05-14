@@ -12,7 +12,8 @@ public enum OpenHABItemType {
     Number(5, "NumberItem"),
     Contact(6, "ContactItem"),
     Color(7, "ColorItem"),
-    String(8,"StringItem");
+    String(8,"StringItem"),
+    DateTime(9, "DateTimeItem");
 
     public final String Name;
     public final int Id;

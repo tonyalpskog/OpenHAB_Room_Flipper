@@ -8,7 +8,6 @@ import com.zenit.habclient.rule.RuleOperationProvider;
 import com.zenit.habclient.rule.RuleOperator;
 import com.zenit.habclient.rule.RuleOperatorType;
 import com.zenit.habclient.rule.RuleTreeItem;
-import com.zenit.habclient.rule.UnitEntityDataType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
@@ -22,6 +21,7 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
     private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
     private HABApplication mHABApplication;
     RuleOperationProvider rop;
+    HttpDataSetup mHttpDataSetup;
 
     public RuleTreeTest() {
         super(HABApplication.class);
@@ -35,8 +35,8 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         createApplication();
         mHABApplication = getApplication();
 
-        HttpDataSetup httpDataSetup = new HttpDataSetup();
-        httpDataSetup.loadHttpDataFromString(mHABApplication);
+        mHttpDataSetup = new HttpDataSetup(mHABApplication);
+        mHttpDataSetup.loadHttpDataFromString();
 
         rop = mHABApplication.getRuleOperationProvider();
 
@@ -60,67 +60,20 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         assertEquals(true, Math.abs(d.doubleValue() - f.doubleValue()) < 8E-7f);
     }
 
-    private UnitEntityDataType mock_getUnitEntityDataType(OpenHABWidget openHABWidget) {
-        UnitEntityDataType rue = null;
-
-        switch(openHABWidget.getItem().getType()) {
-            case Switch:
-                Boolean aBoolean;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aBoolean = null;
-                else
-                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("On");
-
-                rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
-                {
-                    public String getFormattedString(){
-                        return mValue.booleanValue()? "On": "Off";//TODO - Language independent
-                    }
-
-                    @Override
-                    public Boolean valueOf(String input) {
-                        return Boolean.valueOf(input);
-                    }
-                };
-                break;
-            case Number:
-                Double aNumber;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aNumber = null;
-                else
-                    aNumber = Double.valueOf(openHABWidget.getItem().getState());
-
-                rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
-                {
-                    public String getFormattedString(){
-                        return mValue.toString();
-                    }
-
-                    @Override
-                    public Double valueOf(String input) {
-                        return Double.valueOf(input);
-                    }
-                };
-                break;
-        }
-
-        return rue;
-    }
-
     private List<IEntityDataType> mock_getOperandsAsList(int operandPairNumber) {
         List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
 
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(mock_getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0")));
-                operands.add(mock_getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(mock_getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3")));
-                operands.add(mock_getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
