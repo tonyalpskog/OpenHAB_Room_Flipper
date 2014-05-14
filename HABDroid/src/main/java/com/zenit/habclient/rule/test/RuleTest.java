@@ -1,6 +1,7 @@
 package com.zenit.habclient.rule.test;
 
 import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.OnValueChangedListener;
 import com.zenit.habclient.rule.UnitEntityDataType;
 import com.zenit.habclient.UnitEntityDataTypeProvider;
 import com.zenit.habclient.rule.IEntityDataType;
@@ -803,11 +804,23 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         //Second operation (Rule B)
         RuleOperator<Number> operator2 =  ruleOperatorsNumeric.get(RuleOperatorType.LessThan);
 
-        RuleOperation roB = new RuleOperation(operator2, operands);
+        List<IEntityDataType> operands2 = getOperandsAsList();
+        RuleOperation roB = new RuleOperation(operator2, operands2);
         assertEquals("Humidity percentage [50.7%Rh] < Test Value [50.7]", roB.toString());
         assertEquals(false, roB.getValue().booleanValue());
 
         assertEquals(false, roA.getValue().booleanValue() && roB.getValue().booleanValue());
+
+        //Test if a value change on first operator in second operation will update itself and the sub-operations
+        UnitEntityDataType operand1 = ((UnitEntityDataType)operands2.get(0));
+        assertEquals(50.7d, operand1.getValue());
+        operand1.setValue(59.2d);
+        assertEquals(59.2d, operand1.getValue());
+        ((OnValueChangedListener)operands2.get(0)).onValueChanged(((OnValueChangedListener) operands2.get(0)).getDataSourceId(), "43.5");
+        assertEquals(43.5d, operand1.getValue());
+        assertEquals(true, roA.getValue().booleanValue());
+        assertEquals(true, roB.getValue().booleanValue());
+        assertEquals(true, roA.getValue().booleanValue() && roB.getValue().booleanValue());
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {
@@ -884,6 +897,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
         assertEquals("Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
+
 
         widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));

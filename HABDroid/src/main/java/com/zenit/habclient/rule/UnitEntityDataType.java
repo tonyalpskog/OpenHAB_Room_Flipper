@@ -45,7 +45,7 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
     }
 
     public void setValue(T value) {
-        boolean changed = mValue.equals(value);
+        boolean changed = !mValue.equals(value);
         mValue = value;
         if(changed && mOnOperandValueChangedListener != null)
             mOnOperandValueChangedListener.onOperandValueChanged(this);
