@@ -1,6 +1,8 @@
 package com.zenit.habclient.rule;
 
-import com.zenit.habclient.HABApplication;
+import android.content.Context;
+
+import com.zenit.habclient.OpenHABWidgetControl;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
@@ -13,15 +15,12 @@ import java.util.List;
 public class RuleOperationProvider {
 //    private List<IOperatorValue> mValueTypes;
     public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
-    HABApplication mHABApplication;
+    Context mContext;
+    OpenHABWidgetControl mOpenHABWidgetControl;
 
-//    public RuleOperationProvider(HABApplication application) {
-//        mHABApplication = application;
-//        mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
-//        createLogicOperators();
-//    }
-//
-    public RuleOperationProvider() {
+    public RuleOperationProvider(Context context) {
+        mContext = context;
+        mOpenHABWidgetControl = new OpenHABWidgetControl(mContext);
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
         createLogicOperators();
     }
@@ -310,21 +309,19 @@ public class RuleOperationProvider {
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
         HashMap<RuleOperatorType, RuleOperator<?>> result = null;
 
-        RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
-
         switch(openHABWidget.getItem().getType()) {
             case Contact:
             case Switch:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Boolean.class);
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(Boolean.class);
                 break;
             case Number:
             case Dimmer:
             case Rollershutter:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(Number.class);
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(Number.class);
                 break;
             case String:
             case Color:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(String.class);
+                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(String.class);
                 break;
         }
 
@@ -332,8 +329,6 @@ public class RuleOperationProvider {
     }
 
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperatorHash(Class<?> operandClass) {
-        RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
-
-        return (HashMap<RuleOperatorType, RuleOperator<?>>) rop.mOperatorHash.get(operandClass);
+        return (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(operandClass);
     }
 }
