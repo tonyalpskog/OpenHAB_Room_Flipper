@@ -48,7 +48,7 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
     }
 
     public void testGetWidgetById() {
-        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
         assertEquals("Ceiling", unit.getLabel());
         assertEquals("Light_GF_Kitchen_Ceiling", unit.getItem().getName());
     }
@@ -66,14 +66,14 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0")));
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3")));
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
+                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
@@ -86,22 +86,22 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
 
         switch(operationNumber) {
             case 1:
-                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
+                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]
                 break;
             case 2:
-                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1");
+                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]
                 break;
             case 3:
-                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3");
+                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] < Temperature_GF_Toilet [21.50]
                 break;
             case 4:
-                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4");
+                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] > Temperature_GF_Toilet [21.50]
                 break;
@@ -112,20 +112,20 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
 
     public void test_toString() {
         RuleTreeItem rt = mock_getRuleOperation(1).getRuleTreeItem(0);
-        assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", rt.toString());
+        assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", rt.toString());
     }
 
     public void test_toString_from_a_two_operation_operands_operation() {
         RuleOperation ron1 = mock_getRuleOperation(1);
         RuleTreeItem rti1 = new RuleTreeItem(0, ron1.getRuleTreeItem(0).toString());
-        assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", rti1.toString());
+        assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", rti1.toString());
         assertEquals(0, rti1.getPosition());
         assertEquals(0, rti1.getChildren().size());
         assertEquals(true, ron1.getValue().booleanValue());
 
         RuleOperation ron2 = mock_getRuleOperation(4);
         RuleTreeItem rti2 = new RuleTreeItem(1, ron2.getRuleTreeItem(1).toString());
-        assertEquals("Temperature_FF_Bed > Temperature_GF_Toilet", rti2.toString());
+        assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", rti2.toString());
         assertEquals(1, rti2.getPosition());
         assertEquals(0, rti2.getChildren().size());
         assertEquals(false, ron2.getValue().booleanValue());
@@ -138,15 +138,18 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         RuleTreeItem mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         assertEquals(3, mainRuleTreeItem.getPosition());
         assertEquals(false, mainOperation.getValue().booleanValue());
-        assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainOperation.toString());
-        assertEquals("(Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror) AND (Temperature_FF_Bed > Temperature_GF_Toilet)", mainRuleTreeItem.toString());
-        assertEquals(2, mainRuleTreeItem.getChildren().size());
-        assertEquals("Light_GF_Kitchen_Ceiling = Light_FF_Bath_Mirror", mainRuleTreeItem.getChildren().get(0).toString());
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5])", mainOperation.toString());
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5])", mainRuleTreeItem.toString());
+        assertEquals(3, mainRuleTreeItem.getChildren().size());
+        assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", mainRuleTreeItem.getChildren().get(0).toString());
         assertEquals(0, mainRuleTreeItem.getChildren().get(0).getPosition());
         assertEquals(0, mainRuleTreeItem.getChildren().get(0).getChildren().size());
-        assertEquals("Temperature_FF_Bed > Temperature_GF_Toilet", mainRuleTreeItem.getChildren().get(1).toString());
+        assertEquals("AND", mainRuleTreeItem.getChildren().get(1).toString());
         assertEquals(1, mainRuleTreeItem.getChildren().get(1).getPosition());
         assertEquals(0, mainRuleTreeItem.getChildren().get(1).getChildren().size());
+        assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", mainRuleTreeItem.getChildren().get(2).toString());
+        assertEquals(2, mainRuleTreeItem.getChildren().get(2).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(2).getChildren().size());
 
         operandList.clear();
         ron1.setName("First_Operation");
@@ -157,14 +160,17 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         assertEquals(3, mainRuleTreeItem.getPosition());
         assertEquals(false, mainOperation.getValue().booleanValue());
-        assertEquals("First_Operation AND Second_Operation", mainOperation.toString());
-        assertEquals("First_Operation AND Second_Operation", mainRuleTreeItem.toString());
-        assertEquals(2, mainRuleTreeItem.getChildren().size());
-        assertEquals("First_Operation", mainRuleTreeItem.getChildren().get(0).toString());
+        assertEquals("First_Operation [Sant] AND Second_Operation [Falskt]", mainOperation.toString());
+        assertEquals("First_Operation [Sant] AND Second_Operation [Falskt]", mainRuleTreeItem.toString());
+        assertEquals(3, mainRuleTreeItem.getChildren().size());
+        assertEquals("First_Operation [Sant]", mainRuleTreeItem.getChildren().get(0).toString());
         assertEquals(0, mainRuleTreeItem.getChildren().get(0).getPosition());
         assertEquals(0, mainRuleTreeItem.getChildren().get(0).getChildren().size());
-        assertEquals("Second_Operation", mainRuleTreeItem.getChildren().get(1).toString());
+        assertEquals("AND", mainRuleTreeItem.getChildren().get(1).toString());
         assertEquals(1, mainRuleTreeItem.getChildren().get(1).getPosition());
         assertEquals(0, mainRuleTreeItem.getChildren().get(1).getChildren().size());
+        assertEquals("Second_Operation [Falskt]", mainRuleTreeItem.getChildren().get(2).toString());
+        assertEquals(2, mainRuleTreeItem.getChildren().get(2).getPosition());
+        assertEquals(0, mainRuleTreeItem.getChildren().get(2).getChildren().size());
     }
 }

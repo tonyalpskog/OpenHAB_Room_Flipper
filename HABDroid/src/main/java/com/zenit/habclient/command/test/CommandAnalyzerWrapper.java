@@ -50,7 +50,7 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //        // could have heard
 //        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
 ////        if(widgetList.size() == 0) {
-//            widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+//            widgetList = habApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
 ////        }
 //        //Create widget name Map
 //        Iterator<OpenHABWidget> iterator = widgetList.iterator();
@@ -84,7 +84,7 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //        // could have heard
 //        List<OpenHABWidget> widgetList = getListOfWidgetsFromListOfRooms(listOfRooms);
 //        if(widgetList.size() == 0) {
-//            widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+//            widgetList = habApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
 //        }
 //        //Create widget name Map
 //        Iterator<OpenHABWidget> iterator = widgetList.iterator();

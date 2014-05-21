@@ -35,7 +35,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     @Override
     public String toString() {
         if(!StringHandler.isNullOrEmpty(getName())) {
-            return getName() + "[" + getFormattedString() + "]";
+            return getName() + " [" + getFormattedString() + "]";
         }
 
         String[] operandsAsStringArray = new String[mOperands.size() - 1];
@@ -57,7 +57,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     private boolean getIsRuleAndUseGeneratedString(IEntityDataType operand) {
-        return operand.getSourceType() == EntityDataTypeSource.RULE && !StringHandler.isNullOrEmpty(operand.getName());
+        return operand.getSourceType() == EntityDataTypeSource.RULE && StringHandler.isNullOrEmpty(operand.getName());
     }
 
     private void runCalculation() {
@@ -88,16 +88,20 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public void setDescription(String description) { mDescription = description; }
 
     @Override
-    public RuleTreeItem getRuleTreeItem(int treeIndex) {
+    public RuleTreeItem
+    getRuleTreeItem(int treeIndex) {
         HashMap<Integer, RuleTreeItem> hm = new HashMap<Integer, RuleTreeItem>();
 
         Integer integer = 0;
-
         for(IEntityDataType operand : mOperands.toArray(new IEntityDataType[0])) {
             RuleTreeItem rti = operand.getRuleTreeItem(integer);
             if(rti != null) {
-                hm.put(integer, rti);
-                integer++;
+                if(!hm.isEmpty()) {
+                    RuleTreeItem operatorTreeItem = new RuleTreeItem(integer, mRuleOperator.getType().getName());
+                    hm.put(integer++, operatorTreeItem);
+                    rti.setPosition(integer);
+                }
+                hm.put(integer++, rti);
             }
         }
 

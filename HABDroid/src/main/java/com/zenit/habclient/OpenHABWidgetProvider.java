@@ -7,6 +7,7 @@ import com.zenit.habclient.command.WidgetPhraseMatchResult;
 import com.zenit.habclient.util.RegExAccuracyResult;
 import com.zenit.habclient.util.StringHandler;
 
+import org.openhab.habdroid.model.OpenHABItem;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -24,12 +25,14 @@ import java.util.UUID;
  */
 public class OpenHABWidgetProvider {
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
+    private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private UUID mUpdateSetUUID;
 
     public OpenHABWidgetProvider() {
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
+        mOpenHABItemNameMap = new HashMap<String, OpenHABWidget>();
     }
 
     //Long polling method..?
@@ -59,10 +62,16 @@ public class OpenHABWidgetProvider {
             while (widgetIterator.hasNext()) {
                 OpenHABWidget widget = widgetIterator.next();
                 mOpenHABWidgetIdMap.put(widget.getId(), widget);
+                if(widget.hasItem())
+                    mOpenHABItemNameMap.put(widget.getItem().getName(), widget);
                 stringList.add(widget.getItem().getName());
             }
             mOpenHABWidgetTypeMap.put(type, stringList);
         }
+    }
+
+    public void setOpenHABItem(OpenHABItem item) {
+        mOpenHABItemNameMap.get(item.getName()).setItem(item);
     }
 
     public void setOpenHABWidgets(OpenHABWidgetDataSource openHABWidgetDataSource) {
@@ -95,6 +104,8 @@ public class OpenHABWidgetProvider {
         if(widget.getType() != null) {
             //Overwrite / Update widget if it already exists.
             mOpenHABWidgetIdMap.put(widget.getId(), widget);
+            if(widget.hasItem())
+                mOpenHABItemNameMap.put(widget.getItem().getName(), widget);
 
             if(widget.getType() == OpenHABWidgetType.Group || widget.getType() == OpenHABWidgetType.SitemapText) {
                 String widgetName = (widget.hasLinkedPage()? widget.getLinkedPage().getTitle() : widget.getId());
@@ -227,19 +238,36 @@ public class OpenHABWidgetProvider {
     }
 
     public OpenHABWidget getWidgetByID(String widgetID) {
-        if(!hasWidgetID(widgetID))
-            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", widgetID));
+        OpenHABWidget widget = mOpenHABWidgetIdMap.get(widgetID);
+        if(widget == null)
+            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetID));
 
-        return mOpenHABWidgetIdMap.get(widgetID);
+        return widget;
     }
 
-    public boolean hasWidgetID(String itemName) {
-        if(itemName == null)
+    public boolean hasWidgetID(String widgetId) {
+        if(widgetId == null)
             return false;
 
-        boolean result = mOpenHABWidgetIdMap.containsKey(itemName);
+        boolean result = mOpenHABWidgetIdMap.containsKey(widgetId);
         if(!result)
-            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", itemName));
+            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetId));
         return result;
     }
-}
+
+    public OpenHABWidget getWidgetByItemName(String openHabItemName) {
+        OpenHABWidget widget = mOpenHABItemNameMap.get(openHabItemName);
+        if(widget == null)
+            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
+        return widget;
+    }
+
+    public boolean hasItemName(String openHabItemName) {
+        if(openHabItemName == null)
+            return false;
+
+        boolean result = mOpenHABItemNameMap.containsKey(openHabItemName);
+        if(!result)
+            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
+        return result;
+    }}

@@ -186,8 +186,8 @@ public class Room {
 
     public String getName() {
         return mName;
-//        if(HABApplication.getOpenHABWidgetProvider().hasWidgetID(mGroupWidgetId)) {
-//            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidgetByID(mGroupWidgetId);
+//        if(HABApplication.getOpenHABWidgetProvider2().hasWidgetID(mGroupWidgetId)) {
+//            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mGroupWidgetId);
 //            if(widget.getLabel() == null) {
 //                Log.w(HABApplication.getLogTag(), String.format("\n%s\nNo label found for Room widget ID '%s'", HABApplication.getLogTag(1), mGroupWidgetId));
 //                return "<No label>";
@@ -212,7 +212,7 @@ public class Room {
         if(mLocalWidget != null)
             return mLocalWidget;
 
-        return HABApplication.getOpenHABWidgetProvider().getWidgetByID(mGroupWidgetId);
+        return HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mGroupWidgetId);
     }
 
     private Bitmap adjustOpacity(Bitmap bitmap, int opacity) {

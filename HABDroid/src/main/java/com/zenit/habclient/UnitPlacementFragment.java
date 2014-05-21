@@ -200,7 +200,7 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void showAddUnitDialog(Context context) {
-        List<OpenHABWidget> list = HABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+        List<OpenHABWidget> list = HABApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
         Iterator<OpenHABWidget> iter = list.iterator();
         while(iter.hasNext())
             Log.d(HABApplication.getLogTag(), "WidgetProvider data ID = " + iter.next().getId());
@@ -214,7 +214,7 @@ public class UnitPlacementFragment extends Fragment {
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
 //TA: TODO - Not sure if this is needed.
-//        if(!HABApplication.getOpenHABWidgetProvider().hasWidgetID(roomView.getRoom().getGroupWidgetId()))
+//        if(!HABApplication.getOpenHABWidgetProvider2().hasWidgetID(roomView.getRoom().getGroupWidgetId()))
 //            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
 
         if(roomView.getRoom().getRoomWidget() == null) {

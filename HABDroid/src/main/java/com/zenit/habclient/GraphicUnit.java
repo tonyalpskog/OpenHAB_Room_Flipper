@@ -27,7 +27,7 @@ public class GraphicUnit {
 
     public GraphicUnit(String widgetId, UnitContainerView roomView) {
         mWidgetId = widgetId;
-        mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider().getUpdateUUID();
+        mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider2().getUpdateUUID();
         mRoomView = roomView;
 
         mView = null;
@@ -107,7 +107,7 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return HABApplication.getOpenHABWidgetProvider().getWidgetByID(mWidgetId);
+        return HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mWidgetId);
     }
 
     public void setOpenHABWidget(String itemName) {

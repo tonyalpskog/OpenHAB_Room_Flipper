@@ -61,7 +61,7 @@ public class MainActivity extends Activity
         Fragment newFragment = null;
 
         HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
-        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider2().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
             if(widget == null)
                 Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
             else if(widget.hasChildren())
@@ -157,7 +157,7 @@ public class MainActivity extends Activity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = new CommandAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider(), getApplicationContext());
+                mSpeechResultAnalyzer = new CommandAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider2(), getApplicationContext());
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
             mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());

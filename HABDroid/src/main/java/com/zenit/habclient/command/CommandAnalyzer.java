@@ -155,7 +155,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         if(bestKeySoFar.getCommandType() != OpenHABWidgetCommandType.GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {
-                OpenHABWidgetControl openHABWidgetControl = new OpenHABWidgetControl(context);
+                OpenHABWidgetControl openHABWidgetControl = HABApplication.getOpenHABWidgetControl(context);
                 openHABWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
 //                commandReply = getPopularNameFromWidgetLabel(unitMatchResult.get(bestKeySoFar).getWidget().getLabel());
                 commandReply = value;
@@ -186,6 +186,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             case RollerShutterDown: return "DOWN";
             case RollerShutterUp: return "UP";
             default: return null;
+            //TODO - Extend this list of supported item type commands
         }
 
         for(int i = 0; i < commandPhraseMatchResult.getTags().length; i++ ) {
@@ -278,7 +279,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         // could have heard
         List<OpenHABWidget> widgetList = getListOfWidgetsFromListOfRooms(listOfRooms);
         if(widgetList.size() == 0) {
-            widgetList = HABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+            widgetList = HABApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
         }
         //Create widget name Map
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
@@ -305,7 +306,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
         List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
-        widgetList = habApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null);
+        widgetList = habApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
         Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
         while (iterator.hasNext()) {
@@ -445,7 +446,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         String unitTagPhrase = getUnitPhrase(commandPhraseMatchResult);
 
         //Add all found widgets no matter their match points.
-        return HABApplication.getOpenHABWidgetProvider().getWidgetByLabel(unitTagPhrase, this);
+        return HABApplication.getOpenHABWidgetProvider2().getWidgetByLabel(unitTagPhrase, this);
     }
 
     public WidgetPhraseMatchResult getMostProbableWidgetFromCommandMatchResult(CommandPhraseMatchResult commandPhraseMatchResult) {
@@ -455,7 +456,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         int matchPoint = 0;
         WidgetPhraseMatchResult widgetMatch = null;
         WidgetPhraseMatchResult matchResult = null;
-        List<WidgetPhraseMatchResult> widgetList = HABApplication.getOpenHABWidgetProvider().getWidgetByLabel(unitTagPhrase, this);
+        List<WidgetPhraseMatchResult> widgetList = HABApplication.getOpenHABWidgetProvider2().getWidgetByLabel(unitTagPhrase, this);
         Iterator<WidgetPhraseMatchResult> widgetResultIterator = widgetList.iterator();
         while(widgetResultIterator.hasNext()) {
             matchResult = widgetResultIterator.next();

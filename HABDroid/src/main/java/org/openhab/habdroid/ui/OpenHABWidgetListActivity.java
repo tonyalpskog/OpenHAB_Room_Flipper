@@ -643,7 +643,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void processContent(String content) {
         Node rootNode = getRootNode(content);
         openHABWidgetDataSource.setSourceNode(rootNode);
-        HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
+        HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         // As we change the page we need to stop all videos on current page
         // before going to the new page. This is quite dirty, but is the only
@@ -834,7 +834,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
             Util.overridePendingTransition(this, false);
     		return true;
         case R.id.mainmenu_openhab_changedate:
-            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider().getWidgetByID("Date").getItem(), "2014-02-06T21:42:28");//TODO - getWidgetByID("Date") ???
+            openHABWidgetAdapter.sendItemCommand(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("Date").getItem(), "2014-02-06T21:42:28");//TODO - getWidgetByID("Date") ???
             return true;
         default:
     		return super.onOptionsItemSelected(item);

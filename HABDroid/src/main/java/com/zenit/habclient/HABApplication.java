@@ -1,6 +1,7 @@
 package com.zenit.habclient;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.zenit.habclient.command.CommandAnalyzer;
@@ -30,6 +31,7 @@ public class HABApplication extends Application {
     private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
     private static ICommandAnalyzer mSpeechResultAnalyzer = null;
     private static RegularExpression mRegularExpression = null;
+    private static OpenHABWidgetControl mOpenHABWidgetControl = null;
 
     public ICommandAnalyzer getSpeechResultAnalyzer() {
         if(mSpeechResultAnalyzer == null)
@@ -53,7 +55,11 @@ public class HABApplication extends Application {
         mAppMode = appMode;
     }
 
-    public static OpenHABWidgetProvider getOpenHABWidgetProvider() {
+    public OpenHABWidgetProvider getOpenHABWidgetProvider() {
+        return getOpenHABWidgetProvider2();
+    }
+
+    public static OpenHABWidgetProvider getOpenHABWidgetProvider2() {
         if(mOpenHABWidgetProvider == null)
             mOpenHABWidgetProvider = new OpenHABWidgetProvider();
 
@@ -126,9 +132,13 @@ public class HABApplication extends Application {
         return mRoomProvider;
     }
 
-    public static RuleOperationProvider getRuleOperationProvider() {
+    public RuleOperationProvider getRuleOperationProvider() {
+        return getRuleOperationProvider(getApplicationContext());
+    }
+
+    public static RuleOperationProvider getRuleOperationProvider(Context context) {
         if(mRuleOperationProvider == null)
-            mRuleOperationProvider = new RuleOperationProvider();
+            mRuleOperationProvider = new RuleOperationProvider(context);
 
         return mRuleOperationProvider;
     }
@@ -140,4 +150,10 @@ public class HABApplication extends Application {
         return mRegularExpression;
     }
 
+    public static OpenHABWidgetControl getOpenHABWidgetControl(Context context) {
+        if(mOpenHABWidgetControl == null)
+            mOpenHABWidgetControl = new OpenHABWidgetControl(context);
+
+        return mOpenHABWidgetControl;
+    }
 }

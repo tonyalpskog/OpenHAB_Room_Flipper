@@ -36,4 +36,8 @@ public class RuleTreeItem extends HashMap<Integer, RuleTreeItem> {
     public HashMap<Integer, RuleTreeItem> getChildren() {
         return mChildren;
     }
+
+    public void setPosition(Integer position) {
+        mPosition = position;
+    }
 }

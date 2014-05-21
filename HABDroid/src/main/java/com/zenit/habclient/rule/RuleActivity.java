@@ -57,7 +57,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         Log.d("LifeCycle.RuleActivity", "onCreate()");
 
         if(mRule == null) {
-            mRule = new Rule();
+            mRule = new Rule(getApplication().getApplicationContext());
             mRule.setName("Initial rule name");
         }
 
@@ -395,14 +395,17 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             List<RuleOperation> operandList = new ArrayList<RuleOperation>();
             operandList.add(getRuleOperation());
             operandList.add(getRuleOperation());
-            RuleOperator ror =  HABApplication.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+            RuleOperator ror =  HABApplication.getRuleOperationProvider(mContext).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
             RuleOperation ron2 = new RuleOperation(ror, operandList);
+            RuleOperation ron3 = new RuleOperation(ror, operandList);
+            ron3.setName("The is the name of the ron3 rule.");
 
-            comingSoon.put(Integer.valueOf(0), operandList.get(0).getRuleTreeItem(0));
-            comingSoon.put(Integer.valueOf(1), operandList.get(1).getRuleTreeItem(1));
+            comingSoon.put(Integer.valueOf(0), new RuleTreeItem(4, "Men In Black"));
+            comingSoon.put(Integer.valueOf(1), ron2.getRuleTreeItem(3));
             comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now"));
-            comingSoon.put(Integer.valueOf(3), ron2.getRuleTreeItem(3));
+            comingSoon.put(Integer.valueOf(3), ron3.getRuleTreeItem(3));
             comingSoon.put(Integer.valueOf(4), new RuleTreeItem(4, "Europa Report"));
+            comingSoon.put(Integer.valueOf(5), new RuleTreeItem(5, "Apocalypse Now"));
 
             if(mTreeData == null)
                 mTreeData = new HashMap<Integer, RuleTreeItem>();
@@ -413,8 +416,8 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         }
 
         private RuleOperation getRuleOperation() {
-            RuleOperationProvider rop = HABApplication.getRuleOperationProvider();
-            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0");
+            RuleOperationProvider rop = HABApplication.getRuleOperationProvider(mContext);
+            OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0");
             RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
             return roA;
         }
@@ -425,14 +428,14 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             switch(operandPairNumber) {
                 case 1:
                     //Switch
-                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_1")));
-                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Corridor_1")));
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_1")));
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Corridor_1")));
                     break;
 
                 case 2:
                     //Number
-                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0")));//"demo_1_0"
-                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider().getWidgetByID("demo_1_0")));//ekafallettest_1
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//"demo_1_0"
+                    operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//ekafallettest_1
                     break;
             }
 

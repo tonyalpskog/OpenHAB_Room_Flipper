@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="C:\Source\Git\Home\MyHABDroid" />
-            <option value="C:\Source\Git\Home\MyHABDroid\HABDroid" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/HABDroid" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -67,7 +67,7 @@ public class HttpDataSetup {
 
         openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode);
 
-        mHABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
+        mHABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
         return;
     }
 
@@ -158,6 +158,6 @@ public class HttpDataSetup {
     }
 
     public IEntityDataType getUnitEntityDataType(String widgetId) {
-        return getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID(widgetId));
+        return getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId));
     }
 }

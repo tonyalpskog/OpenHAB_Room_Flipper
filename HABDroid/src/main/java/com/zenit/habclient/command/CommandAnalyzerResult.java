@@ -7,51 +7,51 @@ import org.openhab.habdroid.model.OpenHABWidget;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzerResult {
-    protected Room Room;
-    protected OpenHABWidget OpenHABWidget;
-    protected int matchPoint;
-    protected String openHABItemState;
-    protected OpenHABWidgetCommandType commandType;
+    protected Room mRoom;
+    protected OpenHABWidget mOpenHABWidget;
+    protected int mMatchPoint;
+    protected String mOpenHABItemState;
+    protected OpenHABWidgetCommandType mCommandType;
 
     public CommandAnalyzerResult(com.zenit.habclient.Room room, org.openhab.habdroid.model.OpenHABWidget openHABWidget, int matchPoint, String openHABItemState, OpenHABWidgetCommandType commandType) {
-        Room = room;
-        OpenHABWidget = openHABWidget;
-        this.matchPoint = matchPoint;
-        this.openHABItemState = openHABItemState;
-        this.commandType = commandType;
+        mRoom = room;
+        mOpenHABWidget = openHABWidget;
+        this.mMatchPoint = matchPoint;
+        this.mOpenHABItemState = openHABItemState;
+        this.mCommandType = commandType;
     }
 
     public Room getRoom() {
-        return Room;
+        return mRoom;
     }
 
     public void setRoom(Room room) {
-        Room = room;
+        mRoom = room;
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return OpenHABWidget;
+        return mOpenHABWidget;
     }
 
     public void setOpenHABWidget(OpenHABWidget openHABWidget) {
-        OpenHABWidget = openHABWidget;
+        mOpenHABWidget = openHABWidget;
     }
 
     public int getMatchPoint() {
-        return matchPoint;
+        return mMatchPoint;
     }
 
     public void setMatchPoint(int matchPoint) {
-        this.matchPoint = matchPoint;
+        this.mMatchPoint = matchPoint;
     }
 
     public String getOpenHABItemState() {
-        return openHABItemState;
+        return mOpenHABItemState;
     }
 
-    public void setOpenHABItemState(String openHABItemState) { this.openHABItemState = openHABItemState; }
+    public void setOpenHABItemState(String openHABItemState) { this.mOpenHABItemState = openHABItemState; }
 
-    public OpenHABWidgetCommandType getCommandType() { return commandType; }
+    public OpenHABWidgetCommandType getCommandType() { return mCommandType; }
 
-    public void setCommandType(OpenHABWidgetCommandType commandType) { this.commandType = commandType; }
+    public void setCommandType(OpenHABWidgetCommandType commandType) { this.mCommandType = commandType; }
 }

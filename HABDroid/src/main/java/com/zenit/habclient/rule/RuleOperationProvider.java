@@ -2,6 +2,7 @@ package com.zenit.habclient.rule;
 
 import android.content.Context;
 
+import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OpenHABWidgetControl;
 
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -20,7 +21,7 @@ public class RuleOperationProvider {
 
     public RuleOperationProvider(Context context) {
         mContext = context;
-        mOpenHABWidgetControl = new OpenHABWidgetControl(mContext);
+        mOpenHABWidgetControl = HABApplication.getOpenHABWidgetControl(mContext);
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
         createLogicOperators();
     }

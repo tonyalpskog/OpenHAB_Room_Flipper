@@ -91,7 +91,7 @@ public class RoomConfigFragment extends Fragment {
 
         mRoomNameText.setText(mCurrentRoom.getName() != null? mCurrentRoom.getName(): "");
 
-        List<OpenHABWidget> habGroupArrayList = HABApplication.getOpenHABWidgetProvider().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText));
+        List<OpenHABWidget> habGroupArrayList = HABApplication.getOpenHABWidgetProvider2().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText));
         if(habGroupArrayList.size() == 0)
             Log.e(HABApplication.getLogTag(), "No OpenHABWidget groups found in OpenHABWidgetProvider.");
 
@@ -111,7 +111,7 @@ public class RoomConfigFragment extends Fragment {
 
             //TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
             if(room.getGroupWidgetId() == null) {
-                OpenHABWidget groupWidget = HABApplication.getOpenHABWidgetProvider().getWidgetByID(room.getRoomWidget().getId());
+                OpenHABWidget groupWidget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(room.getRoomWidget().getId());
                 HABApplication.getRestCommunication().requestOpenHABSitemap(inflater.getContext(), groupWidget);
             }
 
@@ -149,7 +149,7 @@ public class RoomConfigFragment extends Fragment {
         if(mCurrentRoom.getGroupWidgetId() == null || mCurrentRoom.getGroupWidgetId().isEmpty())
             mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(NULL_GROUP_WIDGET));
         else
-            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(HABApplication.getOpenHABWidgetProvider().getWidgetByID(mCurrentRoom.getGroupWidgetId())));
+            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mCurrentRoom.getGroupWidgetId())));
 
         if(mSpinnerHashMap == null)
             mSpinnerHashMap = new HashMap<Direction, Spinner>();

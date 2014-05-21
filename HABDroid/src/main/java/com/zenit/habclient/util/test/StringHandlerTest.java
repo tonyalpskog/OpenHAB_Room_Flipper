@@ -33,7 +33,7 @@ public class StringHandlerTest extends InstrumentationTestCase {
     }
 
     public void test_getLevenshteinPercent() {
-        assertEquals(43, StringHandler.getLevenshteinDistance("OUTDOOR", "OUTSIDE"));
+        assertEquals(42, StringHandler.getLevenshteinPercent("OUTDOOR", "OUTSIDE"));
     }
 
     public void test_replaceSubStrings() {
@@ -42,5 +42,16 @@ public class StringHandlerTest extends InstrumentationTestCase {
 
         String result = StringHandler.replaceSubStrings("One <two> three <four> five", "<", ">", "(.+)");
         assertEquals("One (.+) three (.+) five", result);
+    }
+
+    public void test_isNullOrEmpty() {
+        String testString = "fkl43";
+        assertEquals(false, StringHandler.isNullOrEmpty(testString));
+
+        testString = "";
+        assertEquals(true, StringHandler.isNullOrEmpty(testString));
+
+        testString = null;
+        assertEquals(true, StringHandler.isNullOrEmpty(testString));
     }
 }

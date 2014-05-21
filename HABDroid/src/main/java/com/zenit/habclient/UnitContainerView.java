@@ -41,7 +41,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     public UnitContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mOpenHABWidgetControl = new OpenHABWidgetControl(context);
+        mOpenHABWidgetControl = HABApplication.getOpenHABWidgetControl(context);
 
         addedUnitViews = new ArrayList<View>();
 

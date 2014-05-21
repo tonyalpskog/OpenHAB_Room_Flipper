@@ -58,7 +58,7 @@ public class RestCommunication {
                     Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.toString() + "'");
                     Node rootNode = document.getFirstChild();
 
-                    HABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode): new OpenHABWidgetDataSource(rootNode, finalWidget));
+                    HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode): new OpenHABWidgetDataSource(rootNode, finalWidget));
                 } else {
                     Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
                 }

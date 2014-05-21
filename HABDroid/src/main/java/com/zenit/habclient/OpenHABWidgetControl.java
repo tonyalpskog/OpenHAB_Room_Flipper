@@ -40,6 +40,18 @@ public class OpenHABWidgetControl {
         mAsyncHttpClient = asyncHttpClient;
     }
 
+    public boolean sendItemCommandFromWidget(String widgetId, String command) {
+        OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId);
+        if(widget == null || !widget.hasItem())
+            return false;
+        sendItemCommand(widget.getItem(), command);
+        return true;
+    }
+
+    public void sendItemCommand(String itemName, String command) {
+        sendItemCommand(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(itemName).getItem(), command);
+    }
+
     public void sendItemCommand(OpenHABItem item, String command) {
         try {
             Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
