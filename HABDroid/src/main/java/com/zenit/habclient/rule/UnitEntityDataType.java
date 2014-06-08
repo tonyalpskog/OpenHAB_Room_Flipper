@@ -1,8 +1,11 @@
 package com.zenit.habclient.rule;
 
+import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OnValueChangedListener;
 import com.zenit.habclient.UnitValueChangedListener;
 import com.zenit.habclient.util.StringHandler;
+
+import org.openhab.habdroid.model.OpenHABWidget;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -23,6 +26,7 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
         mUnitValueChangedListener = unitValueChangedListener;
     }
 
+    @Override
     public void setDataSourceId(String dataSourceId) {
         if(mIsRegistered && mUnitValueChangedListener != null)
             mUnitValueChangedListener.unregisterOnValueChangedListener(this);
@@ -52,10 +56,86 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
     }
 
     @Override
-    public String getDataSourceId() { return mDataSourceId; }
-
-    @Override
     public void onValueChanged(String sourceID, String value) {
         setValue(valueOf(value));
+    }
+
+    public static UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget) {
+        UnitEntityDataType unitEntityDataType = null;
+
+        switch(openHABWidget.getItem().getType()) {
+            case Switch:
+                Boolean aBoolean;
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aBoolean = null;
+                else
+                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("ON");
+
+                unitEntityDataType = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                {
+                    public String getFormattedString(){
+                        return mValue.booleanValue()? "ON": "OFF";//TODO - Format value
+                    }
+
+                    @Override
+                    public Boolean valueOf(String input) {
+                        return Boolean.valueOf(input);
+                    }
+                };
+                break;
+
+            case Contact:
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aBoolean = null;
+                else
+                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("CLOSED");
+
+                unitEntityDataType = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
+                {
+                    public String getFormattedString(){
+                        return mValue.booleanValue()? "CLOSED": "OPEN";//TODO - Format value
+                    }
+
+                    @Override
+                    public Boolean valueOf(String input) {
+                        return Boolean.valueOf(input);
+                    }
+                };
+                break;
+
+            case Rollershutter:
+            case Dimmer:
+            case Number:
+                Double aNumber;
+                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
+                    aNumber = null;
+                else
+                    aNumber = Double.valueOf(openHABWidget.getItem().getState());
+
+                unitEntityDataType = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
+                {
+                    public String getFormattedString(){
+                        return mValue.toString();
+                    }
+
+                    @Override
+                    public Double valueOf(String input) {
+                        return Double.valueOf(input);
+                    }
+                };
+                break;
+        }
+
+        return unitEntityDataType;
+    }
+
+    public static IEntityDataType getUnitEntityDataTypeByWidgetId(String widgetId) {
+        OpenHABWidget openHABWidget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId);
+        return openHABWidget != null? getUnitEntityDataType(openHABWidget) : null;
+    }
+
+    public static IEntityDataType getUnitEntityDataTypeByItemName(String itemName) {
+        OpenHABWidget openHABWidget = HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(itemName);
+        return openHABWidget != null? getUnitEntityDataType(openHABWidget) : null;
     }
 }

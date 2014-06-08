@@ -8,6 +8,7 @@ import java.util.List;
  * Created by Tony Alpskog in 2014.
  */
 public abstract class RuleOperator<T> implements com.zenit.habclient.rule.IOperator<T> {
+    public static final String MISSING_OPERATOR = "<Missing operator>";//TODO - TA:Language
 
     protected boolean mSupportsMultipleOperations;
     protected RuleOperatorType mType;
@@ -34,8 +35,11 @@ public abstract class RuleOperator<T> implements com.zenit.habclient.rule.IOpera
 
         List<T> argsList = new ArrayList<T>();
 
-        for(int i = 0; i < args.length; i++)
+        for(int i = 0; i < args.length; i++) {
+            if(args[i] == null)
+                return false;//Unfinished operation initialization will result in FALSE as operation result.
             argsList.add(args[i]);
+        }
 
         return getOperationResult2(argsList);
     }
@@ -44,6 +48,8 @@ public abstract class RuleOperator<T> implements com.zenit.habclient.rule.IOpera
     public boolean getOperationResult(List<IEntityDataType> operands) {
         List<T> operandList = new ArrayList<T>(operands.size());
         for (IEntityDataType operand : operands) {
+            if(operand == null)
+                return false;//Unfinished operation initialization will result in FALSE as operation result.
             operandList.add((T) operand.getValue());
         }
 

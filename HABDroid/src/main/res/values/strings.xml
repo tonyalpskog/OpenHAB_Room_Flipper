@@ -108,4 +108,11 @@
     <!-- Command phrase -->
     <string name="command_wakeup_listener">yo hab</string>
     <string name="command_close_listener">bye hab</string>
+    <string name="unit">Unit</string>
+    <string name="new_operation">New operation:</string>
+    <string name="operation">Operation</string>
+    <string name="static_value">Static value:</string>
+    <string name="no_value"><![CDATA[<No value>]]></string>
+    <string name="select_unit">Pick a unit</string>
+    <string name="select_operation">Pick an operation</string>
 </resources>

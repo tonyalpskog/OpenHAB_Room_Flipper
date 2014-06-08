@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unit">Enhet</string>
+    <string name="new_operation">Ny operation:</string>
+    <string name="operation">Operation</string>
+    <string name="static_value">Statiskt värde:</string>
+</resources>

@@ -66,6 +66,12 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
     }
 
     @Override
+    public void setDataSourceId(String value) { mDataSourceId = value; }
+
+    @Override
+    public String getDataSourceId() { return mDataSourceId; }
+
+    @Override
     public abstract T valueOf(String input);
 
     @Override

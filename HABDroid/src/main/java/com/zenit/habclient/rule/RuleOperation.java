@@ -6,64 +6,124 @@ import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OnOperandValueChangedListener;
 import com.zenit.habclient.util.StringHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, OnOperandValueChangedListener {
-    private List<? extends IEntityDataType> mOperands;
+    private List<IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mDescription;
 
-    public RuleOperation(RuleOperator ruleOperator, List<? extends IEntityDataType> operands) {
+    public RuleOperation(String name) {
+        setName(name);
+        mOperands = new ArrayList<IEntityDataType>();
+        mOperands.add(null);
+        mDataSourceId = UUID.randomUUID().toString();
+    }
+
+    public RuleOperation(RuleOperator ruleOperator, List<IEntityDataType> operands) {
         mRuleOperator = ruleOperator;
         mOperands = operands;
+        mDataSourceId = UUID.randomUUID().toString();
         for (IEntityDataType operand : operands) {
-            operand.setOnOperandValueChangedListener(this);
+            if(operand != null)
+                operand.setOnOperandValueChangedListener(this);
         }
         runCalculation();
     }
 
-//    public RuleOperation(RuleOperator ruleOperator, List<RuleOperation> operands) {
-//        mRuleOperator = ruleOperator;
-//        mOperands = operands;
-//    }
+    public void setOperand(int index, IEntityDataType operand) {
+        //TODO - TA: Investigate if OnOperandValueChangedListener should be unregistered.
+//        if(mOperands.get(index) != null)
+            //Unregister OnOperandValueChangedListener ???
+
+        mOperands.set(index, operand);
+        if(operand != null)
+            operand.setOnOperandValueChangedListener(this);
+
+        runCalculation();
+    }
 
     @Override
     public String toString() {
+        return toString(true);
+    }
+
+    public boolean isIncomplete() {
+        if(getRuleOperator() == null)
+            return true;
+
+        for(IEntityDataType operand : mOperands.toArray(new IEntityDataType[0]))
+            if(operand == null)
+                return true;
+
+        return false;
+    }
+
+    private String toString(boolean addResultAsPostfixToNonGeneratedStrings) {
         if(!StringHandler.isNullOrEmpty(getName())) {
-            return getName() + " [" + getFormattedString() + "]";
+            return getName()
+                    + (isIncomplete()? " <Incomplete>" : "")
+                    + (addResultAsPostfixToNonGeneratedStrings? " [" + getFormattedString() + "]" : "");
         }
 
         String[] operandsAsStringArray = new String[mOperands.size() - 1];
         int index = 0;
-        Iterator<? extends IEntityDataType> iterator = mOperands.iterator();
+        Iterator<IEntityDataType> iterator = mOperands.iterator();
         IEntityDataType mLeftOperand;
         if(iterator.hasNext())
             mLeftOperand = iterator.next();//Save the the leftmost operand for later.
-        else return "Oooops!";//TODO - Throw exception or change description
+        else return "Oooops!";//TODO - TA: Throw exception or change description
+
+        if(mLeftOperand == null && getRuleOperator() == null)
+            return RuleOperatorType.MISSING_OPERAND;
+
         while(iterator.hasNext()) {
             IEntityDataType operand = iterator.next();
             boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(operand);
             String format = isRuleAndUseGeneratedString? "(%s)" : "%s";
-            operandsAsStringArray[index++] = String.format(format, operand.toString());
+            operandsAsStringArray[index++] = String.format(format, operand == null? RuleOperatorType.MISSING_OPERAND : operand.toString());
         }
         boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(mLeftOperand);
         String format = isRuleAndUseGeneratedString? "(%s)%s" : "%s%s";
-        return String.format(format, mLeftOperand.toString(), getRuleOperator().getType().getFormattedString(operandsAsStringArray));
+
+        return String.format(format, mLeftOperand == null? RuleOperatorType.MISSING_OPERAND : mLeftOperand.toString()
+                , getRuleOperator() == null? " " + RuleOperator.MISSING_OPERATOR : getRuleOperator().getType().getFormattedString(operandsAsStringArray));
+    }
+
+    public String toString(boolean addResultAsPrefix, boolean addResultAsPostfix) {
+        StringBuilder result = new StringBuilder();
+
+        if(addResultAsPrefix)
+            result.append("[" + getFormattedString() + "] ");
+
+        result.append(toString(false));
+
+        if(addResultAsPostfix)
+            result.append(" [" + getFormattedString() + "]");
+
+        return result.toString();
     }
 
     private boolean getIsRuleAndUseGeneratedString(IEntityDataType operand) {
-        return operand.getSourceType() == EntityDataTypeSource.RULE && StringHandler.isNullOrEmpty(operand.getName());
+        return operand == null? false : operand.getSourceType() == EntityDataTypeSource.OPERATION && StringHandler.isNullOrEmpty(operand.getName());
     }
 
     private void runCalculation() {
         try {
-            Boolean oldValue = mValue;
-            mValue = getRuleOperator().getOperationResult(mOperands);
+            Boolean oldValue = getValue();
+
+            if(getRuleOperator() == null) {
+                mValue = false;//Missing operator shall result as FALSE.
+            } else
+                mValue = getRuleOperator().getOperationResult(mOperands);
+
             if(!oldValue.equals(mValue) && mOnOperandValueChangedListener != null)
                 mOnOperandValueChangedListener.onOperandValueChanged(this);
         } catch (Exception e) {
@@ -88,34 +148,42 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public void setDescription(String description) { mDescription = description; }
 
     @Override
-    public RuleTreeItem
-    getRuleTreeItem(int treeIndex) {
+    public RuleTreeItem getRuleTreeItem(int treeIndex) {
         HashMap<Integer, RuleTreeItem> hm = new HashMap<Integer, RuleTreeItem>();
 
-        Integer integer = 0;
+        Integer treeItemIndex = 0;
         for(IEntityDataType operand : mOperands.toArray(new IEntityDataType[0])) {
-            RuleTreeItem rti = operand.getRuleTreeItem(integer);
+            RuleTreeItem rti = operand == null? null : operand.getRuleTreeItem(treeItemIndex);
             if(rti != null) {
                 if(!hm.isEmpty()) {
-                    RuleTreeItem operatorTreeItem = new RuleTreeItem(integer, mRuleOperator.getType().getName());
-                    hm.put(integer++, operatorTreeItem);
-                    rti.setPosition(integer);
+                    RuleTreeItem operatorTreeItem = new RuleTreeItem(treeItemIndex
+                            , getRuleOperator() != null? getRuleOperator().getType().getName() : RuleOperator.MISSING_OPERATOR
+                            , RuleTreeItem.ItemType.OPERATOR);
+                    hm.put(treeItemIndex++, operatorTreeItem);
+                    rti.setPosition(treeItemIndex);
                 }
-                hm.put(integer++, rti);
+                hm.put(treeItemIndex++, rti);
             }
         }
 
-        return hm.isEmpty()? new RuleTreeItem(treeIndex, toString()) : new RuleTreeItem(treeIndex, toString(), hm);
+        return hm.isEmpty()? new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND) : new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND, hm);
     }
 
     @Override
     public String getFormattedString(){
+        if(getRuleOperator() == null)
+            return "Falskt";
+
+        for(IEntityDataType operand : mOperands)
+            if(operand == null)
+                return "Falskt";
+
         return getValue()? "Sant": "Falskt";//TODO - Language independent
     }
 
     @Override
     public EntityDataTypeSource getSourceType() {
-        return EntityDataTypeSource.RULE;
+        return EntityDataTypeSource.OPERATION;
     }
 
     @Override
@@ -133,13 +201,16 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
      * The latest resulting value OR null.
      */
     public Boolean getValue() {
-        //Returns mValue instead of calling runCalculation() to prevent multiple calls to getResult().
-        return mValue;
+        //Returns mValue instead of calling runCalculation() to prevent from multiple calls to getResult().
+        return mValue == null? false: mValue;
     }
 
     public RuleOperator getRuleOperator() { return mRuleOperator; }
 
-    public void setRuleOperator(RuleOperator ruleOperator) { mRuleOperator = ruleOperator; }
+    public void setRuleOperator(RuleOperator ruleOperator) {
+        mRuleOperator = ruleOperator;
+        runCalculation();
+    }
 
     @Override
     public void onOperandValueChanged(IEntityDataType operand) {

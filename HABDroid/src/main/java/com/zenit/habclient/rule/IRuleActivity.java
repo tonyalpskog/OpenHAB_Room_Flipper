@@ -7,4 +7,6 @@ public interface IRuleActivity {
     public int getDisplayViewIndex();
     public String getRuleName();
     public void setRuleName(String name);
+    public Rule getRule();
+    public void setRule(Rule rule);
 }

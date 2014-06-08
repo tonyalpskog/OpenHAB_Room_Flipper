@@ -534,7 +534,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         //IllegalArgumentException shall be thrown if more than two operation values is used.
         try {
             roOr.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(false), Boolean.valueOf(false));
-            assertFalse(true);
+            assertTrue(true);
         } catch (Exception e) {
             assertTrue(e instanceof IllegalArgumentException);
         }
@@ -550,6 +550,15 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
         //Boolean true OR true = True
         assertTrue(roOr.getOperationResult(Boolean.valueOf(true), Boolean.valueOf(true)));
+
+        //Boolean true OR false OR true = True
+        assertTrue(roOr.getOperationResult(Boolean.valueOf(true), Boolean.valueOf(false), Boolean.valueOf(true)));
+
+        //Boolean false OR true OR false = True
+        assertTrue(roOr.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(true), Boolean.valueOf(false)));
+
+        //Boolean false OR false OR false = False
+        assertFalse(roOr.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(false), Boolean.valueOf(false)));
     }
 
     public void testBooleanEqual() {
@@ -919,7 +928,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         assertEquals("Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
 
-
         widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
         assertEquals("Light_GF_Kitchen_Ceiling [Off] != Light_FF_Bath_Mirror [Off]", roA.toString());
@@ -936,6 +944,100 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         assertEquals(false, roB.getValue().booleanValue());
 
         assertEquals(false, roA.getValue() && roB.getValue());
+    }
+
+    private List<IEntityDataType> getListOfRuleOperationsForTest() {
+        RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
+
+        OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+        RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
+
+        widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
+        RuleOperation roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
+
+        List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
+        operandList.add(roA);
+        operandList.add(roB);
+
+        return operandList;
+    }
+
+    private final String LEFT_OPERAND_NAME = "Operation as left operand";
+    private RuleOperation getNestedRuleOperationForTest(boolean nameTheLeftOperand, RuleOperatorType ruleType) {
+        RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
+
+        List<IEntityDataType> operandList = getListOfRuleOperationsForTest();
+        if(nameTheLeftOperand) ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
+        RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(ruleType), operandList);
+
+        return ro;
+    }
+
+    public void test_RuleOperation_toString_methods_on_nameless_operation_and_sub_operations() {
+        RuleOperation ro = getNestedRuleOperationForTest(false, RuleOperatorType.And);
+
+        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
+        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
+        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(false, true));
+        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(false, false));
+        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(true, true));
+    }
+
+    public void test_RuleOperation_toString_methods_on_named_operation_and_mixed_sub_operations() {
+        RuleOperation ro = getNestedRuleOperationForTest(true, RuleOperatorType.NotEqual);
+
+        assertEquals(LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
+        assertEquals("[Falskt] " + LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
+
+        //Name the main operation
+        final String OPERATION_NAME = "My sweet operation name";
+        ro.setName(OPERATION_NAME);
+        assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
+        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
+        assertEquals(OPERATION_NAME, ro.toString(false, false));
+        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
+    }
+
+    public void test_RuleOperation_toString_methods_on_null_objects() {
+        RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
+
+        List<IEntityDataType> operandList = getListOfRuleOperationsForTest();
+        ((RuleOperation) operandList.get(0)).setRuleOperator(null);
+        ((RuleOperation) operandList.get(1)).setOperand(1, null);
+        RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
+
+        assertEquals("(Light_GF_Kitchen_Ceiling [Off] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+
+        ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
+        ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
+
+        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+
+        ((RuleOperation) operandList.get(0)).setOperand(1, null);
+        ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
+
+        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+
+        ((RuleOperation) operandList.get(0)).setOperand(0, null);
+        ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
+
+        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+
+        //Name the main operation
+        final String OPERATION_NAME = "My sweet operation name";
+        ro.setName(OPERATION_NAME);
+        assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
+        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
+        assertEquals(OPERATION_NAME, ro.toString(false, false));
+        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
     }
 
     //mRuleOperator.getOperationResult(mOperands.get(0).getValue(), mRuleOperator.parseValue("10"));

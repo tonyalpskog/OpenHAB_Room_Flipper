@@ -5,8 +5,8 @@ package com.zenit.habclient.rule;
  */
 public enum EntityDataTypeSource {
     UNIT(0),
-    RULE(1),
-    USER(2);
+    OPERATION(1),
+    STATIC(2);
 
     public final int Value;
 

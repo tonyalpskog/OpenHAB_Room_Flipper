@@ -33,7 +33,7 @@ public class UserValue<T> {
 //
 //    @Override
 //    public EntityDataTypeSource getSourceType() {
-//        return EntityDataTypeSource.USER;
+//        return EntityDataTypeSource.STATIC;
 //    }
 //
 //    @Override

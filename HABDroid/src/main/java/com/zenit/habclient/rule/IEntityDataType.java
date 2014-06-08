@@ -10,4 +10,6 @@ public interface IEntityDataType<T> extends IRuleTree, IRuleOperationOperand {
     public T getValue();
     public String getFormattedString();
     public T valueOf(String input);
+    public void setDataSourceId(String value);
+    public String getDataSourceId();
 }

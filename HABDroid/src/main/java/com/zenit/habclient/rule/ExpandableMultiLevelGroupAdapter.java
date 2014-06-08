@@ -9,6 +9,7 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -75,6 +76,30 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
         childAsHash.put(Integer.valueOf(0), childItem);
         branchView.setAdapter(new ExpandableMultiLevelGroupAdapter(mContext, childAsHash, mLevelNumber + 1));
         //branchView.setGroupIndicator(null);
+
+        // Group expanded listener
+        branchView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+            @Override
+            public void onGroupExpand(int groupPosition) {
+//                mSelectedItem = mTreeData.get(Integer.valueOf(groupPosition));
+                Toast.makeText(mContext,
+                        mTreeData.get(Integer.valueOf(groupPosition)).mName + " Expanded2",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Group collasped listener
+        branchView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+                Toast.makeText(mContext,
+                        mTreeData.get(Integer.valueOf(groupPosition)).mName + " Collapsed2",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+        });
         return branchView;
     }
 

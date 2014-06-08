@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.zenit.habclient.HABApplication;
+import com.zenit.habclient.util.StringSelectionDialogFragment;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -31,8 +32,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class RuleActivity extends Activity implements ActionBar.TabListener, IRuleActivity {
+public class RuleActivity extends Activity implements ActionBar.TabListener, IRuleActivity
+        , RuleOperandDialogFragment.RuleOperationBuildListener, StringSelectionDialogFragment.StringSelectionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,6 +48,8 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
     SectionsPagerAdapter mSectionsPagerAdapter;
     RuleFragment mTabFragment;
     Rule mRule;
+    RuleOperation mOperationUnderConstruction;
+    List<RuleOperation> mOperationList = new ArrayList<RuleOperation>();
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -112,11 +117,31 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        RuleTreeItem rti = getRuleFragment().getSelectedItem();
+        if(rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
+            final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(getEntityDataBySourceId(rti.getItemId()), 0);
+            dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
+        } else if(rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
+            //TODO - TA: open an operator selection dialog.
+            getOperatorBySourceId(rti.getItemId());
+        }
+
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private IEntityDataType getEntityDataBySourceId(String dataSourceId) {
+        if(dataSourceId == null) return null;
+        //TODO - TA: implement
+        return null;
+    }
+
+    private RuleOperator getOperatorBySourceId(String dataSourceId) {
+        //TODO - TA: implement
+        return null;
     }
 
     @Override
@@ -149,21 +174,87 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         mRule.setName(name);
     }
 
+    @Override
+    public Rule getRule() {
+        return mRule;
+    }
+
+    @Override
+    public void setRule(Rule rule) {
+        mRule = rule;
+    }
+
+    @Override
+    public void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface
+            , RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
+            , int operandPosition, RuleOperator ruleOperator) {
+        if(ruleOperationDialogButtonInterface == RuleOperationDialogButtonInterface.CANCEL)
+            return;
+
+        switch(ruleOperationSelectionInterface) {
+            case UNIT:
+                if(getRuleFragment().getSelectedItem() != null)
+                    getRuleFragment().addTreeItem(operand);
+                else
+                    getRuleFragment().addTreeItem(Integer.valueOf(getRuleFragment().mTreeData.size()), operand.getRuleTreeItem(getRuleFragment().mTreeData.size()));
+                break;
+            case NEW_RULE:
+            case OLD_RULE:
+            case STATIC:
+                if(getRuleFragment().getSelectedItem() != null)
+                    getRuleFragment().addTreeItem(operand);
+                else
+                    getRuleFragment().addTreeItem(Integer.valueOf(getRuleFragment().mTreeData.size()), operand.getRuleTreeItem(getRuleFragment().mTreeData.size()));
+                break;
+            case OPERATOR: mOperationUnderConstruction.setRuleOperator(ruleOperator);
+        }
+    }
+
+    private RuleFragment getRuleFragment() {
+        return (RuleFragment) mSectionsPagerAdapter.getFragment(0);
+    }
+
+    public RuleOperation getOperationBySourceId(String dataSourceId) {
+        for(RuleOperation operation : mOperationList) {
+            if(operation.getDataSourceId().equalsIgnoreCase(dataSourceId))
+                return operation;
+        }
+
+        return null;
+    }
+
+
+    //TODO - TA: just for test, remove later
+    @Override
+    public void onStringSelected(String selection) {
+
+    }
+
+    @Override
+    public void onSelectionAborted() {
+
+    }
+
     //      SectionsPagerAdapter
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private Map<Integer, RuleFragment> mFragmentMap = new HashMap<Integer, RuleFragment>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        public RuleFragment getFragment(int position) {
+            return mFragmentMap.get(position);
+        }
+
         @Override
         public Fragment getItem(int position) {
-            mTabFragment = RuleFragment.newInstance(position);
-
-            mTabFragment.setDisplayView(position);
-
-            return mTabFragment;
+            RuleFragment fragment = RuleFragment.newInstance(position);
+            fragment.setDisplayView(position);
+            mFragmentMap.put(position, fragment);
+            mTabFragment = fragment;
+            return fragment;
         }
 
         @Override
@@ -185,13 +276,18 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         }
     }
 
-    private static class RuleFragment extends Fragment {
+    private interface IRuleFragment {
+        public void addTreeItem(Integer treeIndex, RuleTreeItem ruleTreeItem);
+    }
+
+    public static class RuleFragment extends Fragment implements IRuleFragment {
 
         private ViewFlipper mTabViewFlipper;
         private EditText mRuleNameView;
         private int mDisplayViewIndex = 0;
         private IRuleActivity mRuleActivity;
         private Context mContext;
+        private RuleTreeItem mSelectedItem;
 
         ExpandableMultiLevelGroupAdapter listAdapter;
         ExpandableListView mTreeView;
@@ -205,8 +301,6 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
 
         public RuleFragment(int displayViewIndex) {
             mDisplayViewIndex = displayViewIndex;
-            // preparing list data
-            prepareListData();
         }
 
         @Override
@@ -225,6 +319,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             Log.d("LifeCycle.RuleFragment", "onAttach()");
             mRuleActivity = (IRuleActivity) activity;
             mContext = activity.getApplicationContext();
+            prepareListData(mRuleActivity.getRule().getRuleOperation());
         }
 
         @Override
@@ -279,6 +374,9 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
 //                            "Boolean false AND false = " + ro2.getOperationResult(Boolean.valueOf(false), Boolean.valueOf(false)),
 //                            Toast.LENGTH_LONG).show();
 
+                    Toast.makeText(mContext,
+                            "Fantastic!",
+                            Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });
@@ -288,6 +386,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
 
                 @Override
                 public void onGroupExpand(int groupPosition) {
+                    mSelectedItem = mTreeData.get(Integer.valueOf(groupPosition));
                     Toast.makeText(mContext,
                             mTreeData.get(Integer.valueOf(groupPosition)).mName + " Expanded",
                             Toast.LENGTH_SHORT).show();
@@ -303,6 +402,14 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                             mTreeData.get(Integer.valueOf(groupPosition)).mName + " Collapsed",
                             Toast.LENGTH_SHORT).show();
 
+                }
+            });
+
+            mTreeView.setOnLongClickListener(new ExpandableListView.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Toast.makeText(mContext,"ExpandableListView.OnLongClick", Toast.LENGTH_SHORT).show();
+                    return false;
                 }
             });
 
@@ -345,9 +452,24 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                 mTabViewFlipper.setDisplayedChild(position);
         }
 
+        public void addTreeItem(IEntityDataType operand) {
+            getSelectedItem().mChildren.put(getSelectedItem().mChildren.size(), operand.getRuleTreeItem(getSelectedItem().mChildren.size()));
+            listAdapter.notifyDataSetChanged();
+            listAdapter.notifyDataSetInvalidated();
+        }
+
+        public void addTreeItem(Integer treeIndex, RuleTreeItem ruleTreeItem) {
+            mTreeData.put(treeIndex, ruleTreeItem);
+            listAdapter.notifyDataSetChanged();
+            listAdapter.notifyDataSetInvalidated();
+        }
+
         private TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                Toast.makeText(mContext,"Open RuleOperandDialogFragment", Toast.LENGTH_SHORT).show();
+//                final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(null);
+//                dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
             }
 
             @Override
@@ -365,34 +487,9 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         /*
          * Preparing the list data
          */
-        private void prepareListData() {
-            // Adding child data
-            HashMap<Integer, RuleTreeItem> top250 = new HashMap<Integer, RuleTreeItem>();
-            top250.put(Integer.valueOf(0), new RuleTreeItem(0, "The Shawshank Redemption"));
-            top250.put(Integer.valueOf(1), new RuleTreeItem(1, "The Godfather"));
-            top250.put(Integer.valueOf(2), new RuleTreeItem(2, "The Godfather: Part II"));
-            top250.put(Integer.valueOf(3), new RuleTreeItem(3, "Pulp Fiction"));
-            top250.put(Integer.valueOf(4), new RuleTreeItem(4, "The Good, the Bad and the Ugly"));
-            top250.put(Integer.valueOf(5), new RuleTreeItem(5, "The Dark Knight"));
-            top250.put(Integer.valueOf(6), new RuleTreeItem(6, "12 Angry Men"));
-
-            HashMap<Integer, RuleTreeItem> thirdLevel = new HashMap<Integer, RuleTreeItem>();
-            thirdLevel.put(Integer.valueOf(0), new RuleTreeItem(0, "Närkontakt"));
-            thirdLevel.put(Integer.valueOf(1), new RuleTreeItem(1, "Av tredje"));
-            thirdLevel.put(Integer.valueOf(2), new RuleTreeItem(2, "Graden"));
-
-            HashMap<Integer, RuleTreeItem> nowShowing = new HashMap<Integer, RuleTreeItem>();
-            nowShowing.put(Integer.valueOf(0), new RuleTreeItem(0, "The Conjuring"));
-            nowShowing.put(Integer.valueOf(1), new RuleTreeItem(1, "Despicable Me 2"));
-            nowShowing.put(Integer.valueOf(2), new RuleTreeItem(2, "Turbo"));
-            nowShowing.put(Integer.valueOf(3), new RuleTreeItem(3, "Grown Ups 2", thirdLevel));
-            nowShowing.put(Integer.valueOf(4), new RuleTreeItem(4, "Red 2"));
-            nowShowing.put(Integer.valueOf(5), new RuleTreeItem(5, "The Wolverine"));
-
-            HashMap<Integer, RuleTreeItem> comingSoon = new HashMap<Integer, RuleTreeItem>();
-            RuleOperation ron = getRuleOperation();
-
-            List<RuleOperation> operandList = new ArrayList<RuleOperation>();
+        private void prepareListData(RuleOperation ruleOperationRoot) {
+            // Adding tree data
+            List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
             operandList.add(getRuleOperation());
             operandList.add(getRuleOperation());
             RuleOperator ror =  HABApplication.getRuleOperationProvider(mContext).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
@@ -400,19 +497,63 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             RuleOperation ron3 = new RuleOperation(ror, operandList);
             ron3.setName("The is the name of the ron3 rule.");
 
-            comingSoon.put(Integer.valueOf(0), new RuleTreeItem(4, "Men In Black"));
-            comingSoon.put(Integer.valueOf(1), ron2.getRuleTreeItem(3));
-            comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now"));
+            if(mTreeData == null)
+                mTreeData = new HashMap<Integer, RuleTreeItem>();
+
+            mTreeData.put(Integer.valueOf(0), ron2.getRuleTreeItem(0));
+            mTreeData.put(Integer.valueOf(1), ron3.getRuleTreeItem(1));
+        }
+
+        /*
+         * Preparing the list data
+         */
+        private void prepareMockedListData() {
+            // Adding child data
+            HashMap<Integer, RuleTreeItem> top250 = new HashMap<Integer, RuleTreeItem>();
+            top250.put(Integer.valueOf(0), new RuleTreeItem(0, "The Shawshank Redemption", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(1), new RuleTreeItem(1, "The Godfather", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(2), new RuleTreeItem(2, "The Godfather: Part II", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(3), new RuleTreeItem(3, "Pulp Fiction", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(4), new RuleTreeItem(4, "The Good, the Bad and the Ugly", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(5), new RuleTreeItem(5, "The Dark Knight", RuleTreeItem.ItemType.OPERAND));
+            top250.put(Integer.valueOf(6), new RuleTreeItem(6, "12 Angry Men", RuleTreeItem.ItemType.OPERAND));
+
+            HashMap<Integer, RuleTreeItem> thirdLevel = new HashMap<Integer, RuleTreeItem>();
+            thirdLevel.put(Integer.valueOf(0), new RuleTreeItem(0, "Närkontakt", RuleTreeItem.ItemType.OPERAND));
+            thirdLevel.put(Integer.valueOf(1), new RuleTreeItem(1, "Av tredje", RuleTreeItem.ItemType.OPERAND));
+            thirdLevel.put(Integer.valueOf(2), new RuleTreeItem(2, "Graden", RuleTreeItem.ItemType.OPERAND));
+
+            HashMap<Integer, RuleTreeItem> nowShowing = new HashMap<Integer, RuleTreeItem>();
+            nowShowing.put(Integer.valueOf(0), new RuleTreeItem(0, "The Conjuring", RuleTreeItem.ItemType.OPERAND));
+            nowShowing.put(Integer.valueOf(1), new RuleTreeItem(1, "Despicable Me 2", RuleTreeItem.ItemType.OPERAND));
+            nowShowing.put(Integer.valueOf(2), new RuleTreeItem(2, "Turbo", RuleTreeItem.ItemType.OPERAND));
+            nowShowing.put(Integer.valueOf(3), new RuleTreeItem(3, "Grown Ups 2", RuleTreeItem.ItemType.OPERAND, thirdLevel));
+            nowShowing.put(Integer.valueOf(4), new RuleTreeItem(4, "Red 2", RuleTreeItem.ItemType.OPERAND));
+            nowShowing.put(Integer.valueOf(5), new RuleTreeItem(5, "The Wolverine", RuleTreeItem.ItemType.OPERAND));
+
+            HashMap<Integer, RuleTreeItem> comingSoon = new HashMap<Integer, RuleTreeItem>();
+
+            List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
+            operandList.add(getRuleOperation());
+            operandList.add(getRuleOperation());
+            RuleOperator ror =  HABApplication.getRuleOperationProvider(mContext).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+            RuleOperation ron2 = new RuleOperation(ror, operandList);
+            RuleOperation ron3 = new RuleOperation(ror, operandList);
+            ron3.setName("The is the name of the ron3 rule.");
+
+            comingSoon.put(Integer.valueOf(0), new RuleTreeItem(0, "Men In Black", RuleTreeItem.ItemType.OPERAND));
+            comingSoon.put(Integer.valueOf(1), ron2.getRuleTreeItem(1));
+            comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now", RuleTreeItem.ItemType.OPERAND));
             comingSoon.put(Integer.valueOf(3), ron3.getRuleTreeItem(3));
-            comingSoon.put(Integer.valueOf(4), new RuleTreeItem(4, "Europa Report"));
-            comingSoon.put(Integer.valueOf(5), new RuleTreeItem(5, "Apocalypse Now"));
+            comingSoon.put(Integer.valueOf(4), new RuleTreeItem(4, "Europa Report", RuleTreeItem.ItemType.OPERAND));
+            comingSoon.put(Integer.valueOf(5), new RuleTreeItem(5, "Apocalypse Now", RuleTreeItem.ItemType.OPERAND));
 
             if(mTreeData == null)
                 mTreeData = new HashMap<Integer, RuleTreeItem>();
 
-            mTreeData.put(Integer.valueOf(0), new RuleTreeItem(0, "Top 250", top250));
-            mTreeData.put(Integer.valueOf(1), new RuleTreeItem(1, "Now Showing", nowShowing));
-            mTreeData.put(Integer.valueOf(2), new RuleTreeItem(2, "Coming Soon...", comingSoon));
+            mTreeData.put(Integer.valueOf(0), new RuleTreeItem(0, "Top 250", RuleTreeItem.ItemType.OPERAND, top250));
+            mTreeData.put(Integer.valueOf(1), new RuleTreeItem(1, "Now Showing", RuleTreeItem.ItemType.OPERAND, nowShowing));
+            mTreeData.put(Integer.valueOf(2), new RuleTreeItem(2, "Coming Soon...", RuleTreeItem.ItemType.OPERAND, comingSoon));
         }
 
         private RuleOperation getRuleOperation() {
@@ -489,6 +630,10 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             }
 
             return rue;
+        }
+
+        public RuleTreeItem getSelectedItem() {
+            return mSelectedItem;
         }
     }
 

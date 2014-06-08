@@ -270,4 +270,11 @@ public class OpenHABWidgetProvider {
         if(!result)
             Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
         return result;
-    }}
+    }
+
+    public List<String> getItemNameList() {
+        List<String> list = new ArrayList<String>();
+        list.addAll(mOpenHABItemNameMap.keySet());
+        return list;
+    }
+}

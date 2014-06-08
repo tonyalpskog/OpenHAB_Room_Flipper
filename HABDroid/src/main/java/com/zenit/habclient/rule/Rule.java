@@ -8,7 +8,9 @@ import com.zenit.habclient.OpenHABWidgetControl;
 import com.zenit.habclient.util.StringHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -17,6 +19,7 @@ public class Rule implements OnOperandValueChangedListener {
     private String mName;
     protected RuleOperation mRuleOperation;
     protected Context mContext;
+    protected Map<String, RuleOperation> mRuleOperationDataSourceIdMap;
     protected List<RuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
     protected OpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
@@ -30,6 +33,7 @@ public class Rule implements OnOperandValueChangedListener {
         setName(name);
         mOpenHABWidgetControl = HABApplication.getOpenHABWidgetControl(mContext);
         mActions = new ArrayList<RuleAction>();
+        mRuleOperationDataSourceIdMap = new HashMap<String, RuleOperation>();
     }
 
     public RuleOperation getRuleOperation() {
@@ -53,13 +57,14 @@ public class Rule implements OnOperandValueChangedListener {
 
     @Override
     public String toString() {
-        String result;
+        StringBuilder result = new StringBuilder();
+        result.append("[" + mRuleOperation.getFormattedString() + "]  ");
         if(!StringHandler.isNullOrEmpty(getName())) {
-            result = getName() + " [" + mRuleOperation.getFormattedString() + "]";
+            result.append(getName());
         } else {
-            result = mRuleOperation.toString();
+            result.append(mRuleOperation.toString());
         }
-        return result;
+        return result.toString();
     }
 
     public void setEnabled(boolean value) {
