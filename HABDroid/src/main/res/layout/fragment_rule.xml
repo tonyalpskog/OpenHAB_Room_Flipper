@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:longClickable="true"
-    android:clickable="true">
+    android:clickable="true"
+    tools:context="com.zenit.habclient.rule.RuleActivity">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -33,7 +34,9 @@
     <ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/rule_viewflipper"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:longClickable="false">
 
         <include layout="@layout/merge_rule_if_tree" />
         <include layout="@layout/merge_rule_then_list" />

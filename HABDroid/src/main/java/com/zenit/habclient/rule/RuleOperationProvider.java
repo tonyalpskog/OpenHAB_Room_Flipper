@@ -308,8 +308,10 @@ public class RuleOperationProvider {
     }
 
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
-        HashMap<RuleOperatorType, RuleOperator<?>> result = null;
+        if(openHABWidget == null)
+            return null;
 
+        HashMap<RuleOperatorType, RuleOperator<?>> result = null;
         switch(openHABWidget.getItem().getType()) {
             case Contact:
             case Switch:

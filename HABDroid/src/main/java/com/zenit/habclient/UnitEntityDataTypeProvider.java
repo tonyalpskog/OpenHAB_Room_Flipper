@@ -4,6 +4,7 @@ import com.zenit.habclient.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -30,6 +31,11 @@ public class UnitEntityDataTypeProvider {
             public Boolean valueOf(String input) {
                 return Boolean.valueOf(input);
             }
+
+            @Override
+            public Map<String, Boolean> getStaticValues() {
+                return null;
+            }
         });
 
         mUnitDataTypeList.add(new UnitEntityDataType<Integer>("Dimmer percentage", 75)
@@ -41,6 +47,11 @@ public class UnitEntityDataTypeProvider {
             @Override
             public Integer valueOf(String input) {
                 return Integer.valueOf(input);
+            }
+
+            @Override
+            public Map<String, Integer> getStaticValues() {
+                return null;
             }
         });
 
@@ -54,6 +65,11 @@ public class UnitEntityDataTypeProvider {
             public Double valueOf(String input) {
                 return Double.valueOf(input);
             }
+
+            @Override
+            public Map<String, Double> getStaticValues() {
+                return null;
+            }
         });
 
         mUnitDataTypeList.add(new UnitEntityDataType<Double>("Temperature", 8.4)
@@ -65,6 +81,11 @@ public class UnitEntityDataTypeProvider {
             @Override
             public Double valueOf(String input) {
                 return Double.valueOf(input);
+            }
+
+            @Override
+            public Map<String, Double> getStaticValues() {
+                return null;
             }
         });
     }

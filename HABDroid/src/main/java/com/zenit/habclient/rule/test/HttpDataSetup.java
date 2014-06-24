@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -109,6 +110,11 @@ public class HttpDataSetup {
                     public Boolean valueOf(String input) {
                         return Boolean.valueOf(input);
                     }
+
+                    @Override
+                    public Map<String, Boolean> getStaticValues() {
+                        return null;
+                    }
                 };
                 break;
 
@@ -127,6 +133,11 @@ public class HttpDataSetup {
                     @Override
                     public Boolean valueOf(String input) {
                         return Boolean.valueOf(input);
+                    }
+
+                    @Override
+                    public Map<String, Boolean> getStaticValues() {
+                        return null;
                     }
                 };
                 break;
@@ -149,6 +160,11 @@ public class HttpDataSetup {
                     @Override
                     public Double valueOf(String input) {
                         return Double.valueOf(input);
+                    }
+
+                    @Override
+                    public Map<String, Double> getStaticValues() {
+                        return null;
                     }
                 };
                 break;

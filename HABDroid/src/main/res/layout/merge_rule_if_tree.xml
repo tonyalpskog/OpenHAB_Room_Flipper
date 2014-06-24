@@ -5,6 +5,10 @@
     <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/rule_if_tree" />
+        android:id="@+id/rule_if_tree"
+        android:choiceMode="singleChoice"
+        android:clickable="true"
+        android:longClickable="true"
+        android:listSelector="@color/normal" />
 
 </merge>

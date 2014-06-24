@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class StringSelectionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener, ListView.OnItemSelectedListener {
+public class StringSelectionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
     List<String> mSourceList = new ArrayList<String>();
     String mDialogTitle;
     EditText mEditTextFilter;
@@ -113,6 +113,28 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
                 }
             });
 
+            mFilteredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mFilteredListView.clearChoices();
+                    mFilteredListView.setItemChecked(position, true);
+                    mFilteredListView.setSelection(position);// mArrayAdapter.getItem(position);
+                    mSelectedString = mFilteredListView.getItemAtPosition(position).toString();
+                }
+            });
+
+            mFilteredListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    mSelectedString = parent.getAdapter().getItem(position).toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    mSelectedString = null;
+                }
+            });
+
         }
         List<String> initialList = new ArrayList<String>();
         initialList.addAll(mSourceList);
@@ -136,16 +158,6 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
                 }
                 break;
         }
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mSelectedString = parent.getAdapter().getItem(position).toString();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        mSelectedString = null;
     }
 
     public interface StringSelectionListener {

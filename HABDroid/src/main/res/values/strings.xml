@@ -115,4 +115,7 @@
     <string name="no_value"><![CDATA[<No value>]]></string>
     <string name="select_unit">Pick a unit</string>
     <string name="select_operation">Pick an operation</string>
+    <string name="text_value">Text value:</string>
+    <string name="select_target_unit">Pick a target unit</string>
+    <string name="select_source_unit">Pick a source unit</string>
 </resources>

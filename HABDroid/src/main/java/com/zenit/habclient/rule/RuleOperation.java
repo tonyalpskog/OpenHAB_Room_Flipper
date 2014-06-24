@@ -50,6 +50,22 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
         runCalculation();
     }
 
+    public IEntityDataType getOperand(int index) {
+        return mOperands.get(index);
+    }
+
+    public IEntityDataType getOperandBySourceId(String operandSourceId) {
+        for(IEntityDataType operand : mOperands)
+            if(operand!= null && !StringHandler.isNullOrEmpty(operand.getDataSourceId()) && operand.getDataSourceId().equalsIgnoreCase(operandSourceId))
+                return operand;
+        return null;
+    }
+
+    public int getOperandIndexBySourceId(String operandSourceId) {
+        IEntityDataType operand = getOperandBySourceId(operandSourceId);
+        return operand != null? mOperands.indexOf(operand) : -1;
+    }
+
     @Override
     public String toString() {
         return toString(true);
@@ -166,7 +182,9 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
             }
         }
 
-        return hm.isEmpty()? new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND) : new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND, hm);
+        RuleTreeItem result = hm.isEmpty()? new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND) : new RuleTreeItem(treeIndex, toString(true, false), RuleTreeItem.ItemType.OPERAND, hm);
+        result.setItemId(getDataSourceId());
+        return result;
     }
 
     @Override
@@ -215,5 +233,17 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     @Override
     public void onOperandValueChanged(IEntityDataType operand) {
         runCalculation();
+    }
+
+    public HashMap<String, RuleOperation> getRuleOperationHash() {
+        HashMap<String, RuleOperation> operationIdHash = new HashMap<String, RuleOperation>();
+        operationIdHash.put(getDataSourceId(), this);
+        for(IEntityDataType operand : mOperands) {
+            if(operand.getSourceType() == EntityDataTypeSource.OPERATION)
+                operationIdHash.putAll(((RuleOperation) operand).getRuleOperationHash());
+            else
+                operationIdHash.put(operand.getDataSourceId(), this);
+        }
+        return operationIdHash;
     }
 }

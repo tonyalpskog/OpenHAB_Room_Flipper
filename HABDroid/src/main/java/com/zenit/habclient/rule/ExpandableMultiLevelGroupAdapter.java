@@ -82,9 +82,9 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
 
             @Override
             public void onGroupExpand(int groupPosition) {
-//                mSelectedItem = mTreeData.get(Integer.valueOf(groupPosition));
+//                mSelectedItem = getTreeData().get(Integer.valueOf(groupPosition));
                 Toast.makeText(mContext,
-                        mTreeData.get(Integer.valueOf(groupPosition)).mName + " Expanded2",
+                        getTreeData().get(Integer.valueOf(groupPosition)).getItemId() + " Expanded_2",
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -95,7 +95,7 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
             @Override
             public void onGroupCollapse(int groupPosition) {
                 Toast.makeText(mContext,
-                        mTreeData.get(Integer.valueOf(groupPosition)).mName + " Collapsed2",
+                        getTreeData().get(Integer.valueOf(groupPosition)).getItemId() + " Collapsed:2",
                         Toast.LENGTH_SHORT).show();
 
             }
@@ -123,12 +123,12 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
 
     @Override
     public Object getGroup(int groupPosition) {
-        return mTreeData.get(Integer.valueOf(groupPosition));
+        return getTreeData().get(Integer.valueOf(groupPosition));
     }
 
     @Override
     public int getGroupCount() {
-        return mTreeData.size();
+        return getTreeData().size();
     }
 
     @Override
@@ -162,6 +162,11 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
         return true;
     }
 
+    private HashMap<Integer, RuleTreeItem> getTreeData() {
+        if(mTreeData == null)
+            mTreeData = new HashMap<Integer, RuleTreeItem>();
+        return mTreeData;
+    }
 
 
     //====================================================

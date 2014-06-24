@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -631,6 +632,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             public Double valueOf(String input) {
                 return Double.valueOf(input);
             }
+
+            @Override
+            public Map getStaticValues() {
+                return null;
+            }
         };
 
         assertTrue(rue.getValue() != null);
@@ -648,6 +654,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             public String getFormattedString(){
                 return mValue.toString() + "%Rh";
             }
+
+            @Override
+            public Map getStaticValues() {
+                return null;
+            }
         };
 
         assertTrue(rue.getValue() != null);
@@ -664,6 +675,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             @Override
             public Double valueOf(String input) {
                 return Double.valueOf(input);
+            }
+
+            @Override
+            public Map<String, Double> getStaticValues() {
+                return null;
             }
         };
         operands.add(rue);
@@ -894,6 +910,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
                     public Boolean valueOf(String input) {
                         return Boolean.valueOf(input);
                     }
+
+                    @Override
+                    public Map<String, Boolean> getStaticValues() {
+                        return null;
+                    }
                 };
                 break;
             case Number:
@@ -912,6 +933,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
                     @Override
                     public Double valueOf(String input) {
                         return Double.valueOf(input);
+                    }
+
+                    @Override
+                    public Map<String, Double> getStaticValues() {
+                        return null;
                     }
                 };
                 break;
@@ -1051,6 +1077,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             public Double valueOf(String input) {
                 return Double.valueOf(input);
             }
+
+            @Override
+            public Map<String, Double> getStaticValues() {
+                return null;
+            }
         };
         operands.add(rue);
 
@@ -1058,6 +1089,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             @Override
             public Float valueOf(String input) {
                 return Float.valueOf(input);
+            }
+
+            @Override
+            public Map<String, Float> getStaticValues() {
+                return null;
             }
         };
         operands.add(rue2);

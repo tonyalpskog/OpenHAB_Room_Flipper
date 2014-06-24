@@ -7,6 +7,9 @@ import com.zenit.habclient.util.StringHandler;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -25,6 +28,8 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
         super(name, value);
         mUnitValueChangedListener = unitValueChangedListener;
     }
+
+    public abstract Map<String, T> getStaticValues();
 
     @Override
     public void setDataSourceId(String dataSourceId) {
@@ -74,12 +79,26 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
                 unitEntityDataType = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
                 {
                     public String getFormattedString(){
-                        return mValue.booleanValue()? "ON": "OFF";//TODO - Format value
+                        return mValue.booleanValue()? "ON": "OFF";//TODO - TA: Translate value
                     }
 
                     @Override
                     public Boolean valueOf(String input) {
-                        return Boolean.valueOf(input);
+                        if(input.equalsIgnoreCase("ON"))
+                                return Boolean.valueOf(true);
+
+                        if(input.equalsIgnoreCase("OFF"))
+                                return Boolean.valueOf(false);
+
+                        return null;
+                    }
+
+                    @Override
+                    public Map<String, Boolean> getStaticValues() {
+                        Map<String, Boolean> nameValueMap = new HashMap<String, Boolean>(2);
+                        nameValueMap.put("OFF", Boolean.FALSE);
+                        nameValueMap.put("ON", Boolean.TRUE);
+                        return nameValueMap;
                     }
                 };
                 break;
@@ -93,12 +112,26 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
                 unitEntityDataType = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
                 {
                     public String getFormattedString(){
-                        return mValue.booleanValue()? "CLOSED": "OPEN";//TODO - Format value
+                        return mValue.booleanValue()? "CLOSED": "OPEN";//TODO - TA: Translate value
                     }
 
                     @Override
                     public Boolean valueOf(String input) {
-                        return Boolean.valueOf(input);
+                        if(input.equalsIgnoreCase("CLOSED"))
+                            return Boolean.valueOf(true);
+
+                        if(input.equalsIgnoreCase("OPEN"))
+                            return Boolean.valueOf(false);
+
+                        return null;
+                    }
+
+                    @Override
+                    public Map<String, Boolean> getStaticValues() {
+                        Map<String, Boolean> nameValueMap = new HashMap<String, Boolean>(2);
+                        nameValueMap.put("OPEN", Boolean.FALSE);
+                        nameValueMap.put("CLOSED", Boolean.TRUE);
+                        return nameValueMap;
                     }
                 };
                 break;
@@ -121,6 +154,11 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
                     @Override
                     public Double valueOf(String input) {
                         return Double.valueOf(input);
+                    }
+
+                    @Override
+                    public Map<String, Double> getStaticValues() {
+                        return null;
                     }
                 };
                 break;

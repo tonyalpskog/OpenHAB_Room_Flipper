@@ -82,6 +82,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                             = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameList()
                             , mButtonUnit.getText().toString(), mPosition);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
+                    dismiss();
                 }
             });
         }
