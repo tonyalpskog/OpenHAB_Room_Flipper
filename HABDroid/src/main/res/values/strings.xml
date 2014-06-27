@@ -118,4 +118,5 @@
     <string name="text_value">Text value:</string>
     <string name="select_target_unit">Pick a target unit</string>
     <string name="select_source_unit">Pick a source unit</string>
+    <string name="action_launch_rules_activity">Open rules handler</string>
 </resources>

@@ -14,7 +14,11 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     int mOperandIndex;
 
     public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position) {
-        super(source, dialogTitle);
+        this(source, dialogTitle, position, false);
+    }
+
+    public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position, boolean showNextButton) {
+        super(source, dialogTitle, showNextButton);
         mOperandIndex = position;
     }
 
@@ -31,9 +35,10 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
+            case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
                     getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
-                            , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
+                            , which == DialogInterface.BUTTON_POSITIVE? RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
                             , UnitEntityDataType.getUnitEntityDataTypeByItemName(mSelectedString), mOperandIndex, null);
                 }
                 break;

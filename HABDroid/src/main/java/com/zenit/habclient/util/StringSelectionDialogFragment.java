@@ -26,7 +26,7 @@ import java.util.List;
  * Created by Tony Alpskog in 2014.
  */
 public class StringSelectionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
-    List<String> mSourceList = new ArrayList<String>();
+    protected List<String> mSourceList = new ArrayList<String>();
     String mDialogTitle;
     EditText mEditTextFilter;
     ListView mFilteredListView;
@@ -34,14 +34,16 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
     protected String mSelectedString = null;
     String mPreviousSearch = "";
     StringListSearch mStringListSearch;
+    boolean mShowNextButton;
 
     private static final int MIN_SEARCH_WORD_LENGTH = 3;
     private static final String SEARCH_WORD_DELIMITER = "\\s+";
 
-    public StringSelectionDialogFragment(List<String> source, String dialogTitle) {
+    public StringSelectionDialogFragment(List<String> source, String dialogTitle, boolean showNextButton) {
         mSourceList = source;
         mDialogTitle = dialogTitle;
         mStringListSearch = new StringListSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
+        mShowNextButton = showNextButton;
     }
 
     @Override
@@ -67,9 +69,17 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         if(activity == null)
             throw new IllegalStateException("activity is null");
 
+        if(mShowNextButton)
+            return new AlertDialog.Builder(activity).setTitle(mDialogTitle)
+                    .setView(createCustomView(activity))
+                    .setPositiveButton("Next", this)
+                    .setNeutralButton("Done", this)
+                    .setNegativeButton("Cancel", this)
+                    .create();
+
         return new AlertDialog.Builder(activity).setTitle(mDialogTitle)
                 .setView(createCustomView(activity))
-                .setPositiveButton("Done", this)
+                .setNeutralButton("Done", this)
                 .setNegativeButton("Cancel", this)
                 .create();
     }
@@ -148,6 +158,7 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
+            case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
                     getListener().onStringSelected(mSelectedString);
                 }

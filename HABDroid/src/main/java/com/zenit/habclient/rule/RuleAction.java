@@ -1,7 +1,12 @@
 package com.zenit.habclient.rule;
 
+import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.util.StringHandler;
 
+import org.openhab.habdroid.model.OpenHABItemType;
+import org.openhab.habdroid.model.OpenHABWidget;
+
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -21,8 +26,24 @@ public class RuleAction {
     }
 
     public boolean validate() {
-        //TODO - TA: 1. Check if target getUnitEntityDataType match the source unit if any.
-        //TODO - TA: 2. Check if target getUnitEntityDataType has getStaticValues() that match mStaticValue if it´s not null.
+        if(StringHandler.isNullOrEmpty(mTargetOpenHABItemName)) {
+            //mTargetOpenHABItemName = mStaticValue = mTextValue = null;//TODO - TA: need code here? I dont think misc data shall be cleared due to missing target.
+        } else {
+            //Check if target getUnitEntityDataType match the source unit if any.
+            OpenHABWidget targetWidget = HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(mTargetOpenHABItemName);
+            OpenHABItemType targetType = targetWidget.getItem().getType();
+            if(!targetType.equals(OpenHABItemType.String) && !StringHandler.isNullOrEmpty(mSourceOpenHABItemName)
+                    && !HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(mSourceOpenHABItemName).getItem().getType().equals(targetType)) {
+                mSourceOpenHABItemName = null;
+            }
+            //Check if target getUnitEntityDataType has getStaticValues() that match mStaticValue if it´s not null.
+            if(!StringHandler.isNullOrEmpty(mStaticValue)) {
+                UnitEntityDataType unitEntityDataType = UnitEntityDataType.getUnitEntityDataType(targetWidget);
+                Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
+                if(staticValueHash == null || !staticValueHash.containsKey(mStaticValue))
+                    mStaticValue = null;
+            }
+        }
         //TODO - TA: 3. Clear any COMMAND specific data if of type MESSAGE and vice versa.
        return true;
     }

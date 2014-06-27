@@ -42,7 +42,8 @@ public class Rule implements OnOperandValueChangedListener {
 
     public void setRuleOperation(RuleOperation ruleOperation) {
         mRuleOperation = ruleOperation;
-        ((IRuleOperationOperand)mRuleOperation).setOnOperandValueChangedListener(this);
+        if(mRuleOperation != null)
+            ((IRuleOperationOperand)mRuleOperation).setOnOperandValueChangedListener(this);
     }
 
     public String getName() {

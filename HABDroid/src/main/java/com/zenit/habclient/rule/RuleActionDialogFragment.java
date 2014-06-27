@@ -23,6 +23,10 @@ import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.util.StringHandler;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABItemType;
+import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+
+import java.util.List;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -83,7 +87,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                 @Override
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameList()
+                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
                             , mButtonTargetUnit.getText().toString(), 0);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
@@ -94,9 +98,12 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                 @Override
                 public void onClick(View v) {
                     mRuleActionValueType = RuleActionValueType.SOURCE_UNIT;
+                    OpenHABItemType type = HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
+                    List<String> itemNameList = HABApplication.getOpenHABWidgetProvider2().getItemNamesByType(type);
+                    itemNameList.remove(mAction.getTargetOpenHABItemName());
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameList()
+                            = new UnitOperandSelectionDialogFragment(itemNameList
                             , mButtonTargetUnit.getText().toString(), 1);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
@@ -106,9 +113,11 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mSpinnerValue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    mRuleActionValueType = RuleActionValueType.STATIC;
-                    clearSourceSelection();
-                    clearTextSelection();
+                    if(position > 0) {
+                        mRuleActionValueType = RuleActionValueType.STATIC;
+                        clearSourceSelection();
+                        clearTextSelection();
+                    }
                 }
 
                 @Override
@@ -158,10 +167,13 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mEditTextValue.setVisibility(mAction.getValueType() == RuleActionValueType.TEXT? View.VISIBLE : View.GONE);
 
             //Set content
-            if(StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) || AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null)
+            if(StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()))
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
+            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null)
+                mSpinnerValue.setVisibility(View.GONE);
             else
                 mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName);
+
             mSpinnerValue.setAdapter(mSpinnerAdapter);
 
             mTextSourceUnit.setText((StringHandler.isNullOrEmpty(mAction.mSourceOpenHABItemName)? getString(R.string.no_value) : mAction.mSourceOpenHABItemName).toString());

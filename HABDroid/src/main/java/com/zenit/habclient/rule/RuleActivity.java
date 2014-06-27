@@ -70,14 +70,13 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.rule_tab_if).toUpperCase(l)).setTabListener(this));
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.rule_tab_then).toUpperCase(l)).setTabListener(this));
 
-        String[] list = new String[] {"hello", "how", "are", "you"};//TODO - TA: implement the listView and its adapter
         mListAdapter = new ArrayAdapter<RuleAction>(this, android.R.layout.simple_list_item_1, mRule.mActions);
         mListView.setAdapter(mListAdapter);
 
         mTreeListAdapter = new ExpandableMultiLevelGroupAdapter(this, mTreeData);
         mTreeView.setAdapter(mTreeListAdapter);
 
-        RuleOperation initialRootOperation = getInitialTreeOperation();
+        RuleOperation initialRootOperation = null/*getInitialTreeOperation()*/;//TODO - TA: getInitialTreeOperation is just a time saver for UI test
         getRule().setRuleOperation(initialRootOperation);
 //            mRuleNameView.setText(getRuleName());
         updateRuleTree(initialRootOperation);
@@ -125,17 +124,18 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         mTreeView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        mTreeData.get(Integer.valueOf(groupPosition)).mName
-                                + " : "
-                                + mTreeData.get(Integer.valueOf(groupPosition)).mChildren.get(Integer.valueOf(childPosition)).mName, Toast.LENGTH_SHORT
-                )
-                        .show();
+//                Toast.makeText(
+//                        getApplicationContext(),
+//                        mTreeData.get(Integer.valueOf(groupPosition)).mName
+//                                + " : "
+//                                + mTreeData.get(Integer.valueOf(groupPosition)).mChildren.get(Integer.valueOf(childPosition)).mName, Toast.LENGTH_SHORT
+//                )
+//                        .show();
+                mSelectedTreeItem = mTreeData.get(Integer.valueOf(groupPosition)).mChildren.get(Integer.valueOf(childPosition));
+                openOperationBuilderDialog(-1);
                 return false;
             }
         });
-
         mTreeView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -170,6 +170,7 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             @Override
             public boolean onLongClick(View v) {
                 Toast.makeText(getApplicationContext(), "ExpandableListView.OnLongClick", Toast.LENGTH_SHORT).show();
+                openOperationBuilderDialog(-1);
                 return false;
             }
         });
@@ -177,11 +178,13 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         mTreeView.setOnItemLongClickListener(new ExpandableListView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO Auto-generated method stub
                 Toast.makeText(
                         getApplicationContext(),
-                        position + " OnItemLongClickListener", Toast.LENGTH_SHORT)
+                        position + " OnItemLongClickListener" + "  Parent => " + ((RuleTreeItem)parent.getSelectedItem()).mName, Toast.LENGTH_SHORT)
                         .show();
+//                mSelectedTreeItem = XXX
+                //TODO - TA: set parent as mSelectedTreeItem
+//                openOperationBuilderDialog(-1);
                 return false;
             }
         });
@@ -197,8 +200,10 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedActionPosition = position;
-                mListView.setItemChecked(position, true);
+                openActionBuilderDialog(position);
+//                mSelectedActionPosition = position;
+//                mListView.setItemChecked(position, true);
+
 //                    mListView.getFocusables(position);
 //                    mListView.setSelection(position);
             }
@@ -226,38 +231,58 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(mTabViewFlipper.getDisplayedChild() == 0) {
-            RuleTreeItem rti = getSelectedTreeItem();
-            if (rti == null && getRule().getRuleOperation() != null) {
-                Toast.makeText(this, "Select a target item first.", Toast.LENGTH_SHORT).show();
-            } else if (rti == null || rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
-                RuleOperation selectedOperation = getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
-                int operandPosition = selectedOperation.getOperandIndexBySourceId(getSelectedTreeItem().getItemId());
-                final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
-                        selectedOperation.getOperandBySourceId(getSelectedTreeItem().getItemId())
-                        , operandPosition != -1 ? operandPosition : 0);
-                dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
-            } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
-                //TODO - TA: open an operator selection dialog.
-                getOperatorBySourceId(rti.getItemId());
-            }
+            openOperationBuilderDialog(-1);
         } else {
-            if(mSelectedActionPosition > -1)
-                mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
-            else
-                mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND);//TODO - TA: Let the user decide if COMMAND or MESSAGE
-
-            if (mActionUnderConstruction == null ) {
-                Toast.makeText(this, "Select a target item first.", Toast.LENGTH_SHORT).show();
-            } else {
-                final RuleActionDialogFragment dialogFragment = new RuleActionDialogFragment(mActionUnderConstruction);
-                dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
-            }
+            openActionBuilderDialog(-1);
         }
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openOperationBuilderDialog(int aOperandposition) {
+        RuleTreeItem rti = getSelectedTreeItem();
+        if (rti == null && getRule().getRuleOperation() != null) {
+            Toast.makeText(this, "Select a target item first.", Toast.LENGTH_SHORT).show();
+        } else if (rti == null || rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
+            if(rti == null && mOperationUnderConstruction == null && mRule.getRuleOperation() == null) {
+                final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(null, 0, true);
+                dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
+                return;
+            }/* else
+                rti = mRule.getRuleOperation().getRuleTreeItem();*///TODO - TA: get current operation and open it up
+            RuleOperation selectedOperation = rti != null? getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
+            int operandPosition = aOperandposition;
+            if(operandPosition == -1 && selectedOperation.getSourceType() != EntityDataTypeSource.OPERATION) {
+                operandPosition = rti.getPosition();
+            } else if(operandPosition == -1) {
+                operandPosition = 0;
+            }
+            final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
+                    selectedOperation.getOperand(operandPosition)
+                    , operandPosition != -1 ? operandPosition : 0, operandPosition > 1 && (selectedOperation.getRuleOperator() != null && selectedOperation.getRuleOperator().supportsMultipleOperations()));
+            dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
+        } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
+            //TODO - TA: open an operator selection dialog.
+            getOperatorBySourceId(rti.getItemId());
+        }
+    }
+
+    private void openActionBuilderDialog(int position) {
+        mSelectedActionPosition = position;
+        if(mSelectedActionPosition > -1)
+            mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
+        else
+            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND);//TODO - TA: Let the user decide if COMMAND or MESSAGE
+
+        if (mActionUnderConstruction == null ) {
+            Toast.makeText(this, "Select a target item first.", Toast.LENGTH_SHORT).show();
+        } else {
+            final RuleActionDialogFragment dialogFragment = new RuleActionDialogFragment(mActionUnderConstruction);
+            dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
+        }
     }
 
     private IEntityDataType getEntityDataBySourceId(String dataSourceId) {
@@ -307,7 +332,19 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                         RuleOperation selectedOperation = getOperationByOperandSourceId(operand.getDataSourceId());
                         selectedOperation.setOperand(operandPosition, operand);
                     } else {
+                        if(mOperationUnderConstruction == null)
+                            mOperationUnderConstruction = new RuleOperation("My operation");
                         mOperationUnderConstruction.setOperand(operandPosition, operand);
+                        if(ruleOperationDialogButtonInterface == RuleOperationDialogButtonInterface.NEXT){
+                            if(operandPosition == 0) {
+                                final OperatorSelectionDialogFragment dialogFragment
+                                        = new OperatorSelectionDialogFragment(this, operand.getDataSourceId()
+                                        , "Select an operator", true);
+                                dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
+                            } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
+                                showRuleOperandDialogFragment(mOperationUnderConstruction.getOperand(operandPosition + 1), operandPosition + 1, true);
+                            }
+                        }
 //                    addTreeItem(Integer.valueOf(mTreeData.size()), operand.getRuleTreeItem(mTreeData.size()));
                         //TODO - TA: update item tree if "DONE"
                     }
@@ -321,13 +358,31 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                     else
                         addTreeItem(Integer.valueOf(mTreeData.size()), operand.getRuleTreeItem(mTreeData.size()));
                     break;
-                case OPERATOR: mOperationUnderConstruction.setRuleOperator(ruleOperator);
+                case OPERATOR:
+                    RuleOperation currentOperation;
+                    if (getSelectedTreeItem() != null) {
+                        RuleOperation selectedOperation = getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
+                        currentOperation = selectedOperation;
+                    } else {
+                        currentOperation = mOperationUnderConstruction;
+                    }
+                    currentOperation.setRuleOperator(ruleOperator);
+                    if(ruleOperationDialogButtonInterface == RuleOperationDialogButtonInterface.NEXT) {
+                        openOperationBuilderDialog(operandPosition + 1);
+                        return;
+                    }
+                    break;
+            }
+
+            if(ruleOperationDialogButtonInterface == RuleOperationDialogButtonInterface.DONE) {
+                updateRuleTree(mOperationUnderConstruction);
             }
         } else {
             //THEN tab
             if(ruleOperationSelectionInterface == RuleOperationSelectionInterface.UNIT && mActionUnderConstruction != null) {
                 if (operandPosition == 0) {
                     mActionUnderConstruction.setTargetOpenHABItemName(operand.getName());
+                    mActionUnderConstruction.validate();
                 } else
                     mActionUnderConstruction.setSourceOpenHABItemName(operand.getName());
 
@@ -335,6 +390,12 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
                 dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
             }
         }
+    }
+
+    private void showRuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
+        final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
+                currentOperand, position != -1 ? position : 0, showNextButton);
+        dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
     }
 
     public RuleOperation getOperationByOperandSourceId(String dataSourceId) {
@@ -396,7 +457,8 @@ public class RuleActivity extends Activity implements ActionBar.TabListener, IRu
             mTreeData = new HashMap<Integer, RuleTreeItem>();
 
         mTreeData.clear();
-        mTreeData.put(Integer.valueOf(0), ruleOperationRoot.getRuleTreeItem(0));
+        if(ruleOperationRoot != null)
+            mTreeData.put(Integer.valueOf(0), ruleOperationRoot.getRuleTreeItem(0));
         mTreeListAdapter.notifyDataSetInvalidated();
     }
 

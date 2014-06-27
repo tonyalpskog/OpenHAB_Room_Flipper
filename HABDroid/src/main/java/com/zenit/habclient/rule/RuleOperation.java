@@ -38,12 +38,20 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
         runCalculation();
     }
 
+    public int getNumberOfOperands() {
+        return mOperands.size();
+    }
+
     public void setOperand(int index, IEntityDataType operand) {
         //TODO - TA: Investigate if OnOperandValueChangedListener should be unregistered.
 //        if(mOperands.get(index) != null)
             //Unregister OnOperandValueChangedListener ???
 
-        mOperands.set(index, operand);
+        if(mOperands.size() > index)
+            mOperands.set(index, operand);
+        else
+            mOperands.add(index, operand);
+
         if(operand != null)
             operand.setOnOperandValueChangedListener(this);
 
@@ -51,7 +59,9 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     public IEntityDataType getOperand(int index) {
-        return mOperands.get(index);
+        if(mOperands.size() > index)
+            return mOperands.get(index);
+        return null;
     }
 
     public IEntityDataType getOperandBySourceId(String operandSourceId) {

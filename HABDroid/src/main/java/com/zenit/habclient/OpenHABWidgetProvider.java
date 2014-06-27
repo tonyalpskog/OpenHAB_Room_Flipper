@@ -8,6 +8,7 @@ import com.zenit.habclient.util.RegExAccuracyResult;
 import com.zenit.habclient.util.StringHandler;
 
 import org.openhab.habdroid.model.OpenHABItem;
+import org.openhab.habdroid.model.OpenHABItemType;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.model.OpenHABWidgetType;
@@ -27,10 +28,12 @@ public class OpenHABWidgetProvider {
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
+    private Map<OpenHABItemType, List<String>> mOpenHABItemTypeMap;
     private UUID mUpdateSetUUID;
 
     public OpenHABWidgetProvider() {
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
+        mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
         mOpenHABItemNameMap = new HashMap<String, OpenHABWidget>();
     }
@@ -42,9 +45,7 @@ public class OpenHABWidgetProvider {
 
     public Map<OpenHABWidgetType, List<OpenHABWidget>> getOpenHABWidgets() {
         Map<OpenHABWidgetType, List<OpenHABWidget>> resultingMap = new HashMap<OpenHABWidgetType, List<OpenHABWidget>>();
-        Iterator<OpenHABWidgetType> iterator = mOpenHABWidgetTypeMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            OpenHABWidgetType type = iterator.next();
+        for (OpenHABWidgetType type : mOpenHABWidgetTypeMap.keySet()) {
             resultingMap.put(type, getWidgetList(type));
         }
         return resultingMap;
@@ -67,6 +68,7 @@ public class OpenHABWidgetProvider {
                 stringList.add(widget.getItem().getName());
             }
             mOpenHABWidgetTypeMap.put(type, stringList);
+            //TODO - TA: implement population of mOpenHABItemTypeMap.put(...)
         }
     }
 
@@ -115,11 +117,21 @@ public class OpenHABWidgetProvider {
             Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getId(), widget.getType()));
 
             if(!widgetExists) { //Don't add existing widgets to the type<->name_list mapping.
+                //Add widget to widget type mapping
                 if(widget.getType() != null && !mOpenHABWidgetTypeMap.containsKey(widget.getType()))
                     mOpenHABWidgetTypeMap.put(widget.getType(), new ArrayList<String>());
 
                 List<String> widgetList = mOpenHABWidgetTypeMap.get(widget.getType());
                 widgetList.add(widget.getId());
+
+                if(widget.hasItem()) {
+                    //Add item to widget type mapping
+                    if (widget.getItem().getType() != null && !mOpenHABItemTypeMap.containsKey(widget.getItem().getType()))
+                        mOpenHABItemTypeMap.put(widget.getItem().getType(), new ArrayList<String>());
+
+                    List<String> itemList = mOpenHABItemTypeMap.get(widget.getItem().getType());
+                    itemList.add(widget.getItemName());
+                }
             }
         }
 
@@ -167,6 +179,10 @@ public class OpenHABWidgetProvider {
             }
         }
         return resultList;
+    }
+
+    public List<String> getItemNamesByType(OpenHABItemType type) {
+        return mOpenHABItemTypeMap.get(type);
     }
 
     private static final double APPROVED_UNIT_ACCURACY_VALUE = 0.75;
@@ -276,5 +292,15 @@ public class OpenHABWidgetProvider {
         List<String> list = new ArrayList<String>();
         list.addAll(mOpenHABItemNameMap.keySet());
         return list;
+    }
+
+    public List<String> getItemNameListByWidgetType(Set<OpenHABWidgetType> widgetTypes) {
+        List<String> itemNameList = new ArrayList<String>();
+        List<OpenHABWidget> widgetList = getWidgetList(widgetTypes);
+        for(OpenHABWidget widget : widgetList) {
+            if(widget.hasItem())
+                itemNameList.add(widget.getItemName());
+        }
+        return itemNameList;
     }
 }

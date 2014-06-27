@@ -22,7 +22,10 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
         super();
     }
 
-    public UnitEntityDataType(String name, T value) { super(name, value); }
+    public UnitEntityDataType(String name, T value) {
+        super(name, value);
+        setDataSourceId(name);
+    }
 
     public UnitEntityDataType(String name, T value, UnitValueChangedListener unitValueChangedListener) {
         super(name, value);

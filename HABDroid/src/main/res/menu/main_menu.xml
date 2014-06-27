@@ -25,7 +25,4 @@
     <item android:id="@+id/mainmenu_openhab_flipper"
         android:title="@string/mainmenu_openhab_flipper"
         />
-    <item android:id="@+id/mainmenu_openhab_changedate"
-        android:title="Send date/time change command"
-        />
 </menu>

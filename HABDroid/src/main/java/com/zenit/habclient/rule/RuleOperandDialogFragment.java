@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.zenit.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -28,17 +29,19 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private TextView mTextOperation;
     private EditText mEditNewOperation;
     private EditText mEditStaticValue;
+    private boolean mShowNextButton;
 
     private RuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
     private int mPosition;
 
-    public RuleOperandDialogFragment(IEntityDataType currentOperand, int position) {
+    public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
 //        Bundle bundle = new Bundle();
 //        bundle.putInt(ARG_ID, status.value());
 //        this.setArguments(bundle);
         mOldOperand = currentOperand;
         mPosition = position;
+        mShowNextButton = showNextButton;
     }
 
     @Override
@@ -71,7 +74,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mButtonUnit = (Button) view.findViewById(R.id.button_rule_operation_builder_unit);
             mTextUnit = (TextView) view.findViewById(R.id.text_rule_operation_builder_unit);
             mButtonOperation = (Button) view.findViewById(R.id.button_rule_operation_builder_operation);
-            mTextUnit = (TextView) view.findViewById(R.id.button_rule_operation_builder_operation);
+            mTextOperation = (TextView) view.findViewById(R.id.text_rule_operation_builder_operation);
             mEditNewOperation = (EditText) view.findViewById(R.id.edit_rule_operation_builder_new_operation);
             mEditStaticValue = (EditText) view.findViewById(R.id.edit_rule_operation_builder_static_value);
 
@@ -79,8 +82,8 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 @Override
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameList()
-                            , mButtonUnit.getText().toString(), mPosition);
+                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
+                            , mButtonUnit.getText().toString(), mPosition, mShowNextButton);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -91,10 +94,13 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             switch (mOldOperand.getSourceType()) {
                 case UNIT:
                     mTextUnit.setText(mOldOperand.toString());
+                    break;
                 case OPERATION:
                     mTextOperation.setText(mOldOperand.toString());
+                    break;
                 case STATIC:
                     mEditStaticValue.setText(mOldOperand.toString());
+                    break;
             }
         }
 
@@ -110,9 +116,16 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
 //        final int statusTextId = mStatusTextResourceProvider.getStatusText(mStatus);
 //        final String statusText = getString(statusTextId);
 
-        return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0? "left" : "right") + " side operand")
+        if(mShowNextButton)
+            return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0 ? "left" : "right") + " side operand")
+                    .setView(createCustomView(activity))
+                    .setPositiveButton("Next", this)
+                    .setNegativeButton("Cancel", this)
+                    .setNeutralButton("Done", this)
+                    .create();
+
+        return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0 ? "left" : "right") + " side operand")
                 .setView(createCustomView(activity))
-                .setPositiveButton("Next", this)
                 .setNegativeButton("Cancel", this)
                 .setNeutralButton("Done", this)
                 .create();
