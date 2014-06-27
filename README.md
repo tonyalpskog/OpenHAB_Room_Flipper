@@ -1,4 +1,6 @@
 This is an **OpenHAB** android client. Please read a lot about the [OpenHAB](http://www.openhab.org/) server and settings before trying to understand how this app works.
+
+
 1. Setup a local server
 2. Read about OpenHAB items and sitemaps
 
