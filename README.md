@@ -17,11 +17,16 @@ Extended functionality:
 * All rooms is (during run-time design) connected to each other in a 3D-way. (8 directions + up/down = 10 directions)
 
 (In main activity option menu -> *Room Flipper* -> option menu -> *Rules*)
+
 NOTE! this has nothing to do with the design-time rules on the server side.
+
+
 * Rules can be added in a *Tasker*-like way.
 * Each Rule contains an Operation that will run a bunch of Actions when the criterias of the operation becomes TRUE.
 
 (In main activity option menu -> *Room Flipper* -> option menu -> *Clock*)
+
+
 * This menu option will fire a notification that will be shown on an Android Wear device.
 * The Wear device can open the notification and send voice commands to OpenHAB system.
 * These voice commands is a lot more powerful and accurate (forgiving) than the original one.
