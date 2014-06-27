@@ -214,8 +214,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		openHABUsername = settings.getString("default_openhab_username", null);
 		openHABPassword = settings.getString("default_openhab_password", null);
 
-        HABApplication.getOpenHABSetting().setUsername(openHABUsername);
-        HABApplication.getOpenHABSetting().setPassword(openHABPassword);
+        HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
+        HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
 
 		// Create new data source and adapter and set it to list view
 		openHABWidgetDataSource = new OpenHABWidgetDataSource();
@@ -265,15 +265,15 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			// If we are in demo mode, ignore all settings and use demo url from strings
 			if (settings.getBoolean("default_openhab_demomode", false)) {
-                HABApplication.getOpenHABSetting().setBaseUrl(getString(R.string.openhab_demo_url));
-				openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
+                HABApplication.getOpenHABSetting(this).setBaseUrl(getString(R.string.openhab_demo_url));
+				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
 				Log.i(HABApplication.getLogTag(), "Demo mode, connecting to " + openHABBaseUrl);
 				Toast.makeText(getApplicationContext(), getString(R.string.info_demo_mode),
 					Toast.LENGTH_LONG).show();
 				showWidgetList();
 			} else {
-                HABApplication.getOpenHABSetting().setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
-				openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
+                HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
+				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
 				// Check if we have a direct URL in preferences, if yes - use it
 				if (openHABBaseUrl.length() > 0) {
 					Log.i(HABApplication.getLogTag(), "Connecting to configured URL = " + openHABBaseUrl);
@@ -294,8 +294,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 							} else {
 								Log.i(HABApplication.getLogTag(), "Network is Mobile (" + activeNetworkInfo.getSubtypeName() + ")");
 							}
-                            HABApplication.getOpenHABSetting().setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
-                            openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
+                            HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
+                            openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
 							// If remote URL is configured
 							if (openHABBaseUrl.length() > 0) {
 								Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),

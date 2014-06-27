@@ -230,16 +230,16 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         if (savedInstanceState != null) {
             openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
-            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
             sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
-            HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
+            HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
         }
         mSitemapList = new ArrayList<OpenHABSitemap>();
         mNavDrawerItemList = new ArrayList<INavDrawerItem>();
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
-        HABApplication.getOpenHABSetting().setUsername(openHABUsername);
-        HABApplication.getOpenHABSetting().setPassword(openHABPassword);
-        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);//Added by TA
+        HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
+        HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
+        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);//Added by TA
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -333,7 +333,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         Toast.makeText(getApplicationContext(), message,
                 Toast.LENGTH_LONG).show();
         openHABBaseUrl = baseUrl;
-        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
         pagerAdapter.setOpenHABBaseUrl(openHABBaseUrl);
         if (!TextUtils.isEmpty(mNfcData)) {
             onNfcTag(mNfcData);
@@ -501,7 +501,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     public void openSitemap(String sitemapUrl) {
         Log.i(TAG, "Opening sitemap at " + sitemapUrl);
         sitemapRootUrl = sitemapUrl;
-        HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
+        HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
         pagerAdapter.clearFragmentList();
         pagerAdapter.openPage(sitemapRootUrl);
         pager.setCurrentItem(0);
@@ -904,7 +904,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     public void setOpenHABBaseUrl(String openHABBaseUrl) {
         this.openHABBaseUrl = openHABBaseUrl;
-        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
     }
 
     public String getOpenHABUsername() {

@@ -176,12 +176,12 @@ public class OpenHABSitemap implements INavDrawerItem {
             drawerItemLabelTextView.setText(getName());
         }
         if (getIcon() != null && drawerItemImage != null) {
-            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(getIcon() + ".png");
+            String iconUrl = HABApplication.getOpenHABSetting(context).getBaseUrl() + "images/" + Uri.encode(getIcon() + ".png");
             drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall,
-                    HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+                    HABApplication.getOpenHABSetting(context).getUsername(), HABApplication.getOpenHABSetting(context).getPassword());
         } else {
-            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + ".png";
-            drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+            String iconUrl = HABApplication.getOpenHABSetting(context).getBaseUrl() + "images/" + ".png";
+            drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(context).getUsername(), HABApplication.getOpenHABSetting(context).getPassword());
         }
         return drawerItemView;
     }

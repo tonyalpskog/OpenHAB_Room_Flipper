@@ -236,12 +236,10 @@ public class UnitPlacementFragment extends Fragment {
             if(mUnitTypes.contains(next.getType()) && !roomView.getRoom().contains(next)){
                 itemNameList.add(next.getItem().getName());
                 widgetMap.put(i, next);
-                itemsList.add(i, String.format("(%s) %s", next.getType().Name, next.hasLinkedPage() ? next.getLinkedPage().getTitle() : next.getItem().getName()));
+                itemsList.add(i++, String.format("(%s) %s", next.getType().Name, next.hasLinkedPage() ? next.getLinkedPage().getTitle() : next.getItem().getName()));
             }
             else
                 strLogRemoved += next.getId() + ", ";
-
-            i++;
         }
         Log.d(HABApplication.getLogTag(), strLogAll);
         Log.d(HABApplication.getLogTag(), strLogRemoved);

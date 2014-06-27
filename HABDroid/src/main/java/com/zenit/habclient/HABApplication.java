@@ -74,9 +74,9 @@ public class HABApplication extends Application {
     }
 
     private static OpenHABSetting mOpenHABSetting;
-    public static OpenHABSetting getOpenHABSetting() {
+    public static OpenHABSetting getOpenHABSetting(Context context) {
         if(mOpenHABSetting == null)
-            mOpenHABSetting = new OpenHABSetting();
+            mOpenHABSetting = new OpenHABSetting(context);
         return mOpenHABSetting;
     }
 

@@ -17,7 +17,7 @@ public class AsyncHttpClientAsAsyncTask implements IAsyncHttpClientAsAsyncTask {
     public void doAsync(HABApplication habApplication, final Listener l) {
         Header[] headers = {};
 //        headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
-        AsyncHttpClient asyncHttpClient = habApplication.getOpenHABSetting().getAsyncHttpClient(habApplication.getApplicationContext());
+        AsyncHttpClient asyncHttpClient = habApplication.getOpenHABSetting(habApplication.getApplicationContext()).getAsyncHttpClient();
 //        MyAsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(habApplication.getApplicationContext());
         asyncHttpClient.get(habApplication.getApplicationContext(), "https://demo.openhab.org:8443/rest/sitemaps/demo/demo", headers, null, new DocumentHttpResponseHandler() {
             @Override

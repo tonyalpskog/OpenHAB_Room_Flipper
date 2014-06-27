@@ -149,9 +149,9 @@ public class OpenHABWidgetListFragment extends ListFragment {
         openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(getActivity(),
                 R.layout.openhabwidgetlist_genericitem, widgetList);
         getListView().setAdapter(openHABWidgetAdapter);
-        openHABBaseUrl = HABApplication.getOpenHABSetting().getBaseUrl();
-        openHABUsername = HABApplication.getOpenHABSetting().getUsername();
-        openHABPassword = HABApplication.getOpenHABSetting().getPassword();
+        openHABBaseUrl = HABApplication.getOpenHABSetting(getActivity()).getBaseUrl();
+        openHABUsername = HABApplication.getOpenHABSetting(getActivity()).getUsername();
+        openHABPassword = HABApplication.getOpenHABSetting(getActivity()).getPassword();
         openHABWidgetAdapter.setOpenHABUsername(openHABUsername);
         openHABWidgetAdapter.setOpenHABPassword(openHABPassword);
         openHABWidgetAdapter.setOpenHABBaseUrl(openHABBaseUrl);

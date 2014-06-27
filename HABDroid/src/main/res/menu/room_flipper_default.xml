@@ -22,7 +22,7 @@
         android:title="@string/action_launch_wear_app"
         android:showAsAction="always"/>
     <item android:id="@+id/action_open_rules"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_menu_openhab_rule"
         android:title="@string/action_launch_rules_activity"
         android:showAsAction="always"/>
 </menu>

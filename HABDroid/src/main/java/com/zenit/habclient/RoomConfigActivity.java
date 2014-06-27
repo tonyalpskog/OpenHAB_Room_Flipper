@@ -7,18 +7,11 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.openhab.habdroid.R;
 
@@ -210,9 +203,9 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section2).toUpperCase(l);
+                    return getString(R.string.title_unit_placement).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return getString(R.string.title_room_config).toUpperCase(l);
             }
             return null;
         }

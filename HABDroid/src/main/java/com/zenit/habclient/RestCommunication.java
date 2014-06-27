@@ -4,8 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
+import com.zenit.habclient.util.StringHandler;
 
 import org.apache.http.Header;
+import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.model.OpenHABWidget;
 import org.openhab.habdroid.model.OpenHABWidgetDataSource;
@@ -19,7 +21,7 @@ public class RestCommunication {
 
     public void requestOpenHABSitemap(Context context, OpenHABWidget widget) {
         if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
-            requestOpenHABSitemap(context, /*"https://192.168.137.1:8443/rest/sitemaps/ekafallet/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getItem().getLink()), widget);
+            requestOpenHABSitemap(context, /*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getItem().getLink()), widget);
         else
             Log.e(HABApplication.getLogTag(2), "[AsyncHttpClient] Sitemap cannot be requested due to missing sitemap data.");
     }
@@ -29,9 +31,9 @@ public class RestCommunication {
     }
 
     public void requestOpenHABSitemap(Context context, String sitemapUrl, OpenHABWidget widget) {
-        if(sitemapUrl == null || sitemapUrl.isEmpty()) {
+        if(StringHandler.isNullOrEmpty(sitemapUrl)) {
             Log.w(HABApplication.getLogTag(), String.format("\n\r%s\n\r[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
-            sitemapUrl = "https://169.254.2.2:8443/rest/sitemaps/ekafallet/ekafallet";
+            sitemapUrl = HABApplication.getOpenHABSetting(context).getBaseUrl() + context.getString(R.string.openhab_demo_sitemap_postfix);
         }
 
         Log.d(HABApplication.getLogTag(2), String.format("\n\r[AsyncHttpClient] Requested sitemap URL is '%s'", sitemapUrl));
@@ -48,7 +50,7 @@ public class RestCommunication {
 //        //TA - Calling REST Get method, requesting data from server.
 //        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler()
 
-        AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting().getAsyncHttpClient(context);
+        AsyncHttpClient asyncHttpClient = HABApplication.getOpenHABSetting(context).getAsyncHttpClient();
         final String RESTaddress = sitemapUrl;
         Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
         asyncHttpClient.get(context, RESTaddress, headers, null, new DocumentHttpResponseHandler() {

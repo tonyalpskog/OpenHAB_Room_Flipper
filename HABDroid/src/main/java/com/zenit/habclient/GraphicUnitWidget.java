@@ -18,7 +18,6 @@ import android.widget.Toast;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
-import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
 /**
@@ -35,8 +34,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
         this(context);
         gUnit = graphicUnit;
-        String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-        setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+        String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+        setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(context).getPassword());
         setOnLongClickListener(this);
         setOnClickListener(this);
     }
@@ -97,8 +96,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             setImageBitmap(bitmap);
         } else {
 //            setImageBitmap(originalBitmap);
-            String iconUrl = HABApplication.getOpenHABSetting().getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-            setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting().getUsername(), HABApplication.getOpenHABSetting().getPassword());
+            String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+            setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(getContext()).getPassword());
         }
     }
 

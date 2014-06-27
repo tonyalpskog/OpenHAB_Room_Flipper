@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 
 import com.zenit.habclient.command.CommandAnalyzer;
 import com.zenit.habclient.command.ICommandAnalyzer;
+import com.zenit.habclient.rule.RuleActivity;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -79,10 +80,14 @@ public class MainActivity extends Activity
                         .replace(R.id.container, UnitPlacementFragment.newInstance(position + 1))
                         .commit();
                 break;
-            default:
+            case 2:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, RoomConfigFragment.newInstance(((HABApplication) getApplication()).getRoomProvider()))
                         .commit();
+                break;
+            default:
+                Intent i = new Intent(this, RuleActivity.class);
+                startActivity(i);
                 break;
 
         }
@@ -91,13 +96,16 @@ public class MainActivity extends Activity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_room_flipper);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_unit_placement);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_room_config);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_rule_config);
                 break;
         }
     }

@@ -15,14 +15,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.zenit.habclient.rule.RuleActivity;
 
@@ -107,9 +105,10 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
+                        getString(R.string.title_room_flipper),
+                        getString(R.string.title_unit_placement),
+                        getString(R.string.title_room_config),
+                        getString(R.string.title_rule_config)
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
