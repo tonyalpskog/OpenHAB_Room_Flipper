@@ -1,4 +1,4 @@
-This is a OpenHAB android client. Please read a lot about the [OpenHAB](http://www.openhab.org/) server and settings before trying to understand how this app works.
+This is an **OpenHAB** android client. Please read a lot about the [OpenHAB](http://www.openhab.org/) server and settings before trying to understand how this app works.
 1. Setup a local server
 2. Read about OpenHAB items and sitemaps
 
@@ -11,6 +11,7 @@ Pretty much everything extended is experimental and totally unfinished.
 Extended functionality:
 
 (In main activity option menu -> *Room Flipper* -> option menu -> *Edit*)
+
 * Each site group can be attached to a graphical Room
 * Each room can have OpenHAB widgets attached to it. Room design in run-time.
 * All rooms is (during run-time design) connected to each other in a 3D-way. (8 directions + up/down = 10 directions)
