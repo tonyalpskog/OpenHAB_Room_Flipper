@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="android-async-http-1.4.2-openhab">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/HABDroid/libs/android-async-http-1.4.2-openhab.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

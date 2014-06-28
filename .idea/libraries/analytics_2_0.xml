@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="analytics-2.0">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/HABDroid/libs/analytics-2.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
