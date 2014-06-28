@@ -176,8 +176,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             PreferenceManager.getDefaultSharedPreferences(this).edit().putString("default_openhab_appversion",
                     getPackageManager().getPackageInfo(getPackageName(), 0).versionName).commit();
         } catch (PackageManager.NameNotFoundException e1) {
-            if (e1 != null)
-                Log.d(TAG, e1.getMessage());
+            Log.d(TAG, e1.getMessage());
         }
         checkDiscoveryPermissions();
         checkVoiceRecognition();
