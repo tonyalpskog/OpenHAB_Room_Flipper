@@ -56,8 +56,6 @@
         <activity
             android:name="org.openhab.habdroid.ui.OpenHABPreferencesActivity"
             android:label="@string/app_preferences_name" >
-            <intent-filter>
-            </intent-filter>
         </activity>
         <activity
             android:name="org.openhab.habdroid.ui.OpenHABMainActivity"
