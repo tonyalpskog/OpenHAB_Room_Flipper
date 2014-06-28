@@ -1,4 +1,4 @@
-This is an **OpenHAB** android client. Please read a lot about the [OpenHAB](http://www.openhab.org/) server and settings before trying to understand how this app works.
+This is an **OpenHAB** android client. Please read a lot about the [OpenHAB](http://www.openhab.org/) server and it´s settings before trying to understand how this app works.
 
 
 1. Setup a local server
@@ -7,6 +7,8 @@ This is an **OpenHAB** android client. Please read a lot about the [OpenHAB](htt
 This repo is a [HABDroid](https://github.com/openhab/openhab/wiki/HABDroid) clone with a lot of extra functionality.
 The client needs connection to a OpenHAB server to be able to show any kind of data.
 The main activity in the app has *Settings* in the option menu. By default the app is in demo mode = connection to a demo server in Germany(?).
+
+APK:s are published in the [Downloads](https://bitbucket.org/tonyalpskog/open-hab-android-client/downloads) area. 
 
 Major refactoring has been done to the original code in order to be able to use it for extended functionality.
 Pretty much everything extended is experimental and totally unfinished.
