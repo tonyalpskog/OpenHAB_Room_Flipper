@@ -10,7 +10,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import org.openhab.habdroid.R;
-import org.openhab.rule.RuleTreeItem;
+import org.openhab.domain.business.rule.RuleTreeItem;
 
 import java.util.HashMap;
 

@@ -10,7 +10,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.util.StringHandler;
+import org.openhab.domain.util.StringHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

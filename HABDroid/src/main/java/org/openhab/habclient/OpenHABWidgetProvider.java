@@ -11,7 +11,7 @@ import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
 import org.openhab.habclient.util.RegExAccuracyResult;
-import org.openhab.util.StringHandler;
+import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;

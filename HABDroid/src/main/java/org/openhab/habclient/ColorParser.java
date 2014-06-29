@@ -2,7 +2,7 @@ package org.openhab.habclient;
 
 import android.graphics.Color;
 
-import org.openhab.util.IColorParser;
+import org.openhab.domain.util.IColorParser;
 
 public class ColorParser implements IColorParser {
     @Override

@@ -20,19 +20,18 @@ import android.widget.Toast;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.rule.EntityDataTypeSource;
-import org.openhab.rule.IEntityDataType;
-import org.openhab.rule.RuleOperation;
-import org.openhab.rule.RuleOperationProvider;
-import org.openhab.rule.RuleOperator;
-import org.openhab.rule.RuleOperatorType;
-import org.openhab.rule.RuleTreeItem;
-import org.openhab.rule.UnitEntityDataType;
+import org.openhab.domain.business.rule.EntityDataTypeSource;
+import org.openhab.domain.business.rule.IEntityDataType;
+import org.openhab.domain.business.rule.RuleOperation;
+import org.openhab.domain.business.rule.RuleOperationProvider;
+import org.openhab.domain.business.rule.RuleOperator;
+import org.openhab.domain.business.rule.RuleOperatorType;
+import org.openhab.domain.business.rule.RuleTreeItem;
+import org.openhab.domain.business.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RuleOperationFragment extends Fragment implements RuleOperandDialogFragment.RuleOperationBuildListener {
 

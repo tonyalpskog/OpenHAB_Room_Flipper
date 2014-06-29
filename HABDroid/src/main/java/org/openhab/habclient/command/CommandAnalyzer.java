@@ -18,7 +18,7 @@ import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechAnalyzerResult;
 import org.openhab.habclient.TextToSpeechProvider;
 import org.openhab.habdroid.R;
-import org.openhab.util.StringHandler;
+import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;

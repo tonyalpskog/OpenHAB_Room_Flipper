@@ -9,8 +9,8 @@ import android.graphics.PorterDuff;
 import android.util.Log;
 
 import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.util.IColorParser;
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 
 import java.util.HashMap;
 import java.util.Iterator;

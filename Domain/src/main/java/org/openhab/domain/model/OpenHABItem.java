@@ -29,7 +29,7 @@
 
 package org.openhab.domain.model;
 
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.ILogger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

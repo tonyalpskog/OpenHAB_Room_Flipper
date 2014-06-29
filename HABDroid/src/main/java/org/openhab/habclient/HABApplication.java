@@ -9,9 +9,9 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.util.RegularExpression;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
-import org.openhab.rule.RuleOperationProvider;
-import org.openhab.util.IColorParser;
-import org.openhab.util.ILogger;
+import org.openhab.domain.business.rule.RuleOperationProvider;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 
 import java.util.Locale;
 import java.util.UUID;

@@ -21,11 +21,11 @@ import android.widget.Toast;
 import org.openhab.domain.business.IOpenHABWidgetProvider;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.rule.IEntityDataType;
-import org.openhab.rule.RuleAction;
-import org.openhab.rule.RuleActionType;
-import org.openhab.rule.RuleActionValueType;
-import org.openhab.rule.RuleOperator;
+import org.openhab.domain.business.rule.IEntityDataType;
+import org.openhab.domain.business.rule.RuleAction;
+import org.openhab.domain.business.rule.RuleActionType;
+import org.openhab.domain.business.rule.RuleActionValueType;
+import org.openhab.domain.business.rule.RuleOperator;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 

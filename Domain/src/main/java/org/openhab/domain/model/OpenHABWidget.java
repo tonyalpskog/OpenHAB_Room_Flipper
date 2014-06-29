@@ -29,8 +29,8 @@
 
 package org.openhab.domain.model;
 
-import org.openhab.util.IColorParser;
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -39,7 +39,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.openhab.util.StringHandler.isNullOrEmpty;
+import static org.openhab.domain.util.StringHandler.isNullOrEmpty;
 
 /**
  * This is a class to hold basic information about openHAB widget.

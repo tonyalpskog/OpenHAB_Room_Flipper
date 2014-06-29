@@ -9,7 +9,7 @@ buildscript {
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile project(':Rule')
+    compile project(':Domain')
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 

@@ -17,8 +17,8 @@ import android.widget.Toast;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.R;
-import org.openhab.util.IColorParser;
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 
 import java.util.ArrayList;
 import java.util.Collections;

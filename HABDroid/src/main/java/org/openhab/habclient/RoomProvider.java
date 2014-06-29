@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import org.openhab.habdroid.R;
-import org.openhab.util.IColorParser;
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 
 import java.util.HashMap;
 import java.util.Iterator;

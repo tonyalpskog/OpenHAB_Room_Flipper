@@ -1,6 +1,6 @@
 package org.openhab.habclient.command;
 
-import org.openhab.util.StringHandler;
+import org.openhab.domain.util.StringHandler;
 
 /**
  * Created by Tony Alpskog in 2014.

@@ -2,7 +2,7 @@ package org.openhab.habclient;
 
 import android.util.Log;
 
-import org.openhab.util.ILogger;
+import org.openhab.domain.util.ILogger;
 
 public class AndroidLogger implements ILogger {
     @Override
