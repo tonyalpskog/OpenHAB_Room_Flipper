@@ -480,79 +480,18 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_1")));
-                operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Corridor_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Corridor_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//"demo_1_0"
-                operands.add(getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//ekafallettest_1
+                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//"demo_1_0"
+                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//ekafallettest_1
                 break;
         }
 
         return operands;
-    }
-
-    private UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget) {
-        UnitEntityDataType rue = null;
-
-        switch(openHABWidget.getItem().getType()) {
-            case Contact:
-            case Switch:
-                Boolean aBoolean;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aBoolean = null;
-                else
-                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("On");
-
-                rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean, null)//TODO - Change <null> to a listener provider
-                {
-                    public String getFormattedString(){
-                        return mValue.booleanValue()? "On": "Off";//TODO - Language independent
-                    }
-
-                    @Override
-                    public Boolean valueOf(String input) {
-                        return Boolean.valueOf(input);
-                    }
-
-                    @Override
-                    public Map<String, Boolean> getStaticValues() {
-                        return null;
-                    }
-                };
-                rue.setDataSourceId(openHABWidget.getId());
-                break;
-            case Number:
-            case Dimmer:
-                Double aNumber;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aNumber = null;
-                else
-                    aNumber = Double.valueOf(openHABWidget.getItem().getState());
-
-                rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber, null)//TODO - Change <null> to a listener provider
-                {
-                    public String getFormattedString(){
-                        return mValue.toString();
-                    }
-
-                    @Override
-                    public Double valueOf(String input) {
-                        return Double.valueOf(input);
-                    }
-
-                    @Override
-                    public Map<String, Double> getStaticValues() {
-                        return null;
-                    }
-                };
-                rue.setDataSourceId(openHABWidget.getId());
-                break;
-        }
-
-        return rue;
     }
 
 }

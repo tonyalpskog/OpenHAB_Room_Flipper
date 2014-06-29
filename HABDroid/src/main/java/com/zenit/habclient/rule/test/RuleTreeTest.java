@@ -8,6 +8,7 @@ import com.zenit.habclient.rule.RuleOperationProvider;
 import com.zenit.habclient.rule.RuleOperator;
 import com.zenit.habclient.rule.RuleOperatorType;
 import com.zenit.habclient.rule.RuleTreeItem;
+import com.zenit.habclient.rule.UnitEntityDataType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
@@ -66,14 +67,14 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         switch (operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
-                operands.add(mHttpDataSetup.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 

@@ -875,75 +875,18 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
-                operands.add(getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
-                operands.add(getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
         return operands;
-    }
-
-    private UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget) {
-        UnitEntityDataType rue = null;
-
-        switch(openHABWidget.getItem().getType()) {
-            case Switch:
-                Boolean aBoolean;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aBoolean = null;
-                else
-                    aBoolean = openHABWidget.getItem().getState().equalsIgnoreCase("On");
-
-                rue = new UnitEntityDataType<Boolean>(openHABWidget.getItem().getName(), aBoolean)
-                {
-                    public String getFormattedString(){
-                        return mValue.booleanValue()? "On": "Off";//TODO - Language independent
-                    }
-
-                    @Override
-                    public Boolean valueOf(String input) {
-                        return Boolean.valueOf(input);
-                    }
-
-                    @Override
-                    public Map<String, Boolean> getStaticValues() {
-                        return null;
-                    }
-                };
-                break;
-            case Number:
-                Double aNumber;
-                if(openHABWidget.getItem().getState().equalsIgnoreCase("Undefined"))
-                    aNumber = null;
-                else
-                    aNumber = Double.valueOf(openHABWidget.getItem().getState());
-
-                rue = new UnitEntityDataType<Double>(openHABWidget.getItem().getName(), aNumber)
-                {
-                    public String getFormattedString(){
-                        return mValue.toString();
-                    }
-
-                    @Override
-                    public Double valueOf(String input) {
-                        return Double.valueOf(input);
-                    }
-
-                    @Override
-                    public Map<String, Double> getStaticValues() {
-                        return null;
-                    }
-                };
-                break;
-        }
-
-        return rue;
     }
 
     public void test_Create_RuleOperation_object_from_provider_units_and_validate_operation_result() {
@@ -951,12 +894,12 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
         OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]", roA.toString());
+        assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
 
         widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling [Off] != Light_FF_Bath_Mirror [Off]", roA.toString());
+        assertEquals("Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]", roA.toString());
         assertEquals(false, roA.getValue().booleanValue());
 
         widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
@@ -1002,11 +945,11 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     public void test_RuleOperation_toString_methods_on_nameless_operation_and_sub_operations() {
         RuleOperation ro = getNestedRuleOperationForTest(false, RuleOperatorType.And);
 
-        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
-        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
-        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(false, true));
-        assertEquals("(Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(false, false));
-        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [Off] = Light_FF_Bath_Mirror [Off]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(true, true));
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
+        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(false, true));
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(false, false));
+        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(true, true));
     }
 
     public void test_RuleOperation_toString_methods_on_named_operation_and_mixed_sub_operations() {
@@ -1032,28 +975,28 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         ((RuleOperation) operandList.get(1)).setOperand(1, null);
         RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("(Light_GF_Kitchen_Ceiling [Off] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
         ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(1, null);
         ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(0, null);
         ro = new RuleOperation((RuleOperator<Boolean>) rop.mOperatorHash.get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
         assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
