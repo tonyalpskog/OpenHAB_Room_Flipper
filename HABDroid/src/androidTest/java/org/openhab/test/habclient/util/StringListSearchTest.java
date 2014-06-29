@@ -2,7 +2,7 @@ package org.openhab.test.habclient.util;
 
 import android.test.InstrumentationTestCase;
 
-import org.openhab.habclient.util.StringListSearch;
+import org.openhab.domain.util.StringListSearch;
 
 import java.util.ArrayList;
 import java.util.List;

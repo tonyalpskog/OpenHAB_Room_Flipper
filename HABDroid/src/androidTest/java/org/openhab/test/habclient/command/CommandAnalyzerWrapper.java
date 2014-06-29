@@ -2,6 +2,7 @@ package org.openhab.test.habclient.command;
 
 import android.content.Context;
 
+import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.HABApplication;
@@ -22,8 +23,8 @@ import java.util.regex.Pattern;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
-    public CommandAnalyzerWrapper(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context) {
-        super(roomProvider, openHABWidgetProvider, context);
+    public CommandAnalyzerWrapper(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context, IOpenHABWidgetControl widgetControl) {
+        super(roomProvider, openHABWidgetProvider, context, widgetControl);
     }
 
     public Map<String, Room> getMapOfRoomNamesFromProvider() {

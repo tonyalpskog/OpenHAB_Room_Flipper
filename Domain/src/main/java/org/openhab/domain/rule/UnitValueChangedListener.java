@@ -43,10 +43,8 @@ public class UnitValueChangedListener {
     }
 
     public void unregisterOnValueChangedListener(OnValueChangedListener eventListener) {
-        Iterator<List<OnValueChangedListener>> iterator = mOnValueChangedListeners.values().iterator();
-        while(iterator.hasNext()) {
-            List<OnValueChangedListener> listenerList = iterator.next();
-            if(listenerList.contains(eventListener))
+        for (List<OnValueChangedListener> listenerList : mOnValueChangedListeners.values()) {
+            if (listenerList.contains(eventListener))
                 listenerList.remove(eventListener);
         }
     }

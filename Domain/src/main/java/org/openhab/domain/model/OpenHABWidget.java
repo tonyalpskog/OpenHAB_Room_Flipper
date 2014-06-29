@@ -70,10 +70,13 @@ public class OpenHABWidget {
     private Integer labelcolor;
     private Integer valuecolor;
     private UUID updateUUID;
-    private ILogger logger;
+    private final ILogger logger;
     private final IColorParser colorParser;
 
     public OpenHABWidget(ILogger logger, IColorParser colorParser) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
+
         this.logger = logger;
         this.colorParser = colorParser;
         this.children = new ArrayList<OpenHABWidget>();
@@ -82,6 +85,9 @@ public class OpenHABWidget {
 	
 	public OpenHABWidget(OpenHABWidget parent, Node startNode, ILogger logger,
                          IColorParser colorParser) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
+
         this.logger = logger;
 		this.parent = parent;
         this.colorParser = colorParser;

@@ -8,9 +8,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import org.apache.http.Header;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.openhab.domain.util.StringHandler;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.domain.util.StringHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -18,6 +20,16 @@ import org.w3c.dom.Node;
  * Created by Tony Alpskog in 2014.
  */
 public class RestCommunication {
+    private final ILogger mLogger;
+    private final IColorParser mColorParser;
+
+    public RestCommunication(ILogger logger, IColorParser colorParser) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
+
+        mLogger = logger;
+        mColorParser = colorParser;
+    }
 
     public void requestOpenHABSitemap(Context context, OpenHABWidget widget) {
         if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
@@ -60,7 +72,7 @@ public class RestCommunication {
                     Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.toString() + "'");
                     Node rootNode = document.getFirstChild();
 
-                    HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode): new OpenHABWidgetDataSource(rootNode, finalWidget));
+                    HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(finalWidget == null? new OpenHABWidgetDataSource(rootNode, mLogger, mColorParser): new OpenHABWidgetDataSource(rootNode, finalWidget, mLogger, mColorParser));
                 } else {
                     Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
                 }

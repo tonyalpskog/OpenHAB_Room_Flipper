@@ -6,7 +6,7 @@ import android.util.Log;
 
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
-import org.openhab.habclient.util.RegularExpression;
+import org.openhab.domain.util.RegularExpression;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
@@ -71,7 +71,7 @@ public class HABApplication extends Application {
 
     public static RestCommunication getRestCommunication() {
         if(mRestCommunication == null)
-            mRestCommunication = new RestCommunication();
+            mRestCommunication = new RestCommunication(new AndroidLogger(), new ColorParser());
 
         return mRestCommunication;
     }

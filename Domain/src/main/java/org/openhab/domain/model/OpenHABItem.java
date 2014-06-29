@@ -49,6 +49,7 @@ public class OpenHABItem {
     private ILogger mLogger;
 
 	public OpenHABItem(Node startNode, ILogger logger) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
         mLogger = logger;
 
 		if (startNode.hasChildNodes()) {

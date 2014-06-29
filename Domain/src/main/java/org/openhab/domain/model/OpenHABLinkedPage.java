@@ -49,6 +49,9 @@ public class OpenHABLinkedPage {
 	private static final String TAG = "OpenHABLinkedPage";
 	
 	public OpenHABLinkedPage(OpenHABWidget parentWidget, Node startNode, ILogger logger, IColorParser colorParser) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
+
 		if (startNode.hasChildNodes()) {
 			NodeList childNodes = startNode.getChildNodes();
 			for (int i = 0; i < childNodes.getLength(); i ++) {

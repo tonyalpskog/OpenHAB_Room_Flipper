@@ -10,7 +10,7 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
-import org.openhab.habclient.util.RegExAccuracyResult;
+import org.openhab.domain.util.RegExAccuracyResult;
 import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
@@ -76,6 +76,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         mOpenHABItemNameMap.get(item.getName()).setItem(item);
     }
 
+    @Override
     public void setOpenHABWidgets(OpenHABWidgetDataSource openHABWidgetDataSource) {
         if(openHABWidgetDataSource.getRootWidget() == null)
             return;
@@ -271,6 +272,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         return result;
     }
 
+    @Override
     public OpenHABWidget getWidgetByItemName(String openHabItemName) {
         OpenHABWidget widget = mOpenHABItemNameMap.get(openHabItemName);
         if(widget == null)

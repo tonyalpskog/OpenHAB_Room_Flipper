@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import org.openhab.domain.util.StringListSearch;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;

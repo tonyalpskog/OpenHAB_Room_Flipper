@@ -1,18 +1,16 @@
 package org.openhab.test.habclient.rule;
 
-import org.openhab.habclient.HABApplication;
-import org.openhab.test.habclient.command.DocumentHttpResponseHandlerWrapper;
-import org.openhab.habclient.rule.IEntityDataType;
-import org.openhab.habclient.rule.UnitEntityDataType;
-
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.openhab.test.habclient.command.DocumentHttpResponseHandlerWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -20,10 +18,16 @@ import javax.xml.parsers.ParserConfigurationException;
  * Created by Tony Alpskog in 2014.
  */
 public class HttpDataSetup {
-    HABApplication mHABApplication;
+    private final ILogger mLogger;
+    private final IColorParser mColorParser;
+    private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
 
-    public HttpDataSetup(HABApplication habApplication) {
-        mHABApplication = habApplication;
+    public HttpDataSetup(ILogger logger,
+                         IColorParser colorParser,
+                         IOpenHABWidgetProvider openHABWidgetProvider) {
+        mLogger = logger;
+        mColorParser = colorParser;
+        mOpenHABWidgetProvider = openHABWidgetProvider;
     }
 
 
@@ -42,10 +46,10 @@ public class HttpDataSetup {
 
         Node rootNode = document.getElementsByTagName("homepage").item(0);
 
-        OpenHABWidget rootWidget = new OpenHABWidget();
+        OpenHABWidget rootWidget = new OpenHABWidget(mLogger, mColorParser);
         int childWidgetsFound = 0, childTitlesFound = 0, childIDsFound = 0, childIconsFound = 0, childLinksFound = 0;
 
-        OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource();
+        OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource(mLogger, mColorParser);
 
         for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
             Node childNode = rootNode.getChildNodes().item(i);
@@ -66,10 +70,9 @@ public class HttpDataSetup {
             }
         }
 
-        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode);
+        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode, mLogger, mColorParser);
 
-        mHABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
-        return;
+        mOpenHABWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
     }
 
     public void loadHttpDataFromString() {

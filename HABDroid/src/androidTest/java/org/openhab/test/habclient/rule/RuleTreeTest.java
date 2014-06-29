@@ -1,19 +1,22 @@
 package org.openhab.test.habclient.rule;
 
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.RuleTreeItem;
+import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
-import org.openhab.habclient.rule.IEntityDataType;
-import org.openhab.habclient.rule.RuleOperation;
-import org.openhab.habclient.rule.RuleOperationProvider;
-import org.openhab.habclient.rule.RuleOperator;
-import org.openhab.habclient.rule.RuleOperatorType;
-import org.openhab.habclient.rule.RuleTreeItem;
-import org.openhab.habclient.rule.UnitEntityDataType;
-
-import org.openhab.domain.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -36,7 +39,9 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         createApplication();
         mHABApplication = getApplication();
 
-        mHttpDataSetup = new HttpDataSetup(mHABApplication);
+        final ILogger logger = mock(ILogger.class);
+        final IColorParser colorParser = mock(IColorParser.class);
+        mHttpDataSetup = new HttpDataSetup(logger, colorParser, mHABApplication.getOpenHABWidgetProvider());
         mHttpDataSetup.loadHttpDataFromString();
 
         rop = mHABApplication.getRuleOperationProvider();

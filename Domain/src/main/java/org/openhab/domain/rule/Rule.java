@@ -24,6 +24,8 @@ public class Rule implements OnOperandValueChangedListener {
     }
 
     public Rule(String name, IOpenHABWidgetControl widgetControl) {
+        if(widgetControl == null) throw new IllegalArgumentException("widgetControl is null");
+
         setName(name);
         mOpenHABWidgetControl = widgetControl;
         mActions = new ArrayList<RuleAction>();
@@ -37,7 +39,7 @@ public class Rule implements OnOperandValueChangedListener {
     public void setRuleOperation(RuleOperation ruleOperation) {
         mRuleOperation = ruleOperation;
         if(mRuleOperation != null)
-            ((IRuleOperationOperand)mRuleOperation).setOnOperandValueChangedListener(this);
+            mRuleOperation.setOnOperandValueChangedListener(this);
     }
 
     public String getName() {

@@ -1,21 +1,24 @@
 package org.openhab.test.habclient.command;
 
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ApplicationMode;
+import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.command.CommandAnalyzerResult;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.OpenHABWidgetCommandType;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
-import org.openhab.habclient.util.DecimalHandler;
-import org.openhab.habclient.util.RegExAccuracyResult;
-import org.openhab.habclient.util.RegExResult;
-
-import org.openhab.domain.model.OpenHABItemType;
-import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.model.OpenHABWidgetDataSource;
-import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.util.DecimalHandler;
+import org.openhab.domain.util.RegExAccuracyResult;
+import org.openhab.domain.util.RegExResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -45,6 +48,8 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     private ArrayList<String> mListOfTestPhrases2;
     private String[] mTestedRoomsNameArray;
     private int mDoubles;
+    private ILogger mLogger;
+    private IColorParser mColorParser;
 
     final String[] mFullRoomNameArray = new String[]{"Tvättstuga", "Källar hall", "Källar bad", "Bastu"
             , "Hobbyrum", "Källar förråd", "Krypgrund", "Hall", "Städskrubb", "Gästtoa"
@@ -61,8 +66,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         }
         createApplication();
         mHABApplication = getApplication();
+        mLogger = new AndroidLogger();
+        mColorParser = new ColorParser();
 
-        mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(), mHABApplication.getOpenHABWidgetProvider2(), mContext);
+        mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(),
+                mHABApplication.getOpenHABWidgetProvider(), mContext,
+                mHABApplication.getOpenHABWidgetControl());
         //mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
 
         loadHttpDataFromString();
@@ -194,11 +203,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertTrue(rootNode.hasChildNodes());
         assertEquals(8, rootNode.getChildNodes().getLength());
 
-
-        OpenHABWidget rootWidget = new OpenHABWidget();
+        final ILogger logger = new AndroidLogger();
+        final IColorParser colorParser = new ColorParser();
+        OpenHABWidget rootWidget = new OpenHABWidget(logger, colorParser);
         int childWidgetsFound = 0, childTitlesFound = 0, childIDsFound = 0, childIconsFound = 0, childLinksFound = 0;
 
-        OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource();
+        OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource(logger, colorParser);
 
         for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
             Node childNode = rootNode.getChildNodes().item(i);
@@ -226,7 +236,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals(1, childLinksFound);
         assertEquals("https://demo.openhab.org:8443/rest/sitemaps/demo/demo", openHABWidgetDataSource.getLink());
 
-        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode);
+        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode, mLogger, mColorParser);
 
         assertEquals("Number of rootWidget childs is incorrect: ", 4, openHABWidgetDataSource.getRootWidget().getChildren().size());
         assertEquals("Number of total childs is incorrect: ", 13, openHABWidgetDataSource.getWidgets().size());

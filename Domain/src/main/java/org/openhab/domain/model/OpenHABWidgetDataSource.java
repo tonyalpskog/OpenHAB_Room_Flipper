@@ -63,19 +63,26 @@ public class OpenHABWidgetDataSource {
 	private String id;
 	private String icon;
 	private String link;
-    private ILogger logger;
-    private IColorParser colorParser;
+    private final ILogger logger;
+    private final IColorParser colorParser;
 
 	public OpenHABWidgetDataSource(ILogger logger, IColorParser colorParser) {
+        if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
+
         this.logger = logger;
         this.colorParser = colorParser;
     }
 	
-	public OpenHABWidgetDataSource(Node rootNode) {
-		setSourceNode(rootNode);
+	public OpenHABWidgetDataSource(Node rootNode, ILogger logger, IColorParser colorParser) {
+        this(logger, colorParser);
+
+        setSourceNode(rootNode);
 	}
 
-    public OpenHABWidgetDataSource(Node rootNode, OpenHABWidget widget) {
+    public OpenHABWidgetDataSource(Node rootNode, OpenHABWidget widget, ILogger logger, IColorParser colorParser) {
+        this(logger, colorParser);
+
         widget.removeAllChildren();
         setSourceNode(rootNode, widget);
     }

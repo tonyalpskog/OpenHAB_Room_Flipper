@@ -1,21 +1,25 @@
 package org.openhab.test.habclient.rule;
 
-import org.openhab.habclient.HABApplication;
-import org.openhab.domain.rule.OnValueChangedListener;
-import org.openhab.habclient.UnitEntityDataTypeProvider;
-import org.openhab.habclient.rule.IEntityDataType;
-import org.openhab.habclient.rule.IOperator;
-import org.openhab.habclient.rule.RuleOperation;
-import org.openhab.habclient.rule.RuleOperationProvider;
-import org.openhab.habclient.rule.RuleOperator;
-import org.openhab.habclient.rule.RuleOperatorType;
-import org.openhab.habclient.rule.UnitEntityDataType;
-
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IOperator;
+import org.openhab.domain.rule.OnValueChangedListener;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.ColorParser;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.UnitEntityDataTypeProvider;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,7 +34,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     private HashMap<RuleOperatorType, RuleOperator<Number>> ruleOperatorsNumeric;
     private HashMap<RuleOperatorType, RuleOperator<Boolean>> ruleOperatorsBoolean;
-    private HashMap<RuleOperatorType, RuleOperator<java.util.Date>> ruleOperatorsDate;
+    private HashMap<RuleOperatorType, RuleOperator<Date>> ruleOperatorsDate;
     private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
 //    @Mock
     private HABApplication mHABApplication;
@@ -65,7 +69,9 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
 //        when(mHABApplication.toString()).thenReturn("Mockoto_string");
 
-        HttpDataSetup httpDataSetup = new HttpDataSetup(mHABApplication);
+        final ILogger logger = new AndroidLogger();
+        final IColorParser colorParser = new ColorParser();
+        HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, mHABApplication.getOpenHABWidgetProvider());
         httpDataSetup.loadHttpDataFromString();
 
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
