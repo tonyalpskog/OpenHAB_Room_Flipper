@@ -9,7 +9,6 @@ import com.zenit.habclient.command.ICommandAnalyzer;
 import com.zenit.habclient.rule.RuleOperationProvider;
 import com.zenit.habclient.util.RegularExpression;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -20,7 +19,6 @@ public class HABApplication extends Application {
 
     //TA: TODO - Replace all static usage of members and methods. Call HABApplication as (HABApplication)getActivity().getApplication() -> Create a method for this in all classes.
 
-    private HashMap<UUID, HashMap<UUID, GraphicUnit>> roomUnitList = new HashMap<UUID, HashMap<UUID, GraphicUnit>>();
     private RoomProvider mRoomProvider = null;
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
