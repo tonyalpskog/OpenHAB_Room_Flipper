@@ -23,9 +23,9 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.domain.business.rule.RuleAction;
-import org.openhab.domain.business.rule.RuleActionType;
-import org.openhab.domain.business.rule.RuleActionValueType;
+import org.openhab.domain.rule.RuleAction;
+import org.openhab.domain.rule.RuleActionType;
+import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.util.StringHandler;
 
 import java.util.List;

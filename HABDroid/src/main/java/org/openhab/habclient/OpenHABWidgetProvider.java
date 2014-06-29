@@ -2,7 +2,7 @@ package org.openhab.habclient;
 
 import android.util.Log;
 
-import org.openhab.domain.business.IOpenHABWidgetProvider;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;

@@ -7,10 +7,10 @@ import android.widget.BaseAdapter;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.domain.business.rule.RuleOperationProvider;
-import org.openhab.domain.business.rule.RuleOperator;
-import org.openhab.domain.business.rule.RuleOperatorType;
-import org.openhab.domain.business.rule.UnitEntityDataType;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -3,7 +3,7 @@ package org.openhab.habclient.command;
 import android.content.Context;
 import android.util.Log;
 
-import org.openhab.domain.business.IOpenHABWidgetControl;
+import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;

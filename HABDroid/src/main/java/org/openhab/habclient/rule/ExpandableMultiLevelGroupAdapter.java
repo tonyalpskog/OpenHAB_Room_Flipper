@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.openhab.domain.business.rule.RuleTreeItem;
+import org.openhab.domain.rule.RuleTreeItem;
 
 import java.util.HashMap;
 import java.util.Iterator;

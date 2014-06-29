@@ -9,7 +9,7 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.util.RegularExpression;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
-import org.openhab.domain.business.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 

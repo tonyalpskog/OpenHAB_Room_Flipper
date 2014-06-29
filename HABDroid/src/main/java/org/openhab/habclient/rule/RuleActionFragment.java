@@ -18,14 +18,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.openhab.domain.business.IOpenHABWidgetProvider;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.domain.business.rule.IEntityDataType;
-import org.openhab.domain.business.rule.RuleAction;
-import org.openhab.domain.business.rule.RuleActionType;
-import org.openhab.domain.business.rule.RuleActionValueType;
-import org.openhab.domain.business.rule.RuleOperator;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleAction;
+import org.openhab.domain.rule.RuleActionType;
+import org.openhab.domain.rule.RuleActionValueType;
+import org.openhab.domain.rule.RuleOperator;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 

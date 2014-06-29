@@ -1,6 +1,6 @@
 package org.openhab.habclient;
 
-import org.openhab.domain.business.rule.UnitEntityDataType;
+import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.List;

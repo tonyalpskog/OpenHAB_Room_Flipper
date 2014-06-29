@@ -1,7 +1,7 @@
 package org.openhab.test.habclient.rule;
 
 import org.openhab.habclient.HABApplication;
-import org.openhab.domain.business.rule.OnValueChangedListener;
+import org.openhab.domain.rule.OnValueChangedListener;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
 import org.openhab.habclient.rule.IEntityDataType;
 import org.openhab.habclient.rule.IOperator;

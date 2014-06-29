@@ -5,12 +5,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 
-import org.openhab.domain.business.IOpenHABWidgetProvider;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
-import org.openhab.domain.business.rule.IEntityDataType;
-import org.openhab.domain.business.rule.UnitEntityDataType;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.List;

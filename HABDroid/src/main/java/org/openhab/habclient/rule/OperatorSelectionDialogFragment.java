@@ -6,9 +6,9 @@ import android.os.Bundle;
 
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
-import org.openhab.domain.business.rule.RuleOperationProvider;
-import org.openhab.domain.business.rule.RuleOperator;
-import org.openhab.domain.business.rule.RuleOperatorType;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

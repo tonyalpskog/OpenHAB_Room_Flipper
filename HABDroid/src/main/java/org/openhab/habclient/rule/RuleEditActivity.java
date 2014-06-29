@@ -14,11 +14,11 @@ import android.view.MenuItem;
 
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.domain.business.rule.IEntityDataType;
-import org.openhab.domain.business.rule.IRuleEditActivity;
-import org.openhab.domain.business.rule.Rule;
-import org.openhab.domain.business.rule.RuleOperation;
-import org.openhab.domain.business.rule.RuleOperator;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleEditActivity;
+import org.openhab.domain.rule.Rule;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperator;
 
 import java.util.HashMap;
 import java.util.Locale;

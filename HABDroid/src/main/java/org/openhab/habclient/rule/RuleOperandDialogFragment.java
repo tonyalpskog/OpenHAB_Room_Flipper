@@ -16,9 +16,9 @@ import android.widget.TextView;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
-import org.openhab.domain.business.rule.IEntityDataType;
-import org.openhab.domain.business.rule.RuleOperation;
-import org.openhab.domain.business.rule.RuleOperator;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperator;
 
 /**
  * Created by Tony Alpskog in 2014.
