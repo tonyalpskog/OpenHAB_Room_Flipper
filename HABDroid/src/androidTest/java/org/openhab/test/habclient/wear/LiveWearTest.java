@@ -1,4 +1,4 @@
-package org.openhab.habclient.wear.test;
+package org.openhab.test.habclient.wear;
 
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.wear.WearCommandHost;
