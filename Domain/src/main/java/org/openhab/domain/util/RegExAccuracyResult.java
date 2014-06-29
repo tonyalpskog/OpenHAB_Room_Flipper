@@ -1,4 +1,4 @@
-package org.openhab.habclient.util;
+package org.openhab.domain.util;
 
 import java.util.List;
 
