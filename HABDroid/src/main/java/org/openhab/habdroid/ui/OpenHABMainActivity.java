@@ -213,9 +213,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
         if (savedInstanceState != null) {
             openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
-            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
             sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
-            HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
+            HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
         }
 
         setUpDrawer();
@@ -284,7 +284,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 
-            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
         mSitemapList = new ArrayList<OpenHABSitemap>();
         mNavDrawerItemList = new ArrayList<INavDrawerItem>();
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
@@ -935,7 +935,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     public void setOpenHABBaseUrl(String openHABBaseUrl) {
         this.openHABBaseUrl = openHABBaseUrl;
-        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
     }
 
     public String getOpenHABUsername() {
