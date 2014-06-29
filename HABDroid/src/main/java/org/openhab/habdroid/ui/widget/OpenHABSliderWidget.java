@@ -3,15 +3,12 @@ package org.openhab.habdroid.ui.widget;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
-import com.crittercism.app.Crittercism;
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
-import org.openhab.habdroid.ui.SecondaryTouchListener;
 
 /**
  * Created by Tony Alpskog in 2014.

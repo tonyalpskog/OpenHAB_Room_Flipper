@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;

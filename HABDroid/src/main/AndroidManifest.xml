@@ -28,7 +28,7 @@
         android:required="false" />
 
     <application
-        android:name="com.zenit.habclient.HABApplication"
+        android:name="org.openhab.habclient.HABApplication"
         android:allowBackup="true"
         android:icon="@drawable/openhabicon"
         android:label="@string/app_name" >
@@ -39,10 +39,10 @@
         <!-- Service -->
 
         <service
-            android:name="com.zenit.habclient.HABService"
+            android:name="org.openhab.habclient.HABService"
             android:icon="@drawable/openhabicon"
             android:label="@string/service_name" />
-        <service android:name="com.zenit.habclient.SpeechService" />
+        <service android:name="org.openhab.habclient.SpeechService" />
         <service android:name="org.openhab.habdroid.core.GcmIntentService" />
 
         <!-- Activity -->
@@ -79,15 +79,15 @@
         <activity android:name="com.crittercism.NotificationActivity" />
         <activity android:name="de.duenndns.ssl.MemorizingActivity" />
         <activity
-            android:name="com.zenit.habclient.MainActivity"
+            android:name="org.openhab.habclient.MainActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.zenit.habclient.rule.RuleEditActivity"
+            android:name="org.openhab.habclient.rule.RuleEditActivity"
             android:label="@string/title_activity_rule_editor" >
         </activity>
         <activity
-            android:name="com.zenit.habclient.RoomConfigActivity"
+            android:name="org.openhab.habclient.RoomConfigActivity"
             android:label="@string/title_activity_room_config"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>

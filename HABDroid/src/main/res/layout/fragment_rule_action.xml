@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:longClickable="true"
     android:clickable="true"
-    tools:context="com.zenit.habclient.rule.RuleEditActivity">
+    tools:context="org.openhab.habclient.rule.RuleEditActivity">
 
     <LinearLayout
         android:orientation="horizontal"

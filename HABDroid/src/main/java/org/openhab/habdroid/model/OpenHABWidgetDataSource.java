@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 
 import android.util.Log;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

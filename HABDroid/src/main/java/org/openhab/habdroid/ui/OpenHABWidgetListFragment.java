@@ -45,7 +45,7 @@ import android.widget.ListView;
 
 //import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
