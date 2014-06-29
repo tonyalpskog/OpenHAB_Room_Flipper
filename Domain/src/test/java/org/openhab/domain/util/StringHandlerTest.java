@@ -1,4 +1,4 @@
-package org.openhab.domain.util.test;
+package org.openhab.domain.util;
 
 import org.junit.Assert;
 import org.junit.Test;
