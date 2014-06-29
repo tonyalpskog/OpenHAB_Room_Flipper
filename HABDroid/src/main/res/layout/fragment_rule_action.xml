@@ -1,13 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_rule_if"
-    android:tag="fragment_rule_if"
+    android:id="@+id/fragment_rule_then"
+    android:tag="fragment_rule_then"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:longClickable="true"
     android:clickable="true"
-    tools:context="com.zenit.habclient.rule.RuleActivity">
+    tools:context="com.zenit.habclient.rule.RuleEditActivity">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -31,16 +31,13 @@
 
     </LinearLayout>
 
-    <ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rule_viewflipper"
-        android:layout_width="wrap_content"
+    <ListView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="false"
-        android:longClickable="false">
-
-        <include layout="@layout/merge_rule_if_tree" />
-        <include layout="@layout/merge_rule_then_list" />
-
-    </ViewFlipper>
+        android:id="@+id/rule_then_list"
+        android:longClickable="true"
+        android:listSelector="@color/normal"
+        android:clickable="true"
+        android:choiceMode="multipleChoice" />
 
 </LinearLayout>

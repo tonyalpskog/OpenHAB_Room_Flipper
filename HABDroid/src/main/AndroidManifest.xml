@@ -91,8 +91,8 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.zenit.habclient.rule.RuleActivity"
-            android:label="@string/title_activity_rule" >
+            android:name="com.zenit.habclient.rule.RuleEditActivity"
+            android:label="@string/title_activity_rule_editor" >
         </activity>
         <activity
             android:name="com.zenit.habclient.RoomConfigActivity"

@@ -1,19 +1,19 @@
 package com.zenit.habclient;
 
-import java.util.Locale;
-
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.openhab.habdroid.R;
+
+import java.util.Locale;
 
 public class RoomConfigActivity extends Activity implements ActionBar.TabListener {
 
@@ -203,9 +203,9 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_unit_placement).toUpperCase(l);
-                case 1:
                     return getString(R.string.title_room_config).toUpperCase(l);
+                case 1:
+                    return getString(R.string.title_unit_placement).toUpperCase(l);
             }
             return null;
         }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+             <TextView
+                android:id="@+id/section_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name of rule:" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rule_name_textview"
+                android:layout_gravity="left|top"
+                android:layout_alignBottom="@+id/section_label"
+                android:layout_toRightOf="@+id/section_label"
+                android:text="SampleRuleName" />
+
+        </LinearLayout>
+
+        <include layout="@layout/merge_rule_if_tree" />
+
+    </LinearLayout>
+</ScrollView>

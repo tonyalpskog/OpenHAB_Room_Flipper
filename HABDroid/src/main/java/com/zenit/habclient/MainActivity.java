@@ -1,20 +1,20 @@
 package com.zenit.habclient;
 
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.widget.DrawerLayout;
 
 import com.zenit.habclient.command.CommandAnalyzer;
 import com.zenit.habclient.command.ICommandAnalyzer;
-import com.zenit.habclient.rule.RuleActivity;
+import com.zenit.habclient.rule.RuleEditActivity;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;
@@ -86,7 +86,7 @@ public class MainActivity extends Activity
                         .commit();
                 break;
             default:
-                Intent i = new Intent(this, RuleActivity.class);
+                Intent i = new Intent(this, RuleEditActivity.class);
                 startActivity(i);
                 break;
 

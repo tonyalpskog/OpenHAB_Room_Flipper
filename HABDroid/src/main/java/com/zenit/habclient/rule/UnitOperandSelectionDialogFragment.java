@@ -12,14 +12,16 @@ import java.util.List;
  */
 public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFragment {
     int mOperandIndex;
+    RuleOperandDialogFragment.RuleOperationBuildListener mListener;
 
-    public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position) {
-        this(source, dialogTitle, position, false);
+    public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position, RuleOperandDialogFragment.RuleOperationBuildListener listener) {
+        this(source, dialogTitle, position, false, listener);
     }
 
-    public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position, boolean showNextButton) {
+    public UnitOperandSelectionDialogFragment(List<String> source, String dialogTitle, int position, boolean showNextButton, RuleOperandDialogFragment.RuleOperationBuildListener listener) {
         super(source, dialogTitle, showNextButton);
         mOperandIndex = position;
+        mListener = listener;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     }
 
     private RuleOperandDialogFragment.RuleOperationBuildListener getListener() {
-        return (RuleOperandDialogFragment.RuleOperationBuildListener) getActivity();
+        return mListener;
     }
 
     @Override

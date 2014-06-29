@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.zenit.habclient.rule.RuleActivity;
+import com.zenit.habclient.rule.RuleEditActivity;
 import com.zenit.habclient.wear.WearCommandHost;
 
 import org.openhab.habdroid.R;
@@ -132,7 +132,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 mWearCommandHost.startSession("Room navigation", "Please, response with the name of a room");
                 return true;
             case R.id.action_open_rules:
-                Intent i = new Intent(getActivity(), RuleActivity.class);
+                Intent i = new Intent(getActivity(), RuleEditActivity.class);
                 startActivity(i);
                 return true;
             default:

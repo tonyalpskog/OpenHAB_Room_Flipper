@@ -175,6 +175,7 @@ public class UnitPlacementFragment extends Fragment {
                 break;
             case R.id.action_clone:
                 //TODO: Create and draw a new copy of any current selection.
+                Toast.makeText(mActivity, "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);

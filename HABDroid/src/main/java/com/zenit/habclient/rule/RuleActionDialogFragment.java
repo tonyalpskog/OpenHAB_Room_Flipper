@@ -44,22 +44,24 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private RuleActionValueType mRuleActionValueType;
     private TextWatcher mTextChangedListener;
 
-    private RuleActionBuildListener mListener;
+    private RuleActionBuildListener mActionListener;
+    private RuleOperandDialogFragment.RuleOperationBuildListener mOperationListener;
     private RuleAction mAction;
     private int mPosition;
 
-    public RuleActionDialogFragment(RuleAction ruleAction) {
+    public RuleActionDialogFragment(RuleAction ruleAction, RuleActionDialogFragment.RuleActionBuildListener actionListener, RuleOperandDialogFragment.RuleOperationBuildListener operationListener) {
 //        Bundle bundle = new Bundle();
 //        bundle.putInt(ARG_ID, status.value());
 //        this.setArguments(bundle);
         mAction = ruleAction;
         mPosition = 1;
+        mActionListener = actionListener;
+        mOperationListener = operationListener;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mListener = (RuleActionBuildListener) activity;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
-                            , mButtonTargetUnit.getText().toString(), 0);
+                            , mButtonTargetUnit.getText().toString(), 0, mOperationListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -104,7 +106,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
                             = new UnitOperandSelectionDialogFragment(itemNameList
-                            , mButtonTargetUnit.getText().toString(), 1);
+                            , mButtonTargetUnit.getText().toString(), 1, mOperationListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -169,9 +171,10 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             //Set content
             if(StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()))
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
-            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null)
+            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null) {
+                mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
                 mSpinnerValue.setVisibility(View.GONE);
-            else
+            } else
                 mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName);
 
             mSpinnerValue.setAdapter(mSpinnerAdapter);
@@ -254,7 +257,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE://Done
-                if(mListener != null) {
+                if(mActionListener != null) {
                     String value = null;
                     switch (mRuleActionValueType) {
                         case STATIC:
@@ -270,7 +273,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                             mRuleActionValueType = mAction.getValueType();
                     }
 
-                    mListener.onActionBuildResult(RuleActionBuildListener.RuleActionDialogButtonInterface.DONE
+                    mActionListener.onActionBuildResult(RuleActionBuildListener.RuleActionDialogButtonInterface.DONE
                             , mAction.getID(), mRuleActionValueType, value);
                 }
                 break;
