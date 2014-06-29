@@ -74,6 +74,7 @@ import com.zenit.habclient.SpeechService;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
+import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
@@ -157,52 +158,105 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         Log.d(TAG, "onCreate()");
+
         // Check if we are in development mode
-        isDeveloper = true;
+        isDeveloper = BuildConfig.DEBUG;
 
         startService(new Intent(this, HABService.class));
         //startService(new Intent(this, SpeechService.class));//TODO - Temporary disabled
 
         // Set default values, false means do it one time during the very first launch
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         // Set non-persistent HABDroid version preference to current version from application package
         try {
             PreferenceManager.getDefaultSharedPreferences(this).edit().putString("default_openhab_appversion",
                     getPackageManager().getPackageInfo(getPackageName(), 0).versionName).commit();
         } catch (PackageManager.NameNotFoundException e1) {
-            if (e1 != null)
-                Log.d(TAG, e1.getMessage());
+            Log.d(TAG, e1.getMessage());
         }
         checkDiscoveryPermissions();
         checkVoiceRecognition();
-        // initialize loopj async http client
-        mAsyncHttpClient = new MyAsyncHttpClient(this);
+
         // Set the theme to one from preferences
         Util.setActivityTheme(this);
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
+
         // Disable screen timeout if set in preferences
         if (mSettings.getBoolean("default_openhab_screentimeroff", false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+
         // Fetch openHAB service type name from strings.xml
         openHABServiceType = getString(R.string.openhab_service_type);
+
         // Get username/password from preferences
         openHABUsername = mSettings.getString("default_openhab_username", null);
         openHABPassword = mSettings.getString("default_openhab_password", null);
+
+        mAsyncHttpClient = new MyAsyncHttpClient(this);
         mAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
         mAsyncHttpClient.addHeader("Accept", "application/xml");
         mAsyncHttpClient.setTimeout(30000);
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         setProgressBarIndeterminateVisibility(true);
-//        if (!isDeveloper)
-//            Util.initCrittercism(getApplicationContext(), "5117659f59e1bd4ba9000004");
-        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         gcmRegisterBackground();
-        // Enable app icon in action bar work as 'home'
-//        this.getActionBar().setHomeButtonEnabled(true);
+
+        setUpPager();
+
+        if (savedInstanceState != null) {
+            openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
+            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
+            sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
+            HABApplication.getOpenHABSetting().setSitemapRootUrl(sitemapRootUrl);
+        }
+
+        setUpDrawer();
+
+        MemorizingTrustManager.setResponder(this);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        final Intent intent = getIntent();
+        if (getIntent() == null) {
+            Log.d(TAG, "Intent == null");
+            return;
+        }
+
+        if ("org.openhab.notification.selected".equals(intent.getAction())) {
+            onNotificationSelected(getIntent());
+        }
+
+        mNfcData = getNfcDataFromIntent(intent);
+    }
+
+    private String getNfcDataFromIntent(Intent intent) {
+        final String action = intent.getAction();
+        if ("android.nfc.action.NDEF_DISCOVERED".equals(action)) {
+            Log.d(TAG, "This is NFC action");
+            final String dataString = intent.getDataString();
+            if (dataString == null) {
+                return null;
+            }
+
+            Log.d(TAG, "NFC data = " + dataString);
+            return dataString;
+        } else if("SHOW_PAGE_AS_LIST".equalsIgnoreCase(action) && intent.getStringExtra("pageUrl") != null) {
+            return intent.getStringExtra("pageUrl");
+        }
+
+        return null;
+    }
+
+    private void setUpPager() {
         pager = (OpenHABViewPager)findViewById(R.id.pager);
         pager.setScrollDurationFactor(2.5);
         pager.setOffscreenPageLimit(1);
@@ -212,9 +266,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         pagerAdapter.setOpenHABPassword(openHABPassword);
         pager.setAdapter(pagerAdapter);
         pager.setOnPageChangeListener(pagerAdapter);
-        MemorizingTrustManager.setResponder(this);
-//        pager.setPageMargin(1);
-//        pager.setPageMarginDrawable(android.R.color.darker_gray);
+    }
+
+    private void setUpDrawer() {
         // Check if we have openHAB page url in saved instance state?
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -228,12 +282,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        if (savedInstanceState != null) {
-            openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
-            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
-            sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
-            HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
-        }
+
+
+            HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
         mSitemapList = new ArrayList<OpenHABSitemap>();
         mNavDrawerItemList = new ArrayList<INavDrawerItem>();
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
@@ -249,26 +300,6 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             }
         });
 //        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-        if (getIntent() != null) {
-            Log.d(TAG, "Intent != null");
-            if (getIntent().getAction() != null) {
-                Log.d(TAG, "Intent action = " + getIntent().getAction());
-                if (getIntent().getAction().equals("android.nfc.action.NDEF_DISCOVERED")) {
-                    Log.d(TAG, "This is NFC action");
-                    if (getIntent().getDataString() != null) {
-                        Log.d(TAG, "NFC data = " + getIntent().getDataString());
-                        mNfcData = getIntent().getDataString();
-                    }
-                } else if (getIntent().getAction().equals("org.openhab.notification.selected")) {
-                    onNotificationSelected(getIntent());
-                } else if(getIntent().getAction().equalsIgnoreCase("SHOW_PAGE_AS_LIST") && getIntent().getStringExtra("pageUrl") != null) {
-                    mNfcData = getIntent().getStringExtra("pageUrl");
-                }
-
-            }
-        }
     }
 
     @Override
@@ -653,7 +684,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     public void onStart() {
         super.onStart();
         // Start activity tracking via Google Analytics
-        if (!isDeveloper)
+        if (!BuildConfig.DEBUG)
             EasyTracker.getInstance().activityStart(this);
     }
 
@@ -904,7 +935,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     public void setOpenHABBaseUrl(String openHABBaseUrl) {
         this.openHABBaseUrl = openHABBaseUrl;
-        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
+        HABApplication.getOpenHABSetting().setBaseUrl(openHABBaseUrl);
     }
 
     public String getOpenHABUsername() {

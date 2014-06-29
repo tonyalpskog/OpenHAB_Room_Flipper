@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="dexmaker-mockito-1.0">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/HABDroid/libs/dexmaker-mockito-1.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
