@@ -1,4 +1,4 @@
-package org.openhab.habclient.util.test;
+package org.openhab.test.habclient.util;
 
 import android.test.InstrumentationTestCase;
 

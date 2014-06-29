@@ -8,7 +8,7 @@ import org.openhab.habclient.rule.RuleOperationProvider;
 import org.openhab.habclient.rule.RuleOperator;
 import org.openhab.habclient.rule.RuleOperatorType;
 import org.openhab.habclient.rule.RuleTreeItem;
-import com.zenit.habclient.rule.UnitEntityDataType;
+import org.openhab.habclient.rule.UnitEntityDataType;
 
 import org.openhab.habdroid.model.OpenHABWidget;
 
