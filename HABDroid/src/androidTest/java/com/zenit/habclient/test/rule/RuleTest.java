@@ -1,4 +1,4 @@
-package com.zenit.habclient.rule.test;
+package com.zenit.habclient.test.rule;
 
 import com.zenit.habclient.HABApplication;
 import com.zenit.habclient.OnValueChangedListener;

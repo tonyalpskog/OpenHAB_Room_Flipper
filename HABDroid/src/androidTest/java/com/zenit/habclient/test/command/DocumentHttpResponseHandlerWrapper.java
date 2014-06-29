@@ -1,4 +1,4 @@
-package com.zenit.habclient.command.test;
+package com.zenit.habclient.test.command;
 
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;

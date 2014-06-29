@@ -1,4 +1,4 @@
-package com.zenit.habclient.command.test;
+package com.zenit.habclient.test.command;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.zenit.habclient.HABApplication;
