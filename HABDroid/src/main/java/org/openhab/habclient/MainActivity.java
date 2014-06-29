@@ -17,8 +17,8 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 
 import java.util.EnumSet;
 
@@ -164,8 +164,13 @@ public class MainActivity extends Activity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
+            final HABApplication application = ((HABApplication) getApplication());
+
             if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = new CommandAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider2(), getApplicationContext());
+                mSpeechResultAnalyzer = new CommandAnalyzer(application.getRoomProvider(),
+                        HABApplication.getOpenHABWidgetProvider2(),
+                        getApplicationContext(),
+                        application.getOpenHABWidgetControl());
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
             mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());

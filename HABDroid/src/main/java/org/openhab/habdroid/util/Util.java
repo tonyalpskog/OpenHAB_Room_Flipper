@@ -29,16 +29,12 @@
 
 package org.openhab.habdroid.util;
 
-import android.content.Context;
-import android.util.Log;
-import com.crittercism.app.Crittercism;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openhab.habdroid.R;
-
 import android.app.Activity;
 import android.preference.PreferenceManager;
-import org.openhab.habdroid.model.OpenHABSitemap;
+import android.util.Log;
+
+import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.habdroid.R;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

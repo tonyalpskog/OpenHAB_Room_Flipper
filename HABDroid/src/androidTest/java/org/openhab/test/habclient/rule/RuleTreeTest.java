@@ -10,7 +10,7 @@ import org.openhab.habclient.rule.RuleOperatorType;
 import org.openhab.habclient.rule.RuleTreeItem;
 import org.openhab.habclient.rule.UnitEntityDataType;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;

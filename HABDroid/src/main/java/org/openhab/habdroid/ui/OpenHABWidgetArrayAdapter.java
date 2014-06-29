@@ -47,9 +47,9 @@ import org.openhab.habclient.HABApplication;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.widget.IHABWidgetCommunication;
 import org.openhab.habdroid.ui.widget.OpenHABChartWidget;
 import org.openhab.habdroid.ui.widget.OpenHABColorWidget;
@@ -82,7 +82,8 @@ import java.util.regex.Pattern;
  */
 
 public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> implements IHABWidgetCommunication {
-	private String openHABBaseUrl = "https://demo.openhab.org:8443/";
+    private final IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	private String openHABUsername = "";
 	private String openHABPassword = "";
 	private ArrayList<VideoView> videoWidgetList;
@@ -90,9 +91,11 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
     private MyAsyncHttpClient mAsyncHttpClient;
 
 	public OpenHABWidgetArrayAdapter(Context context, int resource,
-                                     List<OpenHABWidget> objects) {
+                                     List<OpenHABWidget> objects,
+                                     IWidgetTypeLayoutProvider widgetTypeLayoutProvider) {
 		super(context, resource, objects);
-		// Initialize video view array
+        mWidgetTypeLayoutProvider = widgetTypeLayoutProvider;
+        // Initialize video view array
 		videoWidgetList = new ArrayList<VideoView>();
 		refreshImageList = new ArrayList<AutoRefreshImageView>();
 	}
@@ -102,7 +105,7 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
         ViewData preparedViewData = new ViewData();
     	int widgetLayout;
     	preparedViewData.openHABWidget = getItem(position);
-    	widgetLayout = getItem(position).getType().RowLayoutId;
+    	widgetLayout = mWidgetTypeLayoutProvider.getRowLayoutId(getItem(position).getType());
 
     	if (convertView == null) {
             preparedViewData.widgetView = new RelativeLayout(getContext());

@@ -13,10 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.HABApplication;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+import org.openhab.rule.IEntityDataType;
+import org.openhab.rule.RuleOperation;
+import org.openhab.rule.RuleOperator;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -82,7 +84,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 @Override
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
+                            = UnitOperandSelectionDialogFragment.newInstance(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
                             , mButtonUnit.getText().toString(), mPosition, mShowNextButton, mListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
@@ -176,10 +178,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 Value = value;
             }
         }
-        public void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface,
+        public <T> void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface,
                                            RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface,
-                                           IEntityDataType operand,
+                                           IEntityDataType<T> operand,
                                            int operandPosition,
-                                           RuleOperator ruleOperator);
+                                           RuleOperator<T> ruleOperator);
     }
 }

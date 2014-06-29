@@ -6,8 +6,12 @@ import android.util.Log;
 
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
-import org.openhab.habclient.rule.RuleOperationProvider;
 import org.openhab.habclient.util.RegularExpression;
+import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
+import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
+import org.openhab.rule.RuleOperationProvider;
+import org.openhab.util.IColorParser;
+import org.openhab.util.ILogger;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -30,10 +34,11 @@ public class HABApplication extends Application {
     private static ICommandAnalyzer mSpeechResultAnalyzer = null;
     private static RegularExpression mRegularExpression = null;
     private static OpenHABWidgetControl mOpenHABWidgetControl = null;
+    private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
 
     public ICommandAnalyzer getSpeechResultAnalyzer() {
         if(mSpeechResultAnalyzer == null)
-            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(), getOpenHABWidgetProvider(), getApplicationContext());
+            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(), getOpenHABWidgetProvider(), getApplicationContext(), getOpenHABWidgetControl());
 
         mSpeechResultAnalyzer.setTextToSpeechProvider(getTextToSpeechProvider());
         return mSpeechResultAnalyzer;
@@ -124,19 +129,18 @@ public class HABApplication extends Application {
     }
 
     public RoomProvider getRoomProvider() {
+        final ILogger logger = new AndroidLogger();
+        final IColorParser colorParser = new ColorParser();
+
         if(mRoomProvider == null)
-            mRoomProvider = new RoomProvider(getApplicationContext());
+            mRoomProvider = new RoomProvider(getApplicationContext(), logger, colorParser);
 
         return mRoomProvider;
     }
 
     public RuleOperationProvider getRuleOperationProvider() {
-        return getRuleOperationProvider(getApplicationContext());
-    }
-
-    public static RuleOperationProvider getRuleOperationProvider(Context context) {
         if(mRuleOperationProvider == null)
-            mRuleOperationProvider = new RuleOperationProvider(context);
+            mRuleOperationProvider = new RuleOperationProvider();
 
         return mRuleOperationProvider;
     }
@@ -148,10 +152,17 @@ public class HABApplication extends Application {
         return mRegularExpression;
     }
 
-    public static OpenHABWidgetControl getOpenHABWidgetControl(Context context) {
+    public OpenHABWidgetControl getOpenHABWidgetControl() {
         if(mOpenHABWidgetControl == null)
-            mOpenHABWidgetControl = new OpenHABWidgetControl(context);
+            mOpenHABWidgetControl = new OpenHABWidgetControl(this);
 
         return mOpenHABWidgetControl;
+    }
+
+    public IWidgetTypeLayoutProvider getWidgetTypeLayoutProvider() {
+        if(mWidgetTypeLayoutProvider == null)
+            mWidgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
+
+        return mWidgetTypeLayoutProvider;
     }
 }

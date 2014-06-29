@@ -3,23 +3,22 @@ package org.openhab.habclient.command;
 import android.content.Context;
 import android.util.Log;
 
+import org.openhab.domain.business.IOpenHABWidgetControl;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.GraphicUnit;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.OpenHABWidgetControl;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.RoomFlipper;
 import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechAnalyzerResult;
 import org.openhab.habclient.TextToSpeechProvider;
-import org.openhab.habclient.util.StringHandler;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
-import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+import org.openhab.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +36,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     protected RoomProvider mRoomProvider;
     protected OpenHABWidgetProvider mOpenHABWidgetProvider;
+    private final IOpenHABWidgetControl mWidgetControl;
     protected RoomFlipper mRoomFlipper;
     protected TextToSpeechProvider mTextToSpeechProvider;
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
@@ -73,9 +73,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         mRoomFlipper = roomFlipper;
     }
 
-    public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context) {
+    public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context, IOpenHABWidgetControl widgetControl) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
+        mWidgetControl = widgetControl;
 
         initializeWidgetTypeTagMapping();
         initializeCommandTagMapping(context);
@@ -155,8 +156,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         if(bestKeySoFar.getCommandType() != OpenHABWidgetCommandType.GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {
-                OpenHABWidgetControl openHABWidgetControl = HABApplication.getOpenHABWidgetControl(context);
-                openHABWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
+                mWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
 //                commandReply = getPopularNameFromWidgetLabel(unitMatchResult.get(bestKeySoFar).getWidget().getLabel());
                 commandReply = value;
             }

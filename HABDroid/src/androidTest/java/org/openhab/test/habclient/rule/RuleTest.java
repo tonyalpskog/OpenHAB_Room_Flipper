@@ -1,7 +1,7 @@
 package org.openhab.test.habclient.rule;
 
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.OnValueChangedListener;
+import org.openhab.rule.OnValueChangedListener;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
 import org.openhab.habclient.rule.IEntityDataType;
 import org.openhab.habclient.rule.IOperator;
@@ -11,7 +11,7 @@ import org.openhab.habclient.rule.RuleOperator;
 import org.openhab.habclient.rule.RuleOperatorType;
 import org.openhab.habclient.rule.UnitEntityDataType;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 import java.text.ParseException;
 import java.util.ArrayList;

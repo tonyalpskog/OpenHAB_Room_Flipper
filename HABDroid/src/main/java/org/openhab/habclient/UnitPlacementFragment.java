@@ -23,8 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

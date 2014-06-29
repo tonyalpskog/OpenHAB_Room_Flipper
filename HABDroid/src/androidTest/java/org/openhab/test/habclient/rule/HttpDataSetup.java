@@ -5,8 +5,8 @@ import org.openhab.test.habclient.command.DocumentHttpResponseHandlerWrapper;
 import org.openhab.habclient.rule.IEntityDataType;
 import org.openhab.habclient.rule.UnitEntityDataType;
 
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;

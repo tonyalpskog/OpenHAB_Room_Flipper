@@ -1,1 +1,1 @@
-include ':HABDroid'
+include ':HABDroid', ':Rule', ':util', ':Domain'

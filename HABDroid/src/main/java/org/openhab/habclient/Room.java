@@ -8,7 +8,9 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.util.Log;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.util.IColorParser;
+import org.openhab.util.ILogger;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,20 +36,20 @@ public class Room {
     private Integer mBackgroundImageResourceId;
 
     //TA: TODO - Add a second constructor that replaces the Bitmap with an integer (resource ID) in order to save some memory.
-    public Room(String groupItemName, String name, Bitmap roomImage) {
-        this(groupItemName, name);
+    public Room(String groupItemName, String name, Bitmap roomImage, ILogger logger, IColorParser colorParser) {
+        this(groupItemName, name, logger, colorParser);
         mBackgroundImage = roomImage;
     }
-    public Room(String groupItemName, String name, int backgroundImageResourceId, Context context) {
-        this(groupItemName, name);
+    public Room(String groupItemName, String name, int backgroundImageResourceId, Context context, ILogger logger, IColorParser colorParser) {
+        this(groupItemName, name, logger, colorParser);
         mBackgroundImageResourceId = backgroundImageResourceId;
         mContext = context;
     }
 
-    public Room(String groupItemId, String name) {
+    public Room(String groupItemId, String name, ILogger logger, IColorParser colorParser) {
         mGroupWidgetId = groupItemId;
         if(groupItemId == null || groupItemId.isEmpty())
-            mLocalWidget = new OpenHABWidget();
+            mLocalWidget = new OpenHABWidget(logger, colorParser);
         mName = name;
         id = UUID.randomUUID();
         roomAlignment = new HashMap<Direction, Room>(6);

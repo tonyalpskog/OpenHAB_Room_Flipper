@@ -10,9 +10,10 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.business.IOpenHABWidgetControl;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
 import java.io.UnsupportedEncodingException;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class OpenHABWidgetControl {
+public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
 
     public OpenHABWidgetControl(Context context) {
@@ -40,6 +41,7 @@ public class OpenHABWidgetControl {
         mAsyncHttpClient = asyncHttpClient;
     }
 
+    @Override
     public boolean sendItemCommandFromWidget(String widgetId, String command) {
         OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId);
         if(widget == null || !widget.hasItem())
@@ -48,10 +50,12 @@ public class OpenHABWidgetControl {
         return true;
     }
 
+    @Override
     public void sendItemCommand(String itemName, String command) {
         sendItemCommand(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(itemName).getItem(), command);
     }
 
+    @Override
     public void sendItemCommand(OpenHABItem item, String command) {
         try {
             Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));

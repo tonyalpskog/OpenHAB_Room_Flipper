@@ -4,13 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
-import org.openhab.habclient.util.StringHandler;
 
 import org.apache.http.Header;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
+import org.openhab.util.StringHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

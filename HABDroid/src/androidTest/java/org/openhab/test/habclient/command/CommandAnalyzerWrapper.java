@@ -11,7 +11,7 @@ import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;

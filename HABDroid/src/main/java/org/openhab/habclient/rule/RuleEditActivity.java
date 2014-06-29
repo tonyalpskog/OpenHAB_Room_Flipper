@@ -12,7 +12,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.openhab.habclient.HABApplication;
 import org.openhab.habdroid.R;
+import org.openhab.rule.IEntityDataType;
+import org.openhab.rule.IRuleEditActivity;
+import org.openhab.rule.Rule;
+import org.openhab.rule.RuleOperation;
+import org.openhab.rule.RuleOperator;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,7 +40,8 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         setContentView(R.layout.activity_rule_edit);
 
         if(mRule == null) {
-            mRule = new Rule(getApplication().getApplicationContext());
+            final HABApplication app = (HABApplication) getApplication();
+            mRule = new Rule(app.getOpenHABWidgetControl());
             mRule.setName("Initial rule name");
         }
 

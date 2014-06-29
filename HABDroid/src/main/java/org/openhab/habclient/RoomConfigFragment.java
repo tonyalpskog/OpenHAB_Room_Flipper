@@ -14,9 +14,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.util.IColorParser;
+import org.openhab.util.ILogger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +36,8 @@ public class RoomConfigFragment extends Fragment {
     private Button mSaveButton;
     private EditText mRoomNameText;
     private Spinner mHABGroupSpinner;
-    private final OpenHABWidget NULL_GROUP_WIDGET = new OpenHABWidget();
-    private final Room NULL_ROOM = new Room(null, "<Undefined room>", null);//TA: TODO - Fix name problem. (now sitemapID)
+    private OpenHABWidget mNullGroupWidget;
+    private Room mNullRoom;
     HashMap<Direction, Spinner> mSpinnerHashMap;
     private RoomConfigActivity mActivity;
 
@@ -59,6 +61,11 @@ public class RoomConfigFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ILogger logger = new AndroidLogger();
+        IColorParser colorParser = new ColorParser();
+        mNullGroupWidget = new OpenHABWidget(logger, colorParser);
+        mNullRoom = new Room(null, "<Undefined room>", null, logger, colorParser);//TA: TODO - Fix name problem. (now sitemapID)
     }
 
 //    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
@@ -96,8 +103,8 @@ public class RoomConfigFragment extends Fragment {
         if(habGroupArrayList.size() == 0)
             Log.e(HABApplication.getLogTag(), "No OpenHABWidget groups found in OpenHABWidgetProvider.");
 
-        NULL_GROUP_WIDGET.setLabel("<Undefined HAB group>");
-        habGroupArrayList.add(NULL_GROUP_WIDGET);
+        mNullGroupWidget.setLabel("<Undefined HAB group>");
+        habGroupArrayList.add(mNullGroupWidget);
 
         //Create adapter for HAB Group spinner
         ArrayAdapter<OpenHABWidget> habGroupSpinnerAdapter = new ArrayAdapter<OpenHABWidget>(this.getActivity().getApplicationContext(),
@@ -118,7 +125,7 @@ public class RoomConfigFragment extends Fragment {
 
             roomArrayList.add(room);
         }
-        roomArrayList.add(NULL_ROOM);
+        roomArrayList.add(mNullRoom);
 
         //Inline sort the list of rooms.
         Collections.sort(roomArrayList, new Comparator<Room>() {
@@ -148,7 +155,7 @@ public class RoomConfigFragment extends Fragment {
 
         //Set selection for spinners
         if(mCurrentRoom.getGroupWidgetId() == null || mCurrentRoom.getGroupWidgetId().isEmpty())
-            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(NULL_GROUP_WIDGET));
+            mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(mNullGroupWidget));
         else
             mHABGroupSpinner.setSelection(habGroupSpinnerAdapter.getPosition(HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mCurrentRoom.getGroupWidgetId())));
 
@@ -171,7 +178,7 @@ public class RoomConfigFragment extends Fragment {
             Spinner spinner = mSpinnerHashMap.get(direction);
             if(mCurrentRoom.getRoomByAlignment(direction) != null) {
                 spinner.setSelection(roomSpinnerAdapter.getPosition(mCurrentRoom.getRoomByAlignment(direction)));
-            } else { spinner.setSelection(roomSpinnerAdapter.getPosition(NULL_ROOM)); }
+            } else { spinner.setSelection(roomSpinnerAdapter.getPosition(mNullRoom)); }
         }
 
         mHABGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -279,7 +286,7 @@ public class RoomConfigFragment extends Fragment {
     private void saveRoomConfig() {
         Log.d(TAG, "saveRoomConfig()");
 
-        if(mHABGroupSpinner.getSelectedItem() == NULL_GROUP_WIDGET) {
+        if(mHABGroupSpinner.getSelectedItem() == mNullGroupWidget) {
             Toast.makeText(mActivity.getApplicationContext(),  "Unsuccessful! HAB Group item must be selected.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -289,7 +296,7 @@ public class RoomConfigFragment extends Fragment {
         while(iterator.hasNext()) {
             Direction direction = (Direction) iterator.next();
             Spinner spinner = mSpinnerHashMap.get(direction);
-            if(spinner.getSelectedItem() == NULL_ROOM)
+            if(spinner.getSelectedItem() == mNullRoom)
                 mCurrentRoom.setAlignment(null, direction);
             else {
                 mCurrentRoom.setAlignment((Room) spinner.getSelectedItem(), direction);

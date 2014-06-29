@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Switch;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItem;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 
 /**

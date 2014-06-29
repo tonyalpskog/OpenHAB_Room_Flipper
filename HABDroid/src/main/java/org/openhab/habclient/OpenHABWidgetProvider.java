@@ -2,16 +2,16 @@ package org.openhab.habclient;
 
 import android.util.Log;
 
+import org.openhab.domain.business.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
 import org.openhab.habclient.util.RegExAccuracyResult;
-import org.openhab.habclient.util.StringHandler;
-
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class OpenHABWidgetProvider {
+public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;

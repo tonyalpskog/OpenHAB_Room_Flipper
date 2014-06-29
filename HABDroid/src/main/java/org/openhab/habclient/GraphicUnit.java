@@ -3,8 +3,8 @@ package org.openhab.habclient;
 import android.content.Context;
 import android.widget.ImageView;
 
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 
 import java.util.UUID;
 

@@ -11,8 +11,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
+import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,6 +35,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private boolean mBlockUnitRedraw = false;
     private OpenHABWidgetControl mOpenHABWidgetControl;
     private View mAddedControlView = null;
+    private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
 
     public UnitContainerView(Context context) {
         this(context, null);
@@ -41,7 +44,9 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     public UnitContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mOpenHABWidgetControl = HABApplication.getOpenHABWidgetControl(context);
+        final HABApplication app = (HABApplication) context.getApplicationContext();
+        mOpenHABWidgetControl = app.getOpenHABWidgetControl();
+        mWidgetTypeLayoutProvider = app.getWidgetTypeLayoutProvider();
 
         addedUnitViews = new ArrayList<View>();
 
@@ -165,11 +170,14 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     }
 
     private void drawControlInRoom(GraphicUnit gUnit, int x, int y) {
-        if(gUnit.getOpenHABWidget().getType().ControlLayoutId == -1)//No available layout
+        final IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
+        final int layoutId = widgetTypeLayoutProvider.getControlLayoutId(gUnit.getOpenHABWidget().getType());
+
+        if(layoutId == -1)//No available layout
             return;
 
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View inflatedView = inflater.inflate(gUnit.getOpenHABWidget().getType().ControlLayoutId, this, false);
+        View inflatedView = inflater.inflate(layoutId, this, false);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,

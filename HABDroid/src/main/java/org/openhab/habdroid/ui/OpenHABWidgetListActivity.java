@@ -29,43 +29,6 @@
 
 package org.openhab.habdroid.ui;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.jmdns.ServiceInfo;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import android.view.*;
-
-import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABNFCActionList;
-import org.openhab.habdroid.model.OpenHABSitemap;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
-import org.openhab.habdroid.util.AsyncServiceResolver;
-import org.openhab.habdroid.util.AsyncServiceResolverListener;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
-import org.openhab.habdroid.util.Util;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.google.analytics.tracking.android.EasyTracker;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.image.WebImageCache;
-import org.openhab.habclient.HABApplication;
-
 import android.Manifest.permission;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -85,11 +48,58 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.BadTokenException;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.image.WebImageCache;
+
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABNFCActionList;
+import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.ColorParser;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habdroid.R;
+import org.openhab.habdroid.util.AsyncServiceResolver;
+import org.openhab.habdroid.util.AsyncServiceResolverListener;
+import org.openhab.habdroid.util.MyAsyncHttpClient;
+import org.openhab.habdroid.util.Util;
+import org.openhab.util.IColorParser;
+import org.openhab.util.ILogger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.jmdns.ServiceInfo;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class is apps' main activity which runs startup sequence and displays list of openHAB
@@ -218,9 +228,12 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
 
 		// Create new data source and adapter and set it to list view
-		openHABWidgetDataSource = new OpenHABWidgetDataSource();
+        ILogger logger = new AndroidLogger();
+        IColorParser colorParser = new ColorParser();
+        IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
+		openHABWidgetDataSource = new OpenHABWidgetDataSource(logger, colorParser);
 		openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(OpenHABWidgetListActivity.this,
-				R.layout.openhabwidgetlist_genericitem, widgetList);
+				R.layout.openhabwidgetlist_genericitem, widgetList, widgetTypeLayoutProvider);
 		getListView().setAdapter(openHABWidgetAdapter);
 		// Set adapter parameters
 		openHABWidgetAdapter.setOpenHABUsername(openHABUsername);

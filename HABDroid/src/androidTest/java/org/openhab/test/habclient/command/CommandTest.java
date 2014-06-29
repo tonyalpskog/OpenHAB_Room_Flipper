@@ -11,11 +11,11 @@ import org.openhab.habclient.util.DecimalHandler;
 import org.openhab.habclient.util.RegExAccuracyResult;
 import org.openhab.habclient.util.RegExResult;
 
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
-import org.openhab.habdroid.model.OpenHABWidgetType;
-import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;

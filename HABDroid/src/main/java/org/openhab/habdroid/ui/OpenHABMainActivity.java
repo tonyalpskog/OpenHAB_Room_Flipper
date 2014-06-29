@@ -53,7 +53,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -62,22 +67,21 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.HABService;
-import org.openhab.habclient.INavDrawerActivity;
-import org.openhab.habclient.INavDrawerItem;
-import org.openhab.habclient.MainActivity;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.model.OpenHABLinkedPage;
+import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.HABService;
+import org.openhab.habclient.INavDrawerActivity;
+import org.openhab.habclient.MainActivity;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
 import org.openhab.habdroid.core.OpenHABTracker;
 import org.openhab.habdroid.core.OpenHABTrackerReceiver;
-import org.openhab.habdroid.model.OpenHABLinkedPage;
-import org.openhab.habdroid.model.OpenHABSitemap;
 import org.openhab.habdroid.ui.drawer.OpenHABDrawerAdapter;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
@@ -89,6 +93,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import de.duenndns.ssl.MTMDecision;
 import de.duenndns.ssl.MemorizingResponder;
 import de.duenndns.ssl.MemorizingTrustManager;
@@ -149,7 +154,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     private String[] mDrawerTitles = {"First floor", "Seconf floor", "Cellar", "Garage"};
     private ListView mDrawerList;
     private List<OpenHABSitemap> mSitemapList;
-    private List<INavDrawerItem> mNavDrawerItemList;
+    private List<OpenHABSitemap> mNavDrawerItemList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -281,7 +286,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
             HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
         mSitemapList = new ArrayList<OpenHABSitemap>();
-        mNavDrawerItemList = new ArrayList<INavDrawerItem>();
+        mNavDrawerItemList = new ArrayList<OpenHABSitemap>();
         mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
         HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
         HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
@@ -291,7 +296,11 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Log.d(TAG, "Drawer selected item " + String.valueOf(position));
-                mNavDrawerItemList.get(position).itemClickAction(view.getContext(), OpenHABMainActivity.this);
+
+                final OpenHABSitemap sitemap = (OpenHABSitemap) adapterView.getItemAtPosition(position);
+                Log.d(TAG, "This is sitemap " + sitemap.getLink());
+                getDrawerLayout().closeDrawers();
+                openSitemap(sitemap.getHomepageLink());
             }
         });
 //        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));

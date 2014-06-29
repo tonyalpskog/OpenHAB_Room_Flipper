@@ -29,7 +29,7 @@
 
 package org.openhab.habdroid.ui;
 
-import org.openhab.habdroid.model.OpenHABLinkedPage;
+import org.openhab.domain.model.OpenHABLinkedPage;
 
 /**
  * Created by belovictor on 5/22/13.

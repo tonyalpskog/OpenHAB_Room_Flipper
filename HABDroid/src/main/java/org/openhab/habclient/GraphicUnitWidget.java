@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 

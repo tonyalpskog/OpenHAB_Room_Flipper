@@ -1,6 +1,6 @@
 package org.openhab.habclient.command;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 /**
  * Created by Tony Alpskog in 2014.
