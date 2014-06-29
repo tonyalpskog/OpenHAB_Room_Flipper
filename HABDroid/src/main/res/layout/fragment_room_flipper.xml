@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/my_activity_horizontal_margin"
     android:paddingTop="@dimen/my_activity_vertical_margin"
     android:paddingBottom="@dimen/my_activity_vertical_margin"
-    tools:context="com.zenit.habclient.RoomFlipperFragment">
+    tools:context="org.openhab.habclient.RoomFlipperFragment">
 
     <TextView
         android:id="@+id/room_flipper_section_label"
@@ -25,13 +25,13 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/room_flipper_section_label">
 
-        <com.zenit.habclient.RoomFlipper
+        <org.openhab.habclient.RoomFlipper
             android:id="@+id/flipper"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center">
 
-            <com.zenit.habclient.UnitContainerView
+            <org.openhab.habclient.UnitContainerView
                 android:id="@+id/flipper_image_1"
                 android:src="@drawable/added_room"
                 android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 android:baselineAlignBottom="false"
                 android:clickable="false" />
 
-            <com.zenit.habclient.UnitContainerView
+            <org.openhab.habclient.UnitContainerView
                 android:id="@+id/flipper_image_2"
                 android:src="@drawable/added_room"
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                 android:layout_gravity="center_horizontal"
                 />
 
-        </com.zenit.habclient.RoomFlipper>
+        </org.openhab.habclient.RoomFlipper>
     </FrameLayout>
 
 </RelativeLayout>

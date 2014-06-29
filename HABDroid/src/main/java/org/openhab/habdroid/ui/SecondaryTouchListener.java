@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 /**
  * Created by Tony Alpskog in 2014.

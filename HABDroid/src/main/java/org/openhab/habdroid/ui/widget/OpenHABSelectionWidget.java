@@ -7,7 +7,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;

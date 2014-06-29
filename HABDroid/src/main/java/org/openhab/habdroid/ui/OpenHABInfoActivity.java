@@ -36,7 +36,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyAsyncHttpClient;

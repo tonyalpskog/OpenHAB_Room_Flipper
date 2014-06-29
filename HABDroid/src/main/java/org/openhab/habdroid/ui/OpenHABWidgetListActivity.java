@@ -64,7 +64,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import android.Manifest.permission;
 import android.app.AlertDialog;

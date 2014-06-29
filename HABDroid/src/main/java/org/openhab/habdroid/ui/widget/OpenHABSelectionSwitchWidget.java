@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioGroup;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABWidget;

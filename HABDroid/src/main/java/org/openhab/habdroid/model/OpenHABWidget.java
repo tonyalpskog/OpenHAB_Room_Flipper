@@ -32,7 +32,7 @@ package org.openhab.habdroid.model;
 import android.graphics.Color;
 import android.util.Log;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

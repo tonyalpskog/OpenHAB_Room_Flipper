@@ -33,8 +33,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.zenit.habclient.INavDrawerItem;
-import com.zenit.habclient.NavDrawerItemType;
+import org.openhab.habclient.INavDrawerItem;
+import org.openhab.habclient.NavDrawerItemType;
 
 import java.util.List;
 

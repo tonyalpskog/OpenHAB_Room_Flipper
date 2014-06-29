@@ -36,10 +36,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.zenit.habclient.HABApplication;
-import com.zenit.habclient.INavDrawerActivity;
-import com.zenit.habclient.INavDrawerItem;
-import com.zenit.habclient.NavDrawerItemType;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.INavDrawerActivity;
+import org.openhab.habclient.INavDrawerItem;
+import org.openhab.habclient.NavDrawerItemType;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AutoRefreshImageView;

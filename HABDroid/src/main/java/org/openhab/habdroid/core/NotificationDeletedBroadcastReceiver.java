@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 

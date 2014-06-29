@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 /**
  * A class, that can be used as a TouchListener on any view (e.g. a Button).

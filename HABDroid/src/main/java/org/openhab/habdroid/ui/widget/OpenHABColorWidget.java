@@ -5,7 +5,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.model.OpenHABItem;

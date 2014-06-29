@@ -43,7 +43,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.habdroid.R;

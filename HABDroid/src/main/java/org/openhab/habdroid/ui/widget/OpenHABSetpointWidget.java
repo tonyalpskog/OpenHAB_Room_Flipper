@@ -1,14 +1,10 @@
 package org.openhab.habdroid.ui.widget;
 
 import android.content.Context;
-import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
-
-import com.zenit.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;

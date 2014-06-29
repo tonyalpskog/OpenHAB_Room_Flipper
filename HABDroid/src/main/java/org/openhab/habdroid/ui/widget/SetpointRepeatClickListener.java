@@ -3,7 +3,7 @@ package org.openhab.habdroid.ui.widget;
 import android.util.Log;
 import android.view.View;
 
-import com.zenit.habclient.HABApplication;
+import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 import org.openhab.habdroid.ui.TouchRepeatListener;
