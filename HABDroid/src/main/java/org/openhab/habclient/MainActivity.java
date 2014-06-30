@@ -2,7 +2,6 @@ package org.openhab.habclient;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +20,8 @@ import org.openhab.habdroid.R;
 
 import java.util.EnumSet;
 
+import javax.inject.Inject;
+
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -32,17 +33,21 @@ public class MainActivity extends Activity
     private UnitPlacementFragment configFragment = null;
     private RoomFlipperFragment flipperFragment = null;
 
-    private ICommandAnalyzer mSpeechResultAnalyzer;
-
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
 
+    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
+    @Inject IRestCommunication mRestCommunication;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
+
+        InjectUtils.inject(this);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -58,16 +63,13 @@ public class MainActivity extends Activity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment newFragment = null;
 
-        final HABApplication application = ((HABApplication) getApplication());
-        IOpenHABWidgetProvider widgetProvider = application.getOpenHABWidgetProvider();
-        application.getRestCommunication().requestOpenHABSitemap((String) null);
-        for(OpenHABWidget widget : widgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+        mRestCommunication.requestOpenHABSitemap((String) null);
+        for(OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
             if(widget == null)
                 Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
             else if(widget.hasChildren())
-                application.getRestCommunication().requestOpenHABSitemap(widget);
+                mRestCommunication.requestOpenHABSitemap(widget);
         }
 
         switch (position) {
@@ -166,9 +168,6 @@ public class MainActivity extends Activity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             final HABApplication application = ((HABApplication) getApplication());
-
-            if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = application.getSpeechResultAnalyzer();
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
             mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), application.getAppMode());
