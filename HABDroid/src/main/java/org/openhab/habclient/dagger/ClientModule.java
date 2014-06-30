@@ -12,20 +12,18 @@ import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRestCommunication;
+import org.openhab.habclient.MainActivity;
 import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habclient.OpenHABWidgetControl;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.RestCommunication;
 import org.openhab.habclient.RoomProvider;
-import org.openhab.habclient.TextToSpeechProvider;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
-
-import java.util.Locale;
 
 import javax.inject.Singleton;
 
@@ -36,6 +34,7 @@ import dagger.Provides;
 injects = {
         OpenHABMainActivity.class,
         OpenHABWidgetListActivity.class,
+        MainActivity.class,
         HABApplication.class
 })
 public class ClientModule {
@@ -54,10 +53,10 @@ public class ClientModule {
         return commandAnalyzer;
     }
 
-    @Provides @Singleton
-    public TextToSpeechProvider provideTextToSpeedSpeechProvider(Context context) {
-        return new TextToSpeechProvider(context, Locale.ENGLISH);
-    }
+//    @Provides @Singleton
+//    public TextToSpeechProvider provideTextToSpeedSpeechProvider(Context context) {
+//        return new TextToSpeechProvider(context, Locale.ENGLISH);
+//    }
 
     @Provides @Singleton
     public IRestCommunication provideRestCommunication(RestCommunication restCommunication) {
