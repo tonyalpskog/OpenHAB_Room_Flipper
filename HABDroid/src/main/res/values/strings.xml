@@ -128,4 +128,5 @@
     <string name="action_add_rule_message">Add message</string>
     <string name="action_delete_operation_member">Delete operation member</string>
     <string name="action_edit_operation_member">Edit operation</string>
+    <string name="speech_navigate_rooms">Room name</string>
 </resources>
