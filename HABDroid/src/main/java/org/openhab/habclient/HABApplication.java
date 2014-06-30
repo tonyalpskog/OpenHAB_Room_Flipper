@@ -26,7 +26,6 @@ public class HABApplication extends Application {
     @Inject RoomProvider mRoomProvider = null;
     @Inject RuleOperationProvider mRuleOperationProvider = null;
     @Inject IRestCommunication mRestCommunication;
-    @Inject TextToSpeechProvider mTextToSpeechProvider;
     @Inject OpenHABWidgetProvider mOpenHABWidgetProvider;
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRegularExpression mRegularExpression;
