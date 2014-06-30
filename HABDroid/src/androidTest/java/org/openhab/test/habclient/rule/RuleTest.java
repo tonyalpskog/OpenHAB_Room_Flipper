@@ -6,7 +6,7 @@ import org.openhab.domain.rule.IOperator;
 import org.openhab.domain.rule.OnValueChangedListener;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperationProvider;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;

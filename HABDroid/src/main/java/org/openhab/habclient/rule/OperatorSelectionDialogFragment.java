@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.util.StringSelectionDialogFragment;

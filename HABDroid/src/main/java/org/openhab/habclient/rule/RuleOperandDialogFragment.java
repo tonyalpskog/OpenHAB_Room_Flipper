@@ -17,7 +17,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 

@@ -25,7 +25,7 @@ import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 

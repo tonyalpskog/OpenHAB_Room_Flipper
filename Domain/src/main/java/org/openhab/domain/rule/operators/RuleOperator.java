@@ -1,4 +1,8 @@
-package org.openhab.domain.rule;
+package org.openhab.domain.rule.operators;
+
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IOperator;
+import org.openhab.domain.rule.RuleOperatorType;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -35,10 +39,10 @@ public abstract class RuleOperator<T> implements IOperator<T> {
 
         List<T> argsList = new ArrayList<T>();
 
-        for(int i = 0; i < args.length; i++) {
-            if(args[i] == null)
+        for (T arg : args) {
+            if (arg == null)
                 return false;//Unfinished operation initialization will result in FALSE as operation result.
-            argsList.add(args[i]);
+            argsList.add(arg);
         }
 
         return getOperationResult2(argsList);

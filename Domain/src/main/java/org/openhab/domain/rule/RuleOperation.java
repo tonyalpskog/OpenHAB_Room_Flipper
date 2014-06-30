@@ -1,5 +1,6 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;

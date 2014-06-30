@@ -1,4 +1,7 @@
-package org.openhab.domain.rule;
+package org.openhab.domain.rule.operators;
+
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.operators.RuleOperator;
 
 /**
  * Created by Tony Alpskog in 2014.

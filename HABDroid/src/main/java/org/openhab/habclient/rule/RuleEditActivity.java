@@ -17,7 +17,7 @@ import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habdroid.R;
 
 import java.util.HashMap;

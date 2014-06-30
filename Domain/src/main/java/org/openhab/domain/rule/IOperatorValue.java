@@ -1,5 +1,7 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.rule.operators.RuleOperator;
+
 import java.util.List;
 
 /**
