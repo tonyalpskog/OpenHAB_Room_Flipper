@@ -3,7 +3,7 @@ package org.openhab.test.habclient.command;
 import android.content.Context;
 
 import org.openhab.domain.IOpenHABWidgetControl;
-import org.openhab.domain.util.RegularExpression;
+import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.HABApplication;
@@ -27,7 +27,7 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
     public CommandAnalyzerWrapper(RoomProvider roomProvider,
                                   OpenHABWidgetProvider openHABWidgetProvider, Context context,
                                   IOpenHABWidgetControl widgetControl,
-                                  RegularExpression regularExpression) {
+                                  IRegularExpression regularExpression) {
         super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression);
     }
 
