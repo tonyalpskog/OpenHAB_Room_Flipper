@@ -9,10 +9,6 @@ import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.rule.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.UnitEntityDataType;
-import org.openhab.domain.util.IColorParser;
-import org.openhab.domain.util.ILogger;
-import org.openhab.habclient.AndroidLogger;
-import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
 
@@ -66,9 +62,9 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
 //        when(mHABApplication.toString()).thenReturn("Mockoto_string");
 
-        final ILogger logger = new AndroidLogger();
-        final IColorParser colorParser = new ColorParser();
-        HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, mHABApplication.getOpenHABWidgetProvider());
+        HttpDataSetup httpDataSetup = new HttpDataSetup(mHABApplication.getLogger(),
+                mHABApplication.getColorParser(),
+                mHABApplication.getOpenHABWidgetProvider());
         httpDataSetup.loadHttpDataFromString();
 
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
