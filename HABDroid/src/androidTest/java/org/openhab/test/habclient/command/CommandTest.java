@@ -94,7 +94,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         mListOfTestPhrases2.add("Det var Window_FF_Office_Window en gång en " + mTestedRoomsNameArray[3] + " som mådde dåligt");
         mListOfTestPhrases2.add("Shutter_FF_Bath " + mTestedRoomsNameArray[4] + " är bra Light_Outdoor_Frontdoor att ha");
 
-        Iterator<Room> iterator = mHABApplication.getRoomProvider().roomHash.values().iterator();
+        Iterator<Room> iterator = mHABApplication.getRoomProvider().getRoomHash().values().iterator();
         mRoomNameMap = new HashMap<String, Room>();
         while (iterator.hasNext()) {
             Room nextRoom = iterator.next();
@@ -105,7 +105,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     public void testFinalArrayOfNamesUsedInTests() {
         assertEquals(14, mFullRoomNameArray.length);
-        assertEquals(14, mHABApplication.getRoomProvider().roomHash.size());
+        assertEquals(14, mHABApplication.getRoomProvider().getRoomHash().size());
 
         assertFalse("No MapOfRoomNames items available.", mCommandAnalyzer.getMapOfRoomNamesFromProvider().isEmpty());
 

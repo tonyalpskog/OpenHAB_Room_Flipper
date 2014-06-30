@@ -3,17 +3,16 @@ package org.openhab.test.habclient.command;
 import android.content.Context;
 
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.ApplicationMode;
-import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
-import org.openhab.habclient.RoomProvider;
+import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
-
-import org.openhab.domain.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.regex.Pattern;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
-    public CommandAnalyzerWrapper(RoomProvider roomProvider,
+    public CommandAnalyzerWrapper(IRoomProvider roomProvider,
                                   OpenHABWidgetProvider openHABWidgetProvider, Context context,
                                   IOpenHABWidgetControl widgetControl,
                                   IRegularExpression regularExpression) {

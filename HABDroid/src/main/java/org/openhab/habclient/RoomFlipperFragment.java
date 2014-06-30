@@ -17,11 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.wear.WearCommandHost;
 
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
+
+import javax.inject.Inject;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -36,6 +39,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private TextView mRoomLabel;
     private HABApplication mApplication;
     private WearCommandHost mWearCommandHost;
+
+    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
+    @Inject IRoomProvider mRoomProvider;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -53,12 +59,18 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        InjectUtils.inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_room_flipper, container, false);
         mRoomLabel = (TextView) rootView.findViewById(R.id.room_flipper_section_label);
         mRoomViewFlipper = (RoomFlipper) rootView.findViewById(R.id.flipper);
-
         mRoomViewFlipper.setDisplayedChild(0);//Show middle image as initial image
         mRoomViewFlipper.setGestureListener(new GestureListener(rootView, true));
         mRoomViewFlipper.setOnRoomShiftListener(this);
@@ -68,7 +80,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         setHasOptionsMenu(true);
 
-        ((HABApplication) mApplication).getSpeechResultAnalyzer().setRoomFlipper(mRoomViewFlipper);
+        mSpeechResultAnalyzer.setRoomFlipper(mRoomViewFlipper);
 
         mWearCommandHost = new WearCommandHost(mApplication);
 
@@ -108,8 +120,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 return true;
             case R.id.action_add_room_from_flipper:
                 Log.d("Add Room", "onOptionsItemSelected() - Add room");
-                mApplication.setConfigRoom(mApplication.getRoomProvider().createNewRoom());
-
+                mApplication.setConfigRoom(mRoomProvider.createNewRoom());
+                
                 intent = new Intent(getActivity(), RoomConfigActivity.class);
                 startActivity(intent);
 //                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.

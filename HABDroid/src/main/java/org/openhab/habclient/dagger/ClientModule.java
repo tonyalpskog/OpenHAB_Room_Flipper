@@ -1,7 +1,5 @@
 package org.openhab.habclient.dagger;
 
-import android.content.Context;
-
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
@@ -12,12 +10,17 @@ import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRestCommunication;
+import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.MainActivity;
 import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habclient.OpenHABWidgetControl;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.RestCommunication;
+import org.openhab.habclient.RoomConfigActivity;
+import org.openhab.habclient.RoomConfigFragment;
+import org.openhab.habclient.RoomFlipperFragment;
 import org.openhab.habclient.RoomProvider;
+import org.openhab.habclient.SpeechService;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
@@ -35,6 +38,10 @@ injects = {
         OpenHABMainActivity.class,
         OpenHABWidgetListActivity.class,
         MainActivity.class,
+        RoomConfigActivity.class,
+        RoomFlipperFragment.class,
+        RoomConfigFragment.class,
+        SpeechService.class,
         HABApplication.class
 })
 public class ClientModule {
@@ -70,11 +77,8 @@ public class ClientModule {
     }
 
     @Provides @Singleton
-    public RoomProvider provideRoomProvider(Context context, ILogger logger,
-                                            IColorParser colorParser, IOpenHABSetting setting,
-                                            IOpenHABWidgetProvider widgetProvider) {
-        //TODO: extract interface and add @Inject on constructor
-        return new RoomProvider(context, logger, colorParser, setting, widgetProvider);
+    public IRoomProvider provideRoomProvider(RoomProvider roomProvider) {
+        return roomProvider;
     }
 
     @Provides @Singleton

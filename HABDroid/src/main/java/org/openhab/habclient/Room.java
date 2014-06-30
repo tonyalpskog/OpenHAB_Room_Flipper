@@ -3,9 +3,7 @@ package org.openhab.habclient;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.util.Log;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
@@ -29,7 +27,6 @@ public class Room {
     private String mGroupWidgetId;
 //    private String mSitemapId;
     private HashMap<UUID, GraphicUnit> unitHash = null;
-    private Bitmap mBackgroundImage = null;//TA: TODO - Add a resource member as an alternative to a Bitmap. Bitmap may still be used as external image input and later on be replaced by a path or URL to an image.
     private static String TAG = "Room";
     private UUID mLatestWidgetUpdateUUID;
     private OpenHABWidget mLocalWidget;
@@ -39,15 +36,10 @@ public class Room {
     private final ILogger mLogger;
     private final IColorParser mColorParser;
 
-    //TA: TODO - Add a second constructor that replaces the Bitmap with an integer (resource ID) in order to save some memory.
-    public Room(String groupItemName, String name, Bitmap roomImage, ILogger logger,
-                IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
-        this(groupItemName, name, logger, colorParser, widgetProvider);
-        mBackgroundImage = roomImage;
-    }
     public Room(String groupItemName, String name, int backgroundImageResourceId, Context context,
                 ILogger logger, IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
         this(groupItemName, name, logger, colorParser, widgetProvider);
+
         mBackgroundImageResourceId = backgroundImageResourceId;
         mContext = context;
     }
@@ -77,7 +69,6 @@ public class Room {
         copy.id = this.id;
         copy.mGroupWidgetId = this.mGroupWidgetId;
         copy.unitHash = (HashMap<UUID, GraphicUnit>) this.unitHash.clone();
-        copy.mBackgroundImage = this.mBackgroundImage;
         copy.mLatestWidgetUpdateUUID = this.mLatestWidgetUpdateUUID;
         copy.mLocalWidget = this.mLocalWidget;
         copy.mContext = this.mContext;
@@ -87,9 +78,6 @@ public class Room {
     }
 
     private Bitmap getBitmap(int bitmapResourceId) {
-        if(mBackgroundImage != null)
-            return mBackgroundImage;
-
         return BitmapFactory.decodeResource(mContext.getResources(), bitmapResourceId);
     }
 
@@ -103,10 +91,8 @@ public class Room {
 
     //Check if this room has alignments to input room
     public boolean contains(Room room) {
-        Iterator iterator = roomAlignment.values().iterator();
-        while(iterator.hasNext()) {
-            Room alignmentRoom = (Room) iterator.next();
-            if(room.id == alignmentRoom.getId())
+        for (Room alignmentRoom : roomAlignment.values()) {
+            if (room.id == alignmentRoom.getId())
                 return true;
         }
         return false;
@@ -149,22 +135,12 @@ public class Room {
     //TA: TODO - Modify this method to also be able to create a bitmap from a resource ID.
     public Bitmap getRoomImage() {
         //Bitmap bitmap= Bitmap.createBitmap(255, 255, Bitmap.Config.ARGB_8888);
-//        Bitmap mutableBitmap = mBackgroundImage.copy(Bitmap.Config.ARGB_8888, true);
+//        Bitmap mutableBitmap = mBackgroundImageId.copy(Bitmap.Config.ARGB_8888, true);
 //       mutableBitmap.eraseColor(Color.WHITE);
 //        return invertBitmap(mutableBitmap);
 
-//        mBackgroundImage = invertBitmap(/*adjustOpacity(*/setColorAsAlfa(Color.BLACK, mBackgroundImage)/*, 0*/);//);
-
-        if(mBackgroundImage == null) {
-            mBackgroundImage = getBitmap(mBackgroundImageResourceId);
-        }
-
-        return mBackgroundImage;
-    }
-
-    //TA: TODO - Override this method and replace the Bitmap with an integer (resource ID) in order to save some memory.
-    public void setRoomImage(Bitmap bitmap) {
-        mBackgroundImage = bitmap;
+//        mBackgroundImageId = invertBitmap(/*adjustOpacity(*/setColorAsAlfa(Color.BLACK, mBackgroundImageId)/*, 0*/);//);
+        return getBitmap(mBackgroundImageResourceId);
     }
 
     public void addUnit(GraphicUnit gUnit) {
@@ -229,18 +205,6 @@ public class Room {
         return mWidgetProvider.getWidgetByID(mGroupWidgetId);
     }
 
-    private Bitmap adjustOpacity(Bitmap bitmap, int opacity) {
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Canvas canvas = new Canvas(mutableBitmap);
-        int colour = (opacity & Color.WHITE) << 24;
-        canvas.drawColor(colour, PorterDuff.Mode.DST_IN);
-        return mutableBitmap;
-    }
-
-    public void setPointAsAlfa(int x, int y) {
-        mBackgroundImage = setPointAsAlfa(x, y, mBackgroundImage);
-    }
-
     public Bitmap setPointAsAlfa(int x, int y, Bitmap source) {
         int pixelColor = source.getPixel(x, y);
         return setColorAsAlfa(pixelColor, source);
@@ -260,10 +224,6 @@ public class Room {
         }
 
         return target;
-    }
-
-    public void invertRoomImage() {
-        mBackgroundImage = invertBitmap(mBackgroundImage);
     }
 
     private Bitmap invertBitmap(Bitmap source) {
@@ -290,8 +250,7 @@ public class Room {
     }
 
     public void dispose() {
-        if(mBackgroundImageResourceId != null)
-            mBackgroundImage = null;
+
     }
 
 //    private Bitmap invertBitmap2(Bitmap source) {

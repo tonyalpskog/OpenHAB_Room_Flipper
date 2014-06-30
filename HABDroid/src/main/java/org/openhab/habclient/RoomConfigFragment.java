@@ -17,6 +17,8 @@ import android.widget.Toast;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
@@ -27,9 +29,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class RoomConfigFragment extends Fragment {
     private static final String TAG = "RoomConfigFragment";
-    private RoomProvider mRoomProvider;
     private Room mCurrentRoom;
     private Button mSaveButton;
     private EditText mRoomNameText;
@@ -37,8 +40,12 @@ public class RoomConfigFragment extends Fragment {
     private OpenHABWidget mNullGroupWidget;
     private Room mNullRoom;
     private HashMap<Direction, Spinner> mSpinnerHashMap;
-    private IOpenHABWidgetProvider mOpenHABWidgetProvider;
-    private IRestCommunication mRestCommunication;
+
+    @Inject IRoomProvider mRoomProvider;
+    @Inject IOpenHABWidgetProvider mOpenHABWidgetProvider;
+    @Inject IRestCommunication mRestCommunication;
+    @Inject ILogger mLogger;
+    @Inject IColorParser mColorParser;
 
     public static RoomConfigFragment newInstance() {
         return new RoomConfigFragment();
@@ -48,13 +55,12 @@ public class RoomConfigFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-        mNullGroupWidget = new OpenHABWidget(application.getLogger(), application.getColorParser());
-        mNullRoom = new Room(null, "<Undefined room>", null, application.getLogger(),
-                application.getColorParser(), application.getOpenHABWidgetProvider());//TA: TODO - Fix name problem. (now sitemapID)
-        mOpenHABWidgetProvider = application.getOpenHABWidgetProvider();
-        mRestCommunication = application.getRestCommunication();
-        mRoomProvider = application.getRoomProvider();
+        InjectUtils.inject(this);
+
+        mNullGroupWidget = new OpenHABWidget(mLogger, mColorParser);
+        mNullRoom = new Room(null, "<Undefined room>",  mLogger, mColorParser,
+                mOpenHABWidgetProvider);//TA: TODO - Fix name problem. (now sitemapID)
+
         mCurrentRoom = ((RoomConfigActivity)getActivity()).getConfigRoom();
     }
 
@@ -93,8 +99,8 @@ public class RoomConfigFragment extends Fragment {
         habGroupSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //Create adapter for Room spinners
-        List<Room> roomArrayList = new ArrayList<Room>(mRoomProvider.roomHash.size());
-        Iterator iterator = mRoomProvider.roomHash.values().iterator();
+        List<Room> roomArrayList = new ArrayList<Room>(mRoomProvider.getRoomHash().size());
+        Iterator iterator = mRoomProvider.getRoomHash().values().iterator();
         while(iterator.hasNext()) {
             Room room = (Room) iterator.next();
 
@@ -273,11 +279,9 @@ public class RoomConfigFragment extends Fragment {
         }
 
         boolean hasAlignment = false;
-        Iterator iterator = mSpinnerHashMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            Direction direction = (Direction) iterator.next();
+        for (Direction direction : mSpinnerHashMap.keySet()) {
             Spinner spinner = mSpinnerHashMap.get(direction);
-            if(spinner.getSelectedItem() == mNullRoom)
+            if (spinner.getSelectedItem() == mNullRoom)
                 mCurrentRoom.setAlignment(null, direction);
             else {
                 mCurrentRoom.setAlignment((Room) spinner.getSelectedItem(), direction);

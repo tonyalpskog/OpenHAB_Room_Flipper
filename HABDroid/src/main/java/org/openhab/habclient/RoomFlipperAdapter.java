@@ -12,7 +12,7 @@ public class RoomFlipperAdapter {
     private final String TAG = "RoomFlipperAdapter";
     private Context mContext = null;
     private Room currentRoom;
-    private RoomProvider roomProvider;
+    private IRoomProvider roomProvider;
 
     public RoomFlipperAdapter(Context context, Room initialRoom) {
         mContext = context;
