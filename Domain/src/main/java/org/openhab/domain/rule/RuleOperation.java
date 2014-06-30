@@ -15,7 +15,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     private List<IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mDescription;
-
+    private boolean mIsActive;
 
     public RuleOperation() {
         mOperands = new ArrayList<IEntityDataType>();
@@ -75,6 +75,14 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public int getOperandIndexBySourceId(String operandSourceId) {
         IEntityDataType operand = getOperandBySourceId(operandSourceId);
         return operand != null? mOperands.indexOf(operand) : -1;
+    }
+
+    public boolean isActive() {
+        return mIsActive;
+    }
+
+    public void setActive(boolean isActive) {
+        mIsActive = isActive;
     }
 
     @Override
@@ -143,6 +151,8 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     public void runCalculation() {
+        if(!isActive()) return;
+
         Boolean oldValue = getValue();
 
         if(getRuleOperator() == null) {

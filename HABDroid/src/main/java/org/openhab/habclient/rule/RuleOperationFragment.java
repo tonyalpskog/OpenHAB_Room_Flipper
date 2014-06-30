@@ -304,8 +304,10 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     public void onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
             , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
             , int operandPosition, RuleOperator ruleOperator) {
-        if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL)
+        if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
+            mOperationUnderConstruction.setActive(true);
             return;
+        }
 
         switch(ruleOperationSelectionInterface) {
             case UNIT:
@@ -328,7 +330,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
                                     "Select an operator",
                                     true,
-                                    operatorList);
+                                    operatorList,
+                                    this);
 
                             dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                         } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
@@ -364,6 +367,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
         if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
             ((RuleEditActivity)getActivity()).getRule().setRuleOperation(mOperationUnderConstruction);
+            mOperationUnderConstruction.setActive(true);
+            mOperationUnderConstruction.runCalculation();
             updateRuleTree(mOperationUnderConstruction);
         }
     }
@@ -386,15 +391,17 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             }/* else
                 rti = mRule.getRuleOperation().getRuleTreeItem();*///TODO - TA: get current operation and open it up
             RuleOperation selectedOperation = rti != null? ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
+            mOperationUnderConstruction = selectedOperation;
             int operandPosition = aOperandposition;
-            if(operandPosition == -1 && selectedOperation.getSourceType() != EntityDataTypeSource.OPERATION) {
+            if(operandPosition == -1 && mOperationUnderConstruction.getSourceType() != EntityDataTypeSource.OPERATION) {
                 operandPosition = rti.getPosition();
             } else if(operandPosition == -1) {
                 operandPosition = 0;
             }
+            mOperationUnderConstruction.setActive(false);
             final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
-                    selectedOperation.getOperand(operandPosition)
-                    , operandPosition != -1 ? operandPosition : 0, operandPosition > 1 && (selectedOperation.getRuleOperator() != null && selectedOperation.getRuleOperator().supportsMultipleOperations()), this);
+                    mOperationUnderConstruction.getOperand(operandPosition)
+                    , operandPosition != -1 ? operandPosition : 0, operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()), this);
             dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
         } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
             //TODO - TA: open an operator selection dialog.
