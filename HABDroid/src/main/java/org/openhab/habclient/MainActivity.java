@@ -33,8 +33,6 @@ public class MainActivity extends Activity
     private RoomFlipperFragment flipperFragment = null;
 
     private ICommandAnalyzer mSpeechResultAnalyzer;
-    private RestCommunication mRestCommunication;
-    private IOpenHABWidgetProvider mWidgetProvider;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -62,12 +60,14 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
         Fragment newFragment = null;
 
-        mRestCommunication.requestOpenHABSitemap((String) null);
-        for(OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+        final HABApplication application = ((HABApplication) getApplication());
+        IOpenHABWidgetProvider widgetProvider = application.getOpenHABWidgetProvider();
+        application.getRestCommunication().requestOpenHABSitemap((String) null);
+        for(OpenHABWidget widget : widgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
             if(widget == null)
                 Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
             else if(widget.hasChildren())
-                mRestCommunication.requestOpenHABSitemap(widget);
+                application.getRestCommunication().requestOpenHABSitemap(widget);
         }
 
         switch (position) {

@@ -19,7 +19,7 @@ import org.w3c.dom.Node;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RestCommunication {
+public class RestCommunication implements IRestCommunication {
     private final ILogger mLogger;
     private final IColorParser mColorParser;
     private final OpenHABSetting mOpenHABSetting;
@@ -44,6 +44,7 @@ public class RestCommunication {
         mWidgetProvider = widgetProvider;
     }
 
+    @Override
     public void requestOpenHABSitemap(OpenHABWidget widget) {
         if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
             requestOpenHABSitemap(/*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getItem().getLink()), widget);
@@ -51,10 +52,12 @@ public class RestCommunication {
             mLogger.e(HABApplication.getLogTag(2), "[AsyncHttpClient] Sitemap cannot be requested due to missing sitemap data.");
     }
 
+    @Override
     public void requestOpenHABSitemap(String sitemapUrl) {
         requestOpenHABSitemap(sitemapUrl, null);
     }
 
+    @Override
     public void requestOpenHABSitemap(String sitemapUrl, final OpenHABWidget widget) {
         final String RESTaddress;
         if(StringHandler.isNullOrEmpty(sitemapUrl)) {

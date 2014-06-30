@@ -80,7 +80,7 @@ public class GraphicUnit {
         this.isSelected = isSelected;
         if(mView != null) {
             mView.setSelected(isSelected);
-            mView.drawSelection(isSelected, mSetting);
+            mView.drawSelection(isSelected);
         }
     }
 

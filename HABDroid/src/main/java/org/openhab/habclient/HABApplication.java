@@ -26,7 +26,7 @@ public class HABApplication extends Application {
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
     private RuleOperationProvider mRuleOperationProvider = null;
-    private RestCommunication mRestCommunication = null;
+    private IRestCommunication mRestCommunication = null;
     private ApplicationMode mAppMode = ApplicationMode.Unknown;
     private TextToSpeechProvider mTextToSpeechProvider = null;
     private OpenHABWidgetProvider mOpenHABWidgetProvider = null;
@@ -83,7 +83,7 @@ public class HABApplication extends Application {
         return mOpenHABWidgetProvider;
     }
 
-    public RestCommunication getRestCommunication() {
+    public IRestCommunication getRestCommunication() {
         if(mRestCommunication == null)
             mRestCommunication = new RestCommunication(this, getLogger(), getColorParser(),
                     getOpenHABSetting(),

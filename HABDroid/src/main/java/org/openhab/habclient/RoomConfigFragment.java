@@ -38,7 +38,7 @@ public class RoomConfigFragment extends Fragment {
     private Room mNullRoom;
     private HashMap<Direction, Spinner> mSpinnerHashMap;
     private IOpenHABWidgetProvider mOpenHABWidgetProvider;
-    private RestCommunication mRestCommunication;
+    private IRestCommunication mRestCommunication;
 
     public static RoomConfigFragment newInstance() {
         return new RoomConfigFragment();
