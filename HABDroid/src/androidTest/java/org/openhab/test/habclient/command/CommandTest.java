@@ -116,7 +116,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertFalse("No MapOfRoomNames items available.", mCommandAnalyzer.getMapOfRoomNamesFromProvider().isEmpty());
 
         String availableRooms = "";
-        for (String roomName : mCommandAnalyzer.getMapOfRoomNamesFromProvider().keySet().toArray(new String[0])) {
+        for (String roomName : mCommandAnalyzer.getMapOfRoomNamesFromProvider().keySet()) {
             availableRooms += roomName + " , ";
         }
 
