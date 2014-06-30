@@ -45,11 +45,8 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         super(HABApplication.class);
     }
 
-    public void setUp() {
-        try {
-            super.setUp();
-        } catch (Exception e) {
-        }
+    public void setUp() throws Exception {
+        super.setUp();
         initMocks(this);
         createApplication();
         mHABApplication = getApplication();
