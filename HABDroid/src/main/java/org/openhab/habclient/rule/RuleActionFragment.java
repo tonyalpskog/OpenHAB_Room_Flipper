@@ -18,9 +18,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habclient.HABApplication;
-
 import org.openhab.habdroid.R;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleAction;
+import org.openhab.domain.rule.RuleActionType;
+import org.openhab.domain.rule.RuleActionValueType;
+import org.openhab.domain.rule.RuleOperator;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 
@@ -196,10 +201,12 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
 
     private void openActionBuilderDialog(int position) {
         mSelectedActionPosition = position;
+
+        final IOpenHABWidgetProvider provider = ((HABApplication)getActivity().getApplication()).getOpenHABWidgetProvider();
         if(mSelectedActionPosition > -1)
             mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
         else
-            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND);//TODO - TA: Let the user decide if COMMAND or MESSAGE
+            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND, provider);//TODO - TA: Let the user decide if COMMAND or MESSAGE
 
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();

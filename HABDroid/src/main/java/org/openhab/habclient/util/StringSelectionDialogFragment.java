@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import org.openhab.domain.util.StringListSearch;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
@@ -26,6 +27,10 @@ import java.util.List;
  * Created by Tony Alpskog in 2014.
  */
 public class StringSelectionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+    protected static final String ARG_SOURCE = "source";
+    protected static final String ARG_DIALOG_TITLE = "dialogTitle";
+    protected static final String ARG_SHOW_NEXT_BUTTON = "showNextButton";
+
     protected List<String> mSourceList = new ArrayList<String>();
     String mDialogTitle;
     EditText mEditTextFilter;
@@ -39,11 +44,14 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
     private static final int MIN_SEARCH_WORD_LENGTH = 3;
     private static final String SEARCH_WORD_DELIMITER = "\\s+";
 
-    public StringSelectionDialogFragment(List<String> source, String dialogTitle, boolean showNextButton) {
-        mSourceList = source;
-        mDialogTitle = dialogTitle;
-        mStringListSearch = new StringListSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
-        mShowNextButton = showNextButton;
+    public static StringSelectionDialogFragment newInstance(List<String> source, String dialogTitle, boolean showNextButton) {
+        final StringSelectionDialogFragment fragment = new StringSelectionDialogFragment();
+        final Bundle args = new Bundle();
+        args.putStringArrayList(ARG_SOURCE, new ArrayList<String>(source));
+        args.putString(ARG_DIALOG_TITLE, dialogTitle);
+        args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -61,6 +69,15 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
 
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
+
+        final Bundle args = getArguments();
+        if(args == null)
+            return;
+
+        mSourceList = args.getStringArrayList(ARG_SOURCE);
+        mDialogTitle = args.getString(ARG_DIALOG_TITLE);
+        mStringListSearch = new StringListSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
+        mShowNextButton = args.getBoolean(ARG_SHOW_NEXT_BUTTON);
     }
 
     @Override
@@ -148,7 +165,7 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         }
         List<String> initialList = new ArrayList<String>();
         initialList.addAll(mSourceList);
-        mArrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, initialList);
+        mArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, initialList);
         mFilteredListView.setAdapter(mArrayAdapter);
 
         return view;

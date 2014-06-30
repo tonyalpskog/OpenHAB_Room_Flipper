@@ -1,7 +1,7 @@
 package org.openhab.habclient.command;
 
 import org.openhab.habclient.Room;
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -13,7 +13,7 @@ public class CommandAnalyzerResult {
     protected String mOpenHABItemState;
     protected OpenHABWidgetCommandType mCommandType;
 
-    public CommandAnalyzerResult(Room room, org.openhab.habdroid.model.OpenHABWidget openHABWidget, int matchPoint, String openHABItemState, OpenHABWidgetCommandType commandType) {
+    public CommandAnalyzerResult(Room room, OpenHABWidget openHABWidget, int matchPoint, String openHABItemState, OpenHABWidgetCommandType commandType) {
         mRoom = room;
         mOpenHABWidget = openHABWidget;
         this.mMatchPoint = matchPoint;

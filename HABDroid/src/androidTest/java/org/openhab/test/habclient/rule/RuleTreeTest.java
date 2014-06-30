@@ -1,19 +1,22 @@
 package org.openhab.test.habclient.rule;
 
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.RuleTreeItem;
+import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
-import org.openhab.habclient.rule.IEntityDataType;
-import org.openhab.habclient.rule.RuleOperation;
-import org.openhab.habclient.rule.RuleOperationProvider;
-import org.openhab.habclient.rule.RuleOperator;
-import org.openhab.habclient.rule.RuleOperatorType;
-import org.openhab.habclient.rule.RuleTreeItem;
-import org.openhab.habclient.rule.UnitEntityDataType;
-
-import org.openhab.habdroid.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -36,7 +39,9 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         createApplication();
         mHABApplication = getApplication();
 
-        mHttpDataSetup = new HttpDataSetup(mHABApplication);
+        final ILogger logger = mock(ILogger.class);
+        final IColorParser colorParser = mock(IColorParser.class);
+        mHttpDataSetup = new HttpDataSetup(logger, colorParser, mHABApplication.getOpenHABWidgetProvider());
         mHttpDataSetup.loadHttpDataFromString();
 
         rop = mHABApplication.getRuleOperationProvider();
@@ -49,7 +54,7 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
     }
 
     public void testGetWidgetById() {
-        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
         assertEquals("Ceiling", unit.getLabel());
         assertEquals("Light_GF_Kitchen_Ceiling", unit.getItem().getName());
     }
@@ -67,14 +72,14 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
         switch (operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
@@ -87,22 +92,22 @@ public class RuleTreeTest extends android.test.ApplicationTestCase<HABApplicatio
 
         switch (operationNumber) {
             case 1:
-                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]
                 break;
             case 2:
-                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1");
+                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]
                 break;
             case 3:
-                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
+                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] < Temperature_GF_Toilet [21.50]
                 break;
             case 4:
-                widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4");
+                widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4");
                 result = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] > Temperature_GF_Toilet [21.50]
                 break;

@@ -8,8 +8,8 @@ import android.widget.RadioGroup;
 import org.openhab.habclient.HABApplication;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetMapping;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetMapping;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
 
 import java.util.Iterator;

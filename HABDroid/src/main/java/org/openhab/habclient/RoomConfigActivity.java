@@ -105,10 +105,11 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+        final HABApplication application = (HABApplication) getApplication();
         if(tab.getPosition() == 0)
-            HABApplication.setAppMode(ApplicationMode.RoomEdit);
+            application.setAppMode(ApplicationMode.RoomEdit);
         else
-            HABApplication.setAppMode(ApplicationMode.UnitPlacement);
+            application.setAppMode(ApplicationMode.UnitPlacement);
     }
 
     @Override
@@ -182,7 +183,7 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new RoomConfigFragment(((HABApplication)getApplication()).getRoomProvider(), mActivity);
+                    return RoomConfigFragment.newInstance();
                 case 1:
                     return new UnitPlacementFragment(mActivity);
             }

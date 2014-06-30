@@ -3,7 +3,7 @@ package org.openhab.habclient.command;
 import android.content.Context;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetType;
 
 /**
  * Created by Tony Alpskog in 2014.

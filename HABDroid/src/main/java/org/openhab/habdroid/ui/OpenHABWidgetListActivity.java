@@ -29,43 +29,6 @@
 
 package org.openhab.habdroid.ui;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.jmdns.ServiceInfo;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import android.view.*;
-
-import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABNFCActionList;
-import org.openhab.habdroid.model.OpenHABSitemap;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
-import org.openhab.habdroid.util.AsyncServiceResolver;
-import org.openhab.habdroid.util.AsyncServiceResolverListener;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
-import org.openhab.habdroid.util.Util;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.google.analytics.tracking.android.EasyTracker;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.image.WebImageCache;
-import org.openhab.habclient.HABApplication;
-
 import android.Manifest.permission;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -85,11 +48,60 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.BadTokenException;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.image.WebImageCache;
+
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABNFCActionList;
+import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.ColorParser;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.OpenHABSetting;
+import org.openhab.habdroid.R;
+import org.openhab.habdroid.util.AsyncServiceResolver;
+import org.openhab.habdroid.util.AsyncServiceResolverListener;
+import org.openhab.habdroid.util.MyAsyncHttpClient;
+import org.openhab.habdroid.util.Util;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.jmdns.ServiceInfo;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class is apps' main activity which runs startup sequence and displays list of openHAB
@@ -136,6 +148,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	// Enable/disable openHAB discovery
 	private boolean serviceDiscoveryEnabled = true;
 
+    private OpenHABSetting mOpenHABSetting;
+    private IOpenHABWidgetProvider mWidgetProvider;
+
 	/**
 	 * Overriding onStart to enable Google Analytics stats collection
 	 */
@@ -162,7 +177,12 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.d("OpenHABWidgetListActivity", "onCreate");
+        super.onCreate(savedInstanceState);
+
+        final HABApplication application = (HABApplication) getApplication();
+        mOpenHABSetting = application.getOpenHABSetting();
+
+        Log.d("OpenHABWidgetListActivity", "onCreate");
 		// Set default values, false means do it one time during the very first launch
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		// Set non-persistant HABDroid version preference to current version from application package
@@ -193,7 +213,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 //		}
 //		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
 		// Initialize activity view
-		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.openhabwidgetlist);
 		// Disable screen timeout if set in preferences
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -214,13 +234,16 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		openHABUsername = settings.getString("default_openhab_username", null);
 		openHABPassword = settings.getString("default_openhab_password", null);
 
-        HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
-        HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
+        mOpenHABSetting.setUsername(openHABUsername);
+        mOpenHABSetting.setPassword(openHABPassword);
 
 		// Create new data source and adapter and set it to list view
-		openHABWidgetDataSource = new OpenHABWidgetDataSource();
+        ILogger logger = new AndroidLogger();
+        IColorParser colorParser = new ColorParser();
+        IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
+		openHABWidgetDataSource = new OpenHABWidgetDataSource(logger, colorParser);
 		openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(OpenHABWidgetListActivity.this,
-				R.layout.openhabwidgetlist_genericitem, widgetList);
+				R.layout.openhabwidgetlist_genericitem, widgetList, widgetTypeLayoutProvider);
 		getListView().setAdapter(openHABWidgetAdapter);
 		// Set adapter parameters
 		openHABWidgetAdapter.setOpenHABUsername(openHABUsername);
@@ -265,15 +288,15 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			// If we are in demo mode, ignore all settings and use demo url from strings
 			if (settings.getBoolean("default_openhab_demomode", false)) {
-                HABApplication.getOpenHABSetting(this).setBaseUrl(getString(R.string.openhab_demo_url));
-				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                mOpenHABSetting.setBaseUrl(getString(R.string.openhab_demo_url));
+				openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 				Log.i(HABApplication.getLogTag(), "Demo mode, connecting to " + openHABBaseUrl);
 				Toast.makeText(getApplicationContext(), getString(R.string.info_demo_mode),
 					Toast.LENGTH_LONG).show();
 				showWidgetList();
 			} else {
-                HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
-				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                mOpenHABSetting.setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
+				openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 				// Check if we have a direct URL in preferences, if yes - use it
 				if (openHABBaseUrl.length() > 0) {
 					Log.i(HABApplication.getLogTag(), "Connecting to configured URL = " + openHABBaseUrl);
@@ -288,14 +311,14 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					if (activeNetworkInfo != null) {
 						Log.i(HABApplication.getLogTag(), "Network is connected");
 						// If network is mobile, try to use remote URL
-						if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE || serviceDiscoveryEnabled == false) {
+						if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE || !serviceDiscoveryEnabled) {
 							if (!serviceDiscoveryEnabled) {
 								Log.i(HABApplication.getLogTag(), "openHAB discovery is disabled");
 							} else {
 								Log.i(HABApplication.getLogTag(), "Network is Mobile (" + activeNetworkInfo.getSubtypeName() + ")");
 							}
-                            HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
-                            openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                            mOpenHABSetting.setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
+                            openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 							// If remote URL is configured
 							if (openHABBaseUrl.length() > 0) {
 								Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),
@@ -473,7 +496,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		Log.d(HABApplication.getLogTag(), "displayPageUrl = " + this.displayPageUrl);
 		super.onResume();
 		PendingIntent pendingIntent = PendingIntent.getActivity(
-				  this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				  this, 0, new Intent(this, OpenHABWidgetListActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 		if (NfcAdapter.getDefaultAdapter(this) != null)
 			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pendingIntent, null, null);
 		if (this.displayPageUrl.length() > 0) {
@@ -643,7 +666,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void processContent(String content) {
         Node rootNode = getRootNode(content);
         openHABWidgetDataSource.setSourceNode(rootNode);
-        HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
+        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         // As we change the page we need to stop all videos on current page
         // before going to the new page. This is quite dirty, but is the only

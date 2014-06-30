@@ -2,16 +2,17 @@ package org.openhab.habclient;
 
 import android.util.Log;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
-import org.openhab.habclient.util.RegExAccuracyResult;
-import org.openhab.habclient.util.StringHandler;
-
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetDataSource;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.util.RegExAccuracyResult;
+import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +25,16 @@ import java.util.UUID;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class OpenHABWidgetProvider {
+public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
+    private final RegularExpression mRegularExpression;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private Map<OpenHABItemType, List<String>> mOpenHABItemTypeMap;
     private UUID mUpdateSetUUID;
 
-    public OpenHABWidgetProvider() {
+    public OpenHABWidgetProvider(RegularExpression regularExpression) {
+        mRegularExpression = regularExpression;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
@@ -54,16 +57,12 @@ public class OpenHABWidgetProvider {
     public void setOpenHABWidgets(Map<OpenHABWidgetType, List<OpenHABWidget>> openHABWidgets) {
         clearData();
 
-        Iterator<OpenHABWidgetType> typeKeyIterator  = openHABWidgets.keySet().iterator();
-        while (typeKeyIterator.hasNext()) {
-            OpenHABWidgetType type = typeKeyIterator.next();
+        for (OpenHABWidgetType type : openHABWidgets.keySet()) {
             List<OpenHABWidget> widgetList = openHABWidgets.get(type);
             List<String> stringList = new ArrayList<String>(widgetList.size());
-            Iterator<OpenHABWidget> widgetIterator = widgetList.iterator();
-            while (widgetIterator.hasNext()) {
-                OpenHABWidget widget = widgetIterator.next();
+            for (OpenHABWidget widget : widgetList) {
                 mOpenHABWidgetIdMap.put(widget.getId(), widget);
-                if(widget.hasItem())
+                if (widget.hasItem())
                     mOpenHABItemNameMap.put(widget.getItem().getName(), widget);
                 stringList.add(widget.getItem().getName());
             }
@@ -76,6 +75,7 @@ public class OpenHABWidgetProvider {
         mOpenHABItemNameMap.get(item.getName()).setItem(item);
     }
 
+    @Override
     public void setOpenHABWidgets(OpenHABWidgetDataSource openHABWidgetDataSource) {
         if(openHABWidgetDataSource.getRootWidget() == null)
             return;
@@ -91,6 +91,7 @@ public class OpenHABWidgetProvider {
         mUpdateSetUUID = UUID.randomUUID();
     }
 
+    @Override
     public UUID getUpdateUUID() {
         return mUpdateSetUUID;
     }
@@ -136,23 +137,21 @@ public class OpenHABWidgetProvider {
         }
 
         if(widget.hasChildren()) {
-            Iterator<OpenHABWidget> iterator = widget.getChildren().iterator();
-            while(iterator.hasNext()) {
-                addOpenHABWidget(iterator.next());
+            for (OpenHABWidget widget1 : widget.getChildren()) {
+                addOpenHABWidget(widget1);
             }
         }
     }
 
     public Map<OpenHABWidgetType, List<OpenHABWidget>> getWidgetMap(Set<OpenHABWidgetType> category) {
         Map<OpenHABWidgetType, List<OpenHABWidget>> resultMap = new HashMap<OpenHABWidgetType, List<OpenHABWidget>>();
-        Iterator<OpenHABWidgetType> iterator = category.iterator();
-        while(iterator.hasNext()) {
-            OpenHABWidgetType key = iterator.next();
+        for (OpenHABWidgetType key : category) {
             resultMap.put(key, getWidgetList(key));
         }
         return resultMap;
     }
 
+    @Override
     public List<OpenHABWidget> getWidgetList(Set<OpenHABWidgetType> category) {
         ArrayList<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
@@ -161,13 +160,13 @@ public class OpenHABWidgetProvider {
             return resultList;
         }
 
-        Iterator<OpenHABWidgetType> iterator = category.iterator();
-        while(iterator.hasNext()) {
-            resultList.addAll(getWidgetList(iterator.next()));
+        for (OpenHABWidgetType aCategory : category) {
+            resultList.addAll(getWidgetList(aCategory));
         }
         return resultList;
     }
 
+    @Override
     public List<OpenHABWidget> getWidgetList(OpenHABWidgetType type) {
         List<String> idList = new ArrayList<String>();
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
@@ -181,6 +180,7 @@ public class OpenHABWidgetProvider {
         return resultList;
     }
 
+    @Override
     public List<String> getItemNamesByType(OpenHABItemType type) {
         return mOpenHABItemTypeMap.get(type);
     }
@@ -198,7 +198,7 @@ public class OpenHABWidgetProvider {
 
         List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
         for(OpenHABWidget widget : mOpenHABWidgetIdMap.values().toArray(new OpenHABWidget[0])) {
-            RegExAccuracyResult regExResult = HABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
+            RegExAccuracyResult regExResult = mRegularExpression.getStringMatchAccuracy(sourceWordsList, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
             double accuracy = regExResult.getAccuracy();
             if(accuracy < APPROVED_UNIT_ACCURACY_VALUE && accuracy > DENIED_UNIT_ACCURACY_VALUE) {
                 List<String> sitemapGroupWordList = StringHandler.getStringListDiff(sourceWordsList, regExResult.getMatchingWords());
@@ -243,7 +243,7 @@ public class OpenHABWidgetProvider {
                 continue;
             String linkTitle = unit.getLinkedPage().getTitle();
 //            double result = mCommandAnalyzer.getStringMatchAccuracy(sourceWordsList, regExString, linkTitle);
-            double result = HABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, linkTitle).getAccuracy();
+            double result = mRegularExpression.getStringMatchAccuracy(sourceWordsList, linkTitle).getAccuracy();
             if (result > maxResult) {
                 maxResult = result;
 //                resultingParentWidget = unit;
@@ -253,6 +253,7 @@ public class OpenHABWidgetProvider {
         return maxResult;
     }
 
+    @Override
     public OpenHABWidget getWidgetByID(String widgetID) {
         OpenHABWidget widget = mOpenHABWidgetIdMap.get(widgetID);
         if(widget == null)
@@ -271,6 +272,7 @@ public class OpenHABWidgetProvider {
         return result;
     }
 
+    @Override
     public OpenHABWidget getWidgetByItemName(String openHabItemName) {
         OpenHABWidget widget = mOpenHABItemNameMap.get(openHabItemName);
         if(widget == null)
@@ -294,6 +296,7 @@ public class OpenHABWidgetProvider {
         return list;
     }
 
+    @Override
     public List<String> getItemNameListByWidgetType(Set<OpenHABWidgetType> widgetTypes) {
         List<String> itemNameList = new ArrayList<String>();
         List<OpenHABWidget> widgetList = getWidgetList(widgetTypes);

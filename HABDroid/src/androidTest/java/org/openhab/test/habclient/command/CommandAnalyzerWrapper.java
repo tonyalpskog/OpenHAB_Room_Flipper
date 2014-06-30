@@ -2,6 +2,8 @@ package org.openhab.test.habclient.command;
 
 import android.content.Context;
 
+import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.HABApplication;
@@ -11,7 +13,7 @@ import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
 
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +24,11 @@ import java.util.regex.Pattern;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
-    public CommandAnalyzerWrapper(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider, Context context) {
-        super(roomProvider, openHABWidgetProvider, context);
+    public CommandAnalyzerWrapper(RoomProvider roomProvider,
+                                  OpenHABWidgetProvider openHABWidgetProvider, Context context,
+                                  IOpenHABWidgetControl widgetControl,
+                                  RegularExpression regularExpression) {
+        super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression);
     }
 
     public Map<String, Room> getMapOfRoomNamesFromProvider() {

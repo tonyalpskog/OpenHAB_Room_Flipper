@@ -12,13 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.openhab.habclient.command.CommandAnalyzer;
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
-import org.openhab.habdroid.model.OpenHABWidgetType;
 
 import java.util.EnumSet;
 
@@ -61,12 +60,14 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
         Fragment newFragment = null;
 
-        HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
-        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider2().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+        final HABApplication application = ((HABApplication) getApplication());
+        IOpenHABWidgetProvider widgetProvider = application.getOpenHABWidgetProvider();
+        application.getRestCommunication().requestOpenHABSitemap((String) null);
+        for(OpenHABWidget widget : widgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
             if(widget == null)
                 Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
             else if(widget.hasChildren())
-                HABApplication.getRestCommunication().requestOpenHABSitemap(this,  widget);
+                application.getRestCommunication().requestOpenHABSitemap(widget);
         }
 
         switch (position) {
@@ -82,7 +83,7 @@ public class MainActivity extends Activity
                 break;
             case 2:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, RoomConfigFragment.newInstance(((HABApplication) getApplication()).getRoomProvider()))
+                        .replace(R.id.container, RoomConfigFragment.newInstance())
                         .commit();
                 break;
             default:
@@ -164,11 +165,13 @@ public class MainActivity extends Activity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
+            final HABApplication application = ((HABApplication) getApplication());
+
             if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = new CommandAnalyzer(((HABApplication)getApplication()).getRoomProvider(), HABApplication.getOpenHABWidgetProvider2(), getApplicationContext());
+                mSpeechResultAnalyzer = application.getSpeechResultAnalyzer();
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
-            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());
+            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), application.getAppMode());
 
             super.onActivityResult(requestCode, resultCode, data);
         }

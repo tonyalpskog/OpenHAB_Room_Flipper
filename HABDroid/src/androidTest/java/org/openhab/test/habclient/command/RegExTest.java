@@ -2,8 +2,8 @@ package org.openhab.test.habclient.command;
 
 import android.test.InstrumentationTestCase;
 
-import org.openhab.habclient.util.RegExResult;
-import org.openhab.habclient.util.RegularExpression;
+import org.openhab.domain.util.RegExResult;
+import org.openhab.domain.util.RegularExpression;
 
 /**
  * Created by Tony Alpskog in 2014.

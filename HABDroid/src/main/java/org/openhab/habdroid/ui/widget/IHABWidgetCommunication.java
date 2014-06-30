@@ -1,6 +1,6 @@
 package org.openhab.habdroid.ui.widget;
 
-import org.openhab.habdroid.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABItem;
 
 /**
  * Created by Tony Alpskog in 2014.

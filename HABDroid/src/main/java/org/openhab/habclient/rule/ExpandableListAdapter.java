@@ -1,7 +1,5 @@
 package org.openhab.habclient.rule;
 
-import java.util.HashMap;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -12,6 +10,9 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import org.openhab.habdroid.R;
+import org.openhab.domain.rule.RuleTreeItem;
+
+import java.util.HashMap;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -28,7 +29,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
-        return mTreeData.get(Integer.valueOf(groupPosition)).mChildren.get(Integer.valueOf(childPosititon));
+        return mTreeData.get(Integer.valueOf(groupPosition)).getChildren().get(Integer.valueOf(childPosititon));
     }
 
     @Override
@@ -42,7 +43,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         final RuleTreeItem childItem = (RuleTreeItem) getChild(groupPosition, childPosition);
 
-        if(childItem.mChildren.size() > 10) {
+        if(childItem.getChildren().size() > 10) {
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) this._context
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

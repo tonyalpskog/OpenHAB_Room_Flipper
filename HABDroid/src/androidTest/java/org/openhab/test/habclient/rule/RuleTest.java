@@ -1,21 +1,25 @@
 package org.openhab.test.habclient.rule;
 
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IOperator;
+import org.openhab.domain.rule.OnValueChangedListener;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
+import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.OnValueChangedListener;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
-import org.openhab.habclient.rule.IEntityDataType;
-import org.openhab.habclient.rule.IOperator;
-import org.openhab.habclient.rule.RuleOperation;
-import org.openhab.habclient.rule.RuleOperationProvider;
-import org.openhab.habclient.rule.RuleOperator;
-import org.openhab.habclient.rule.RuleOperatorType;
-import org.openhab.habclient.rule.UnitEntityDataType;
-
-import org.openhab.habdroid.model.OpenHABWidget;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,7 +34,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     private HashMap<RuleOperatorType, RuleOperator<Number>> ruleOperatorsNumeric;
     private HashMap<RuleOperatorType, RuleOperator<Boolean>> ruleOperatorsBoolean;
-    private HashMap<RuleOperatorType, RuleOperator<java.util.Date>> ruleOperatorsDate;
+    private HashMap<RuleOperatorType, RuleOperator<Date>> ruleOperatorsDate;
     private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
 //    @Mock
     private HABApplication mHABApplication;
@@ -65,7 +69,9 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
 //        when(mHABApplication.toString()).thenReturn("Mockoto_string");
 
-        HttpDataSetup httpDataSetup = new HttpDataSetup(mHABApplication);
+        final ILogger logger = new AndroidLogger();
+        final IColorParser colorParser = new ColorParser();
+        HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, mHABApplication.getOpenHABWidgetProvider());
         httpDataSetup.loadHttpDataFromString();
 
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
@@ -93,7 +99,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     }
 
     public void testGetWidgetById() {
-        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
         assertEquals("Ceiling", unit.getLabel());
         assertEquals("Light_GF_Kitchen_Ceiling", unit.getItem().getName());
     }
@@ -875,14 +881,14 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
@@ -892,22 +898,22 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     public void test_Create_RuleOperation_object_from_provider_units_and_validate_operation_result() {
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
 
-        OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
         assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", roA.toString());
         assertEquals(true, roA.getValue().booleanValue());
 
-        widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bath_1");
+        widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
         assertEquals("Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]", roA.toString());
         assertEquals(false, roA.getValue().booleanValue());
 
-        widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
+        widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3");
         RuleOperation roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
         assertEquals("Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]", roB.toString());
         assertEquals(true, roB.getValue().booleanValue());
 
-        widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_4");
+        widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Toilet_4");
         roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), getOperandsAsList3(2));
         assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", roB.toString());
         assertEquals(false, roB.getValue().booleanValue());
@@ -918,10 +924,10 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     private List<IEntityDataType> getListOfRuleOperationsForTest() {
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
 
-        OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
 
-        widget = mHABApplication.getOpenHABWidgetProvider2().getWidgetByID("FF_Bed_3");
+        widget = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("FF_Bed_3");
         RuleOperation roB = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
 
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();

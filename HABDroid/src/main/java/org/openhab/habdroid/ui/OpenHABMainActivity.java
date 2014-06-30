@@ -53,7 +53,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -62,22 +67,22 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.HABService;
-import org.openhab.habclient.INavDrawerActivity;
-import org.openhab.habclient.INavDrawerItem;
-import org.openhab.habclient.MainActivity;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.model.OpenHABLinkedPage;
+import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.HABService;
+import org.openhab.habclient.INavDrawerActivity;
+import org.openhab.habclient.MainActivity;
+import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
 import org.openhab.habdroid.core.OpenHABTracker;
 import org.openhab.habdroid.core.OpenHABTrackerReceiver;
-import org.openhab.habdroid.model.OpenHABLinkedPage;
-import org.openhab.habdroid.model.OpenHABSitemap;
 import org.openhab.habdroid.ui.drawer.OpenHABDrawerAdapter;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
@@ -89,6 +94,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import de.duenndns.ssl.MTMDecision;
 import de.duenndns.ssl.MemorizingResponder;
 import de.duenndns.ssl.MemorizingTrustManager;
@@ -149,13 +155,17 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     private String[] mDrawerTitles = {"First floor", "Seconf floor", "Cellar", "Garage"};
     private ListView mDrawerList;
     private List<OpenHABSitemap> mSitemapList;
-    private List<INavDrawerItem> mNavDrawerItemList;
+    private List<OpenHABSitemap> mNavDrawerItemList;
+    private OpenHABSetting mOpenHABSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.d(TAG, "onCreate()");
+
+        final HABApplication application = (HABApplication) getApplication();
+        mOpenHABSetting = application.getOpenHABSetting();
 
         // Check if we are in development mode
         isDeveloper = BuildConfig.DEBUG;
@@ -208,9 +218,9 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
         if (savedInstanceState != null) {
             openHABBaseUrl = savedInstanceState.getString("openHABBaseUrl");
-            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
+            mOpenHABSetting.setBaseUrl(openHABBaseUrl);
             sitemapRootUrl = savedInstanceState.getString("sitemapRootUrl");
-            HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
+            mOpenHABSetting.setSitemapRootUrl(sitemapRootUrl);
         }
 
         setUpDrawer();
@@ -277,21 +287,23 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-
-            HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
+        mOpenHABSetting.setBaseUrl(openHABBaseUrl);
         mSitemapList = new ArrayList<OpenHABSitemap>();
-        mNavDrawerItemList = new ArrayList<INavDrawerItem>();
-        mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList);
-        HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
-        HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
-        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);//Added by TA
+        mNavDrawerItemList = new ArrayList<OpenHABSitemap>();
+        mDrawerAdapter = new OpenHABDrawerAdapter(this, R.layout.openhabdrawer_item, mNavDrawerItemList, mOpenHABSetting);
+        mOpenHABSetting.setUsername(openHABUsername);
+        mOpenHABSetting.setPassword(openHABPassword);
+        mOpenHABSetting.setBaseUrl(openHABBaseUrl);//Added by TA
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Log.d(TAG, "Drawer selected item " + String.valueOf(position));
-                mNavDrawerItemList.get(position).itemClickAction(view.getContext(), OpenHABMainActivity.this);
+
+                final OpenHABSitemap sitemap = (OpenHABSitemap) adapterView.getItemAtPosition(position);
+                Log.d(TAG, "This is sitemap " + sitemap.getLink());
+                getDrawerLayout().closeDrawers();
+                openSitemap(sitemap.getHomepageLink());
             }
         });
 //        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
@@ -315,7 +327,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         Log.d(TAG, "onResume()");
         super.onResume();
         PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+                this, 0, new Intent(this, OpenHABMainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         if (NfcAdapter.getDefaultAdapter(this) != null)
             NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pendingIntent, null, null);
         if (!TextUtils.isEmpty(mNfcData)) {
@@ -359,7 +371,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         Toast.makeText(getApplicationContext(), message,
                 Toast.LENGTH_LONG).show();
         openHABBaseUrl = baseUrl;
-        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
+        mOpenHABSetting.setBaseUrl(openHABBaseUrl);
         pagerAdapter.setOpenHABBaseUrl(openHABBaseUrl);
         if (!TextUtils.isEmpty(mNfcData)) {
             onNfcTag(mNfcData);
@@ -527,7 +539,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     public void openSitemap(String sitemapUrl) {
         Log.i(TAG, "Opening sitemap at " + sitemapUrl);
         sitemapRootUrl = sitemapUrl;
-        HABApplication.getOpenHABSetting(this).setSitemapRootUrl(sitemapRootUrl);
+        mOpenHABSetting.setSitemapRootUrl(sitemapRootUrl);
         pagerAdapter.clearFragmentList();
         pagerAdapter.openPage(sitemapRootUrl);
         pager.setCurrentItem(0);
@@ -829,7 +841,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     private void launchVoiceRecognition() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         // Specify the calling package to identify your application
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, OpenHABMainActivity.class.getPackage().getName());
         // Display an hint to the user about what he should say.
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "openHAB, at your command!");
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -930,7 +942,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     public void setOpenHABBaseUrl(String openHABBaseUrl) {
         this.openHABBaseUrl = openHABBaseUrl;
-        HABApplication.getOpenHABSetting(this).setBaseUrl(openHABBaseUrl);
+        mOpenHABSetting.setBaseUrl(openHABBaseUrl);
     }
 
     public String getOpenHABUsername() {

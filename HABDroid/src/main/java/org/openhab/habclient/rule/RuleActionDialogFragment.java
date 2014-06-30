@@ -19,12 +19,15 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABItemType;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.util.StringHandler;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItemType;
-import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.rule.RuleAction;
+import org.openhab.domain.rule.RuleActionType;
+import org.openhab.domain.rule.RuleActionValueType;
+import org.openhab.domain.util.StringHandler;
 
 import java.util.List;
 
@@ -48,6 +51,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private RuleOperandDialogFragment.RuleOperationBuildListener mOperationListener;
     private RuleAction mAction;
     private int mPosition;
+    private IOpenHABWidgetProvider mWidgetProvider;
 
     public RuleActionDialogFragment(RuleAction ruleAction, RuleActionDialogFragment.RuleActionBuildListener actionListener, RuleOperandDialogFragment.RuleOperationBuildListener operationListener) {
 //        Bundle bundle = new Bundle();
@@ -70,6 +74,9 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
 
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
+
+        final HABApplication application = (HABApplication) activity.getApplication();
+        mWidgetProvider = application.getOpenHABWidgetProvider();
     }
 
     private View createCustomView(Context context) {
@@ -89,8 +96,8 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                 @Override
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
-                            , mButtonTargetUnit.getText().toString(), 0, mOperationListener);
+                            = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
+                            , mButtonTargetUnit.getText().toString(), 0, false, mOperationListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -100,13 +107,13 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                 @Override
                 public void onClick(View v) {
                     mRuleActionValueType = RuleActionValueType.SOURCE_UNIT;
-                    OpenHABItemType type = HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
-                    List<String> itemNameList = HABApplication.getOpenHABWidgetProvider2().getItemNamesByType(type);
+                    OpenHABItemType type = mWidgetProvider.getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
+                    List<String> itemNameList = mWidgetProvider.getItemNamesByType(type);
                     itemNameList.remove(mAction.getTargetOpenHABItemName());
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
-                            = new UnitOperandSelectionDialogFragment(itemNameList
-                            , mButtonTargetUnit.getText().toString(), 1, mOperationListener);
+                            = UnitOperandSelectionDialogFragment.newInstance(itemNameList
+                            , mButtonTargetUnit.getText().toString(), 1, false, mOperationListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -162,7 +169,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             //Set visibility
             mButtonTargetUnit.setVisibility(View.VISIBLE);
             mTextTargetUnit.setVisibility(View.VISIBLE);
-            mSpinnerValue.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) || AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null? View.GONE : View.VISIBLE) : View.VISIBLE);
+            mSpinnerValue.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) || AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider) == null? View.GONE : View.VISIBLE) : View.VISIBLE);
             mButtonSourceUnit.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName())? View.GONE : View.VISIBLE) : View.VISIBLE);
             mTextSourceUnit.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName())? View.GONE : View.VISIBLE) : View.VISIBLE);
             mTextValueLabel.setVisibility(mAction.getValueType() == RuleActionValueType.TEXT? View.VISIBLE: View.GONE);
@@ -171,20 +178,20 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             //Set content
             if(StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()))
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
-            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName) == null) {
+            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider) == null) {
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
                 mSpinnerValue.setVisibility(View.GONE);
             } else
-                mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.mTargetOpenHABItemName);
-
+                mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider);
+            
             mSpinnerValue.setAdapter(mSpinnerAdapter);
 
-            mTextSourceUnit.setText((StringHandler.isNullOrEmpty(mAction.mSourceOpenHABItemName)? getString(R.string.no_value) : mAction.mSourceOpenHABItemName).toString());
+            mTextSourceUnit.setText((StringHandler.isNullOrEmpty(mAction.getSourceOpenHABItemName())? getString(R.string.no_value) : mAction.getSourceOpenHABItemName()).toString());
 
             mEditTextValue.setSingleLine();
             mEditTextValue.removeTextChangedListener(mTextChangedListener);
-            if(mAction.mTextValue != null)
-                mEditTextValue.setText(mAction.mTextValue);
+            if(mAction.getTextValue() != null)
+                mEditTextValue.setText(mAction.getTextValue());
             else {
                 mEditTextValue.setText("");
                 mEditTextValue.setHint(getString(R.string.no_value));
@@ -201,7 +208,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                         continue;
                     }
 
-            mTextTargetUnit.setText((StringHandler.isNullOrEmpty(mAction.mTargetOpenHABItemName) ? getString(R.string.no_value) : mAction.mTargetOpenHABItemName).toString());
+            mTextTargetUnit.setText((StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) ? getString(R.string.no_value) : mAction.getTargetOpenHABItemName()).toString());
 
         } else if(mAction.getActionType() == RuleActionType.MESSAGE) {
             mButtonTargetUnit.setVisibility(View.GONE);
@@ -213,8 +220,8 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mEditTextValue.setVisibility(View.VISIBLE);
 
             mEditTextValue.setSingleLine(false);
-            if(mAction.mTextValue != null)
-                mEditTextValue.setText(mAction.mTextValue);
+            if(mAction.getTextValue() != null)
+                mEditTextValue.setText(mAction.getTextValue());
             else {
                 mEditTextValue.setText("");
                 mEditTextValue.setHint(getString(R.string.no_value));

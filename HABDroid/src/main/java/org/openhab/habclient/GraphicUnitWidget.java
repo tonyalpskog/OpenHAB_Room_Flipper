@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
@@ -25,25 +25,34 @@ import org.openhab.habdroid.util.AutoRefreshImageView;
  */
 public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnClickListener, View.OnLongClickListener {
 
-    GraphicUnit gUnit;
+    private GraphicUnit gUnit;
+    private HABApplication mApplication;
 
     public GraphicUnitWidget(Context context) {
         super(context);
-    }
 
+        mApplication = (HABApplication) context.getApplicationContext();
+    }
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
         this(context);
+
         gUnit = graphicUnit;
-        String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-        setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(context).getPassword());
+
+        final OpenHABSetting setting = mApplication.getOpenHABSetting();
+        String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+        setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
         setOnLongClickListener(this);
         setOnClickListener(this);
+    }
+
+    public GraphicUnit getgUnit() {
+        return gUnit;
     }
 
     @Override
     public boolean onLongClick(View v) {
        Log.d("G-Click", "Long click detected");
-       if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+       if(mApplication.getAppMode() == ApplicationMode.UnitPlacement) {
            ClipData clipData = ClipData.newPlainText("label","text");
            this.startDrag(clipData, new DragShadow(this), this, 0);
        }
@@ -53,11 +62,11 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     @Override
     public void onClick(View v) {
         Log.d("G-Click", "Short click detected");
-        if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+        if(mApplication.getAppMode() == ApplicationMode.UnitPlacement) {
             Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
             gUnit.setSelected(!gUnit.isSelected());
             Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
-        } else if(HABApplication.getAppMode() == ApplicationMode.RoomFlipper) {
+        } else if(mApplication.getAppMode() == ApplicationMode.RoomFlipper) {
             if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
                 // Get launch intent for application
                 Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);
@@ -96,8 +105,9 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             setImageBitmap(bitmap);
         } else {
 //            setImageBitmap(originalBitmap);
-            String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-            setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(getContext()).getPassword());
+            final OpenHABSetting setting = mApplication.getOpenHABSetting();
+            String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+            setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
         }
     }
 

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.openhab.domain.rule.UnitValueChangedListener;
+
 /**
  * Created by Tony Alpskog in 2014.
  */

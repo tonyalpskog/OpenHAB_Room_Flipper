@@ -17,38 +17,48 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habclient.HABApplication;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.rule.EntityDataTypeSource;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.RuleTreeItem;
+import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RuleOperationFragment extends Fragment implements RuleOperandDialogFragment.RuleOperationBuildListener {
-
     private final String TAG = "RuleOperationFragment";
-    private RuleEditActivity mRuleEditActivity;
+
     private ExpandableMultiLevelGroupAdapter mTreeListAdapter;
     private ExpandableListView mTreeView;
     private HashMap<Integer, RuleTreeItem> mTreeData;
     private RuleTreeItem mSelectedTreeItem;
     private RuleOperation mOperationUnderConstruction;
+    private IOpenHABWidgetProvider mWidgetProvider;
 
-    public static RuleOperationFragment newInstance(RuleEditActivity ruleEditActivity) {
-        RuleOperationFragment fragment = new RuleOperationFragment(ruleEditActivity);
-        return fragment;
+    public static RuleOperationFragment newInstance() {
+        return new RuleOperationFragment();
     }
 
-    public RuleOperationFragment(RuleEditActivity ruleEditActivity) {
-        mRuleEditActivity = ruleEditActivity;
+    public RuleOperationFragment() {
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final HABApplication application = (HABApplication) getActivity().getApplication();
+
+        mWidgetProvider = application.getOpenHABWidgetProvider();
     }
 
 //    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
@@ -69,10 +79,10 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         mTreeView = (ExpandableListView) view.findViewById(R.id.rule_if_tree);
         mTreeData = new HashMap<Integer, RuleTreeItem>();
 
-        mTreeListAdapter = new ExpandableMultiLevelGroupAdapter(mRuleEditActivity, mTreeData);
+        mTreeListAdapter = new ExpandableMultiLevelGroupAdapter(getActivity(), mTreeData);
         mTreeView.setAdapter(mTreeListAdapter);
 
-        updateRuleTree(mRuleEditActivity.getRule().getRuleOperation());
+        updateRuleTree(((RuleEditActivity)getActivity()).getRule().getRuleOperation());
 
         mTreeView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
@@ -83,7 +93,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 // "Group Clicked " + listDataHeader.get(groupPosition),
                 // Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(mRuleEditActivity, "OnGroupClickListener", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "OnGroupClickListener", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -157,7 +167,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             }
         });
 
-        mRuleNameView.setText(mRuleEditActivity.getRuleName());
+        mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
         TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -170,7 +180,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d(HABApplication.getLogTag(), "ruleNameTextWatcher.afterTextChanged = " + s.toString());
-                mRuleEditActivity.setRuleName(s.toString());
+                ((RuleEditActivity)getActivity()).setRuleName(s.toString());
             }
         };
         mRuleNameView.addTextChangedListener(ruleNameTextWatcher);
@@ -178,7 +188,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         setHasOptionsMenu(true);
 
         RuleOperation initialRootOperation = null/*getInitialTreeOperation()*/;//TODO - TA: getInitialTreeOperation is just a time saver for UI test
-        mRuleEditActivity.getRule().setRuleOperation(initialRootOperation);
+        ((RuleEditActivity)getActivity()).getRule().setRuleOperation(initialRootOperation);
 
         return view;
     }
@@ -258,7 +268,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 break;
             case R.id.action_delete_rule_operation_member:
                 //TODO - TA: Implement this.
-                Toast.makeText(mRuleEditActivity, "Not implemented.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
@@ -300,7 +310,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         switch(ruleOperationSelectionInterface) {
             case UNIT:
                 if (getSelectedTreeItem() != null) {
-                    RuleOperation selectedOperation = mRuleEditActivity.getOperationByOperandSourceId(operand.getDataSourceId());
+                    RuleOperation selectedOperation = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(operand.getDataSourceId());
                     selectedOperation.setOperand(operandPosition, operand);
                 } else {
                     if(mOperationUnderConstruction == null)
@@ -308,9 +318,18 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                     mOperationUnderConstruction.setOperand(operandPosition, operand);
                     if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT){
                         if(operandPosition == 0) {
-                            final OperatorSelectionDialogFragment dialogFragment
-                                    = new OperatorSelectionDialogFragment(getActivity(), operand.getDataSourceId()
-                                    , "Select an operator", true, this);
+                            final HABApplication application = (HABApplication) getActivity().getApplication();
+                            final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
+                                    operand.getDataSourceId(),
+                                    false,
+                                    application.getRuleOperationProvider(),
+                                    application.getOpenHABWidgetProvider());
+
+                            final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
+                                    "Select an operator",
+                                    true,
+                                    operatorList);
+
                             dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                         } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
                             openRuleOperandDialogFragment(mOperationUnderConstruction.getOperand(operandPosition + 1), operandPosition + 1, true);
@@ -330,7 +349,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             case OPERATOR:
                 RuleOperation currentOperation;
                 if (getSelectedTreeItem() != null) {
-                    RuleOperation selectedOperation = mRuleEditActivity.getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
+                    RuleOperation selectedOperation = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
                     currentOperation = selectedOperation;
                 } else {
                     currentOperation = mOperationUnderConstruction;
@@ -344,7 +363,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         }
 
         if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
-            mRuleEditActivity.getRule().setRuleOperation(mOperationUnderConstruction);
+            ((RuleEditActivity)getActivity()).getRule().setRuleOperation(mOperationUnderConstruction);
             updateRuleTree(mOperationUnderConstruction);
         }
     }
@@ -357,16 +376,16 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
     public void openOperationBuilderDialog(int aOperandposition, RuleTreeItem selectedTreeItem) {
         RuleTreeItem rti = selectedTreeItem;
-        if (rti == null && mRuleEditActivity.getRule().getRuleOperation() != null) {
+        if (rti == null && ((RuleEditActivity)getActivity()).getRule().getRuleOperation() != null) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
         } else if (rti == null || rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
-            if(rti == null && mOperationUnderConstruction == null && mRuleEditActivity.getRule().getRuleOperation() == null) {
+            if(rti == null && mOperationUnderConstruction == null && ((RuleEditActivity)getActivity()).getRule().getRuleOperation() == null) {
                 final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(null, 0, true, this);
                 dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
                 return;
             }/* else
                 rti = mRule.getRuleOperation().getRuleTreeItem();*///TODO - TA: get current operation and open it up
-            RuleOperation selectedOperation = rti != null? mRuleEditActivity.getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
+            RuleOperation selectedOperation = rti != null? ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
             int operandPosition = aOperandposition;
             if(operandPosition == -1 && selectedOperation.getSourceType() != EntityDataTypeSource.OPERATION) {
                 operandPosition = rti.getPosition();
@@ -379,7 +398,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
         } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
             //TODO - TA: open an operator selection dialog.
-            mRuleEditActivity.getOperatorBySourceId(rti.getItemId());
+            ((RuleEditActivity)getActivity()).getOperatorBySourceId(rti.getItemId());
         }
     }
 
@@ -394,7 +413,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  HABApplication.getRuleOperationProvider(getActivity()).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        HABApplication application = (HABApplication) getActivity().getApplication();
+        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron = new RuleOperation(ror, operandList);
         ron.setName("The is the name of the root operation.");
 
@@ -406,7 +426,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  HABApplication.getRuleOperationProvider(getActivity()).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        HABApplication application = (HABApplication) getActivity().getApplication();
+        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -417,7 +438,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         mTreeData.put(Integer.valueOf(0), ron2.getRuleTreeItem(0));
         mTreeData.put(Integer.valueOf(1), ron3.getRuleTreeItem(1));
 
-        mRuleEditActivity.getRule().setRuleOperation(ron3);
+        ((RuleEditActivity)getActivity()).getRule().setRuleOperation(ron3);
     }
 
     /*
@@ -452,7 +473,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  HABApplication.getRuleOperationProvider(getActivity()).getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        final HABApplication application = (HABApplication) getActivity().getApplication();
+        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -473,8 +495,9 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     }
 
     private RuleOperation getRuleOperation() {
-        RuleOperationProvider rop = HABApplication.getRuleOperationProvider(getActivity());
-        OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0");
+        final HABApplication application = (HABApplication) getActivity().getApplication();
+        RuleOperationProvider rop = application.getRuleOperationProvider();
+        OpenHABWidget widget = mWidgetProvider.getWidgetByID("demo_1_0");
         RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
         return roA;
     }
@@ -485,14 +508,14 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Toilet_1")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("GF_Corridor_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_1")));
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Corridor_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//"demo_1_0"
-                operands.add(UnitEntityDataType.getUnitEntityDataType(HABApplication.getOpenHABWidgetProvider2().getWidgetByID("demo_1_0")));//ekafallettest_1
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//"demo_1_0"
+                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//ekafallettest_1
                 break;
         }
 

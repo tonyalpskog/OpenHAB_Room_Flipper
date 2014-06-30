@@ -10,9 +10,11 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABItem;
-import org.openhab.habdroid.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABItem;
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
 import java.io.UnsupportedEncodingException;
@@ -22,11 +24,13 @@ import java.util.regex.Pattern;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class OpenHABWidgetControl {
+public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
+    private final IOpenHABWidgetProvider mWidgetProvider;
 
-    public OpenHABWidgetControl(Context context) {
+    public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
         mContext = context;
+        mWidgetProvider = widgetProvider;
         mAsyncHttpClient = new MyAsyncHttpClient(context);
     }
 
@@ -40,18 +44,21 @@ public class OpenHABWidgetControl {
         mAsyncHttpClient = asyncHttpClient;
     }
 
+    @Override
     public boolean sendItemCommandFromWidget(String widgetId, String command) {
-        OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId);
+        OpenHABWidget widget = mWidgetProvider.getWidgetByID(widgetId);
         if(widget == null || !widget.hasItem())
             return false;
         sendItemCommand(widget.getItem(), command);
         return true;
     }
 
+    @Override
     public void sendItemCommand(String itemName, String command) {
-        sendItemCommand(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(itemName).getItem(), command);
+        sendItemCommand(mWidgetProvider.getWidgetByItemName(itemName).getItem(), command);
     }
 
+    @Override
     public void sendItemCommand(OpenHABItem item, String command) {
         try {
             Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));

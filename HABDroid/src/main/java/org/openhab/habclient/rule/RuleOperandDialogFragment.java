@@ -13,10 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.habclient.HABApplication;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperator;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -34,6 +37,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private RuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
     private int mPosition;
+    private IOpenHABWidgetProvider mWidgetProvider;
 
     public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton, RuleOperationBuildListener listener) {
 //        Bundle bundle = new Bundle();
@@ -56,6 +60,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
 
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
+
+        final HABApplication application = (HABApplication) activity.getApplication();
+
+        mWidgetProvider = application.getOpenHABWidgetProvider();
 
 //        Injector injector = (Injector) getActivity().getApplication();
 //        injector.inject(this);
@@ -82,7 +90,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 @Override
                 public void onClick(View v) {
                     final UnitOperandSelectionDialogFragment dialogFragment
-                            = new UnitOperandSelectionDialogFragment(HABApplication.getOpenHABWidgetProvider2().getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
+                            = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
                             , mButtonUnit.getText().toString(), mPosition, mShowNextButton, mListener);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
@@ -176,10 +184,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 Value = value;
             }
         }
-        public void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface,
+        public <T> void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface,
                                            RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface,
-                                           IEntityDataType operand,
+                                           IEntityDataType<T> operand,
                                            int operandPosition,
-                                           RuleOperator ruleOperator);
+                                           RuleOperator<T> ruleOperator);
     }
 }
