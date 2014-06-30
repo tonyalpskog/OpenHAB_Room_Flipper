@@ -80,7 +80,7 @@ public class Rule implements OnOperandValueChangedListener {
             return;
 
         for(RuleAction action : mActions) {
-            if(!(StringHandler.isNullOrEmpty(action.mTargetOpenHABItemName) && StringHandler.isNullOrEmpty(action.getCommand())))
+            if(StringHandler.isNullOrEmpty(action.mTargetOpenHABItemName) || StringHandler.isNullOrEmpty(action.getCommand()))
                 continue;
             mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
         }

@@ -153,14 +153,14 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public void runCalculation() {
         if(!isActive()) return;
 
-        Boolean oldValue = getValue();
+        Boolean oldValue = mValue;
 
         if(getRuleOperator() == null) {
             mValue = false;//Missing operator shall result as FALSE.
         } else
             mValue = getRuleOperator().getOperationResult(mOperands);
 
-        if(!oldValue.equals(mValue) && mOnOperandValueChangedListener != null)
+        if(!mValue.equals(oldValue) && mOnOperandValueChangedListener != null)
             mOnOperandValueChangedListener.onOperandValueChanged(this);
     }
 

@@ -43,6 +43,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
             final HABApplication app = (HABApplication) getApplication();
             mRule = new Rule(app.getOpenHABWidgetControl());
             mRule.setName("Initial rule name");
+            mRule.setEnabled(true);
         }
 
         // Set up the action bar.
