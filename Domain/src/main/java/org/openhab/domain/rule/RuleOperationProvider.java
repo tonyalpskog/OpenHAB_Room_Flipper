@@ -45,7 +45,7 @@ public class RuleOperationProvider {
 
         HashMap<RuleOperatorType, RuleOperator<Number>> numberOperatorHash = new HashMap<RuleOperatorType, RuleOperator<Number>>();
 
-        RuleOperator equalNum = new NumberRuleOperator<Number>(RuleOperatorType.Equal, false) {
+        RuleOperator<Number> equalNum = new NumberRuleOperator<Number>(RuleOperatorType.Equal, false) {
             @Override
             public boolean getOperationResult2(List<Number> args) {
                 validateArgumentNumber(args);

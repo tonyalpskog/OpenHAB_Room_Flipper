@@ -8,7 +8,7 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
-import org.openhab.domain.util.RegularExpression;
+import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.GraphicUnit;
 import org.openhab.habclient.HABApplication;
@@ -38,7 +38,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     protected RoomProvider mRoomProvider;
     protected OpenHABWidgetProvider mOpenHABWidgetProvider;
     private final IOpenHABWidgetControl mWidgetControl;
-    private final RegularExpression mRegularExpression;
+    private final IRegularExpression mRegularExpression;
     protected RoomFlipper mRoomFlipper;
     protected TextToSpeechProvider mTextToSpeechProvider;
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
@@ -77,7 +77,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
                            Context context, IOpenHABWidgetControl widgetControl,
-                           RegularExpression regularExpression) {
+                           IRegularExpression regularExpression) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
         mWidgetControl = widgetControl;

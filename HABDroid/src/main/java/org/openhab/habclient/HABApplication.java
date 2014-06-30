@@ -6,6 +6,7 @@ import android.util.Log;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
+import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
@@ -31,7 +32,7 @@ public class HABApplication extends Application {
     private TextToSpeechProvider mTextToSpeechProvider = null;
     private OpenHABWidgetProvider mOpenHABWidgetProvider = null;
     private ICommandAnalyzer mSpeechResultAnalyzer = null;
-    private RegularExpression mRegularExpression = null;
+    private IRegularExpression mRegularExpression = null;
     private OpenHABWidgetControl mOpenHABWidgetControl = null;
     private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
     private ILogger mLogger;
@@ -160,7 +161,7 @@ public class HABApplication extends Application {
         return mRuleOperationProvider;
     }
 
-    public RegularExpression getRegularExpression() {
+    public IRegularExpression getRegularExpression() {
         if(mRegularExpression == null)
             mRegularExpression = new RegularExpression();
 

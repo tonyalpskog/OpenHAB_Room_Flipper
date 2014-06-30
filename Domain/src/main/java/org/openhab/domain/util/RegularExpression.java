@@ -8,11 +8,12 @@ import java.util.regex.Pattern;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RegularExpression {
+public class RegularExpression implements IRegularExpression {
 
     public RegularExpression() {
     }
 
+    @Override
     public RegExResult getAllNextMatchAsList(String regEx, String target, boolean caseInsensitive) {
         RegExResult regExResult = new RegExResult();
         Matcher matcher = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE).matcher(target);
@@ -25,6 +26,7 @@ public class RegularExpression {
         return regExResult;
     }
 
+    @Override
     public RegExAccuracyResult getStringMatchAccuracy(List<String> sourceWordsList, String target) {
         double wordCountAccuracy = 0;
         double orderAccuracy = 0;
@@ -69,6 +71,7 @@ public class RegularExpression {
         return new RegExAccuracyResult(matchingWords, sourceWordsList.size() > 0? (wordCountAccuracy + orderAccuracy + lengthDifferenceAccuracy) / 3 : 0);
     }
 
+    @Override
     public String getRegExStringForMatchAccuracySource(String[] source) {
         StringBuilder sb = new StringBuilder();
         for(String partOfLabel : source)
@@ -77,6 +80,7 @@ public class RegularExpression {
         return sb.toString();
     }
 
+    @Override
     public String getRegExStringForMatchAccuracySource(List<String> source) {
         return getRegExStringForMatchAccuracySource(source.toArray(new String[0]));
     }

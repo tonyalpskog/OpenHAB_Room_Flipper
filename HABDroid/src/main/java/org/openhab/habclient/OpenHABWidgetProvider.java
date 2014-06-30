@@ -8,7 +8,7 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.domain.util.RegularExpression;
+import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
 import org.openhab.domain.util.RegExAccuracyResult;
@@ -26,14 +26,14 @@ import java.util.UUID;
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
-    private final RegularExpression mRegularExpression;
+    private final IRegularExpression mRegularExpression;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private Map<OpenHABItemType, List<String>> mOpenHABItemTypeMap;
     private UUID mUpdateSetUUID;
 
-    public OpenHABWidgetProvider(RegularExpression regularExpression) {
+    public OpenHABWidgetProvider(IRegularExpression regularExpression) {
         mRegularExpression = regularExpression;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
