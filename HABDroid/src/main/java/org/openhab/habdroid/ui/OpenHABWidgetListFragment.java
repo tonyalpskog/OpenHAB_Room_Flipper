@@ -52,7 +52,7 @@ import org.openhab.habclient.HABApplication;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
-import org.openhab.habclient.OpenHABSetting;
+import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.domain.model.OpenHABItem;
@@ -116,7 +116,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
     private int mPosition;
     private int mOldSelectedItem = -1;
 
-    private OpenHABSetting mOpenHABSetting;
+    private IOpenHABSetting mOpenHABSetting;
     private IOpenHABWidgetProvider mWidgetProvider;
 
     @Override

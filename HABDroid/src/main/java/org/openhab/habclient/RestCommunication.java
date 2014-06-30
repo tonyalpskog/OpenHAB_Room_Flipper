@@ -16,20 +16,23 @@ import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class RestCommunication implements IRestCommunication {
     private final ILogger mLogger;
     private final IColorParser mColorParser;
-    private final OpenHABSetting mOpenHABSetting;
+    private final IOpenHABSetting mOpenHABSetting;
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final Context mContext;
 
+    @Inject
     public RestCommunication(Context context,
                              ILogger logger,
                              IColorParser colorParser,
-                             OpenHABSetting openHABSetting,
+                             IOpenHABSetting openHABSetting,
                              IOpenHABWidgetProvider widgetProvider) {
         if(context == null) throw new IllegalArgumentException("context is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");

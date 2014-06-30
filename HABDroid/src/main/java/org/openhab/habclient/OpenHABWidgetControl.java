@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -28,6 +30,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
     private final IOpenHABWidgetProvider mWidgetProvider;
 
+    @Inject
     public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
         mContext = context;
         mWidgetProvider = widgetProvider;

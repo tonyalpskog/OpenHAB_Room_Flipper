@@ -24,12 +24,12 @@ public class GraphicUnit {
     UnitContainerView mRoomView;
     private final IOpenHABWidgetProvider mWidgetProvider;
     private String mWidgetId;
-    private final OpenHABSetting mSetting;
+    private final IOpenHABSetting mSetting;
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
     public GraphicUnit(String widgetId, UnitContainerView roomView,
-                       IOpenHABWidgetProvider widgetProvider, OpenHABSetting setting) {
+                       IOpenHABWidgetProvider widgetProvider, IOpenHABSetting setting) {
         mWidgetId = widgetId;
         mSetting = setting;
         mLatestWidgetUpdateUUID = widgetProvider.getUpdateUUID();

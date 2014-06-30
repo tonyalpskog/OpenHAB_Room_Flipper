@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -44,6 +46,19 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
     protected Map<String, List<OpenHABItemType>> mItemTypeTagMapping = new HashMap<String, List<OpenHABItemType>>();
     protected Map<String, String> mCommandTagsRegex = new HashMap<String, String>();
+
+    @Inject
+    public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
+                           Context context, IOpenHABWidgetControl widgetControl,
+                           IRegularExpression regularExpression) {
+        mRoomProvider = roomProvider;
+        mOpenHABWidgetProvider = openHABWidgetProvider;
+        mWidgetControl = widgetControl;
+        mRegularExpression = regularExpression;
+
+        initializeWidgetTypeTagMapping();
+        initializeCommandTagMapping(context);
+    }
 
     @Override
     public TextToSpeechProvider getTextToSpeechProvider() {
@@ -73,18 +88,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     @Override
     public void setRoomFlipper(RoomFlipper roomFlipper) {
         mRoomFlipper = roomFlipper;
-    }
-
-    public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
-                           Context context, IOpenHABWidgetControl widgetControl,
-                           IRegularExpression regularExpression) {
-        mRoomProvider = roomProvider;
-        mOpenHABWidgetProvider = openHABWidgetProvider;
-        mWidgetControl = widgetControl;
-        mRegularExpression = regularExpression;
-
-        initializeWidgetTypeTagMapping();
-        initializeCommandTagMapping(context);
     }
 
     @Override

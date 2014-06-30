@@ -52,7 +52,7 @@ public class UnitPlacementFragment extends Fragment {
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
     private IOpenHABWidgetProvider mWidgetProvider;
     private IRestCommunication mRestCommunication;
-    private OpenHABSetting mOpenHABSetting;
+    private IOpenHABSetting mOpenHABSetting;
 
     /**
      * Returns a new instance of this fragment for the given section

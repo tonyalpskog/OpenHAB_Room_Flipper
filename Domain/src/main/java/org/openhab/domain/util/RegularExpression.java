@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class RegularExpression implements IRegularExpression {
 
+    @Inject
     public RegularExpression() {
     }
 

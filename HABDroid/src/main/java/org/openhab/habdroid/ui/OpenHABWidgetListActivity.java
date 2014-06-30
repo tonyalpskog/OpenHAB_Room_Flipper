@@ -77,7 +77,8 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.OpenHABSetting;
+import org.openhab.habclient.IOpenHABSetting;
+import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AsyncServiceResolver;
 import org.openhab.habdroid.util.AsyncServiceResolverListener;
@@ -98,6 +99,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.jmdns.ServiceInfo;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -148,8 +150,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	// Enable/disable openHAB discovery
 	private boolean serviceDiscoveryEnabled = true;
 
-    private OpenHABSetting mOpenHABSetting;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
 	/**
 	 * Overriding onStart to enable Google Analytics stats collection
@@ -179,8 +181,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final HABApplication application = (HABApplication) getApplication();
-        mOpenHABSetting = application.getOpenHABSetting();
+        InjectUtils.inject(this);
 
         Log.d("OpenHABWidgetListActivity", "onCreate");
 		// Set default values, false means do it one time during the very first launch

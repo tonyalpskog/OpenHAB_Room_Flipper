@@ -4,7 +4,13 @@ import android.util.Log;
 
 import org.openhab.domain.util.ILogger;
 
+import javax.inject.Inject;
+
 public class AndroidLogger implements ILogger {
+    @Inject
+    public AndroidLogger() {
+    }
+
     @Override
     public void i(String tag, String message) {
         Log.i(tag, message);

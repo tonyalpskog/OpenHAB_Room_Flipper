@@ -7,66 +7,50 @@ import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
-import org.openhab.domain.util.RegularExpression;
-import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.habclient.dagger.AndroidModule;
+import org.openhab.habclient.dagger.ClientModule;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
-import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
-import java.util.Locale;
 import java.util.UUID;
+
+import javax.inject.Inject;
+
+import dagger.ObjectGraph;
 
 /**
  * Created by Tony Alpskog in 2013.
  */
 public class HABApplication extends Application {
 
-    //TA: TODO - Replace all static usage of members and methods. Call HABApplication as (HABApplication)getActivity().getApplication() -> Create a method for this in all classes.
+    @Inject RoomProvider mRoomProvider = null;
+    @Inject RuleOperationProvider mRuleOperationProvider = null;
+    @Inject IRestCommunication mRestCommunication;
+    @Inject TextToSpeechProvider mTextToSpeechProvider;
+    @Inject OpenHABWidgetProvider mOpenHABWidgetProvider;
+    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
+    @Inject IRegularExpression mRegularExpression;
+    @Inject OpenHABWidgetControl mOpenHABWidgetControl;
+    @Inject IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    @Inject ILogger mLogger;
+    @Inject IColorParser mColorParser;
+    @Inject IOpenHABSetting mOpenHABSetting;
 
-    private RoomProvider mRoomProvider = null;
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
-    private RuleOperationProvider mRuleOperationProvider = null;
-    private IRestCommunication mRestCommunication = null;
     private ApplicationMode mAppMode = ApplicationMode.Unknown;
-    private TextToSpeechProvider mTextToSpeechProvider = null;
-    private OpenHABWidgetProvider mOpenHABWidgetProvider = null;
-    private ICommandAnalyzer mSpeechResultAnalyzer = null;
-    private IRegularExpression mRegularExpression = null;
-    private OpenHABWidgetControl mOpenHABWidgetControl = null;
-    private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
-    private ILogger mLogger;
-    private IColorParser mColorParser;
-    private OpenHABSetting mOpenHABSetting;
+    private ObjectGraph mObjectGraph;
 
     public ILogger getLogger() {
-        if(mLogger == null)
-            mLogger = new AndroidLogger();
-
         return mLogger;
     }
 
     public IColorParser getColorParser() {
-        if(mColorParser == null)
-            mColorParser = new ColorParser();
-
         return mColorParser;
     }
 
     public ICommandAnalyzer getSpeechResultAnalyzer() {
-        if(mSpeechResultAnalyzer == null)
-            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(),
-                    getOpenHABWidgetProvider(), getApplicationContext(), getOpenHABWidgetControl(),
-                    getRegularExpression());
-
-        mSpeechResultAnalyzer.setTextToSpeechProvider(getTextToSpeechProvider());
         return mSpeechResultAnalyzer;
-    }
-
-    public TextToSpeechProvider getTextToSpeechProvider() {
-        if(mTextToSpeechProvider == null)
-            mTextToSpeechProvider = new TextToSpeechProvider(getApplicationContext(), Locale.ENGLISH);
-        return mTextToSpeechProvider;
     }
 
     public ApplicationMode getAppMode() {
@@ -78,26 +62,13 @@ public class HABApplication extends Application {
     }
 
     public OpenHABWidgetProvider getOpenHABWidgetProvider() {
-        if(mOpenHABWidgetProvider == null)
-            mOpenHABWidgetProvider = new OpenHABWidgetProvider(getRegularExpression());
-
         return mOpenHABWidgetProvider;
     }
 
     public IRestCommunication getRestCommunication() {
-        if(mRestCommunication == null)
-            mRestCommunication = new RestCommunication(this, getLogger(), getColorParser(),
-                    getOpenHABSetting(),
-                    getOpenHABWidgetProvider());
-
         return mRestCommunication;
     }
-
-
-    public OpenHABSetting getOpenHABSetting() {
-        if(mOpenHABSetting == null)
-            mOpenHABSetting = new OpenHABSetting(this);
-
+    public IOpenHABSetting getOpenHABSetting() {
         return mOpenHABSetting;
     }
 
@@ -147,38 +118,34 @@ public class HABApplication extends Application {
     }
 
     public RoomProvider getRoomProvider() {
-        if(mRoomProvider == null)
-            mRoomProvider = new RoomProvider(getApplicationContext(), getLogger(),
-                    getColorParser(), getOpenHABSetting(), getOpenHABWidgetProvider());
-
         return mRoomProvider;
     }
 
     public RuleOperationProvider getRuleOperationProvider() {
-        if(mRuleOperationProvider == null)
-            mRuleOperationProvider = new RuleOperationProvider();
-
         return mRuleOperationProvider;
     }
 
     public IRegularExpression getRegularExpression() {
-        if(mRegularExpression == null)
-            mRegularExpression = new RegularExpression();
-
         return mRegularExpression;
     }
 
     public OpenHABWidgetControl getOpenHABWidgetControl() {
-        if(mOpenHABWidgetControl == null)
-            mOpenHABWidgetControl = new OpenHABWidgetControl(this, getOpenHABWidgetProvider());
-
         return mOpenHABWidgetControl;
     }
 
     public IWidgetTypeLayoutProvider getWidgetTypeLayoutProvider() {
-        if(mWidgetTypeLayoutProvider == null)
-            mWidgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
-
         return mWidgetTypeLayoutProvider;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        mObjectGraph = ObjectGraph.create(new AndroidModule(this), new ClientModule());
+        inject(this);
+    }
+
+    public void inject(Object object) {
+        mObjectGraph.inject(object);
     }
 }

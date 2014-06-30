@@ -5,6 +5,8 @@ import org.openhab.habdroid.R;
 
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 public class WidgetTypeLayoutProvider implements IWidgetTypeLayoutProvider {
     private static final HashMap<OpenHABWidgetType, WidgetTypeResources> sResources = new HashMap<OpenHABWidgetType, WidgetTypeResources>();
     static {
@@ -27,6 +29,7 @@ public class WidgetTypeLayoutProvider implements IWidgetTypeLayoutProvider {
         sResources.put(OpenHABWidgetType.Color, new WidgetTypeResources(R.layout.openhabwidgetlist_coloritem, -1));
     }
 
+    @Inject
     public WidgetTypeLayoutProvider() {
 
     }

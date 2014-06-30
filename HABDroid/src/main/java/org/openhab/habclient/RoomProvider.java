@@ -21,12 +21,12 @@ public class RoomProvider {
     private Context mContext;
     private final ILogger mLogger;
     private final IColorParser mColorParser;
-    private final OpenHABSetting mOpenHABSetting;
+    private final IOpenHABSetting mOpenHABSetting;
     private final IOpenHABWidgetProvider mWidgetProvider;
     private Room mNewRoom = null;
 
     public RoomProvider(Context context, ILogger logger, IColorParser colorParser,
-                        OpenHABSetting openHABSetting, IOpenHABWidgetProvider widgetProvider) {
+                        IOpenHABSetting openHABSetting, IOpenHABWidgetProvider widgetProvider) {
         mContext = context;
         mLogger = logger;
         mColorParser = colorParser;

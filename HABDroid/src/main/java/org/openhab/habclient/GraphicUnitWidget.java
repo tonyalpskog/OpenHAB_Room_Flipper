@@ -38,7 +38,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
 
         gUnit = graphicUnit;
 
-        final OpenHABSetting setting = mApplication.getOpenHABSetting();
+        final IOpenHABSetting setting = mApplication.getOpenHABSetting();
         String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
         setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
         setOnLongClickListener(this);
@@ -105,7 +105,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             setImageBitmap(bitmap);
         } else {
 //            setImageBitmap(originalBitmap);
-            final OpenHABSetting setting = mApplication.getOpenHABSetting();
+            final IOpenHABSetting setting = mApplication.getOpenHABSetting();
             String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
             setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
         }

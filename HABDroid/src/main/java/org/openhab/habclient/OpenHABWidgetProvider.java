@@ -8,6 +8,7 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
@@ -22,19 +23,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
+    private static final String TAG = "OpenHABWidgetProvider";
     private final IRegularExpression mRegularExpression;
+    private final ILogger mLogger;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private Map<OpenHABItemType, List<String>> mOpenHABItemTypeMap;
     private UUID mUpdateSetUUID;
 
-    public OpenHABWidgetProvider(IRegularExpression regularExpression) {
+    @Inject
+    public OpenHABWidgetProvider(IRegularExpression regularExpression,
+                                 ILogger logger) {
         mRegularExpression = regularExpression;
+        mLogger = logger;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
@@ -112,10 +120,10 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
             if(widget.getType() == OpenHABWidgetType.Group || widget.getType() == OpenHABWidgetType.SitemapText) {
                 String widgetName = (widget.hasLinkedPage()? widget.getLinkedPage().getTitle() : widget.getId());
-                Log.d(HABApplication.getLogTag(), String.format("Setting data for group widget '%s' of type '%s'", widgetName, widget.getType().name()));
+                mLogger.d(TAG, String.format("Setting data for group widget '%s' of type '%s'", widgetName, widget.getType().name()));
             }
 
-            Log.d(HABApplication.getLogTag(), String.format("Setting data for widget '%s' of type '%s'", widget.getId(), widget.getType()));
+            mLogger.d(TAG, String.format("Setting data for widget '%s' of type '%s'", widget.getId(), widget.getType()));
 
             if(!widgetExists) { //Don't add existing widgets to the type<->name_list mapping.
                 //Add widget to widget type mapping

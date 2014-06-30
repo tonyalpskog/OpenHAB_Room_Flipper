@@ -37,8 +37,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.openhab.domain.model.OpenHABSitemap;
+import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.NavDrawerItemType;
-import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
@@ -48,11 +48,11 @@ public class OpenHABDrawerAdapter extends ArrayAdapter<OpenHABSitemap> {
     public static final int TYPE_SITEMAPITEM = 0;
     public static final int TYPES_COUNT = 1;
     private static final String TAG = "OpenHABDrawerAdapter";
-    private final OpenHABSetting mOpenHABSetting;
+    private final IOpenHABSetting mOpenHABSetting;
 
     private LayoutInflater mInflater;
 
-    public OpenHABDrawerAdapter(Context context, int resource, List<OpenHABSitemap> objects, OpenHABSetting openHABSetting) {
+    public OpenHABDrawerAdapter(Context context, int resource, List<OpenHABSitemap> objects, IOpenHABSetting openHABSetting) {
         super(context, resource, objects);
 
         mOpenHABSetting = openHABSetting;
