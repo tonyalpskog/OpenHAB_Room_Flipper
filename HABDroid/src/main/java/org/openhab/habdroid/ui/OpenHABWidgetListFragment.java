@@ -53,6 +53,7 @@ import org.openhab.habclient.HABApplication;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.openhab.habclient.IOpenHABSetting;
+import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.domain.model.OpenHABItem;
@@ -69,6 +70,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * This class is apps' main fragment which displays list of openHAB
@@ -116,14 +119,17 @@ public class OpenHABWidgetListFragment extends ListFragment {
     private int mPosition;
     private int mOldSelectedItem = -1;
 
-    private IOpenHABSetting mOpenHABSetting;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate()");
-        mTag = this;
         super.onCreate(savedInstanceState);
+
+        InjectUtils.inject(this);
+
+        mTag = this;
+        Log.d(TAG, "onCreate()");
 
         final HABApplication application = (HABApplication) getActivity().getApplication();
 

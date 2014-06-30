@@ -2,6 +2,7 @@ package org.openhab.habclient.rule;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -13,9 +14,6 @@ import android.widget.Toast;
 
 import org.openhab.domain.rule.RuleTreeItem;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -25,13 +23,13 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
     int mLevelNumber;
     Context mContext;
 
-    HashMap<Integer, RuleTreeItem> mTreeData;
+    SparseArray<RuleTreeItem> mTreeData;
 
-    public ExpandableMultiLevelGroupAdapter(Context context, HashMap<Integer, RuleTreeItem> treeData) {
+    public ExpandableMultiLevelGroupAdapter(Context context, SparseArray<RuleTreeItem> treeData) {
         this(context, treeData, 1);
     }
 
-    private ExpandableMultiLevelGroupAdapter(Context context, HashMap<Integer, RuleTreeItem> treeData, int levelNumber) {
+    private ExpandableMultiLevelGroupAdapter(Context context, SparseArray<RuleTreeItem> treeData, int levelNumber) {
         mContext = context;
         mTreeData = treeData;
         mLevelNumber = levelNumber;
@@ -74,8 +72,8 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
 //        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         branchView.setLayoutParams(params);
         branchView.setPadding(50, 0, 0, 0);
-        HashMap<Integer, RuleTreeItem> childAsHash = new HashMap<Integer, RuleTreeItem> ();
-        childAsHash.put(Integer.valueOf(0), childItem);
+        SparseArray<RuleTreeItem> childAsHash = new SparseArray<RuleTreeItem>();
+        childAsHash.put(0, childItem);
         branchView.setAdapter(new ExpandableMultiLevelGroupAdapter(mContext, childAsHash, mLevelNumber + 1));
         //branchView.setGroupIndicator(null);
 
@@ -109,9 +107,8 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
         if(treeItem.mChildren.size() < 1)
             return false;
 
-        Iterator<RuleTreeItem> childIterator = treeItem.mChildren.values().iterator();
-        while(childIterator.hasNext()) {
-            if(!childIterator.next().mChildren.isEmpty())
+        for (RuleTreeItem ruleTreeItem : treeItem.mChildren.values()) {
+            if (!ruleTreeItem.mChildren.isEmpty())
                 return true;
         }
 
@@ -164,9 +161,9 @@ public class ExpandableMultiLevelGroupAdapter extends BaseExpandableListAdapter
         return true;
     }
 
-    private HashMap<Integer, RuleTreeItem> getTreeData() {
+    private SparseArray<RuleTreeItem> getTreeData() {
         if(mTreeData == null)
-            mTreeData = new HashMap<Integer, RuleTreeItem>();
+            mTreeData = new SparseArray<RuleTreeItem>();
         return mTreeData;
     }
 

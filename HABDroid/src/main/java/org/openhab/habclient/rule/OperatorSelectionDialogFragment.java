@@ -5,16 +5,18 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.util.StringSelectionDialogFragment;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.rule.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -24,8 +26,8 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
     private Map<String, RuleOperator<?>> mOperatorMap;
     private String mOpenHABItemName;
-    private RuleOperationProvider mRuleOperationProvider;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject RuleOperationProvider mRuleOperationProvider;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
                                                               String dialogTitle,
@@ -50,9 +52,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        HABApplication application = (HABApplication) getActivity().getApplication();
-        mRuleOperationProvider = application.getRuleOperationProvider();
-        mWidgetProvider = application.getOpenHABWidgetProvider();
+        InjectUtils.inject(this);
 
         final Bundle args = getArguments();
         if(args == null)

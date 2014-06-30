@@ -21,11 +21,17 @@ import org.openhab.habclient.RoomConfigFragment;
 import org.openhab.habclient.RoomFlipperFragment;
 import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechService;
+import org.openhab.habclient.UnitPlacementFragment;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
+import org.openhab.habclient.rule.RuleActionDialogFragment;
+import org.openhab.habclient.rule.RuleActionFragment;
+import org.openhab.habclient.rule.RuleOperationFragment;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
+import org.openhab.habdroid.ui.OpenHABWidgetListFragment;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
 import javax.inject.Singleton;
@@ -37,10 +43,16 @@ import dagger.Provides;
 injects = {
         OpenHABMainActivity.class,
         OpenHABWidgetListActivity.class,
+        OpenHABWidgetListFragment.class,
         MainActivity.class,
         RoomConfigActivity.class,
         RoomFlipperFragment.class,
         RoomConfigFragment.class,
+        UnitPlacementFragment.class,
+        OperatorSelectionDialogFragment.class,
+        RuleActionDialogFragment.class,
+        RuleActionFragment.class,
+        RuleOperationFragment.class,
         SpeechService.class,
         HABApplication.class
 })

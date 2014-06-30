@@ -192,7 +192,7 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
                 case 0:
                     return RoomConfigFragment.newInstance();
                 case 1:
-                    return new UnitPlacementFragment(mActivity);
+                    return UnitPlacementFragment.newInstance(0);
             }
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).

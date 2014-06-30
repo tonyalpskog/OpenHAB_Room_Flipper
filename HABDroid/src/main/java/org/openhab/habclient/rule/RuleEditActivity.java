@@ -12,21 +12,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.openhab.habclient.HABApplication;
-import org.openhab.habdroid.R;
+import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperator;
+import org.openhab.habdroid.R;
 
 import java.util.HashMap;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 public class RuleEditActivity extends Activity implements IRuleEditActivity, ActionBar.TabListener {
     private enum RuleActivityMode {
         OPERATION_EDITOR,
-        ACTION_LIST;
+        ACTION_LIST
     }
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -34,6 +36,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private Rule mRule;
     private RuleActivityMode mRuleActivityMode;
     private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
+    @Inject IOpenHABWidgetControl mWidgetControl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +44,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         setContentView(R.layout.activity_rule_edit);
 
         if(mRule == null) {
-            final HABApplication app = (HABApplication) getApplication();
-            mRule = new Rule(app.getOpenHABWidgetControl());
+            mRule = new Rule(mWidgetControl);
             mRule.setName("Initial rule name");
             mRule.setEnabled(true);
         }
@@ -182,7 +184,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
                 case 0:
                     return RuleOperationFragment.newInstance();
                 case 1:
-                    return new RuleActionFragment(mActivity);
+                    return RuleActionFragment.newInstance();
             }
             return null;
         }

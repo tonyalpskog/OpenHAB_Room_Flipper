@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -45,14 +47,13 @@ public class UnitPlacementFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "UnitPlacementFragment";
 
-    private RoomConfigActivity mActivity;
-    private View fragmentView;
     private UnitContainerView roomView;
     private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.ItemText, OpenHABWidgetType.SitemapText, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
-    private IOpenHABWidgetProvider mWidgetProvider;
-    private IRestCommunication mRestCommunication;
-    private IOpenHABSetting mOpenHABSetting;
+
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IRestCommunication mRestCommunication;
+    @Inject IOpenHABSetting mOpenHABSetting;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -64,15 +65,6 @@ public class UnitPlacementFragment extends Fragment {
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public UnitPlacementFragment() {
-        Log.d("LifeCycle", "UnitPlacementFragment(" + (getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : "?") + ") <constructor>");
-    }
-
-    public UnitPlacementFragment(RoomConfigActivity activity) {
-        this();
-        mActivity = activity;
     }
 
     @Override
@@ -92,19 +84,18 @@ public class UnitPlacementFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-        mRestCommunication = application.getRestCommunication();
-        mWidgetProvider = application.getOpenHABWidgetProvider();
-        mOpenHABSetting = application.getOpenHABSetting();
+        InjectUtils.inject(this);
+
+        Log.d("LifeCycle", "UnitPlacementFragment(" + (getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : "?") + ") <constructor>");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Room room = mActivity.getConfigRoom();
+        Room room = ((RoomConfigActivity)getActivity()).getConfigRoom();
         Log.d("LifeCycle", "UnitPlacementFragment.onCreateView() room<" + (room == null? "NULL": room.getId()) + ">");
 
-        fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
         TextView textView = (TextView) fragmentView.findViewById(R.id.room_config_section_label);
         roomView = (UnitContainerView) fragmentView.findViewById(R.id.room_layout);
 
@@ -189,7 +180,7 @@ public class UnitPlacementFragment extends Fragment {
                 break;
             case R.id.action_clone:
                 //TODO: Create and draw a new copy of any current selection.
-                Toast.makeText(mActivity, "Not implemented.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
