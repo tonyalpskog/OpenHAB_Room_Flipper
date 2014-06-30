@@ -35,19 +35,19 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private IEntityDataType mOldOperand;
     private int mPosition;
 
-    public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
+    public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton, RuleOperationBuildListener listener) {
 //        Bundle bundle = new Bundle();
 //        bundle.putInt(ARG_ID, status.value());
 //        this.setArguments(bundle);
         mOldOperand = currentOperand;
         mPosition = position;
         mShowNextButton = showNextButton;
+        mListener = listener;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mListener = (RuleOperationBuildListener) activity;
     }
 
     @Override

@@ -18,17 +18,17 @@ import java.util.Map;
  * Created by Tony Alpskog in 2014.
  */
 public class AdapterProvider {
-    public static List<String> getRuleOperatorList(Context context, String openHABItemName) {
+    public static List<String> getRuleOperatorList(Context context, String openHABItemName, boolean includeNonSelectionValue) {
         HashMap<RuleOperatorType, RuleOperator<?>> operatorHash = HABApplication.getRuleOperationProvider(context).getUnitRuleOperator(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(openHABItemName));
         List<String> adapterList = new ArrayList<String>();
-        adapterList.add(context.getString(R.string.no_value));
+        if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
         for(RuleOperatorType operatorType : operatorHash.keySet())
             adapterList.add(operatorType.getName());
         return adapterList;
     }
 
     public static BaseAdapter getRuleOperatorAdapter(Context context, String openHABItemName) {
-        return new ArrayAdapter(context, android.R.layout.simple_list_item_1, getRuleOperatorList(context, openHABItemName).toArray(new String[0]));
+        return new ArrayAdapter(context, android.R.layout.simple_list_item_1, getRuleOperatorList(context, openHABItemName, true).toArray(new String[0]));
     }
 
     public static BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName) {

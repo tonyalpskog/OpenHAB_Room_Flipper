@@ -1,5 +1,7 @@
 package org.openhab.habclient.rule;
 
+import android.widget.Switch;
+
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.util.StringHandler;
 
@@ -53,7 +55,12 @@ public class RuleAction {
     }
 
     public String getCommand() {
-        return "joo";
+        switch(getValueType()) {
+            case SOURCE_UNIT: return HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(getSourceOpenHABItemName()).getItem().getState();
+            case STATIC: return getStaticValue();
+            case TEXT: return getTextValue();
+            default: return null;
+        }
     }
 
     public RuleActionValueType getValueType() {

@@ -42,8 +42,10 @@ public class Rule implements OnOperandValueChangedListener {
 
     public void setRuleOperation(RuleOperation ruleOperation) {
         mRuleOperation = ruleOperation;
-        if(mRuleOperation != null)
-            ((IRuleOperationOperand)mRuleOperation).setOnOperandValueChangedListener(this);
+        if(mRuleOperation != null) {
+            ((IRuleOperationOperand) mRuleOperation).setOnOperandValueChangedListener(this);
+            getRuleOperation().runCalculation();
+        }
     }
 
     public String getName() {
@@ -82,14 +84,16 @@ public class Rule implements OnOperandValueChangedListener {
             return;
 
         for(RuleAction action : mActions) {
-            if(/*StringHandler.isNullOrEmpty(action.OpenHABItemCommand) || */(StringHandler.isNullOrEmpty(action.mTargetOpenHABItemName)))//TODO - TA: Temporary removed code
+            if(!(StringHandler.isNullOrEmpty(action.mTargetOpenHABItemName) && StringHandler.isNullOrEmpty(action.getCommand())))
                 continue;
-            mOpenHABWidgetControl.sendItemCommand(action.mTargetOpenHABItemName, "ON"/*action.OpenHABItemCommand*/);//TODO - TA: Fix this...
+            mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
         }
     }
 
     public void addAction(RuleAction action) {
         mActions.add(action);
+        if(getRuleOperation() != null)
+            getRuleOperation().runCalculation();
     }
 
     public List<RuleAction> getActions() {

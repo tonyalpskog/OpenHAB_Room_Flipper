@@ -141,12 +141,6 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         //TODO - TA: Update Table, List and UI
     }
 
-    public void showRuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
-        final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
-                currentOperand, position != -1 ? position : 0, showNextButton);
-        dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
-    }
-
     public RuleOperation getOperationByOperandSourceId(String dataSourceId) {
         HashMap<String, RuleOperation> entityMap = getRule().getRuleOperation().getRuleOperationHash();
         return entityMap.get(dataSourceId);

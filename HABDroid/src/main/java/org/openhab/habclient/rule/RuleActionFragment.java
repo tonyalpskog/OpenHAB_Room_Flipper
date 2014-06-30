@@ -251,6 +251,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             mRuleEditActivity.getRule().getActions().remove(actionIndex);
             mRuleEditActivity.getRule().getActions().add(actionIndex, mActionUnderConstruction);
         }
+        if(mRuleEditActivity.getRule().getRuleOperation() != null)
+            mRuleEditActivity.getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code
         mListAdapter.notifyDataSetChanged();
     }
 

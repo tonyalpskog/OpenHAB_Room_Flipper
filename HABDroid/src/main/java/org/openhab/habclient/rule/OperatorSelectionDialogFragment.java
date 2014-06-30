@@ -15,13 +15,11 @@ import java.util.Map;
  */
 public class OperatorSelectionDialogFragment extends StringSelectionDialogFragment {
     Map<String, RuleOperator<?>> mOperatorMap;
+    RuleOperandDialogFragment.RuleOperationBuildListener mListener;
 
-    public OperatorSelectionDialogFragment(Context context, String openHABItemName, String dialogTitle) {
-        this(context, openHABItemName, dialogTitle, false);
-    }
-
-    public OperatorSelectionDialogFragment(Context context, String openHABItemName, String dialogTitle, boolean showNextButton) {
-        super(AdapterProvider.getRuleOperatorList(context, openHABItemName), dialogTitle,showNextButton);
+    public OperatorSelectionDialogFragment(Context context, String openHABItemName, String dialogTitle, boolean showNextButton, RuleOperandDialogFragment.RuleOperationBuildListener listener) {
+        super(AdapterProvider.getRuleOperatorList(context, openHABItemName, false), dialogTitle,showNextButton);
+        mListener = listener;
         mOperatorMap = getRuleOperatorMap(context, openHABItemName);
     }
 
@@ -39,7 +37,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     }
 
     private RuleOperandDialogFragment.RuleOperationBuildListener getListener() {
-        return (RuleOperandDialogFragment.RuleOperationBuildListener) getActivity();
+        return mListener;
     }
 
     @Override

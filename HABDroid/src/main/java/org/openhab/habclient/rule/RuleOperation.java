@@ -20,11 +20,16 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     private RuleOperator mRuleOperator;
     private String mDescription;
 
-    public RuleOperation(String name) {
-        setName(name);
+
+    public RuleOperation() {
         mOperands = new ArrayList<IEntityDataType>();
         mOperands.add(null);
         mDataSourceId = UUID.randomUUID().toString();
+    }
+
+    public RuleOperation(String name) {
+        this();
+        setName(name);
     }
 
     public RuleOperation(RuleOperator ruleOperator, List<IEntityDataType> operands) {
@@ -141,7 +146,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
         return operand == null? false : operand.getSourceType() == EntityDataTypeSource.OPERATION && StringHandler.isNullOrEmpty(operand.getName());
     }
 
-    private void runCalculation() {
+    public void runCalculation() {
         try {
             Boolean oldValue = getValue();
 
