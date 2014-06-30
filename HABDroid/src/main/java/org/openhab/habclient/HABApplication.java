@@ -1,17 +1,16 @@
 package org.openhab.habclient;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.ICommandAnalyzer;
-import org.openhab.domain.util.RegularExpression;
-import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
-import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
+import org.openhab.domain.util.RegularExpression;
+import org.openhab.habclient.command.CommandAnalyzer;
+import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
+import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -26,19 +25,38 @@ public class HABApplication extends Application {
     private RoomProvider mRoomProvider = null;
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
-    private static RuleOperationProvider mRuleOperationProvider = null;
-    private static RestCommunication mRestCommunication = null;
-    private static ApplicationMode mAppMode = ApplicationMode.Unknown;
+    private RuleOperationProvider mRuleOperationProvider = null;
+    private RestCommunication mRestCommunication = null;
+    private ApplicationMode mAppMode = ApplicationMode.Unknown;
     private TextToSpeechProvider mTextToSpeechProvider = null;
-    private static OpenHABWidgetProvider mOpenHABWidgetProvider = null;
-    private static ICommandAnalyzer mSpeechResultAnalyzer = null;
-    private static RegularExpression mRegularExpression = null;
-    private static OpenHABWidgetControl mOpenHABWidgetControl = null;
+    private OpenHABWidgetProvider mOpenHABWidgetProvider = null;
+    private ICommandAnalyzer mSpeechResultAnalyzer = null;
+    private RegularExpression mRegularExpression = null;
+    private OpenHABWidgetControl mOpenHABWidgetControl = null;
     private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    private ILogger mLogger;
+    private IColorParser mColorParser;
+    private OpenHABSetting mOpenHABSetting;
+
+    public ILogger getLogger() {
+        if(mLogger == null)
+            mLogger = new AndroidLogger();
+
+        return mLogger;
+    }
+
+    public IColorParser getColorParser() {
+        if(mColorParser == null)
+            mColorParser = new ColorParser();
+
+        return mColorParser;
+    }
 
     public ICommandAnalyzer getSpeechResultAnalyzer() {
         if(mSpeechResultAnalyzer == null)
-            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(), getOpenHABWidgetProvider(), getApplicationContext(), getOpenHABWidgetControl());
+            mSpeechResultAnalyzer = new CommandAnalyzer(getRoomProvider(),
+                    getOpenHABWidgetProvider(), getApplicationContext(), getOpenHABWidgetControl(),
+                    getRegularExpression());
 
         mSpeechResultAnalyzer.setTextToSpeechProvider(getTextToSpeechProvider());
         return mSpeechResultAnalyzer;
@@ -50,36 +68,35 @@ public class HABApplication extends Application {
         return mTextToSpeechProvider;
     }
 
-    public static ApplicationMode getAppMode() {
+    public ApplicationMode getAppMode() {
         return mAppMode;
     }
 
-    public static void setAppMode(ApplicationMode appMode) {
+    public void setAppMode(ApplicationMode appMode) {
         mAppMode = appMode;
     }
 
     public OpenHABWidgetProvider getOpenHABWidgetProvider() {
-        return getOpenHABWidgetProvider2();
-    }
-
-    public static OpenHABWidgetProvider getOpenHABWidgetProvider2() {
         if(mOpenHABWidgetProvider == null)
-            mOpenHABWidgetProvider = new OpenHABWidgetProvider();
+            mOpenHABWidgetProvider = new OpenHABWidgetProvider(getRegularExpression());
 
         return mOpenHABWidgetProvider;
     }
 
-    public static RestCommunication getRestCommunication() {
+    public RestCommunication getRestCommunication() {
         if(mRestCommunication == null)
-            mRestCommunication = new RestCommunication(new AndroidLogger(), new ColorParser());
+            mRestCommunication = new RestCommunication(this, getLogger(), getColorParser(),
+                    getOpenHABSetting(),
+                    getOpenHABWidgetProvider());
 
         return mRestCommunication;
     }
 
-    private static OpenHABSetting mOpenHABSetting;
-    public static OpenHABSetting getOpenHABSetting(Context context) {
+
+    public OpenHABSetting getOpenHABSetting() {
         if(mOpenHABSetting == null)
-            mOpenHABSetting = new OpenHABSetting(context);
+            mOpenHABSetting = new OpenHABSetting(this);
+
         return mOpenHABSetting;
     }
 
@@ -129,11 +146,9 @@ public class HABApplication extends Application {
     }
 
     public RoomProvider getRoomProvider() {
-        final ILogger logger = new AndroidLogger();
-        final IColorParser colorParser = new ColorParser();
-
         if(mRoomProvider == null)
-            mRoomProvider = new RoomProvider(getApplicationContext(), logger, colorParser);
+            mRoomProvider = new RoomProvider(getApplicationContext(), getLogger(),
+                    getColorParser(), getOpenHABSetting(), getOpenHABWidgetProvider());
 
         return mRoomProvider;
     }
@@ -145,7 +160,7 @@ public class HABApplication extends Application {
         return mRuleOperationProvider;
     }
 
-    public static RegularExpression getRegularExpression() {
+    public RegularExpression getRegularExpression() {
         if(mRegularExpression == null)
             mRegularExpression = new RegularExpression();
 
@@ -154,7 +169,7 @@ public class HABApplication extends Application {
 
     public OpenHABWidgetControl getOpenHABWidgetControl() {
         if(mOpenHABWidgetControl == null)
-            mOpenHABWidgetControl = new OpenHABWidgetControl(this);
+            mOpenHABWidgetControl = new OpenHABWidgetControl(this, getOpenHABWidgetProvider());
 
         return mOpenHABWidgetControl;
     }

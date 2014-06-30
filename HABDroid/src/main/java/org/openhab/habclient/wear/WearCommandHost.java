@@ -82,7 +82,7 @@ public class WearCommandHost {
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
-            mApplication.getSpeechResultAnalyzer().analyzeCommand(replyToBeAnalyzed, HABApplication.getAppMode(), mApplication.getApplicationContext());
+            mApplication.getSpeechResultAnalyzer().analyzeCommand(replyToBeAnalyzed, mApplication.getAppMode(), mApplication.getApplicationContext());
 
             showNotification("Reply", "Hard coded message");
         }

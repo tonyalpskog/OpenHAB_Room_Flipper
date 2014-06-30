@@ -54,7 +54,7 @@ public class OpenHABSetting {
 
     public String getSitemapRootUrl() {return mSitemapRootUrl;}
 
-    public AsyncHttpClient getAsyncHttpClient() {
+    public AsyncHttpClient createAsyncHttpClient() {
         AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(mContext);
         asyncHttpClient.setBasicAuth(mUsername, mPassword);
         return asyncHttpClient;

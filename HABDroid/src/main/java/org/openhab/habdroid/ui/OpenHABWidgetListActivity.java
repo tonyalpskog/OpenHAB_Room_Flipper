@@ -67,6 +67,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABNFCActionList;
@@ -76,6 +77,7 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AsyncServiceResolver;
 import org.openhab.habdroid.util.AsyncServiceResolverListener;
@@ -146,6 +148,9 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	// Enable/disable openHAB discovery
 	private boolean serviceDiscoveryEnabled = true;
 
+    private OpenHABSetting mOpenHABSetting;
+    private IOpenHABWidgetProvider mWidgetProvider;
+
 	/**
 	 * Overriding onStart to enable Google Analytics stats collection
 	 */
@@ -172,7 +177,12 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.d("OpenHABWidgetListActivity", "onCreate");
+        super.onCreate(savedInstanceState);
+
+        final HABApplication application = (HABApplication) getApplication();
+        mOpenHABSetting = application.getOpenHABSetting();
+
+        Log.d("OpenHABWidgetListActivity", "onCreate");
 		// Set default values, false means do it one time during the very first launch
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		// Set non-persistant HABDroid version preference to current version from application package
@@ -203,7 +213,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 //		}
 //		Crittercism.init(getApplicationContext(), "5117659f59e1bd4ba9000004", crittercismConfig);
 		// Initialize activity view
-		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.openhabwidgetlist);
 		// Disable screen timeout if set in preferences
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -224,8 +234,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		openHABUsername = settings.getString("default_openhab_username", null);
 		openHABPassword = settings.getString("default_openhab_password", null);
 
-        HABApplication.getOpenHABSetting(this).setUsername(openHABUsername);
-        HABApplication.getOpenHABSetting(this).setPassword(openHABPassword);
+        mOpenHABSetting.setUsername(openHABUsername);
+        mOpenHABSetting.setPassword(openHABPassword);
 
 		// Create new data source and adapter and set it to list view
         ILogger logger = new AndroidLogger();
@@ -278,15 +288,15 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			}
 			// If we are in demo mode, ignore all settings and use demo url from strings
 			if (settings.getBoolean("default_openhab_demomode", false)) {
-                HABApplication.getOpenHABSetting(this).setBaseUrl(getString(R.string.openhab_demo_url));
-				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                mOpenHABSetting.setBaseUrl(getString(R.string.openhab_demo_url));
+				openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 				Log.i(HABApplication.getLogTag(), "Demo mode, connecting to " + openHABBaseUrl);
 				Toast.makeText(getApplicationContext(), getString(R.string.info_demo_mode),
 					Toast.LENGTH_LONG).show();
 				showWidgetList();
 			} else {
-                HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
-				openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                mOpenHABSetting.setBaseUrl(normalizeUrl(settings.getString("default_openhab_url", "")));
+				openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 				// Check if we have a direct URL in preferences, if yes - use it
 				if (openHABBaseUrl.length() > 0) {
 					Log.i(HABApplication.getLogTag(), "Connecting to configured URL = " + openHABBaseUrl);
@@ -301,14 +311,14 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 					if (activeNetworkInfo != null) {
 						Log.i(HABApplication.getLogTag(), "Network is connected");
 						// If network is mobile, try to use remote URL
-						if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE || serviceDiscoveryEnabled == false) {
+						if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE || !serviceDiscoveryEnabled) {
 							if (!serviceDiscoveryEnabled) {
 								Log.i(HABApplication.getLogTag(), "openHAB discovery is disabled");
 							} else {
 								Log.i(HABApplication.getLogTag(), "Network is Mobile (" + activeNetworkInfo.getSubtypeName() + ")");
 							}
-                            HABApplication.getOpenHABSetting(this).setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
-                            openHABBaseUrl = HABApplication.getOpenHABSetting(this).getBaseUrl();
+                            mOpenHABSetting.setBaseUrl(normalizeUrl(settings.getString("default_openhab_alturl", "")));
+                            openHABBaseUrl = mOpenHABSetting.getBaseUrl();
 							// If remote URL is configured
 							if (openHABBaseUrl.length() > 0) {
 								Toast.makeText(getApplicationContext(), getString(R.string.info_conn_rem_url),
@@ -486,7 +496,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		Log.d(HABApplication.getLogTag(), "displayPageUrl = " + this.displayPageUrl);
 		super.onResume();
 		PendingIntent pendingIntent = PendingIntent.getActivity(
-				  this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				  this, 0, new Intent(this, OpenHABWidgetListActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 		if (NfcAdapter.getDefaultAdapter(this) != null)
 			NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(this, pendingIntent, null, null);
 		if (this.displayPageUrl.length() > 0) {
@@ -656,7 +666,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void processContent(String content) {
         Node rootNode = getRootNode(content);
         openHABWidgetDataSource.setSourceNode(rootNode);
-        HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
+        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         // As we change the page we need to stop all videos on current page
         // before going to the new page. This is quite dirty, but is the only

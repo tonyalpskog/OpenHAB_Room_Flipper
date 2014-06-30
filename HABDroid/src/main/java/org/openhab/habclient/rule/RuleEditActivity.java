@@ -176,7 +176,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new RuleOperationFragment(mActivity);
+                    return RuleOperationFragment.newInstance();
                 case 1:
                     return new RuleActionFragment(mActivity);
             }

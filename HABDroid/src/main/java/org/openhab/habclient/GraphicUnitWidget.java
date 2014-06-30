@@ -1,8 +1,6 @@
 package org.openhab.habclient;
 
-import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,21 +10,18 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import org.openhab.habdroid.R;
-import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
 /**
  * Created by Tony Alpskog in 2013.
  */
-public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnClickListener, View.OnLongClickListener {
+public class GraphicUnitWidget extends AutoRefreshImageView {
 
-    GraphicUnit gUnit;
+    private GraphicUnit gUnit;
 
+    private IGraphicUnitWidgetAdapter mUnitWidgetAdapter;
     public GraphicUnitWidget(Context context) {
         super(context);
     }
@@ -34,48 +29,22 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
         this(context);
         gUnit = graphicUnit;
-        String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-        setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(context).getPassword());
-        setOnLongClickListener(this);
-        setOnClickListener(this);
+
+        final HABApplication application = (HABApplication) context.getApplicationContext();
+        final OpenHABSetting setting = application.getOpenHABSetting();
+        String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+        setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-       Log.d("G-Click", "Long click detected");
-       if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
-           ClipData clipData = ClipData.newPlainText("label","text");
-           this.startDrag(clipData, new DragShadow(this), this, 0);
-       }
-       return false;
+    public GraphicUnit getgUnit() {
+        return gUnit;
     }
 
-    @Override
-    public void onClick(View v) {
-        Log.d("G-Click", "Short click detected");
-        if(HABApplication.getAppMode() == ApplicationMode.UnitPlacement) {
-            Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
-            gUnit.setSelected(!gUnit.isSelected());
-            Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
-        } else if(HABApplication.getAppMode() == ApplicationMode.RoomFlipper) {
-            if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
-                // Get launch intent for application
-                Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);
-                widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
-                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + gUnit.getOpenHABWidget().getLinkedPage().getId() /*GF_Kitchen"*/ /*"https://demo.openhab.org:8443/rest/sitemaps/demo/GF_Kitchen"*/);
-                Log.d(HABApplication.getLogTag(), "SHOW_PAGE_AS_LIST  Intent for: " + "openhab://sitemaps/demo/" + gUnit.getOpenHABWidget().getLinkedPage().getId());
-
-                // Start launch activity
-                getContext().startActivity(widgetListIntent);
-            } else
-                if(gUnit.getOpenHABWidget().getType().HasDynamicControl)
-                    gUnit.getUnitContainerView().drawControlInRoom(gUnit);
-                else
-                    Toast.makeText(getContext(), "Unit action is not (yet) supported for this unit type", Toast.LENGTH_SHORT).show();
-        }
+    public void setAdapter(IGraphicUnitWidgetAdapter adapter) {
+        mUnitWidgetAdapter = adapter;
     }
 
-    public void drawSelection(boolean selected) {
+    public void drawSelection(boolean selected, OpenHABSetting setting) {
         if(selected) {
             Bitmap bitmap = drawableToBitmap(getDrawable()).copy(Bitmap.Config.ARGB_8888, true);
             Rect bounds = getDrawable().getBounds();
@@ -96,8 +65,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             setImageBitmap(bitmap);
         } else {
 //            setImageBitmap(originalBitmap);
-            String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-            setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(getContext()).getPassword());
+            String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+            setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
         }
     }
 

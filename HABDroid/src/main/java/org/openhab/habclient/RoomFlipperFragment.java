@@ -143,7 +143,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public void onResume() {
         super.onResume();
-        HABApplication.setAppMode(ApplicationMode.RoomFlipper);
+        final HABApplication application = (HABApplication) getActivity().getApplication();
+        application.setAppMode(ApplicationMode.RoomFlipper);
         mRoomLabel.setText(mApplication.getFlipperRoom().getName());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
         mWearCommandHost.registerReceiver();

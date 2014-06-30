@@ -45,12 +45,14 @@ import android.widget.ListView;
 
 //import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
+import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.domain.model.OpenHABItem;
@@ -114,11 +116,20 @@ public class OpenHABWidgetListFragment extends ListFragment {
     private int mPosition;
     private int mOldSelectedItem = -1;
 
+    private OpenHABSetting mOpenHABSetting;
+    private IOpenHABWidgetProvider mWidgetProvider;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate()");
         mTag = this;
         super.onCreate(savedInstanceState);
+
+        final HABApplication application = (HABApplication) getActivity().getApplication();
+
+        mOpenHABSetting = application.getOpenHABSetting();
+        mWidgetProvider = application.getOpenHABWidgetProvider();
+
         if (savedInstanceState != null) {
             Log.d(TAG, "restoring state from savedInstanceState");
             displayPageUrl = savedInstanceState.getString("displayPageUrl");
@@ -157,9 +168,9 @@ public class OpenHABWidgetListFragment extends ListFragment {
                 R.layout.openhabwidgetlist_genericitem, widgetList,
                 application.getWidgetTypeLayoutProvider());
         getListView().setAdapter(openHABWidgetAdapter);
-        openHABBaseUrl = HABApplication.getOpenHABSetting(getActivity()).getBaseUrl();
-        openHABUsername = HABApplication.getOpenHABSetting(getActivity()).getUsername();
-        openHABPassword = HABApplication.getOpenHABSetting(getActivity()).getPassword();
+        openHABBaseUrl = mOpenHABSetting.getBaseUrl();
+        openHABUsername = mOpenHABSetting.getUsername();
+        openHABPassword = mOpenHABSetting.getPassword();
         openHABWidgetAdapter.setOpenHABUsername(openHABUsername);
         openHABWidgetAdapter.setOpenHABPassword(openHABPassword);
         openHABWidgetAdapter.setOpenHABBaseUrl(openHABBaseUrl);
@@ -378,7 +389,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
 
         Node rootNode = document.getFirstChild();
         openHABWidgetDataSource.setSourceNode(rootNode);
-        HABApplication.getOpenHABWidgetProvider2().setOpenHABWidgets(openHABWidgetDataSource);
+        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
             // Remove frame widgets with no label text

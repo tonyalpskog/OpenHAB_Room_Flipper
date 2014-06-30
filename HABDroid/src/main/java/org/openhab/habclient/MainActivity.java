@@ -12,13 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.ICommandAnalyzer;
-import org.openhab.habclient.rule.RuleEditActivity;
-
-import org.openhab.habdroid.R;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.habclient.rule.RuleEditActivity;
+import org.openhab.habdroid.R;
 
 import java.util.EnumSet;
 
@@ -34,6 +33,8 @@ public class MainActivity extends Activity
     private RoomFlipperFragment flipperFragment = null;
 
     private ICommandAnalyzer mSpeechResultAnalyzer;
+    private RestCommunication mRestCommunication;
+    private IOpenHABWidgetProvider mWidgetProvider;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -61,12 +62,12 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
         Fragment newFragment = null;
 
-        HABApplication.getRestCommunication().requestOpenHABSitemap(this,  (String) null);
-        for(OpenHABWidget widget : HABApplication.getOpenHABWidgetProvider2().getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+        mRestCommunication.requestOpenHABSitemap((String) null);
+        for(OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
             if(widget == null)
                 Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
             else if(widget.hasChildren())
-                HABApplication.getRestCommunication().requestOpenHABSitemap(this,  widget);
+                mRestCommunication.requestOpenHABSitemap(widget);
         }
 
         switch (position) {
@@ -82,7 +83,7 @@ public class MainActivity extends Activity
                 break;
             case 2:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, RoomConfigFragment.newInstance(((HABApplication) getApplication()).getRoomProvider()))
+                        .replace(R.id.container, RoomConfigFragment.newInstance())
                         .commit();
                 break;
             default:
@@ -167,13 +168,10 @@ public class MainActivity extends Activity
             final HABApplication application = ((HABApplication) getApplication());
 
             if(mSpeechResultAnalyzer == null)
-                mSpeechResultAnalyzer = new CommandAnalyzer(application.getRoomProvider(),
-                        HABApplication.getOpenHABWidgetProvider2(),
-                        getApplicationContext(),
-                        application.getOpenHABWidgetControl());
+                mSpeechResultAnalyzer = application.getSpeechResultAnalyzer();
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
-            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), HABApplication.getAppMode());
+            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), application.getAppMode());
 
             super.onActivityResult(requestCode, resultCode, data);
         }

@@ -37,8 +37,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.openhab.domain.model.OpenHABSitemap;
-import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.NavDrawerItemType;
+import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
@@ -48,12 +48,14 @@ public class OpenHABDrawerAdapter extends ArrayAdapter<OpenHABSitemap> {
     public static final int TYPE_SITEMAPITEM = 0;
     public static final int TYPES_COUNT = 1;
     private static final String TAG = "OpenHABDrawerAdapter";
+    private final OpenHABSetting mOpenHABSetting;
 
     private LayoutInflater mInflater;
 
-    public OpenHABDrawerAdapter(Context context, int resource, List<OpenHABSitemap> objects) {
+    public OpenHABDrawerAdapter(Context context, int resource, List<OpenHABSitemap> objects, OpenHABSetting openHABSetting) {
         super(context, resource, objects);
 
+        mOpenHABSetting = openHABSetting;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -96,12 +98,14 @@ public class OpenHABDrawerAdapter extends ArrayAdapter<OpenHABSitemap> {
         }
 
         if (sitemap.getIcon() != null) {
-            String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + Uri.encode(sitemap.getIcon() + ".png");
+            String iconUrl = mOpenHABSetting.getBaseUrl() + "images/" + Uri.encode(sitemap.getIcon() + ".png");
             holder.drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall,
-                    HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(getContext()).getPassword());
+                    mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
         } else {
-            String iconUrl = HABApplication.getOpenHABSetting(getContext()).getBaseUrl() + "images/" + ".png";
-            holder.drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall, HABApplication.getOpenHABSetting(getContext()).getUsername(), HABApplication.getOpenHABSetting(getContext()).getPassword());
+            String iconUrl = mOpenHABSetting.getBaseUrl() + "images/" + ".png";
+            holder.drawerItemImage.setImageUrl(iconUrl, R.drawable.openhabiconsmall,
+                    mOpenHABSetting.getUsername(),
+                    mOpenHABSetting.getPassword());
         }
         return convertView;
     }

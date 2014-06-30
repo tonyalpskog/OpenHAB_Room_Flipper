@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.util.Log;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
@@ -34,19 +35,26 @@ public class Room {
     private OpenHABWidget mLocalWidget;
     private Context mContext;
     private Integer mBackgroundImageResourceId;
+    private final IOpenHABWidgetProvider mWidgetProvider;
+    private final ILogger mLogger;
+    private final IColorParser mColorParser;
 
     //TA: TODO - Add a second constructor that replaces the Bitmap with an integer (resource ID) in order to save some memory.
-    public Room(String groupItemName, String name, Bitmap roomImage, ILogger logger, IColorParser colorParser) {
-        this(groupItemName, name, logger, colorParser);
+    public Room(String groupItemName, String name, Bitmap roomImage, ILogger logger,
+                IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
+        this(groupItemName, name, logger, colorParser, widgetProvider);
         mBackgroundImage = roomImage;
     }
-    public Room(String groupItemName, String name, int backgroundImageResourceId, Context context, ILogger logger, IColorParser colorParser) {
-        this(groupItemName, name, logger, colorParser);
+    public Room(String groupItemName, String name, int backgroundImageResourceId, Context context,
+                ILogger logger, IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
+        this(groupItemName, name, logger, colorParser, widgetProvider);
         mBackgroundImageResourceId = backgroundImageResourceId;
         mContext = context;
     }
 
-    public Room(String groupItemId, String name, ILogger logger, IColorParser colorParser) {
+    public Room(String groupItemId, String name, ILogger logger, IColorParser colorParser,
+                IOpenHABWidgetProvider widgetProvider) {
+        this(logger, colorParser, widgetProvider);
         mGroupWidgetId = groupItemId;
         if(groupItemId == null || groupItemId.isEmpty())
             mLocalWidget = new OpenHABWidget(logger, colorParser);
@@ -56,10 +64,14 @@ public class Room {
         unitHash = new HashMap<UUID, GraphicUnit>();
     }
 
-    private Room() {}
+    private Room(ILogger logger, IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
+        mLogger = logger;
+        mColorParser = colorParser;
+        mWidgetProvider = widgetProvider;
+    }
 
     public Room shallowClone() {
-        Room copy = new Room();
+        Room copy = new Room(mLogger, mColorParser, mWidgetProvider);
         copy.roomAlignment = (HashMap<Direction, Room>) this.roomAlignment.clone();
         copy.mName = this.mName;
         copy.id = this.id;
@@ -214,7 +226,7 @@ public class Room {
         if(mLocalWidget != null)
             return mLocalWidget;
 
-        return HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mGroupWidgetId);
+        return mWidgetProvider.getWidgetByID(mGroupWidgetId);
     }
 
     private Bitmap adjustOpacity(Bitmap bitmap, int opacity) {

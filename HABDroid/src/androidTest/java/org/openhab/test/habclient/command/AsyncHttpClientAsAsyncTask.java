@@ -13,11 +13,12 @@ import java.net.SocketTimeoutException;
  * Created by Tony Alpskog in 2014.
  */
 public class AsyncHttpClientAsAsyncTask implements IAsyncHttpClientAsAsyncTask {
+
     @Override
     public void doAsync(HABApplication habApplication, final Listener l) {
         Header[] headers = {};
 //        headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
-        AsyncHttpClient asyncHttpClient = habApplication.getOpenHABSetting(habApplication.getApplicationContext()).getAsyncHttpClient();
+        AsyncHttpClient asyncHttpClient = habApplication.getOpenHABSetting().createAsyncHttpClient();
 //        MyAsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(habApplication.getApplicationContext());
         asyncHttpClient.get(habApplication.getApplicationContext(), "https://demo.openhab.org:8443/rest/sitemaps/demo/demo", headers, null, new DocumentHttpResponseHandler() {
             @Override

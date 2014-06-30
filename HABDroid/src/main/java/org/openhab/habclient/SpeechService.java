@@ -331,8 +331,8 @@ public class SpeechService extends Service
                     {
                         Log.e(HABApplication.getLogTag(), "RemoteException: " + e.toString());
                     }
-
-                    mSpeechResultAnalyzer.analyze(matches, HABApplication.getAppMode());
+                    final HABApplication application = (HABApplication) getApplication();
+                    mSpeechResultAnalyzer.analyze(matches, application.getAppMode());
                 } else
                     Log.d(HABApplication.getLogTag(), "Matches = NULL");
             } else

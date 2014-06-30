@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 import org.openhab.domain.rule.RuleOperationProvider;
@@ -24,6 +25,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     private Map<String, RuleOperator<?>> mOperatorMap;
     private String mOpenHABItemName;
     private RuleOperationProvider mRuleOperationProvider;
+    private IOpenHABWidgetProvider mWidgetProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
                                                               String dialogTitle,
@@ -51,6 +53,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
         HABApplication application = (HABApplication) getActivity().getApplication();
         mRuleOperationProvider = application.getRuleOperationProvider();
+        mWidgetProvider = application.getOpenHABWidgetProvider();
 
         final Bundle args = getArguments();
         if(args == null)
@@ -61,7 +64,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     }
 
     public Map<String, RuleOperator<?>> getRuleOperatorMap(String openHABItemName) {
-        HashMap<RuleOperatorType, RuleOperator<?>> operatorTypeHash = mRuleOperationProvider.getUnitRuleOperator(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(openHABItemName));
+        HashMap<RuleOperatorType, RuleOperator<?>> operatorTypeHash = mRuleOperationProvider.getUnitRuleOperator(mWidgetProvider.getWidgetByItemName(openHABItemName));
         HashMap<String, RuleOperator<?>> operatorNameHash = new HashMap<String, RuleOperator<?>>();
         for(RuleOperatorType operatorType : operatorTypeHash.keySet())
             operatorNameHash.put(operatorType.getName(), operatorTypeHash.get(operatorType));

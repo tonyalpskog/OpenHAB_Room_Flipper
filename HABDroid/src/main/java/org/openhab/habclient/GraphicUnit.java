@@ -3,6 +3,7 @@ package org.openhab.habclient;
 import android.content.Context;
 import android.widget.ImageView;
 
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 
@@ -21,14 +22,19 @@ public class GraphicUnit {
     private float roomRelativeY = 0;
     private GraphicUnitWidget mView;
     UnitContainerView mRoomView;
+    private final IOpenHABWidgetProvider mWidgetProvider;
     private String mWidgetId;
+    private final OpenHABSetting mSetting;
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
-    public GraphicUnit(String widgetId, UnitContainerView roomView) {
+    public GraphicUnit(String widgetId, UnitContainerView roomView,
+                       IOpenHABWidgetProvider widgetProvider, OpenHABSetting setting) {
         mWidgetId = widgetId;
-        mLatestWidgetUpdateUUID = HABApplication.getOpenHABWidgetProvider2().getUpdateUUID();
+        mSetting = setting;
+        mLatestWidgetUpdateUUID = widgetProvider.getUpdateUUID();
         mRoomView = roomView;
+        mWidgetProvider = widgetProvider;
 
         mView = null;
         isSelected = false;
@@ -74,7 +80,7 @@ public class GraphicUnit {
         this.isSelected = isSelected;
         if(mView != null) {
             mView.setSelected(isSelected);
-            mView.drawSelection(isSelected);
+            mView.drawSelection(isSelected, mSetting);
         }
     }
 
@@ -107,7 +113,7 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return HABApplication.getOpenHABWidgetProvider2().getWidgetByID(mWidgetId);
+        return mWidgetProvider.getWidgetByID(mWidgetId);
     }
 
     public void setOpenHABWidget(String itemName) {

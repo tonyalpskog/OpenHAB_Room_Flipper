@@ -11,6 +11,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
@@ -25,9 +26,11 @@ import java.util.regex.Pattern;
  */
 public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
+    private final IOpenHABWidgetProvider mWidgetProvider;
 
-    public OpenHABWidgetControl(Context context) {
+    public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
         mContext = context;
+        mWidgetProvider = widgetProvider;
         mAsyncHttpClient = new MyAsyncHttpClient(context);
     }
 
@@ -43,7 +46,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
 
     @Override
     public boolean sendItemCommandFromWidget(String widgetId, String command) {
-        OpenHABWidget widget = HABApplication.getOpenHABWidgetProvider2().getWidgetByID(widgetId);
+        OpenHABWidget widget = mWidgetProvider.getWidgetByID(widgetId);
         if(widget == null || !widget.hasItem())
             return false;
         sendItemCommand(widget.getItem(), command);
@@ -52,7 +55,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
 
     @Override
     public void sendItemCommand(String itemName, String command) {
-        sendItemCommand(HABApplication.getOpenHABWidgetProvider2().getWidgetByItemName(itemName).getItem(), command);
+        sendItemCommand(mWidgetProvider.getWidgetByItemName(itemName).getItem(), command);
     }
 
     @Override
