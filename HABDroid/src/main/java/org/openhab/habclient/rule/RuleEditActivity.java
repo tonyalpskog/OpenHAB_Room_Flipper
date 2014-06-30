@@ -33,6 +33,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private ViewPager mViewPager;
     private Rule mRule;
     private RuleActivityMode mRuleActivityMode;
+    private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +153,14 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public RuleOperation getOperationByOperandSourceId(String dataSourceId) {
         HashMap<String, RuleOperation> entityMap = getRule().getRuleOperation().getRuleOperationHash();
         return entityMap.get(dataSourceId);
+    }
+
+    public RuleOperandDialogFragment.RuleOperationBuildListener getRuleOperationBuildListener() {
+        return mRuleOperationBuildListener;
+    }
+
+    public void setRuleOperationBuildListener(RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener) {
+        this.mRuleOperationBuildListener = mRuleOperationBuildListener;
     }
 
     /**

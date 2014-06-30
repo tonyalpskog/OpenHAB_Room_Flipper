@@ -326,12 +326,11 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                                     false,
                                     application.getRuleOperationProvider(),
                                     application.getOpenHABWidgetProvider());
-
+                            ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
                             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
                                     "Select an operator",
                                     true,
-                                    operatorList,
-                                    this);
+                                    operatorList);
 
                             dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                         } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {

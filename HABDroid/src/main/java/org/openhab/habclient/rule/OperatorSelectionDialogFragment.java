@@ -26,13 +26,11 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     private String mOpenHABItemName;
     private RuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
-    private static RuleOperandDialogFragment.RuleOperationBuildListener mListener;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
                                                               String dialogTitle,
                                                               boolean showNextButton,
-                                                              List<String> ruleOperatorList,
-                                                              RuleOperandDialogFragment.RuleOperationBuildListener listener) {
+                                                              List<String> ruleOperatorList) {
         final OperatorSelectionDialogFragment fragment = new OperatorSelectionDialogFragment();
 
         final Bundle args = new Bundle();
@@ -41,7 +39,6 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
         args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
         args.putString(ARG_OPEN_HAB_ITEM_NAME, openHABItemName);
         fragment.setArguments(args);
-        mListener = listener;
         return fragment;
     }
     @Override
@@ -74,7 +71,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     }
 
     private RuleOperandDialogFragment.RuleOperationBuildListener getListener() {
-        return mListener;
+        return ((RuleEditActivity)getActivity()).getRuleOperationBuildListener();
     }
 
     @Override
