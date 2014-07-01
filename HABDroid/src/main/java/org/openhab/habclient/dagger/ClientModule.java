@@ -31,6 +31,7 @@ import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
 import org.openhab.habclient.rule.RuleEditActivity;
+import org.openhab.habclient.rule.RuleOperandDialogFragment;
 import org.openhab.habclient.rule.RuleOperationFragment;
 import org.openhab.habclient.rule.UnitOperandSelectionDialogFragment;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
@@ -62,6 +63,7 @@ injects = {
         UnitOperandSelectionDialogFragment.class,
         GraphicUnitWidget.class, //TODO: create adapter for this instead
         UnitContainerView.class, //TODO: create adapter for this instead
+        RuleOperandDialogFragment.class,
         SpeechService.class,
         HABApplication.class
 })
