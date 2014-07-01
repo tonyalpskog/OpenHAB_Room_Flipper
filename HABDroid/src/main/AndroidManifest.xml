@@ -84,7 +84,8 @@
         </activity>
         <activity
             android:name="org.openhab.habclient.rule.RuleEditActivity"
-            android:label="@string/title_activity_rule_editor" >
+            android:label="@string/title_activity_rule_editor"
+            android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
             android:name="org.openhab.habclient.RoomConfigActivity"

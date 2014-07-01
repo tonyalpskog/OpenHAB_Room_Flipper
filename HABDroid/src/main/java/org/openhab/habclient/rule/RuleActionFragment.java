@@ -100,7 +100,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openActionBuilderDialog(position);
+                openActionBuilderDialog(position, null);
 //                mSelectedActionPosition = position;
 //                mListView.setItemChecked(position, true);
 
@@ -183,30 +183,30 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit_rule_action:
-                openActionBuilderDialog(mSelectedActionPosition);
+                openActionBuilderDialog(mSelectedActionPosition, null);
                 break;
             case R.id.action_delete_rule_action:
                 //TODO - TA: Implement this.
                 Toast.makeText(mRuleEditActivity, "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_add_rule_command_action:
-                openActionBuilderDialog(-1);
+                openActionBuilderDialog(-1, RuleActionType.COMMAND);
                 break;
             case R.id.action_add_rule_message_action:
-                openActionBuilderDialog(-1);
+                openActionBuilderDialog(-1, RuleActionType.MESSAGE);
                 break;
         }
         return true;
     }
 
-    private void openActionBuilderDialog(int position) {
+    private void openActionBuilderDialog(int position, RuleActionType actionType) {
         mSelectedActionPosition = position;
 
         final IOpenHABWidgetProvider provider = ((HABApplication)getActivity().getApplication()).getOpenHABWidgetProvider();
         if(mSelectedActionPosition > -1)
             mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
         else
-            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND, provider);//TODO - TA: Let the user decide if COMMAND or MESSAGE
+            mActionUnderConstruction = new RuleAction(actionType, provider);
 
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
@@ -251,12 +251,12 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
                 break;
         }
 
-        if (mSelectedActionPosition < 0/*mListView.getSelectedItem() == null*/) {
-            mRuleEditActivity.getRule().getActions().add(mActionUnderConstruction);
+        if (mSelectedActionPosition < 0) {
+            mRuleEditActivity.getRule().getActions().add(action);
         } else {
             int actionIndex = mRuleEditActivity.getRule().getActions().indexOf(/*mListView.getSelectedItem()*/mListAdapter.getItem(mSelectedActionPosition));
             mRuleEditActivity.getRule().getActions().remove(actionIndex);
-            mRuleEditActivity.getRule().getActions().add(actionIndex, mActionUnderConstruction);
+            mRuleEditActivity.getRule().getActions().add(actionIndex, action);
         }
         if(mRuleEditActivity.getRule().getRuleOperation() != null)
             mRuleEditActivity.getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code

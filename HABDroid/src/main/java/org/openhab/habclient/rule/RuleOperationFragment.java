@@ -92,7 +92,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 // Toast.makeText(getApplicationContext(),
                 // "Group Clicked " + listDataHeader.get(groupPosition),
                 // Toast.LENGTH_SHORT).show();
-
+                mSelectedTreeItem = mTreeData.get(Integer.valueOf(groupPosition));
                 Toast.makeText(getActivity(), "OnGroupClickListener", Toast.LENGTH_SHORT).show();
                 return false;
             }
