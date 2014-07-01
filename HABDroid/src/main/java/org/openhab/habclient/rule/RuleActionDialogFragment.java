@@ -96,9 +96,10 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mButtonTargetUnit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(mOperationListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
-                            , mButtonTargetUnit.getText().toString(), 0, false, mOperationListener);
+                            , mButtonTargetUnit.getText().toString(), 0, false);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -111,10 +112,11 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                     OpenHABItemType type = mWidgetProvider.getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
                     List<String> itemNameList = mWidgetProvider.getItemNamesByType(type);
                     itemNameList.remove(mAction.getTargetOpenHABItemName());
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(mOperationListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
                             = UnitOperandSelectionDialogFragment.newInstance(itemNameList
-                            , mButtonTargetUnit.getText().toString(), 1, false, mOperationListener);
+                            , mButtonTargetUnit.getText().toString(), 1, false);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -283,7 +285,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
 
                     mActionListener.onActionBuildResult(RuleActionBuildListener.RuleActionDialogButtonInterface.DONE
                             , mAction.getID(), mRuleActionValueType, value);
-                }
+                }  else throw new IllegalArgumentException("listener is null");
                 break;
         }
     }

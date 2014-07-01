@@ -24,15 +24,13 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     private int mOperandIndex;
-    RuleOperandDialogFragment.RuleOperationBuildListener mListener;
+    private RuleOperandDialogFragment.RuleOperationBuildListener mListener;
 
     public static UnitOperandSelectionDialogFragment newInstance(List<String> source,
                                                               String dialogTitle,
                                                               int position,
-                                                              boolean showNextButton,
-                                                              RuleOperandDialogFragment.RuleOperationBuildListener listener) {
+                                                              boolean showNextButton) {
         final UnitOperandSelectionDialogFragment fragment = new UnitOperandSelectionDialogFragment();
-        fragment.setListener(listener);
 
         final Bundle args = new Bundle();
         args.putStringArrayList(ARG_SOURCE, new ArrayList<String>(source));
@@ -59,35 +57,27 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
             return;
 
         mOperandIndex = args.getInt(ARG_POSITION);
-    }
 
-    public void setListener(RuleOperandDialogFragment.RuleOperationBuildListener listener) {
-        mListener = listener;
-    }
-
-    private RuleOperandDialogFragment.RuleOperationBuildListener getListener() {
-        return mListener;
+        mListener = ((RuleEditActivity)getActivity()).getRuleOperationBuildListener();
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case DialogInterface.BUTTON_POSITIVE:
-            case DialogInterface.BUTTON_NEUTRAL:
-                if(getListener() != null) {
+        if (mListener != null) {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                case DialogInterface.BUTTON_NEUTRAL:
                     final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
                     final IEntityDataType entityDataType = UnitEntityDataType.getUnitEntityDataType(widget);
                     final RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
-                    getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
-                }
-                break;
-            default:
-                if(getListener() != null) {
-                    getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
+                    mListener.onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
+                    break;
+                default:
+                    mListener.onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
                             , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
-                }
-                break;
-        }
+                    break;
+            }
+        } else throw new IllegalArgumentException("listener is null");
     }
 }

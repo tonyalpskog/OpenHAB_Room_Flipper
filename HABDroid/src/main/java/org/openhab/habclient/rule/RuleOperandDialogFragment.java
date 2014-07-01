@@ -79,13 +79,6 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
         mListener = ((RuleEditActivity)activity).getRuleOperationBuildListener();
-//        Injector injector = (Injector) getActivity().getApplication();
-//        injector.inject(this);
-
-//        Bundle args = getArguments();
-//        if(args != null) {
-//            mStatus = CaseTaskStatus.fromId(args.getInt(ARG_ID));
-//        }
     }
 
     private View createCustomView(Context context) {
@@ -103,9 +96,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mButtonUnit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(mListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
-                            , mButtonUnit.getText().toString(), mPosition, mShowNextButton, mListener);
+                            , mButtonUnit.getText().toString(), mPosition, mShowNextButton);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                     dismiss();
                 }
@@ -136,9 +130,6 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
         if(activity == null)
             throw new IllegalStateException("activity is null");
 
-//        final int statusTextId = mStatusTextResourceProvider.getStatusText(mStatus);
-//        final String statusText = getString(statusTextId);
-
         if(mShowNextButton)
             return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0 ? "left" : "right") + " side operand")
                     .setView(createCustomView(activity))
@@ -156,21 +147,21 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        switch (which) {
-            case DialogInterface.BUTTON_POSITIVE://Next
-                if(mListener != null) {
-//                    boolean machineUsable = mCheckMachinceUsable.isChecked();
-//                    boolean liquidsRemoved = mCheckLiquidsRemoved.isChecked();
-//                    String volumeOfLiquids = mEditVolumeOfLiquids.getText().toString();
-//                    String abandonReason = mEditAbandonReason.getText().toString();
-
-//                    mListener.onCheckListSave(mStatus, machineUsable, liquidsRemoved, volumeOfLiquids, abandonReason);
+        if(mListener != null) {
+            switch (which) {
+                case DialogInterface.BUTTON_NEUTRAL: //Done
+                case DialogInterface.BUTTON_POSITIVE://Next
                     mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE
-                            , RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT
-                    , new RuleOperation(mEditNewOperation.getText().toString()), mPosition, null);
-                }
-                break;
-        }
+                            , which == DialogInterface.BUTTON_POSITIVE?  RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT :RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
+                            , new RuleOperation(mEditNewOperation.getText().toString()), mPosition, null);
+                    break;
+                default:
+                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE
+                            , RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                            , null, mPosition, null);
+
+            }
+        } else throw new IllegalArgumentException("listener is null");
     }
 
     public interface RuleOperationBuildListener {
