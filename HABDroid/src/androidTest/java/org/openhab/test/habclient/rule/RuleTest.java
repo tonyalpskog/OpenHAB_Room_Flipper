@@ -1120,67 +1120,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
     }
 
-    public void testDateAfter() {
-        RuleOperator<java.util.Date> roAfter =  ruleOperatorsDate.get(RuleOperatorType.After);
 
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roAfter.getOperationResult(roAfter.parseValue("12:15"));
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roAfter.getOperationResult(roAfter.parseValue("12:15"), roAfter.parseValue("13:30"), roAfter.parseValue("14:45"));
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Date 10:15 after 11:30 = False
-        try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("10:15"), roAfter.parseValue("11:30")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-
-        //Date 11:30 after 10:15 = True
-        try {
-            assertTrue(roAfter.getOperationResult(roAfter.parseValue("11:30"), roAfter.parseValue("10:15")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-
-        //Date Mon 11:30 after Tue 10:15 = False
-        try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-24"), roAfter.parseValue("10:15 2014-03-25")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-
-        //Date Sun 11:30 after Mon 10:15 = False
-        try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-23"), roAfter.parseValue("10:15 2014-03-24")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-
-        //Date Sat 11:30 after Mon 10:15 = False
-        try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("11:30 2014-03-22"), roAfter.parseValue("10:15 2014-03-24")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-
-        //Date Mon 10:30 after Sun 11:15 = False
-        try {
-            assertFalse(roAfter.getOperationResult(roAfter.parseValue("10:30 2014-03-24"), roAfter.parseValue("11:15 2014-03-23")));
-        } catch (Exception e) {
-            assertEquals("Should have returned an instance of java.util.Date", e.toString()/*getClass().getSimpleName()*/);
-        }
-    }
 
 //    public void test_XXX() {
 //        assertEquals("ON", mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName("Light_FF_Child_Ceiling").getItem().getState());
