@@ -1,5 +1,7 @@
 package org.openhab.test.habclient.rule;
 
+import android.test.AndroidTestCase;
+
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
@@ -20,7 +22,6 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
-import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.UnitEntityDataTypeProvider;
 
@@ -32,26 +33,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.MockitoAnnotations.initMocks;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
+public class RuleTest extends AndroidTestCase {
     private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
-    private HABApplication mHABApplication;
+
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
-
-    public RuleTest() {
-        super(HABApplication.class);
-    }
-
     public void setUp() throws Exception {
         super.setUp();
-        initMocks(this);
-        createApplication();
-        mHABApplication = getApplication();
 
         final ILogger logger = new AndroidLogger();
         final IColorParser colorParser = new ColorParser();
