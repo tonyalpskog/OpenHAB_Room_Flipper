@@ -32,6 +32,8 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
 
     @Inject
     public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
+        if(context == null) throw new IllegalArgumentException("context is null");
+        if(widgetProvider == null) throw new IllegalArgumentException("widgetProvider is null");
         mContext = context;
         mWidgetProvider = widgetProvider;
         mAsyncHttpClient = new MyAsyncHttpClient(context);

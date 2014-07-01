@@ -41,6 +41,8 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
                                  ILogger logger) {
+        if(regularExpression == null) throw new IllegalArgumentException("regularExpression is null");
+        if(logger == null) throw new IllegalArgumentException("logger is null");
         mRegularExpression = regularExpression;
         mLogger = logger;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
