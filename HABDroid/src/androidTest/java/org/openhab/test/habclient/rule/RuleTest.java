@@ -111,49 +111,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 //        assertEquals(0, Math.abs(f.doubleValue() - d.doubleValue()));
 //    }
 
-    public void testNumberEqual() {
-        RuleOperator<Number> roEqual =  ruleOperatorsNumeric.get(RuleOperatorType.Equal);
 
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roEqual.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roEqual.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 equals 10 = True
-        assertTrue(roEqual.getOperationResult(10, 10));
-
-        //Integer 10 equals Float 10 = True
-        assertTrue(roEqual.getOperationResult(10, (float) 10));
-
-        //Double 10.1 equals Float 10.1 = True
-        assertTrue(roEqual.getOperationResult(10.1, 10.1f));
-
-        //Integer 9 equals 10 = False
-        assertFalse(roEqual.getOperationResult(9, 10));
-
-        //Float 9 equals 9 = True
-        assertTrue(roEqual.getOperationResult((float) 9, (float) 9));
-
-        //Float 34.7 equals 9 = False
-        assertFalse(roEqual.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 equals 34.7 = True
-        assertTrue(roEqual.getOperationResult(34.7f, 34.7f));
-
-        //Double 10.2 equals 10.2 = True
-        assertTrue(roEqual.getOperationResult(10.2d, 10.2d));
-    }
 
     public void testNumberNotEqual() {
         RuleOperator<Number> roNotEqual =  ruleOperatorsNumeric.get(RuleOperatorType.NotEqual);
