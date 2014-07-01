@@ -14,8 +14,8 @@ public class EqualNode<T> implements IConditionNode {
     }
 
     @Override
-    public boolean evaluate() {
-        return mFirst.getValue().equals(mSecond.getValue());
+    public Boolean evaluate() {
+        return mFirst.evaluate().equals(mSecond.evaluate());
     }
 
 }
