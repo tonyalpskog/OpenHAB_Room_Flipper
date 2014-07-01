@@ -113,49 +113,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
 
 
-    public void testNumberNotEqual() {
-        RuleOperator<Number> roNotEqual =  ruleOperatorsNumeric.get(RuleOperatorType.NotEqual);
 
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roNotEqual.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roNotEqual.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 != 10 = False
-        assertFalse(roNotEqual.getOperationResult(10, 10));
-
-        //Double 10.1 != Float 10.1 = False
-        assertFalse(roNotEqual.getOperationResult(10.1, 10.1f));
-
-        //Integer 9 != 10 = False
-        assertTrue(roNotEqual.getOperationResult(9, 10));
-
-        //Float 9 != 9 = False
-        assertFalse(roNotEqual.getOperationResult((float) 9, (float) 9));
-
-        //Float 34.7 != 9 = True
-        assertTrue(roNotEqual.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 != 34.7 = False
-        assertFalse(roNotEqual.getOperationResult(34.7f, 34.7f));
-
-        //Double 10.2 != 10.2 = False
-        assertFalse(roNotEqual.getOperationResult(10.2, 10.2));
-
-        //Double 10.2 != 10.1 = True
-        assertTrue(roNotEqual.getOperationResult(10.2, 10.1));
-    }
 
     public void testNumberBetween() {
         RuleOperator<Number> roBetween =  ruleOperatorsNumeric.get(RuleOperatorType.Between);
