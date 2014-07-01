@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,12 +21,13 @@ import android.widget.Toast;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperationProvider;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.RuleTreeItem;
 import org.openhab.domain.rule.UnitEntityDataType;
@@ -34,15 +36,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class RuleOperationFragment extends Fragment implements RuleOperandDialogFragment.RuleOperationBuildListener {
     private final String TAG = "RuleOperationFragment";
 
     private ExpandableMultiLevelGroupAdapter mTreeListAdapter;
     private ExpandableListView mTreeView;
-    private HashMap<Integer, RuleTreeItem> mTreeData;
+    private SparseArray<RuleTreeItem> mTreeData;
     private RuleTreeItem mSelectedTreeItem;
     private RuleOperation mOperationUnderConstruction;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public static RuleOperationFragment newInstance() {
         return new RuleOperationFragment();
@@ -56,9 +60,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-
-        mWidgetProvider = application.getOpenHABWidgetProvider();
+        InjectUtils.inject(this);
     }
 
 //    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
@@ -77,7 +79,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         View view = inflater.inflate(R.layout.fragment_rule_operation, container, false);
         EditText mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
         mTreeView = (ExpandableListView) view.findViewById(R.id.rule_if_tree);
-        mTreeData = new HashMap<Integer, RuleTreeItem>();
+        mTreeData = new SparseArray<RuleTreeItem>();
 
         mTreeListAdapter = new ExpandableMultiLevelGroupAdapter(getActivity(), mTreeData);
         mTreeView.setAdapter(mTreeListAdapter);
@@ -276,11 +278,11 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
     public void updateRuleTree(RuleOperation ruleOperationRoot) {
         if(mTreeData == null)
-            mTreeData = new HashMap<Integer, RuleTreeItem>();
+            mTreeData = new SparseArray<RuleTreeItem>();
 
         mTreeData.clear();
         if(ruleOperationRoot != null)
-            mTreeData.put(Integer.valueOf(0), ruleOperationRoot.getRuleTreeItem(0));
+            mTreeData.put(0, ruleOperationRoot.getRuleTreeItem(0));
         mTreeListAdapter.notifyDataSetInvalidated();
     }
 
@@ -346,13 +348,12 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 if(getSelectedTreeItem() != null)
                     addTreeItem(operand);
                 else
-                    addTreeItem(Integer.valueOf(mTreeData.size()), operand.getRuleTreeItem(mTreeData.size()));
+                    addTreeItem(mTreeData.size(), operand.getRuleTreeItem(mTreeData.size()));
                 break;
             case OPERATOR:
                 RuleOperation currentOperation;
                 if (getSelectedTreeItem() != null) {
-                    RuleOperation selectedOperation = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
-                    currentOperation = selectedOperation;
+                    currentOperation = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(getSelectedTreeItem().getItemId());
                 } else {
                     currentOperation = mOperationUnderConstruction;
                 }
@@ -389,8 +390,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 return;
             }/* else
                 rti = mRule.getRuleOperation().getRuleTreeItem();*///TODO - TA: get current operation and open it up
-            RuleOperation selectedOperation = rti != null? ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
-            mOperationUnderConstruction = selectedOperation;
+            mOperationUnderConstruction = rti != null? ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(rti.getItemId()) : mOperationUnderConstruction;
             int operandPosition = aOperandposition;
             if(operandPosition == -1 && mOperationUnderConstruction.getSourceType() != EntityDataTypeSource.OPERATION) {
                 operandPosition = rti.getPosition();
@@ -439,10 +439,10 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         ron3.setName("The is the name of the ron3 rule.");
 
         if(mTreeData == null)
-            mTreeData = new HashMap<Integer, RuleTreeItem>();
+            mTreeData = new SparseArray<RuleTreeItem>();
 
-        mTreeData.put(Integer.valueOf(0), ron2.getRuleTreeItem(0));
-        mTreeData.put(Integer.valueOf(1), ron3.getRuleTreeItem(1));
+        mTreeData.put(0, ron2.getRuleTreeItem(0));
+        mTreeData.put(1, ron3.getRuleTreeItem(1));
 
         ((RuleEditActivity)getActivity()).getRule().setRuleOperation(ron3);
     }
@@ -453,26 +453,26 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     private void prepareMockedListData() {
         // Adding child data
         HashMap<Integer, RuleTreeItem> top250 = new HashMap<Integer, RuleTreeItem>();
-        top250.put(Integer.valueOf(0), new RuleTreeItem(0, "The Shawshank Redemption", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(1), new RuleTreeItem(1, "The Godfather", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(2), new RuleTreeItem(2, "The Godfather: Part II", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(3), new RuleTreeItem(3, "Pulp Fiction", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(4), new RuleTreeItem(4, "The Good, the Bad and the Ugly", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(5), new RuleTreeItem(5, "The Dark Knight", RuleTreeItem.ItemType.OPERAND));
-        top250.put(Integer.valueOf(6), new RuleTreeItem(6, "12 Angry Men", RuleTreeItem.ItemType.OPERAND));
+        top250.put(0, new RuleTreeItem(0, "The Shawshank Redemption", RuleTreeItem.ItemType.OPERAND));
+        top250.put(1, new RuleTreeItem(1, "The Godfather", RuleTreeItem.ItemType.OPERAND));
+        top250.put(2, new RuleTreeItem(2, "The Godfather: Part II", RuleTreeItem.ItemType.OPERAND));
+        top250.put(3, new RuleTreeItem(3, "Pulp Fiction", RuleTreeItem.ItemType.OPERAND));
+        top250.put(4, new RuleTreeItem(4, "The Good, the Bad and the Ugly", RuleTreeItem.ItemType.OPERAND));
+        top250.put(5, new RuleTreeItem(5, "The Dark Knight", RuleTreeItem.ItemType.OPERAND));
+        top250.put(6, new RuleTreeItem(6, "12 Angry Men", RuleTreeItem.ItemType.OPERAND));
 
         HashMap<Integer, RuleTreeItem> thirdLevel = new HashMap<Integer, RuleTreeItem>();
-        thirdLevel.put(Integer.valueOf(0), new RuleTreeItem(0, "Närkontakt", RuleTreeItem.ItemType.OPERAND));
-        thirdLevel.put(Integer.valueOf(1), new RuleTreeItem(1, "Av tredje", RuleTreeItem.ItemType.OPERAND));
-        thirdLevel.put(Integer.valueOf(2), new RuleTreeItem(2, "Graden", RuleTreeItem.ItemType.OPERAND));
+        thirdLevel.put(0, new RuleTreeItem(0, "Närkontakt", RuleTreeItem.ItemType.OPERAND));
+        thirdLevel.put(1, new RuleTreeItem(1, "Av tredje", RuleTreeItem.ItemType.OPERAND));
+        thirdLevel.put(2, new RuleTreeItem(2, "Graden", RuleTreeItem.ItemType.OPERAND));
 
         HashMap<Integer, RuleTreeItem> nowShowing = new HashMap<Integer, RuleTreeItem>();
-        nowShowing.put(Integer.valueOf(0), new RuleTreeItem(0, "The Conjuring", RuleTreeItem.ItemType.OPERAND));
-        nowShowing.put(Integer.valueOf(1), new RuleTreeItem(1, "Despicable Me 2", RuleTreeItem.ItemType.OPERAND));
-        nowShowing.put(Integer.valueOf(2), new RuleTreeItem(2, "Turbo", RuleTreeItem.ItemType.OPERAND));
-        nowShowing.put(Integer.valueOf(3), new RuleTreeItem(3, "Grown Ups 2", RuleTreeItem.ItemType.OPERAND, thirdLevel));
-        nowShowing.put(Integer.valueOf(4), new RuleTreeItem(4, "Red 2", RuleTreeItem.ItemType.OPERAND));
-        nowShowing.put(Integer.valueOf(5), new RuleTreeItem(5, "The Wolverine", RuleTreeItem.ItemType.OPERAND));
+        nowShowing.put(0, new RuleTreeItem(0, "The Conjuring", RuleTreeItem.ItemType.OPERAND));
+        nowShowing.put(1, new RuleTreeItem(1, "Despicable Me 2", RuleTreeItem.ItemType.OPERAND));
+        nowShowing.put(2, new RuleTreeItem(2, "Turbo", RuleTreeItem.ItemType.OPERAND));
+        nowShowing.put(3, new RuleTreeItem(3, "Grown Ups 2", RuleTreeItem.ItemType.OPERAND, thirdLevel));
+        nowShowing.put(4, new RuleTreeItem(4, "Red 2", RuleTreeItem.ItemType.OPERAND));
+        nowShowing.put(5, new RuleTreeItem(5, "The Wolverine", RuleTreeItem.ItemType.OPERAND));
 
         HashMap<Integer, RuleTreeItem> comingSoon = new HashMap<Integer, RuleTreeItem>();
 
@@ -485,27 +485,26 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
 
-        comingSoon.put(Integer.valueOf(0), new RuleTreeItem(0, "Men In Black", RuleTreeItem.ItemType.OPERAND));
-        comingSoon.put(Integer.valueOf(1), ron2.getRuleTreeItem(1));
-        comingSoon.put(Integer.valueOf(2), new RuleTreeItem(2, "The Spectacular Now", RuleTreeItem.ItemType.OPERAND));
-        comingSoon.put(Integer.valueOf(3), ron3.getRuleTreeItem(3));
-        comingSoon.put(Integer.valueOf(4), new RuleTreeItem(4, "Europa Report", RuleTreeItem.ItemType.OPERAND));
-        comingSoon.put(Integer.valueOf(5), new RuleTreeItem(5, "Apocalypse Now", RuleTreeItem.ItemType.OPERAND));
+        comingSoon.put(0, new RuleTreeItem(0, "Men In Black", RuleTreeItem.ItemType.OPERAND));
+        comingSoon.put(1, ron2.getRuleTreeItem(1));
+        comingSoon.put(2, new RuleTreeItem(2, "The Spectacular Now", RuleTreeItem.ItemType.OPERAND));
+        comingSoon.put(3, ron3.getRuleTreeItem(3));
+        comingSoon.put(4, new RuleTreeItem(4, "Europa Report", RuleTreeItem.ItemType.OPERAND));
+        comingSoon.put(5, new RuleTreeItem(5, "Apocalypse Now", RuleTreeItem.ItemType.OPERAND));
 
         if(mTreeData == null)
-            mTreeData = new HashMap<Integer, RuleTreeItem>();
+            mTreeData = new SparseArray<RuleTreeItem>();
 
-        mTreeData.put(Integer.valueOf(0), new RuleTreeItem(0, "Top 250", RuleTreeItem.ItemType.OPERAND, top250));
-        mTreeData.put(Integer.valueOf(1), new RuleTreeItem(1, "Now Showing", RuleTreeItem.ItemType.OPERAND, nowShowing));
-        mTreeData.put(Integer.valueOf(2), new RuleTreeItem(2, "Coming Soon...", RuleTreeItem.ItemType.OPERAND, comingSoon));
+        mTreeData.put(0, new RuleTreeItem(0, "Top 250", RuleTreeItem.ItemType.OPERAND, top250));
+        mTreeData.put(1, new RuleTreeItem(1, "Now Showing", RuleTreeItem.ItemType.OPERAND, nowShowing));
+        mTreeData.put(2, new RuleTreeItem(2, "Coming Soon...", RuleTreeItem.ItemType.OPERAND, comingSoon));
     }
 
     private RuleOperation getRuleOperation() {
         final HABApplication application = (HABApplication) getActivity().getApplication();
         RuleOperationProvider rop = application.getRuleOperationProvider();
         OpenHABWidget widget = mWidgetProvider.getWidgetByID("demo_1_0");
-        RuleOperation roA = new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
-        return roA;
+        return new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {

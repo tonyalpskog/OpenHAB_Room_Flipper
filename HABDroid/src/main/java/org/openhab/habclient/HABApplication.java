@@ -111,12 +111,12 @@ public class HABApplication extends Application {
 
     private Room getRoom(UUID roomId) {
         if(roomId == null)
-            return getRoomProvider().getInitialRoom();
+            return mRoomProvider.getInitialRoom();
         else
-            return getRoomProvider().get(roomId);
+            return mRoomProvider.get(roomId);
     }
 
-    public RoomProvider getRoomProvider() {
+    public IRoomProvider getRoomProvider() {
         return mRoomProvider;
     }
 

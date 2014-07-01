@@ -15,11 +15,13 @@ import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habdroid.R;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -37,7 +39,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private RuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
     private int mPosition;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton, RuleOperationBuildListener listener) {
 //        Bundle bundle = new Bundle();
@@ -58,12 +60,11 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        InjectUtils.inject(this);
+
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
 
-        final HABApplication application = (HABApplication) activity.getApplication();
-
-        mWidgetProvider = application.getOpenHABWidgetProvider();
 
 //        Injector injector = (Injector) getActivity().getApplication();
 //        injector.inject(this);

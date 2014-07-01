@@ -15,6 +15,8 @@ import org.openhab.habdroid.R;
 
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 public class RoomConfigActivity extends Activity implements ActionBar.TabListener {
 
     /**
@@ -34,9 +36,14 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
 
     private Room mConfigRoom;
 
+    @Inject IRoomProvider mRoomProvider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        InjectUtils.inject(this);
+
         setContentView(R.layout.activity_room_config);
 
         // Set up the action bar.
@@ -131,8 +138,8 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
         Room roomToBeEdited = ((HABApplication)getApplication()).getConfigRoom();
 
         if(roomToBeEdited == null)
-            mConfigRoom = ((HABApplication)getApplication()).getRoomProvider().createNewRoom();
-        else if(roomToBeEdited != null)
+            mConfigRoom = mRoomProvider.createNewRoom();
+        else
             mConfigRoom = roomToBeEdited;
 
         return mConfigRoom;
@@ -185,7 +192,7 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
                 case 0:
                     return RoomConfigFragment.newInstance();
                 case 1:
-                    return new UnitPlacementFragment(mActivity);
+                    return UnitPlacementFragment.newInstance(0);
             }
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).

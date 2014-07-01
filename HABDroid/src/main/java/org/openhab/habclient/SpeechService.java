@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.PowerManager;
 import android.os.RemoteException;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -22,6 +21,8 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -36,23 +37,21 @@ public class SpeechService extends Service
     protected boolean mIsListening;
     protected volatile boolean mIsCountDownOn;
 
-    protected ICommandAnalyzer mSpeechResultAnalyzer;
+    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
 
-    static final int MSG_RECOGNIZER_START_LISTENING = 1;
-    static final int MSG_RECOGNIZER_CANCEL = 2;
-
-    protected PowerManager.WakeLock mWakeLock;
+    private static final int MSG_RECOGNIZER_START_LISTENING = 1;
+    private static final int MSG_RECOGNIZER_CANCEL = 2;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+
+        InjectUtils.inject(this);
+
         Log.d(HABApplication.getLogTag(), "SpeechService created");
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        mSpeechResultAnalyzer = ((HABApplication) getApplication()).getSpeechResultAnalyzer();
-
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mSpeechRecognizer.setRecognitionListener(new SpeechRecognitionListener());
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);

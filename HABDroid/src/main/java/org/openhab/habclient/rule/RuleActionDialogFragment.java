@@ -22,14 +22,16 @@ import android.widget.TextView;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habdroid.R;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.util.StringHandler;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habdroid.R;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -51,7 +53,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private RuleOperandDialogFragment.RuleOperationBuildListener mOperationListener;
     private RuleAction mAction;
     private int mPosition;
-    private IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public RuleActionDialogFragment(RuleAction ruleAction, RuleActionDialogFragment.RuleActionBuildListener actionListener, RuleOperandDialogFragment.RuleOperationBuildListener operationListener) {
 //        Bundle bundle = new Bundle();
@@ -72,11 +74,10 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        InjectUtils.inject(this);
+
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
-
-        final HABApplication application = (HABApplication) activity.getApplication();
-        mWidgetProvider = application.getOpenHABWidgetProvider();
     }
 
     private View createCustomView(Context context) {

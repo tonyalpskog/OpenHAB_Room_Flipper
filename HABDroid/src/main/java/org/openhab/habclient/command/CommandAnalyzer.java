@@ -9,17 +9,17 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.util.IRegularExpression;
+import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.GraphicUnit;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.RoomFlipper;
-import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechAnalyzerResult;
 import org.openhab.habclient.TextToSpeechProvider;
 import org.openhab.habdroid.R;
-import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ import javax.inject.Inject;
  */
 public class CommandAnalyzer implements ICommandAnalyzer {
 
-    protected RoomProvider mRoomProvider;
+    protected IRoomProvider mRoomProvider;
     protected OpenHABWidgetProvider mOpenHABWidgetProvider;
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
@@ -48,7 +48,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     protected Map<String, String> mCommandTagsRegex = new HashMap<String, String>();
 
     @Inject
-    public CommandAnalyzer(RoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
+    public CommandAnalyzer(IRoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
                            Context context, IOpenHABWidgetControl widgetControl,
                            IRegularExpression regularExpression) {
         mRoomProvider = roomProvider;
@@ -76,7 +76,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     @Override
-    public RoomProvider getRoomProvider() {
+    public IRoomProvider getRoomProvider() {
         return mRoomProvider;
     }
 
@@ -103,7 +103,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         List<Room> roomList = new ArrayList<Room>();
 
         if(mRoomProvider != null)
-            roomList.addAll(mRoomProvider.roomHash.values());
+            roomList.addAll(mRoomProvider.getRoomHash().values());
 
         Iterator<Room> iterator = roomList.iterator();
         Map<String, Room> roomNameMap = new HashMap<String, Room>();
@@ -222,7 +222,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         List<Room> roomList = new ArrayList<Room>();
 
         if(mRoomProvider != null)
-            roomList.addAll(mRoomProvider.roomHash.values());
+            roomList.addAll(mRoomProvider.getRoomHash().values());
 
         Iterator<Room> iterator = roomList.iterator();
         Map<String, Room> roomNameMap = new HashMap<String, Room>();

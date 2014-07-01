@@ -25,24 +25,18 @@ import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
-import org.openhab.domain.rule.RuleOperator;
+import org.openhab.domain.rule.operators.RuleOperator;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 
     private final String TAG = "RuleActionFragment";
-    private RuleEditActivity mRuleEditActivity;
     private ListView mListView;
     private ArrayAdapter<RuleAction> mListAdapter;
     private int mSelectedActionPosition = -1;
     private RuleAction mActionUnderConstruction;
 
-    public static RuleActionFragment newInstance(RuleEditActivity ruleEditActivity) {
-        RuleActionFragment fragment = new RuleActionFragment(ruleEditActivity);
-        return fragment;
-    }
-
-    public RuleActionFragment(RuleEditActivity ruleEditActivity) {
-        mRuleEditActivity = ruleEditActivity;
+    public static RuleActionFragment newInstance() {
+        return new RuleActionFragment();
     }
 
     @Override
@@ -67,11 +61,11 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         EditText mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
         mListView = (ListView) view.findViewById(R.id.rule_then_list);
 
-        mListAdapter = new ArrayAdapter<RuleAction>(getActivity(), android.R.layout.simple_list_item_1, mRuleEditActivity.getRule().getActions());
+        mListAdapter = new ArrayAdapter<RuleAction>(getActivity(), android.R.layout.simple_list_item_1, ((RuleEditActivity)getActivity()).getRule().getActions());
         mListView.setAdapter(mListAdapter);
 
         setHasOptionsMenu(true);
-        mRuleNameView.setText(mRuleEditActivity.getRuleName());
+        mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
         TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -84,7 +78,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d(HABApplication.getLogTag(), "ruleNameTextWatcher.afterTextChanged = " + s.toString());
-                mRuleEditActivity.setRuleName(s.toString());
+                ((RuleEditActivity)getActivity()).setRuleName(s.toString());
             }
         };
         mRuleNameView.addTextChangedListener(ruleNameTextWatcher);
@@ -187,7 +181,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
                 break;
             case R.id.action_delete_rule_action:
                 //TODO - TA: Implement this.
-                Toast.makeText(mRuleEditActivity, "Not implemented.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_add_rule_command_action:
                 openActionBuilderDialog(-1, RuleActionType.COMMAND);
@@ -252,14 +246,14 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         }
 
         if (mSelectedActionPosition < 0) {
-            mRuleEditActivity.getRule().getActions().add(action);
+            ((RuleEditActivity)getActivity()).getRule().getActions().add(action);
         } else {
-            int actionIndex = mRuleEditActivity.getRule().getActions().indexOf(/*mListView.getSelectedItem()*/mListAdapter.getItem(mSelectedActionPosition));
-            mRuleEditActivity.getRule().getActions().remove(actionIndex);
-            mRuleEditActivity.getRule().getActions().add(actionIndex, action);
+            int actionIndex = ((RuleEditActivity)getActivity()).getRule().getActions().indexOf(/*mListView.getSelectedItem()*/mListAdapter.getItem(mSelectedActionPosition));
+            ((RuleEditActivity)getActivity()).getRule().getActions().remove(actionIndex);
+            ((RuleEditActivity)getActivity()).getRule().getActions().add(actionIndex, action);
         }
-        if(mRuleEditActivity.getRule().getRuleOperation() != null)
-            mRuleEditActivity.getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code
+        if(((RuleEditActivity)getActivity()).getRule().getRuleOperation() != null)
+            ((RuleEditActivity)getActivity()).getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code
         mListAdapter.notifyDataSetChanged();
     }
 

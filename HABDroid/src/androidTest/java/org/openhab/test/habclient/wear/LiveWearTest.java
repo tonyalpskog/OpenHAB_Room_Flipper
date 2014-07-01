@@ -14,11 +14,8 @@ public class LiveWearTest extends android.test.ApplicationTestCase<HABApplicatio
         super(HABApplication.class);
     }
 
-    public void setUp() {
-        try {
-            super.setUp();
-        } catch (Exception e) {
-        }
+    public void setUp() throws Exception {
+        super.setUp();
         createApplication();
         mHABApplication = getApplication();
 

@@ -21,4 +21,9 @@ public final class InjectUtils {
         final HABApplication application = (HABApplication) fragment.getActivity().getApplication();
         application.inject(fragment);
     }
+
+    public static void inject(android.support.v4.app.Fragment fragment) {
+        final HABApplication application = (HABApplication) fragment.getActivity().getApplication();
+        application.inject(fragment);
+    }
 }
