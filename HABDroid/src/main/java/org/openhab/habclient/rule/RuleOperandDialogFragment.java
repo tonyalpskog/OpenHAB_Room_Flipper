@@ -21,6 +21,8 @@ import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 /**
@@ -28,6 +30,10 @@ import javax.inject.Inject;
  */
 public class RuleOperandDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
     private static final String ARG_ID = "operand";
+    //    protected static final String ARG_DIALOG_TITLE = "dialogTitle";
+    protected static final String ARG_POSITION = "mPosition";
+    protected static final String ARG_SHOW_NEXT_BUTTON = "showNextButton";
+
     private Button mButtonUnit;
     private TextView mTextUnit;
     private Button mButtonOperation;
@@ -37,18 +43,19 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private boolean mShowNextButton;
 
     private RuleOperationBuildListener mListener;
-    private IEntityDataType mOldOperand;
+    @Inject IEntityDataType mOldOperand;
     private int mPosition;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
-    public RuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton, RuleOperationBuildListener listener) {
-//        Bundle bundle = new Bundle();
-//        bundle.putInt(ARG_ID, status.value());
-//        this.setArguments(bundle);
-        mOldOperand = currentOperand;
-        mPosition = position;
-        mShowNextButton = showNextButton;
-        mListener = listener;
+    public static RuleOperandDialogFragment newInstance(int position, boolean showNextButton) {
+        final RuleOperandDialogFragment fragment = new RuleOperandDialogFragment();
+
+        final Bundle args = new Bundle();
+//        args.putString(ARG_DIALOG_TITLE, dialogTitle);
+        args.putInt(ARG_POSITION, position);
+        args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -62,10 +69,16 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
 
         InjectUtils.inject(this);
 
+        final Bundle args = getArguments();
+        if(args == null)
+            return;
+
+        mPosition = args.getInt(ARG_POSITION);
+        mShowNextButton = args.getBoolean(ARG_SHOW_NEXT_BUTTON);
+
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
-
-
+        mListener = ((RuleEditActivity)activity).getRuleOperationBuildListener();
 //        Injector injector = (Injector) getActivity().getApplication();
 //        injector.inject(this);
 

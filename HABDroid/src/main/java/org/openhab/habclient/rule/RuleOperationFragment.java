@@ -374,8 +374,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     }
 
     public void openRuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
-        final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
-                currentOperand, position != -1 ? position : 0, showNextButton, this);
+        final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(
+                /*currentOperand, */position != -1 ? position : 0, showNextButton);
         dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
     }
 
@@ -385,7 +385,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
         } else if (rti == null || rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
             if(rti == null && mOperationUnderConstruction == null && ((RuleEditActivity)getActivity()).getRule().getRuleOperation() == null) {
-                final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(null, 0, true, this);
+                final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(/*null, */0, true);
                 dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
                 return;
             }/* else
@@ -398,9 +398,10 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 operandPosition = 0;
             }
             mOperationUnderConstruction.setActive(false);
-            final RuleOperandDialogFragment dialogFragment = new RuleOperandDialogFragment(
-                    mOperationUnderConstruction.getOperand(operandPosition)
-                    , operandPosition != -1 ? operandPosition : 0, operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()), this);
+            final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(
+                    /*mOperationUnderConstruction.getOperand(operandPosition)
+                    , */operandPosition != -1 ? operandPosition : 0
+                    , operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()));
             dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
         } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
             //TODO - TA: open an operator selection dialog.
