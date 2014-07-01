@@ -14,8 +14,8 @@ public class LessThanNumberNode implements IConditionNode {
     }
 
     @Override
-    public boolean evaluate() {
-        return mFirst.getValue().doubleValue() < mSecond.getValue().doubleValue();
+    public Boolean evaluate() {
+        return mFirst.evaluate().doubleValue() < mSecond.evaluate().doubleValue();
     }
 
 }

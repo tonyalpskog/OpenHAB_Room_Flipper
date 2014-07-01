@@ -13,7 +13,7 @@ public class AndNode implements IConditionNode {
     }
 
     @Override
-    public boolean evaluate() {
+    public Boolean evaluate() {
         return mLeft.evaluate() && mRight.evaluate();
     }
 

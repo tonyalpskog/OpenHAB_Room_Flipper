@@ -16,8 +16,8 @@ public class BeforeDateNode implements IConditionNode {
     }
 
     @Override
-    public boolean evaluate() {
-        return mFirst.getValue().before(mSecond.getValue());
+    public Boolean evaluate() {
+        return mFirst.evaluate().before(mSecond.evaluate());
     }
 
 }
