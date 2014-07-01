@@ -43,35 +43,33 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-//import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
-
-import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.habclient.AndroidLogger;
-import org.openhab.habclient.ColorParser;
-import org.openhab.habclient.HABApplication;
-
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
-import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.InjectUtils;
-import org.openhab.habdroid.R;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABNFCActionList;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
-import org.openhab.habdroid.util.Util;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IOpenHABSetting;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habdroid.R;
+import org.openhab.habdroid.core.DocumentHttpResponseHandler;
+import org.openhab.habdroid.util.MyAsyncHttpClient;
+import org.openhab.habdroid.util.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+
+//import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
 /**
  * This class is apps' main fragment which displays list of openHAB
@@ -121,6 +119,9 @@ public class OpenHABWidgetListFragment extends ListFragment {
 
     @Inject IOpenHABSetting mOpenHABSetting;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IWidgetTypeLayoutProvider mWidgetLayoutProvider;
+    @Inject ILogger mLogger;
+    @Inject IColorParser mColorParser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -166,13 +167,10 @@ public class OpenHABWidgetListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated()");
         mActivity = (OpenHABMainActivity)getActivity();
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-        final ILogger logger = new AndroidLogger();
-        final IColorParser colorParser = new ColorParser();
-        openHABWidgetDataSource = new OpenHABWidgetDataSource(logger, colorParser);
+        openHABWidgetDataSource = new OpenHABWidgetDataSource(mLogger, mColorParser);
         openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(getActivity(),
                 R.layout.openhabwidgetlist_genericitem, widgetList,
-                application.getWidgetTypeLayoutProvider());
+                mWidgetLayoutProvider);
         getListView().setAdapter(openHABWidgetAdapter);
         openHABBaseUrl = mOpenHABSetting.getBaseUrl();
         openHABUsername = mOpenHABSetting.getUsername();
@@ -257,7 +255,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
         if (activity instanceof OnWidgetSelectedListener) {
             widgetSelectedListener = (OnWidgetSelectedListener)activity;
             mActivity = (OpenHABMainActivity)activity;
-            mAsyncHttpClient = mActivity.getAsyncHttpClient();
+            mAsyncHttpClient = OpenHABMainActivity.getAsyncHttpClient();
         } else {
             Log.e(HABApplication.getLogTag(), "Attached to incompatible activity");
         }

@@ -27,6 +27,7 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
+import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.rule.RuleOperationFragment;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -53,6 +54,7 @@ injects = {
         RuleActionDialogFragment.class,
         RuleActionFragment.class,
         RuleOperationFragment.class,
+        RuleEditActivity.class,
         SpeechService.class,
         HABApplication.class
 })
