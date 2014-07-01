@@ -64,12 +64,14 @@ public class MainActivity extends Activity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
 
-        mRestCommunication.requestOpenHABSitemap((String) null);
-        for(OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
-            if(widget == null)
-                Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
-            else if(widget.hasChildren())
-                mRestCommunication.requestOpenHABSitemap(widget);
+        if(mRestCommunication != null) {
+            mRestCommunication.requestOpenHABSitemap((String) null);
+            for (OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
+                if (widget == null)
+                    Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
+                else if (widget.hasChildren())
+                    mRestCommunication.requestOpenHABSitemap(widget);
+            }
         }
 
         switch (position) {
