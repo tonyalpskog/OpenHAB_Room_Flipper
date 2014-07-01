@@ -38,6 +38,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private RuleActivityMode mRuleActivityMode;
     private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
     @Inject IOpenHABWidgetControl mWidgetControl;
+    private IEntityDataType mOperandToEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +167,14 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
 
     public void setRuleOperationBuildListener(RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener) {
         this.mRuleOperationBuildListener = mRuleOperationBuildListener;
+    }
+
+    public IEntityDataType getOperandToEdit() {
+        return mOperandToEdit;
+    }
+
+    public void setOperandToEdit(IEntityDataType operand) {
+        mOperandToEdit = operand;
     }
 
     /**

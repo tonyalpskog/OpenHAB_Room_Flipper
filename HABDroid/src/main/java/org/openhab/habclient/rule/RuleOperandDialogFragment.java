@@ -43,7 +43,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private boolean mShowNextButton;
 
     private RuleOperationBuildListener mListener;
-    @Inject IEntityDataType mOldOperand;
+    private IEntityDataType mOldOperand;
     private int mPosition;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
@@ -112,6 +112,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             });
         }
 
+        mOldOperand = ((RuleEditActivity)getActivity()).getOperandToEdit();
         if(mOldOperand != null) {
             switch (mOldOperand.getSourceType()) {
                 case UNIT:
