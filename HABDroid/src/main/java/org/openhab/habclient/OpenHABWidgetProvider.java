@@ -24,10 +24,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
+@Singleton
 public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private static final String TAG = "OpenHABWidgetProvider";
     private final IRegularExpression mRegularExpression;

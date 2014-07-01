@@ -61,31 +61,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     @Override
-    public TextToSpeechProvider getTextToSpeechProvider() {
-        return mTextToSpeechProvider;
-    }
-
-    @Override
-    public void setTextToSpeechProvider(TextToSpeechProvider textToSpeechProvider) {
-        mTextToSpeechProvider = textToSpeechProvider;
-    }
-
-    @Override
-    public OpenHABWidgetProvider getOpenHABWidgetProvider() {
-        return mOpenHABWidgetProvider;
-    }
-
-    @Override
-    public IRoomProvider getRoomProvider() {
-        return mRoomProvider;
-    }
-
-    @Override
-    public RoomFlipper getRoomFlipper() {
-        return mRoomFlipper;
-    }
-
-    @Override
     public void setRoomFlipper(RoomFlipper roomFlipper) {
         mRoomFlipper = roomFlipper;
     }

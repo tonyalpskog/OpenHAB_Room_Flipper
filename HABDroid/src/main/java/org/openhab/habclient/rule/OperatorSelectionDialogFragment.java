@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.habclient.InjectUtils;
@@ -26,7 +26,8 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
     private Map<String, RuleOperator<?>> mOperatorMap;
     private String mOpenHABItemName;
-    @Inject RuleOperationProvider mRuleOperationProvider;
+    @Inject
+    IRuleOperationProvider mRuleOperationProvider;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,

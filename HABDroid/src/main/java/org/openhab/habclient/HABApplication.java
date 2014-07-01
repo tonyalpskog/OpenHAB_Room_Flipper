@@ -3,14 +3,8 @@ package org.openhab.habclient;
 import android.app.Application;
 import android.util.Log;
 
-import org.openhab.domain.rule.RuleOperationProvider;
-import org.openhab.domain.util.IColorParser;
-import org.openhab.domain.util.ILogger;
-import org.openhab.domain.util.IRegularExpression;
-import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.dagger.AndroidModule;
 import org.openhab.habclient.dagger.ClientModule;
-import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 
 import java.util.UUID;
 
@@ -23,33 +17,16 @@ import dagger.ObjectGraph;
  */
 public class HABApplication extends Application {
 
-    @Inject RoomProvider mRoomProvider = null;
-    @Inject RuleOperationProvider mRuleOperationProvider = null;
-    @Inject IRestCommunication mRestCommunication;
-    @Inject OpenHABWidgetProvider mOpenHABWidgetProvider;
-    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject IRegularExpression mRegularExpression;
-    @Inject OpenHABWidgetControl mOpenHABWidgetControl;
-    @Inject IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
-    @Inject ILogger mLogger;
-    @Inject IColorParser mColorParser;
-    @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject RoomProvider mRoomProvider;
 
     private UUID currentConfigRoom = null;
     private UUID currentFlipperRoom = null;
     private ApplicationMode mAppMode = ApplicationMode.Unknown;
+
     private ObjectGraph mObjectGraph;
 
-    public ILogger getLogger() {
-        return mLogger;
-    }
-
-    public IColorParser getColorParser() {
-        return mColorParser;
-    }
-
-    public ICommandAnalyzer getSpeechResultAnalyzer() {
-        return mSpeechResultAnalyzer;
+    public ObjectGraph getObjectGraph() {
+        return mObjectGraph;
     }
 
     public ApplicationMode getAppMode() {
@@ -58,17 +35,6 @@ public class HABApplication extends Application {
 
     public void setAppMode(ApplicationMode appMode) {
         mAppMode = appMode;
-    }
-
-    public OpenHABWidgetProvider getOpenHABWidgetProvider() {
-        return mOpenHABWidgetProvider;
-    }
-
-    public IRestCommunication getRestCommunication() {
-        return mRestCommunication;
-    }
-    public IOpenHABSetting getOpenHABSetting() {
-        return mOpenHABSetting;
     }
 
     public static String getLogTag() {
@@ -114,26 +80,6 @@ public class HABApplication extends Application {
             return mRoomProvider.getInitialRoom();
         else
             return mRoomProvider.get(roomId);
-    }
-
-    public IRoomProvider getRoomProvider() {
-        return mRoomProvider;
-    }
-
-    public RuleOperationProvider getRuleOperationProvider() {
-        return mRuleOperationProvider;
-    }
-
-    public IRegularExpression getRegularExpression() {
-        return mRegularExpression;
-    }
-
-    public OpenHABWidgetControl getOpenHABWidgetControl() {
-        return mOpenHABWidgetControl;
-    }
-
-    public IWidgetTypeLayoutProvider getWidgetTypeLayoutProvider() {
-        return mWidgetTypeLayoutProvider;
     }
 
     @Override

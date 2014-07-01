@@ -132,11 +132,6 @@ public class OpenHABWidgetListFragment extends ListFragment {
         mTag = this;
         Log.d(TAG, "onCreate()");
 
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-
-        mOpenHABSetting = application.getOpenHABSetting();
-        mWidgetProvider = application.getOpenHABWidgetProvider();
-
         if (savedInstanceState != null) {
             Log.d(TAG, "restoring state from savedInstanceState");
             displayPageUrl = savedInstanceState.getString("displayPageUrl");

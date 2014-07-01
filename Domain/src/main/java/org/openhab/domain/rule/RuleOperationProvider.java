@@ -27,17 +27,24 @@ import org.openhab.domain.rule.operators.WithinNumberRuleOperator;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperationProvider {
-//    private List<IOperatorValue> mValueTypes;
-    public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
+public class RuleOperationProvider implements IRuleOperationProvider {
+    private HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
 
+    @Inject
     public RuleOperationProvider() {
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
 
         createLogicOperators();
+    }
+
+    @Override
+    public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> getOperatorHash() {
+        return mOperatorHash;
     }
 
     private void createLogicOperators() {
@@ -137,6 +144,7 @@ public class RuleOperationProvider {
         return dateOperatorHash;
     }
 
+    @Override
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
         if(openHABWidget == null)
             return null;
@@ -161,6 +169,7 @@ public class RuleOperationProvider {
         return result;
     }
 
+    @Override
     public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperatorHash(Class<?> operandClass) {
         return (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(operandClass);
     }

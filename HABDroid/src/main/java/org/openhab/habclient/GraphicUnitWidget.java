@@ -20,6 +20,8 @@ import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2013.
  */
@@ -27,20 +29,21 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
 
     private GraphicUnit gUnit;
     private HABApplication mApplication;
+    @Inject IOpenHABSetting mOpenHABSetting;
 
     public GraphicUnitWidget(Context context) {
         super(context);
 
         mApplication = (HABApplication) context.getApplicationContext();
+        mApplication.inject(this);
     }
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
         this(context);
 
         gUnit = graphicUnit;
 
-        final IOpenHABSetting setting = mApplication.getOpenHABSetting();
-        String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-        setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
+        String iconUrl = mOpenHABSetting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+        setImageUrl(iconUrl, R.drawable.openhabiconsmall, mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
         setOnLongClickListener(this);
         setOnClickListener(this);
     }
@@ -105,9 +108,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
             setImageBitmap(bitmap);
         } else {
 //            setImageBitmap(originalBitmap);
-            final IOpenHABSetting setting = mApplication.getOpenHABSetting();
-            String iconUrl = setting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
-            setImageUrl(iconUrl, R.drawable.openhabiconsmall, setting.getUsername(), setting.getPassword());
+            String iconUrl = mOpenHABSetting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
+            setImageUrl(iconUrl, R.drawable.openhabiconsmall, mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
         }
     }
 

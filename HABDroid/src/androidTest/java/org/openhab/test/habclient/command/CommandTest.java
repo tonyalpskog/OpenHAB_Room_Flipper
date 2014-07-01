@@ -5,20 +5,26 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.util.DecimalHandler;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
+import org.openhab.domain.util.IRegularExpression;
+import org.openhab.domain.util.RegExAccuracyResult;
+import org.openhab.domain.util.RegExResult;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IRoomProvider;
+import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
+import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.CommandAnalyzerResult;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.OpenHABWidgetCommandType;
 import org.openhab.habclient.command.WidgetPhraseMatchResult;
-import org.openhab.domain.util.DecimalHandler;
-import org.openhab.domain.util.RegExAccuracyResult;
-import org.openhab.domain.util.RegExResult;
+import org.openhab.habclient.dagger.AndroidModule;
+import org.openhab.habclient.dagger.ClientModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -35,13 +41,18 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
+
+import dagger.Module;
+import dagger.ObjectGraph;
+import dagger.Provides;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class CommandTest extends android.test.ApplicationTestCase<HABApplication> {
-    private CommandAnalyzerWrapper mCommandAnalyzer;
     private HABApplication mHABApplication;
     private Map<String, Room> mRoomNameMap;
     private ArrayList<String> mListOfTestPhrases;
@@ -53,6 +64,13 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
             , "Hobbyrum", "Källar förråd", "Krypgrund", "Hall", "Städskrubb", "Gästtoa"
             , "Förråd", "Kök", "Matsal", "Vardagsrum"};
 
+    @Inject CommandAnalyzerWrapper mCommandAnalyzer;
+    @Inject IRegularExpression mRegularExpression;
+    @Inject ILogger mLogger;
+    @Inject IColorParser mColorParser;
+    @Inject OpenHABWidgetProvider mWidgetProvider;
+    @Inject IRoomProvider mRoomProvider;
+
     public CommandTest() {
         super(HABApplication.class);
     }
@@ -62,11 +80,10 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         createApplication();
         mHABApplication = getApplication();
-        mCommandAnalyzer = new CommandAnalyzerWrapper(mHABApplication.getRoomProvider(),
-                mHABApplication.getOpenHABWidgetProvider(), mContext,
-                mHABApplication.getOpenHABWidgetControl(),
-                mHABApplication.getRegularExpression());
-        //mCommandAnalyzer.setTextToSpeechProvider(mHABApplication.getTextToSpeechProvider());
+
+        ObjectGraph graph = mHABApplication.getObjectGraph()
+                .plus(new AndroidModule(mHABApplication), new TestModule(mHABApplication));
+        graph.inject(this);
 
         loadHttpDataFromString();
 
@@ -94,7 +111,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         mListOfTestPhrases2.add("Det var Window_FF_Office_Window en gång en " + mTestedRoomsNameArray[3] + " som mådde dåligt");
         mListOfTestPhrases2.add("Shutter_FF_Bath " + mTestedRoomsNameArray[4] + " är bra Light_Outdoor_Frontdoor att ha");
 
-        Iterator<Room> iterator = mHABApplication.getRoomProvider().getRoomHash().values().iterator();
+        Iterator<Room> iterator = mRoomProvider.getRoomHash().values().iterator();
         mRoomNameMap = new HashMap<String, Room>();
         while (iterator.hasNext()) {
             Room nextRoom = iterator.next();
@@ -103,9 +120,23 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     }
 
+    @Module(injects = CommandTest.class, includes = ClientModule.class, overrides = true)
+    public class TestModule {
+        private final HABApplication mApp;
+
+        public TestModule(HABApplication app) {
+            mApp = app;
+        }
+
+        @Provides @Singleton
+        public CommandAnalyzer provideCommandAnalyzer(CommandAnalyzerWrapper wrapper) {
+            return wrapper;
+        }
+    }
+
     public void testFinalArrayOfNamesUsedInTests() {
         assertEquals(14, mFullRoomNameArray.length);
-        assertEquals(14, mHABApplication.getRoomProvider().getRoomHash().size());
+        assertEquals(14, mRoomProvider.getRoomHash().size());
 
         assertFalse("No MapOfRoomNames items available.", mCommandAnalyzer.getMapOfRoomNamesFromProvider().isEmpty());
 
@@ -230,12 +261,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals(1, childLinksFound);
         assertEquals("https://demo.openhab.org:8443/rest/sitemaps/demo/demo", openHABWidgetDataSource.getLink());
 
-        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode, mHABApplication.getLogger(), mHABApplication.getColorParser());
+        openHABWidgetDataSource = new OpenHABWidgetDataSource(rootNode, mLogger, mColorParser);
         
         assertEquals("Number of rootWidget childs is incorrect: ", 4, openHABWidgetDataSource.getRootWidget().getChildren().size());
         assertEquals("Number of total childs is incorrect: ", 13, openHABWidgetDataSource.getWidgets().size());
 
-        mHABApplication.getOpenHABWidgetProvider().setOpenHABWidgets(openHABWidgetDataSource);
+        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         return;
 
 ////        Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + pageUrl + "   longPolling = " + longPolling);
@@ -326,31 +357,27 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     }
 
     public void testGettingAllWidgetsLoadedFromDocument() {
-        assertTrue("The OpenHABWidgetProvider is NULL", mHABApplication.getOpenHABWidgetProvider() != null);
-
-        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
 
         String result = "";
-        for (OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null))
+        for (OpenHABWidget item : mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null))
             result += (item.hasItem() ? "Item-" + (item.getItem().getType() != null ? item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName() : "Widget-" + (item.getType() != null ? item.getType().Name + "-" : "NULL-") + item.getId()) + ", ";
 
         assertTrue(result.startsWith("Item-ContactItem-Window_GF_Frontdoor, Item-NumberItem-Temperature_GF_Corridor, Item-SwitchItem-Heating_GF_Corridor, Item-SwitchItem-Light_GF_Corridor_Wardrobe"));
     }
 
     public void testGettingUnitItemWidgetsLoadedFromDocument() {
-        assertTrue("The OpenHABWidgetProvider is NULL", mHABApplication.getOpenHABWidgetProvider() != null);
-
-        assertEquals(92, mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem).size());
+        assertEquals(92, mWidgetProvider.getWidgetList(OpenHABWidgetTypeSet.UnitItem).size());
 
         String result = "";
-        for (OpenHABWidget item : mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem))
+        for (OpenHABWidget item : mWidgetProvider.getWidgetList(OpenHABWidgetTypeSet.UnitItem))
             result += (item.hasItem() ? "Item-" + (item.getItem().getType() != null ? item.getItem().getType().Name + "-" : "NULL-") + item.getItem().getName() : "Widget-" + (item.getType() != null ? item.getType().Name + "-" : "NULL-") + item.getId()) + ", ";
 
         assertTrue(result.startsWith("Widget--03020100_0, Item-SwitchItem-Light_FF_Bath_Ceiling, Item-SwitchItem-Light_FF_Bath_Mirror, Item-SwitchItem-Heating_FF_Bath, Item-RollershutterItem-Shutter_FF_Bath, Item-SwitchItem-Light_FF_Office_Ceiling, Item-SwitchItem-Heating_FF_Office"));
     }
 
     public void testMethod_getListOfWidgetsFromListOfRooms() {
-        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
 
         assertFalse("getListOfWidgetsFromListOfRooms(null) returned an empty list of units", mCommandAnalyzer.getListOfWidgetsFromListOfRooms(null).isEmpty());
 //        assertFalse(mCommandAnalyzer.getListOfWidgetsFromListOfRooms(mCommandAnalyzer.getRoomsFromPhrases(mListOfTestPhrases2, ApplicationMode.RoomFlipper)).isEmpty());
@@ -404,7 +431,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     }
 
     public void testGetWidgetByLabel() {
-        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel("TERRACE DOOR", mCommandAnalyzer);
+        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel("TERRACE DOOR", mCommandAnalyzer);
         assertEquals(getAllStringItemsInOneString(resultList), 3, resultList.size());
         assertEquals(100, resultList.get(0).getMatchPercent());
         assertEquals("GF_Living_4", resultList.get(0).getWidget().getId());
@@ -417,7 +444,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
-        List<OpenHABWidget> widgetList = mHABApplication.getOpenHABWidgetProvider().getWidgetList(OpenHABWidgetTypeSet.UnitItem);
+        List<OpenHABWidget> widgetList = mWidgetProvider.getWidgetList(OpenHABWidgetTypeSet.UnitItem);
         assertTrue(widgetList.get(58).getId(), widgetList.get(58).getLabel().startsWith("Terrace door ["));
 
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
@@ -638,9 +665,9 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     private void ExecuteCommandAsPhrase(List<String> inputValue, String test_UnitToLookFor, int test_NoOfFoundUnitMatches, String test_WidgetID
             , String test_WholeWidgetLabel, OpenHABItemType test_WidgetItemType, String test_WidgetLabelValue) {
         List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
-        assertEquals(122, mHABApplication.getOpenHABWidgetProvider().getWidgetList((Set<OpenHABWidgetType>) null).size());
+        assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
         assertEquals(test_UnitToLookFor, result.get(0).getTagPhrases()[0]);
-        List<WidgetPhraseMatchResult> resultList = mHABApplication.getOpenHABWidgetProvider().getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
+        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
         assertEquals(getAllStringItemsInOneString(resultList), test_NoOfFoundUnitMatches, resultList.size());
         assertEquals(test_WidgetID, resultList.get(0).getWidget().getId());
         assertEquals(test_WholeWidgetLabel, resultList.get(0).getWidget().getLabel());
@@ -652,12 +679,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     public void test_getRegExStringForMatchAccuracySource() {
         String[] input = {"hej", "hopp", "allihopa"};
-        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(input));
+        assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", mRegularExpression.getRegExStringForMatchAccuracySource(input));
     }
 
     public void testMatchForGetPatternForMatchAccuracySource() {
         String[] input = {"hej", "hopp", "allihopa"};
-        RegExResult result = mHABApplication.getRegularExpression().getAllNextMatchAsList(mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(input), "hej hopp allihopa", true);
+        RegExResult result = mRegularExpression.getAllNextMatchAsList(mRegularExpression.getRegExStringForMatchAccuracySource(input), "hej hopp allihopa", true);
         assertEquals(3, result.GroupList.size());
         assertEquals("hej", result.GroupList.get(0));
         assertEquals("hopp", result.GroupList.get(1));
@@ -679,7 +706,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
 //        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
 
-        return mHABApplication.getRegularExpression().getStringMatchAccuracy(sourceWordsList, target);
+        return mRegularExpression.getStringMatchAccuracy(sourceWordsList, target);
     }
 
     public void testSplittedStringAndWordsList2() {
@@ -696,7 +723,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("TERRACE", sourceWordsList.get(0));
         assertEquals("DOOR", sourceWordsList.get(1));
 
-        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
+        String regExString = mRegularExpression.getRegExStringForMatchAccuracySource(splittedSource);
         assertEquals("(TERRACE)|(DOOR)", regExString);
 
         assertEquals(1d, doGetStringMatchAccuracy2("Terrace door", sourceWordsList, regExString, "Terrace door"));
@@ -711,7 +738,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         target = target.toUpperCase();
         assertEquals("(TERRACE)|(DOOR)", regEx);
         assertEquals("TERRACE DOOR", target);
-        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
+        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList(regEx, target, true);
         assertEquals(2, sourceWordsList.size());
         assertEquals(2, regExResult.GroupList.size());
         wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
@@ -760,7 +787,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertEquals("HOPP", sourceWordsList.get(1));
         assertEquals("ALLIHOPA", sourceWordsList.get(2));
 
-        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
+        String regExString = mRegularExpression.getRegExStringForMatchAccuracySource(splittedSource);
         assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regExString);
 
         assertEquals(1d, doGetStringMatchAccuracy("hej hopp allihopa", sourceWordsList, regExString, "hej hopp allihopa"));
@@ -775,7 +802,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         target = target.toUpperCase();
         assertEquals("(HEJ)|(HOPP)|(ALLIHOPA)", regEx);
         assertEquals("HEJ HOPP ALLIHOPA", target);
-        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
+        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList(regEx, target, true);
         assertEquals(3, sourceWordsList.size());
         assertEquals(3, regExResult.GroupList.size());
         wordCountAccuracy = regExResult.GroupList.size() / sourceWordsList.size();
@@ -896,10 +923,10 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         for(String sourceWord : splittedSource)
             sourceWordsList.add(sourceWord.toUpperCase());
 
-        String regExString = mHABApplication.getRegularExpression().getRegExStringForMatchAccuracySource(splittedSource);
+        String regExString = mRegularExpression.getRegExStringForMatchAccuracySource(splittedSource);
         assertEquals("(KITCHEN)|(LIGHTS)", regExString);
         double maxResult = 0;
-        OpenHABWidget unit = mHABApplication.getOpenHABWidgetProvider().getWidgetByID("GF_Kitchen_0");
+        OpenHABWidget unit = mWidgetProvider.getWidgetByID("GF_Kitchen_0");
         while(unit.hasParent()) {
             unit = unit.getParent();
             if(!unit.hasLinkedPage())
@@ -927,7 +954,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         int totalMatchLength = 0;
 
         target = target.toUpperCase();
-        RegExResult regExResult = mHABApplication.getRegularExpression().getAllNextMatchAsList(regEx, target, true);
+        RegExResult regExResult = mRegularExpression.getAllNextMatchAsList(regEx, target, true);
         if (target.equalsIgnoreCase("Kitchen"))
             assertEquals(1, regExResult.GroupList.size());
         assertEquals(2, sourceWordsList.size());

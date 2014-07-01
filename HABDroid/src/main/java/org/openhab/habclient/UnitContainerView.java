@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2013.
  */
@@ -33,9 +35,9 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private Room mRoom;
     private List<View> addedUnitViews;
     private boolean mBlockUnitRedraw = false;
-    private OpenHABWidgetControl mOpenHABWidgetControl;
     private View mAddedControlView = null;
-    private IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    @Inject OpenHABWidgetControl mOpenHABWidgetControl;
+    @Inject IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
 
     public UnitContainerView(Context context) {
         this(context, null);
@@ -45,8 +47,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         super(context, attrs);
 
         final HABApplication app = (HABApplication) context.getApplicationContext();
-        mOpenHABWidgetControl = app.getOpenHABWidgetControl();
-        mWidgetTypeLayoutProvider = app.getWidgetTypeLayoutProvider();
+        app.inject(this);
 
         addedUnitViews = new ArrayList<View>();
 

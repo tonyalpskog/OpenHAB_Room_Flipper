@@ -4,16 +4,17 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.util.StringSelectionDialogFragment;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -21,6 +22,7 @@ import java.util.List;
 public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFragment {
     private static final String ARG_POSITION = "position";
 
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
     private int mOperandIndex;
     RuleOperandDialogFragment.RuleOperationBuildListener mListener;
 
@@ -50,6 +52,8 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        InjectUtils.inject(this);
+
         Bundle args = getArguments();
         if(args == null)
             return;
@@ -71,9 +75,7 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
             case DialogInterface.BUTTON_POSITIVE:
             case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
-                    final HABApplication application = (HABApplication) getActivity().getApplication();
-                    final IOpenHABWidgetProvider provider = application.getOpenHABWidgetProvider();
-                    final OpenHABWidget widget = provider.getWidgetByItemName(mSelectedString);
+                    final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
                     final IEntityDataType entityDataType = UnitEntityDataType.getUnitEntityDataType(widget);
                     final RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
                     getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);

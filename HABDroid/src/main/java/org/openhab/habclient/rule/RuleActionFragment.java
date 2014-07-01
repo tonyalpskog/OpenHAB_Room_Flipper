@@ -20,12 +20,15 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.operators.RuleOperator;
+
+import javax.inject.Inject;
 
 public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
 
@@ -35,6 +38,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     private int mSelectedActionPosition = -1;
     private RuleAction mActionUnderConstruction;
 
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
+
     public static RuleActionFragment newInstance() {
         return new RuleActionFragment();
     }
@@ -42,6 +47,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        InjectUtils.inject(this);
     }
 
 //    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
@@ -94,7 +101,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openActionBuilderDialog(position, null);
+                openActionBuilderDialog(position);
 //                mSelectedActionPosition = position;
 //                mListView.setItemChecked(position, true);
 
@@ -177,30 +184,29 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit_rule_action:
-                openActionBuilderDialog(mSelectedActionPosition, null);
+                openActionBuilderDialog(mSelectedActionPosition);
                 break;
             case R.id.action_delete_rule_action:
                 //TODO - TA: Implement this.
                 Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_add_rule_command_action:
-                openActionBuilderDialog(-1, RuleActionType.COMMAND);
+                openActionBuilderDialog(-1);
                 break;
             case R.id.action_add_rule_message_action:
-                openActionBuilderDialog(-1, RuleActionType.MESSAGE);
+                openActionBuilderDialog(-1);
                 break;
         }
         return true;
     }
 
-    private void openActionBuilderDialog(int position, RuleActionType actionType) {
+    private void openActionBuilderDialog(int position) {
         mSelectedActionPosition = position;
 
-        final IOpenHABWidgetProvider provider = ((HABApplication)getActivity().getApplication()).getOpenHABWidgetProvider();
         if(mSelectedActionPosition > -1)
             mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
         else
-            mActionUnderConstruction = new RuleAction(actionType, provider);
+            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND, mWidgetProvider);//TODO - TA: Let the user decide if COMMAND or MESSAGE
 
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
@@ -245,12 +251,12 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
                 break;
         }
 
-        if (mSelectedActionPosition < 0) {
-            ((RuleEditActivity)getActivity()).getRule().getActions().add(action);
+        if (mSelectedActionPosition < 0/*mListView.getSelectedItem() == null*/) {
+            ((RuleEditActivity)getActivity()).getRule().getActions().add(mActionUnderConstruction);
         } else {
             int actionIndex = ((RuleEditActivity)getActivity()).getRule().getActions().indexOf(/*mListView.getSelectedItem()*/mListAdapter.getItem(mSelectedActionPosition));
             ((RuleEditActivity)getActivity()).getRule().getActions().remove(actionIndex);
-            ((RuleEditActivity)getActivity()).getRule().getActions().add(actionIndex, action);
+            ((RuleEditActivity)getActivity()).getRule().getActions().add(actionIndex, mActionUnderConstruction);
         }
         if(((RuleEditActivity)getActivity()).getRule().getRuleOperation() != null)
             ((RuleEditActivity)getActivity()).getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code

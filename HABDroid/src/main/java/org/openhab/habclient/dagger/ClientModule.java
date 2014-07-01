@@ -2,11 +2,13 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
+import org.openhab.habclient.GraphicUnitWidget;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRestCommunication;
@@ -21,6 +23,7 @@ import org.openhab.habclient.RoomConfigFragment;
 import org.openhab.habclient.RoomFlipperFragment;
 import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechService;
+import org.openhab.habclient.UnitContainerView;
 import org.openhab.habclient.UnitPlacementFragment;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.ICommandAnalyzer;
@@ -29,6 +32,7 @@ import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
 import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.rule.RuleOperationFragment;
+import org.openhab.habclient.rule.UnitOperandSelectionDialogFragment;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
@@ -55,6 +59,9 @@ injects = {
         RuleActionFragment.class,
         RuleOperationFragment.class,
         RuleEditActivity.class,
+        UnitOperandSelectionDialogFragment.class,
+        GraphicUnitWidget.class, //TODO: create adapter for this instead
+        UnitContainerView.class, //TODO: create adapter for this instead
         SpeechService.class,
         HABApplication.class
 })
@@ -85,9 +92,8 @@ public class ClientModule {
     }
 
     @Provides @Singleton
-    public RuleOperationProvider provideRuleOperationProvider() {
-        //TODO: extract interface and add @Inject on constructor
-        return new RuleOperationProvider();
+    public IRuleOperationProvider provideRuleOperationProvider(RuleOperationProvider provider) {
+        return provider;
     }
 
     @Provides @Singleton

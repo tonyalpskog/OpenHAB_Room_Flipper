@@ -12,6 +12,7 @@ import android.preview.support.wearable.notifications.WearableNotifications;
 import android.support.v4.app.NotificationCompat;
 
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.util.ArrayList;
 
@@ -23,9 +24,11 @@ public class WearCommandHost {
     private static final String ACTION_RESPONSE = "com.zenit.android.wearable.openhab.COMMAND";
     private BroadcastReceiver mReceiver;
     private HABApplication mApplication;
+    private final ICommandAnalyzer mCommandAnalyzer;
 
-    public WearCommandHost(HABApplication application) {
+    public WearCommandHost(HABApplication application, ICommandAnalyzer commandAnalyzer) {
         mApplication = application;
+        mCommandAnalyzer = commandAnalyzer;
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -82,7 +85,7 @@ public class WearCommandHost {
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
-            mApplication.getSpeechResultAnalyzer().analyzeCommand(replyToBeAnalyzed, mApplication.getAppMode(), mApplication.getApplicationContext());
+            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplication.getAppMode(), mApplication.getApplicationContext());
 
             showNotification("Reply", "Hard coded message");
         }

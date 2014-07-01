@@ -20,13 +20,13 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.RuleTreeItem;
@@ -47,6 +47,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     private RuleTreeItem mSelectedTreeItem;
     private RuleOperation mOperationUnderConstruction;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IRuleOperationProvider mRuleOperationProvider;
 
     public static RuleOperationFragment newInstance() {
         return new RuleOperationFragment();
@@ -94,7 +95,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 // Toast.makeText(getApplicationContext(),
                 // "Group Clicked " + listDataHeader.get(groupPosition),
                 // Toast.LENGTH_SHORT).show();
-                mSelectedTreeItem = mTreeData.get(Integer.valueOf(groupPosition));
+
                 Toast.makeText(getActivity(), "OnGroupClickListener", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -322,12 +323,11 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                     mOperationUnderConstruction.setOperand(operandPosition, operand);
                     if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT){
                         if(operandPosition == 0) {
-                            final HABApplication application = (HABApplication) getActivity().getApplication();
                             final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
                                     operand.getDataSourceId(),
                                     false,
-                                    application.getRuleOperationProvider(),
-                                    application.getOpenHABWidgetProvider());
+                                    mRuleOperationProvider,
+                                    mWidgetProvider);
                             ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
                             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
                                     "Select an operator",
@@ -419,8 +419,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        HABApplication application = (HABApplication) getActivity().getApplication();
-        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron = new RuleOperation(ror, operandList);
         ron.setName("The is the name of the root operation.");
 
@@ -432,8 +431,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        HABApplication application = (HABApplication) getActivity().getApplication();
-        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -479,8 +477,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        final HABApplication application = (HABApplication) getActivity().getApplication();
-        RuleOperator ror =  application.getRuleOperationProvider().getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -502,9 +499,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
     private RuleOperation getRuleOperation() {
         final HABApplication application = (HABApplication) getActivity().getApplication();
-        RuleOperationProvider rop = application.getRuleOperationProvider();
         OpenHABWidget widget = mWidgetProvider.getWidgetByID("demo_1_0");
-        return new RuleOperation(rop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
+        return new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {

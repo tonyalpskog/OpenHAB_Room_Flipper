@@ -19,10 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
+@Singleton
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
+    @Inject
     public CommandAnalyzerWrapper(IRoomProvider roomProvider,
                                   OpenHABWidgetProvider openHABWidgetProvider, Context context,
                                   IOpenHABWidgetControl widgetControl,

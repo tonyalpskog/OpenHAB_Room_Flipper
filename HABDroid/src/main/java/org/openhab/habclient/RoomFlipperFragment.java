@@ -63,6 +63,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         super.onCreate(savedInstanceState);
 
         InjectUtils.inject(this);
+
+        mWearCommandHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
     }
 
     @Override
@@ -81,8 +83,6 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         setHasOptionsMenu(true);
 
         mSpeechResultAnalyzer.setRoomFlipper(mRoomViewFlipper);
-
-        mWearCommandHost = new WearCommandHost(mApplication);
 
         return rootView;
     }
