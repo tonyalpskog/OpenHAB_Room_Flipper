@@ -29,13 +29,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
  */
 public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
     private HashMap<RuleOperatorType, RuleOperator<Number>> ruleOperatorsNumeric;
-    private HashMap<RuleOperatorType, RuleOperator<Boolean>> ruleOperatorsBoolean;
     private HashMap<RuleOperatorType, RuleOperator<Date>> ruleOperatorsDate;
     private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
-//    @Mock
     private HABApplication mHABApplication;
-//    @Mock
-//    private OpenHABWidgetControl mOpenHABWidgetControl_Mock;
 
     public RuleTest() {
         super(HABApplication.class);
@@ -46,21 +42,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         initMocks(this);
         createApplication();
         mHABApplication = getApplication();
-//        mOpenHABWidgetControl_Mock = new OpenHABWidgetControl(mContext);
-//        doAnswer(new Answer() {
-//            @Override
-//            public Object answer(InvocationOnMock invocation) throws Throwable {
-//                Object[] args = invocation.getArguments();
-//                mHABApplication.getOpenHABWidgetProvider().setOpenHABItem(
-//                        mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName(((OpenHABItem) args[0]).getDescription()).getItem()
-//                );
-//                return null;
-//            }
-//        }).when(mOpenHABWidgetControl_Mock).sendItemCommand((OpenHABItem)anyObject(), anyString());
-
-//        when(mHABApplication.getOpenHABWidgetProvider()).thenReturn(mOpenHABWidgetControl_Mock);
-
-//        when(mHABApplication.toString()).thenReturn("Mockoto_string");
 
         HttpDataSetup httpDataSetup = new HttpDataSetup(mHABApplication.getLogger(),
                 mHABApplication.getColorParser(),
@@ -70,16 +51,12 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         RuleOperationProvider rop = mHABApplication.getRuleOperationProvider();
 
         ruleOperatorsNumeric = (HashMap<RuleOperatorType, RuleOperator<Number>>) rop.mOperatorHash.get(Number.class);
-        ruleOperatorsBoolean = (HashMap<RuleOperatorType, RuleOperator<Boolean>>) rop.mOperatorHash.get(Boolean.class);
         ruleOperatorsDate = (HashMap<RuleOperatorType, RuleOperator<java.util.Date>>) rop.mOperatorHash.get(java.util.Date.class);
 
         _unitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
     }
 
     //================================= UNITS ===================================
-
-
-//    ===================================================================================================
 
     public void testSimple1() throws Exception {
         final int expected = 3;
@@ -110,436 +87,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 //        Double d = Double.valueOf(34.7);
 //        assertEquals(0, Math.abs(f.doubleValue() - d.doubleValue()));
 //    }
-
-
-
-
-
-    public void testNumberBetween() {
-        RuleOperator<Number> roBetween =  ruleOperatorsNumeric.get(RuleOperatorType.Between);
-
-        //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
-        try {
-            roBetween.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        try {
-            roBetween.getOperationResult(1, 2);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        try {
-            roBetween.getOperationResult(1, 2, 3, 4);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Float 9 between 10 and 13 = False
-        assertFalse(roBetween.getOperationResult((float) 9, (float) 10, (float) 13));
-
-        //Float 10 between 10 and 13 = False
-        assertFalse(roBetween.getOperationResult((float) 10, (float) 10, (float) 13));
-
-        //Float 10.1 between 10 and 13 = False
-        assertTrue(roBetween.getOperationResult(10.1f, (float) 10, (float) 13));
-
-        //Float 11 between 10 and 13 = True
-        assertTrue(roBetween.getOperationResult((float) 11, (float) 10, (float) 13));
-
-        //Float 12.9 between 10 and 13 = True
-        assertTrue(roBetween.getOperationResult(12.9f, (float) 10, (float) 13));
-
-        //Float 13 between 10 and 13 = False
-        assertFalse(roBetween.getOperationResult((float) 13, (float) 10, (float) 13));
-
-        //Float 14 between 10 and 13 = False
-        assertFalse(roBetween.getOperationResult((float) 14, (float) 10, (float) 13));
-    }
-
-    public void testNumberWithin() {
-        RuleOperator<Number> roWithin =  ruleOperatorsNumeric.get(RuleOperatorType.Within);
-
-        //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
-        try {
-            roWithin.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        try {
-            roWithin.getOperationResult(1, 2);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        try {
-            roWithin.getOperationResult(1, 2, 3, 4);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Float 9 within 10 and 13 = False
-        assertFalse(roWithin.getOperationResult((float) 9, (float) 10, (float) 13));
-
-        //Float 10 within 10 and 13 = True
-        assertTrue(roWithin.getOperationResult((float) 10, (float) 10, (float) 13));
-
-        //Float 11 within 10 and 13 = True
-        assertTrue(roWithin.getOperationResult((float) 11, (float) 10, (float) 13));
-
-        //Float 12 within 10 and 13 = True
-        assertTrue(roWithin.getOperationResult((float) 12, (float) 10, (float) 13));
-
-        //Float 13 within 10 and 13 = True
-        assertTrue(roWithin.getOperationResult((float) 13, (float) 10, (float) 13));
-
-        //Float 14 within 10 and 13 = False
-        assertFalse(roWithin.getOperationResult((float) 14, (float) 10, (float) 13));
-    }
-
-    public void testNumberLessThan() {
-        RuleOperator<Number> roLessThan =  ruleOperatorsNumeric.get(RuleOperatorType.LessThan);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roLessThan.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roLessThan.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 < 11 = True
-        assertTrue(roLessThan.getOperationResult(10, 11));
-
-        //Integer 11 < 10 = False
-        assertFalse(roLessThan.getOperationResult(11, 10));
-
-        //Integer 10 < Float 11 = True
-        assertTrue(roLessThan.getOperationResult(10, (float) 11));
-
-        //Double 10.1 < Float 10.1 = False
-        assertFalse(roLessThan.getOperationResult(10.1, 10.1f));
-
-        //Double 10.1 < Float 10.2 = True
-        assertTrue(roLessThan.getOperationResult(10.1, 10.2f));
-
-        //Float 8.9 < Float 9 = True
-        assertTrue(roLessThan.getOperationResult(8.9f, (float) 9));
-
-        //Float 34.7 < Float 9 = False
-        assertFalse(roLessThan.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 < Float 34.7 = False
-        assertFalse(roLessThan.getOperationResult(34.7f, 34.7f));
-
-        //Double 34.7 < Double 34.7 = False
-        assertFalse(roLessThan.getOperationResult(34.7, 34.7));
-
-        //Double -3 < Double 10 = True
-        assertTrue(roLessThan.getOperationResult((double) -3, (double) 10));
-    }
-
-    public void testNumberMoreThan() {
-        RuleOperator<Number> roMoreThan =  ruleOperatorsNumeric.get(RuleOperatorType.MoreThan);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roMoreThan.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roMoreThan.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 > 11 = False
-        assertFalse(roMoreThan.getOperationResult(10, 11));
-
-        //Integer 11 > 10 = True
-        assertTrue(roMoreThan.getOperationResult(11, 10));
-
-        //Integer 10 > Float 11 = False
-        assertFalse(roMoreThan.getOperationResult(10, (float) 11));
-
-        //Double 10.1 > Float 10.1 = False
-        assertFalse(roMoreThan.getOperationResult(10.1, 10.1f));
-
-        //Double 10.1 > Float 10.2 = False
-        assertFalse(roMoreThan.getOperationResult(10.1, 10.2f));
-
-        //Float 8.9 > Float 9 = False
-        assertFalse(roMoreThan.getOperationResult(8.9f, (float) 9));
-
-        //Float 34.7 > Float 9 = True
-        assertTrue(roMoreThan.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 > Float 34.7 = False
-        assertFalse(roMoreThan.getOperationResult(34.7f, 34.7f));
-
-        //Double 34.7 > Double 34.7 = False
-        assertFalse(roMoreThan.getOperationResult(34.7, 34.7));
-
-        //Double -3 > Double 10 = False
-        assertFalse(roMoreThan.getOperationResult((double) -3, (double) 10));
-    }
-
-    public void testNumberLessOrEqual() {
-        RuleOperator<Number> roLessOrEqual =  ruleOperatorsNumeric.get(RuleOperatorType.LessOrEqual);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roLessOrEqual.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roLessOrEqual.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 <= 11 = True
-        assertTrue(roLessOrEqual.getOperationResult(10, 11));
-
-        //Integer 11 <= 10 = False
-        assertFalse(roLessOrEqual.getOperationResult(11, 10));
-
-        //Integer 10 <= Float 11 = True
-        assertTrue(roLessOrEqual.getOperationResult(10, (float) 11));
-
-        //Double 10.1 <= Float 10.1 = True
-        assertTrue(roLessOrEqual.getOperationResult(10.1, 10.1f));
-
-        //Double 10.1 <= Float 10.2 = True
-        assertTrue(roLessOrEqual.getOperationResult(10.1, 10.2f));
-
-        //Float 8.9 <= Float 9 = True
-        assertTrue(roLessOrEqual.getOperationResult(8.9f, (float) 9));
-
-        //Float 34.7 <= Float 9 = False
-        assertFalse(roLessOrEqual.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 <= Float 34.7 = True
-        assertTrue(roLessOrEqual.getOperationResult(34.7f, 34.7f));
-
-        //Double 34.7 <= Double 34.7 = True
-        assertTrue(roLessOrEqual.getOperationResult(34.7, 34.7));
-
-        //Double -3 <= Double 10 = True
-        assertTrue(roLessOrEqual.getOperationResult((double) -3, (double) 10));
-    }
-
-    public void testNumberMoreOrEqual() {
-        RuleOperator<Number> roMoreOrEqual =  ruleOperatorsNumeric.get(RuleOperatorType.MoreOrEqual);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roMoreOrEqual.getOperationResult(1);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roMoreOrEqual.getOperationResult(1, 2, 3);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Integer 10 >= 11 = False
-        assertFalse(roMoreOrEqual.getOperationResult(10, 11));
-
-        //Integer 11 >= 10 = True
-        assertTrue(roMoreOrEqual.getOperationResult(11, 10));
-
-        //Integer 10 >= Float 11 = False
-        assertFalse(roMoreOrEqual.getOperationResult(10, (float) 11));
-
-        //Double 10.1 >= Float 10.1 = True
-        assertTrue(roMoreOrEqual.getOperationResult(10.1, 10.1f));
-
-        //Double 10.1 >= Float 10.2 = False
-        assertFalse(roMoreOrEqual.getOperationResult(10.1, 10.2f));
-
-        //Float 8.9 >= Float 9 = False
-        assertFalse(roMoreOrEqual.getOperationResult(8.9f, (float) 9));
-
-        //Float 34.7 >= Float 9 = True
-        assertTrue(roMoreOrEqual.getOperationResult(34.7f, (float) 9));
-
-        //Float 34.7 >= Float 34.7 = True
-        assertTrue(roMoreOrEqual.getOperationResult(34.7f, 34.7f));
-
-        //Double 34.7 >= Double 34.7 = True
-        assertTrue(roMoreOrEqual.getOperationResult(34.7, 34.7));
-
-        //Double -3 >= Double 10 = False
-        assertFalse(roMoreOrEqual.getOperationResult((double) -3, (double) 10));
-    }
-
-    public void testBooleanAnd() {
-        RuleOperator<Boolean> roAnd =  ruleOperatorsBoolean.get(RuleOperatorType.And);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            assertTrue(roAnd.getOperationResult(false));
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            assertTrue(roAnd.getOperationResult(true, true, true));
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Boolean true AND false = False
-        assertFalse(roAnd.getOperationResult(true, false));
-
-        //Boolean false AND true = False
-        assertFalse(roAnd.getOperationResult(false, true));
-
-        //Boolean false AND false = False
-        assertFalse(roAnd.getOperationResult(false, false));
-
-        //Boolean true AND true = True
-        assertTrue(roAnd.getOperationResult(true, true));
-    }
-
-    public void testBooleanOr() {
-        RuleOperator<Boolean> roOr =  ruleOperatorsBoolean.get(RuleOperatorType.Or);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roOr.getOperationResult(false);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roOr.getOperationResult(false, false, false);
-            assertTrue(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Boolean true OR false = False
-        assertTrue(roOr.getOperationResult(true, false));
-
-        //Boolean false OR true = False
-        assertTrue(roOr.getOperationResult(false, true));
-
-        //Boolean false OR false = False
-        assertFalse(roOr.getOperationResult(false, false));
-
-        //Boolean true OR true = True
-        assertTrue(roOr.getOperationResult(true, true));
-
-        //Boolean true OR false OR true = True
-        assertTrue(roOr.getOperationResult(true, false, true));
-
-        //Boolean false OR true OR false = True
-        assertTrue(roOr.getOperationResult(false, true, false));
-
-        //Boolean false OR false OR false = False
-        assertFalse(roOr.getOperationResult(false, false, false));
-    }
-
-    public void testBooleanEqual() {
-        RuleOperator<Boolean> roEqual =  ruleOperatorsBoolean.get(RuleOperatorType.Equal);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roEqual.getOperationResult(false);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roEqual.getOperationResult(false, true, false);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Boolean true Equal false = False
-        assertFalse(roEqual.getOperationResult(true, false));
-
-        //Boolean false Equal true = False
-        assertFalse(roEqual.getOperationResult(false, true));
-
-        //Boolean false Equal false = False
-        assertTrue(roEqual.getOperationResult(false, false));
-
-        //Boolean true Equal true = True
-        assertTrue(roEqual.getOperationResult(true, true));
-    }
-
-    public void testBooleanNotEqual() {
-        RuleOperator<Boolean> roNotEqual =  ruleOperatorsBoolean.get(RuleOperatorType.NotEqual);
-
-        //IllegalArgumentException shall be thrown if only one operation value is used.
-        try {
-            roNotEqual.getOperationResult(false);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //IllegalArgumentException shall be thrown if more than two operation values is used.
-        try {
-            roNotEqual.getOperationResult(false, true, false);
-            assertFalse(true);
-        } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
-        }
-
-        //Boolean true NotEqual false = False
-        assertTrue(roNotEqual.getOperationResult(true, false));
-
-        //Boolean false NotEqual true = False
-        assertTrue(roNotEqual.getOperationResult(false, true));
-
-        //Boolean false NotEqual false = False
-        assertFalse(roNotEqual.getOperationResult(false, false));
-
-        //Boolean true NotEqual true = True
-        assertFalse(roNotEqual.getOperationResult(true, true));
-    }
 
     public void test_Verify_value_and_name_in_UnitEntityDataType() {
         UnitEntityDataType rue = new UnitEntityDataType("Test Value", 50.7) {
@@ -601,19 +148,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 
         return operands;
     }
-
-//    public void test_RuleOperator_parseValue_method() {
-//        RuleOperationProvider rop2 = new RuleOperationProvider();
-//        HashMap<RuleOperatorType, RuleOperator<Integer>> ruleOperatorsInteger = (HashMap<RuleOperatorType, RuleOperator<Integer>>) rop2.mOperatorHash.get(Number.class);
-//
-//        RuleOperator<Integer> roEqual =  ruleOperatorsInteger.get(RuleOperatorType.Equal);
-//
-//        try {
-//            assertEquals((Integer)10, roEqual.parseValue("10"));
-//        } catch (Exception e) {
-//            assertEquals("This should not happen", e.getClass().getDescription());
-//        }
-//    }
 
     public void test_should_be_able_to_use_a_List_of_IUnitEntityDataType_as_RuleOperator_input() {
         RuleOperator<Float> testOperatorNum = new RuleOperator<Float>(RuleOperatorType.Equal, false) {
@@ -709,7 +243,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(false);
         } catch (Exception e) {
             assertEquals("java.lang.ClassCastException", e.getClass().getName());
-            //assertFalse(e instanceof IllegalArgumentException);
         }
     }
 
@@ -732,8 +265,6 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(true);
         } catch (Exception e) {
             assertEquals("Something whent wrong", e.toString());
-//            assertEquals("This should not happen", e.getClass().getDescription());
-            //assertFalse(e instanceof IllegalArgumentException);
         }
 
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
@@ -742,11 +273,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(true);
         } catch (Exception e) {
             assertEquals("This should not happen", e.getClass().getName());
-            //assertFalse(e instanceof IllegalArgumentException);
         }
-
-        //Float 12 within 10 and 13 = True
-//        assertTrue(roWithin.getOperationResult(Float.valueOf(12), Float.valueOf(10), Float.valueOf(13)));
     }
 
     public void test_Create_RuleOperation_object_and_validate_operation_result() {
@@ -777,7 +304,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         assertEquals(50.7d, operand1.getValue());
         operand1.setValue(59.2d);
         assertEquals(59.2d, operand1.getValue());
-        ((OnValueChangedListener)operands2.get(0)).onValueChanged(((OnValueChangedListener) operands2.get(0)).getDataSourceId(), "43.5");
+        ((OnValueChangedListener)operands2.get(0)).onValueChanged(operands2.get(0).getDataSourceId(), "43.5");
         assertEquals(43.5d, operand1.getValue());
         assertEquals(true, roA.getValue().booleanValue());
         assertEquals(true, roB.getValue().booleanValue());
@@ -1035,16 +562,4 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
         }
 
     }
-
-
-
-//    public void test_XXX() {
-//        assertEquals("ON", mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName("Light_FF_Child_Ceiling").getItem().getState());
-//        mOpenHABWidgetControl_Mock.sendItemCommand("Light_FF_Child_Ceiling", "OFF");
-//        assertEquals("OFF", mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName("Light_FF_Child_Ceiling").getItem().getState());
-//    }
-
-//    public void test_YYY() {
-//        assertEquals("Mockoto_string", mHABApplication.toString());
-//    }
 }
