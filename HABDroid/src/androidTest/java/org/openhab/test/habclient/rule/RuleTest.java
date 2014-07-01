@@ -52,7 +52,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 //            public Object answer(InvocationOnMock invocation) throws Throwable {
 //                Object[] args = invocation.getArguments();
 //                mHABApplication.getOpenHABWidgetProvider().setOpenHABItem(
-//                        mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName(((OpenHABItem) args[0]).getName()).getItem()
+//                        mHABApplication.getOpenHABWidgetProvider().getWidgetByItemName(((OpenHABItem) args[0]).getDescription()).getItem()
 //                );
 //                return null;
 //            }
@@ -695,7 +695,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
 //        try {
 //            assertEquals((Integer)10, roEqual.parseValue("10"));
 //        } catch (Exception e) {
-//            assertEquals("This should not happen", e.getClass().getName());
+//            assertEquals("This should not happen", e.getClass().getDescription());
 //        }
 //    }
 
@@ -720,7 +720,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
-            assertEquals("This should not happen", e.toString()/*getClass().getName()*/);
+            assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
             //assertFalse(e instanceof IllegalArgumentException);
         }
     }
@@ -757,7 +757,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
-            assertEquals("This should not happen", e.toString()/*getClass().getName()*/);
+            assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
             //assertFalse(e instanceof IllegalArgumentException);
         }
     }
@@ -816,7 +816,7 @@ public class RuleTest extends android.test.ApplicationTestCase<HABApplication> {
             assertTrue(true);
         } catch (Exception e) {
             assertEquals("Something whent wrong", e.toString());
-//            assertEquals("This should not happen", e.getClass().getName());
+//            assertEquals("This should not happen", e.getClass().getDescription());
             //assertFalse(e instanceof IllegalArgumentException);
         }
 

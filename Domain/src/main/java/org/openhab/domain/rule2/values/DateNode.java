@@ -1,10 +1,10 @@
 package org.openhab.domain.rule2.values;
 
-import org.openhab.domain.rule2.IValueNode;
+import org.openhab.domain.rule2.INode;
 
 import java.util.Date;
 
-public class DateNode implements IValueNode<Date> {
+public class DateNode implements INode<Date> {
     private final Date mValue;
 
     public DateNode(Date value) {
@@ -12,12 +12,7 @@ public class DateNode implements IValueNode<Date> {
     }
 
     @Override
-    public Date getValue() {
+    public Date evaluate() {
         return mValue;
-    }
-
-    @Override
-    public String getName() {
-        return "DateNode";
     }
 }

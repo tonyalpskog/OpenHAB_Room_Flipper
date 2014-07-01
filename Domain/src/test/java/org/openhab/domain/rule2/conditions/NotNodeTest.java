@@ -1,4 +1,4 @@
-package org.openhab.domain.rule2.validators;
+package org.openhab.domain.rule2.conditions;
 
 import org.junit.Test;
 import org.openhab.domain.rule2.values.BooleanNode;
@@ -12,13 +12,13 @@ public class NotNodeTest {
     public void validate_givenTrue_returnFalse() {
         final BooleanNode booleanNode = new BooleanNode(true);
         final NotNode notNode = new NotNode(booleanNode);
-        assertThat(notNode.validate(), is(equalTo(false)));
+        assertThat(notNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
     public void validate_givenFalse_returnTrue() {
         final BooleanNode booleanNode = new BooleanNode(false);
         final NotNode notNode = new NotNode(booleanNode);
-        assertThat(notNode.validate(), is(equalTo(true)));
+        assertThat(notNode.evaluate(), is(equalTo(true)));
     }
 }

@@ -1,9 +1,8 @@
 package org.openhab.domain.rule2.values;
 
-import org.openhab.domain.rule2.IValidationNode;
-import org.openhab.domain.rule2.IValueNode;
+import org.openhab.domain.rule2.IConditionNode;
 
-public class BooleanNode implements IValidationNode, IValueNode<Boolean> {
+public class BooleanNode implements IConditionNode {
     private final boolean mValue;
 
     public BooleanNode(boolean value) {
@@ -11,17 +10,7 @@ public class BooleanNode implements IValidationNode, IValueNode<Boolean> {
     }
 
     @Override
-    public boolean validate() {
+    public Boolean evaluate() {
         return mValue;
-    }
-
-    @Override
-    public Boolean getValue() {
-        return mValue;
-    }
-
-    @Override
-    public String getName() {
-        return "Boolean";
     }
 }

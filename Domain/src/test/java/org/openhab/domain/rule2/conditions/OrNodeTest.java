@@ -1,4 +1,4 @@
-package org.openhab.domain.rule2.validators;
+package org.openhab.domain.rule2.conditions;
 
 import org.junit.Test;
 import org.openhab.domain.rule2.values.BooleanNode;
@@ -15,7 +15,7 @@ public class OrNodeTest {
 
         final OrNode andNode = new OrNode(first, second);
 
-        assertThat(andNode.validate(), is(equalTo(true)));
+        assertThat(andNode.evaluate(), is(equalTo(true)));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class OrNodeTest {
 
         final OrNode andNode = new OrNode(first, second);
 
-        assertThat(andNode.validate(), is(equalTo(true)));
+        assertThat(andNode.evaluate(), is(equalTo(true)));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class OrNodeTest {
 
         final OrNode andNode = new OrNode(first, second);
 
-        assertThat(andNode.validate(), is(equalTo(false)));
+        assertThat(andNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
@@ -45,6 +45,6 @@ public class OrNodeTest {
 
         final OrNode andNode = new OrNode(first, second);
 
-        assertThat(andNode.validate(), is(equalTo(true)));
+        assertThat(andNode.evaluate(), is(equalTo(true)));
     }
 }

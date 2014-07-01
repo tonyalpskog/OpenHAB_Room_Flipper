@@ -1,4 +1,4 @@
-package org.openhab.domain.rule2.validators;
+package org.openhab.domain.rule2.conditions;
 
 import org.junit.Test;
 import org.openhab.domain.rule2.values.BooleanNode;
@@ -19,7 +19,7 @@ public class EqualNodeTest {
 
         final EqualNode<Number> equalNode = new EqualNode<Number>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(false)));
+        assertThat(equalNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
@@ -29,7 +29,7 @@ public class EqualNodeTest {
 
         final EqualNode<Number> equalNode = new EqualNode<Number>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(true)));
+        assertThat(equalNode.evaluate(), is(equalTo(true)));
     }
 
     @Test
@@ -39,7 +39,7 @@ public class EqualNodeTest {
 
         final EqualNode<Date> equalNode = new EqualNode<Date>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(false)));
+        assertThat(equalNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class EqualNodeTest {
 
         final EqualNode<Date> equalNode = new EqualNode<Date>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(true)));
+        assertThat(equalNode.evaluate(), is(equalTo(true)));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class EqualNodeTest {
 
         final EqualNode<Boolean> equalNode = new EqualNode<Boolean>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(false)));
+        assertThat(equalNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
@@ -69,6 +69,6 @@ public class EqualNodeTest {
 
         final EqualNode<Boolean> equalNode = new EqualNode<Boolean>(first, second);
 
-        assertThat(equalNode.validate(), is(equalTo(true)));
+        assertThat(equalNode.evaluate(), is(equalTo(true)));
     }
 }

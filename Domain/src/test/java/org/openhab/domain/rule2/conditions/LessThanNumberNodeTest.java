@@ -1,4 +1,4 @@
-package org.openhab.domain.rule2.validators;
+package org.openhab.domain.rule2.conditions;
 
 import org.junit.Test;
 import org.openhab.domain.rule2.values.NumberNode;
@@ -14,7 +14,7 @@ public class LessThanNumberNodeTest {
         final NumberNode second = new NumberNode(0);
 
         final LessThanNumberNode lessThanNumberNode = new LessThanNumberNode(first, second);
-        assertThat(lessThanNumberNode.validate(), is(equalTo(false)));
+        assertThat(lessThanNumberNode.evaluate(), is(equalTo(false)));
     }
 
     @Test
@@ -23,7 +23,7 @@ public class LessThanNumberNodeTest {
         final NumberNode second = new NumberNode(12312.3f);
 
         final LessThanNumberNode lessThanNumberNode = new LessThanNumberNode(first, second);
-        assertThat(lessThanNumberNode.validate(), is(equalTo(true)));
+        assertThat(lessThanNumberNode.evaluate(), is(equalTo(true)));
     }
 
     @Test
@@ -32,6 +32,6 @@ public class LessThanNumberNodeTest {
         final NumberNode second = new NumberNode(42);
 
         final LessThanNumberNode lessThanNumberNode = new LessThanNumberNode(first, second);
-        assertThat(lessThanNumberNode.validate(), is(equalTo(false)));
+        assertThat(lessThanNumberNode.evaluate(), is(equalTo(false)));
     }
 }

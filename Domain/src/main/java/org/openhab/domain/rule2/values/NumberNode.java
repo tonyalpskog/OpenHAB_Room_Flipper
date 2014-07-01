@@ -1,8 +1,8 @@
 package org.openhab.domain.rule2.values;
 
-import org.openhab.domain.rule2.IValueNode;
+import org.openhab.domain.rule2.INode;
 
-public class NumberNode implements IValueNode<Number> {
+public class NumberNode implements INode<Number> {
     private final Number mNumber;
 
     public NumberNode(Number number) {
@@ -10,12 +10,7 @@ public class NumberNode implements IValueNode<Number> {
     }
 
     @Override
-    public Number getValue() {
+    public Number evaluate() {
         return mNumber;
-    }
-
-    @Override
-    public String getName() {
-        return "Number";
     }
 }
