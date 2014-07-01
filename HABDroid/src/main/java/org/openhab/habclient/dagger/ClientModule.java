@@ -6,6 +6,7 @@ import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
+import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.GraphicUnitWidget;
@@ -34,6 +35,7 @@ import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.rule.RuleOperandDialogFragment;
 import org.openhab.habclient.rule.RuleOperationFragment;
 import org.openhab.habclient.rule.UnitOperandSelectionDialogFragment;
+import org.openhab.habclient.wear.WearCommandHost;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
@@ -65,6 +67,7 @@ injects = {
         UnitContainerView.class, //TODO: create adapter for this instead
         RuleOperandDialogFragment.class,
         SpeechService.class,
+        WearCommandHost.class,
         HABApplication.class
 })
 public class ClientModule {
@@ -122,4 +125,7 @@ public class ClientModule {
     public ILogger provideLogger(AndroidLogger logger) {
         return logger;
     }
+
+    @Provides @Singleton
+    public IWearCommandHost provideWearCommandHost(WearCommandHost wearCommandHost) { return wearCommandHost; }
 }

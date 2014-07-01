@@ -1,5 +1,6 @@
 package org.openhab.test.habclient.wear;
 
+import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.dagger.AndroidModule;
@@ -18,7 +19,7 @@ import dagger.Provides;
  */
 public class LiveWearTest extends android.test.ApplicationTestCase<HABApplication> {
     private HABApplication mHABApplication;
-    @Inject WearCommandHost mWearCommandHost;
+    @Inject IWearCommandHost mIWearCommandHost;
 
     public LiveWearTest() {
         super(HABApplication.class);
@@ -33,7 +34,7 @@ public class LiveWearTest extends android.test.ApplicationTestCase<HABApplicatio
                 .plus(new AndroidModule(mHABApplication), new TestModule(mHABApplication));
         graph.inject(this);
 
-        mWearCommandHost.registerReceiver();
+        mIWearCommandHost.registerReceiver();
     }
 
     @Module(injects = LiveWearTest.class, includes = ClientModule.class, overrides = true)
@@ -45,18 +46,18 @@ public class LiveWearTest extends android.test.ApplicationTestCase<HABApplicatio
         }
 
         @Provides @Singleton
-        public WearCommandHost provideWearCommandHost(ICommandAnalyzer commandAnalyzer) {
-            return new WearCommandHost(mApp, commandAnalyzer);
+        public IWearCommandHost provideWearCommandHost() {
+            return new WearCommandHost(mApp);
         }
     }
 
     public void tearDown() {
-        mWearCommandHost.unregisterReceiver();
+        mIWearCommandHost.unregisterReceiver();
     }
 
     public void testShowLeakageMessageOnWear() {
 //        mWearCommandHost = new WearCommandHost(mHABApplication);
 //        mWearCommandHost.registerReceiver();
-        mWearCommandHost.startSession("Leakage alarm", "Kitchen Dishwasher leakage sensor [closed]");
+        mIWearCommandHost.startSession("Leakage alarm", "Kitchen Dishwasher leakage sensor [closed]");
     }
 }

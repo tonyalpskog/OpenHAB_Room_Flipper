@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.wear.WearCommandHost;
@@ -38,7 +39,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
     private HABApplication mApplication;
-    private WearCommandHost mWearCommandHost;
+    @Inject IWearCommandHost mWearCommandHost;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;
@@ -64,7 +65,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         InjectUtils.inject(this);
 
-        mWearCommandHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
+//        mWearCommandHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
     }
 
     @Override

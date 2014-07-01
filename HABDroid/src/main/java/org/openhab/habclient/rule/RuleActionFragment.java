@@ -101,12 +101,10 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openActionBuilderDialog(position);
-//                mSelectedActionPosition = position;
+                mSelectedActionPosition = position;
 //                mListView.setItemChecked(position, true);
-
-//                    mListView.getFocusables(position);
-//                    mListView.setSelection(position);
+//                mListView.getFocusables(position);
+//                mListView.setSelection(position);
             }
         });
 
@@ -184,29 +182,29 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit_rule_action:
-                openActionBuilderDialog(mSelectedActionPosition);
+                openActionBuilderDialog(mSelectedActionPosition, RuleActionType.COMMAND);//COMMAND is used as default if something goes wrong.
                 break;
             case R.id.action_delete_rule_action:
                 //TODO - TA: Implement this.
                 Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_add_rule_command_action:
-                openActionBuilderDialog(-1);
+                openActionBuilderDialog(-1, RuleActionType.COMMAND);
                 break;
             case R.id.action_add_rule_message_action:
-                openActionBuilderDialog(-1);
+                openActionBuilderDialog(-1, RuleActionType.MESSAGE);
                 break;
         }
         return true;
     }
 
-    private void openActionBuilderDialog(int position) {
+    private void openActionBuilderDialog(int position, RuleActionType actionType) {
         mSelectedActionPosition = position;
 
         if(mSelectedActionPosition > -1)
             mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
         else
-            mActionUnderConstruction = new RuleAction(RuleActionType.COMMAND, mWidgetProvider);//TODO - TA: Let the user decide if COMMAND or MESSAGE
+            mActionUnderConstruction = new RuleAction(actionType, mWidgetProvider);
 
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();

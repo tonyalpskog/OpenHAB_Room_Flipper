@@ -87,6 +87,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
         updateRuleTree(((RuleEditActivity)getActivity()).getRule().getRuleOperation());
 
+        ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
+
         mTreeView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
             @Override
@@ -328,7 +330,6 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                                     false,
                                     mRuleOperationProvider,
                                     mWidgetProvider);
-                            ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
                             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
                                     "Select an operator",
                                     true,
@@ -375,7 +376,6 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
     public void openRuleOperandDialogFragment(IEntityDataType currentOperand, int position, boolean showNextButton) {
         ((RuleEditActivity)getActivity()).setOperandToEdit(currentOperand);
-        ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
         final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(
                 position != -1 ? position : 0, showNextButton);
         dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
@@ -388,7 +388,6 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         } else if (rti == null || rti.getItemType() == RuleTreeItem.ItemType.OPERAND) {
             if(rti == null && mOperationUnderConstruction == null && ((RuleEditActivity)getActivity()).getRule().getRuleOperation() == null) {
                 ((RuleEditActivity)getActivity()).setOperandToEdit(null);
-                ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
                 final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(0, true);
                 dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
                 return;
@@ -403,7 +402,6 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             }
             mOperationUnderConstruction.setActive(false);
             ((RuleEditActivity)getActivity()).setOperandToEdit(mOperationUnderConstruction.getOperand(operandPosition));
-            ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
             final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(
                     operandPosition != -1 ? operandPosition : 0
                     , operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()));

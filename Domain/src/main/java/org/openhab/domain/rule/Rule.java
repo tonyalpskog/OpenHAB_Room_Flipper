@@ -2,11 +2,14 @@ package org.openhab.domain.rule;
 
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.util.StringHandler;
+import org.openhab.domain.wear.IWearCommandHost;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -18,6 +21,7 @@ public class Rule implements OnOperandValueChangedListener {
     protected List<RuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
     protected final IOpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
+    @Inject IWearCommandHost mWearCommandHost;
 
     public Rule(IOpenHABWidgetControl widgetControl) {
         this("New Rule", widgetControl);
@@ -82,7 +86,10 @@ public class Rule implements OnOperandValueChangedListener {
         for(RuleAction action : mActions) {
             if(StringHandler.isNullOrEmpty(action.mTargetOpenHABItemName) || StringHandler.isNullOrEmpty(action.getCommand()))
                 continue;
-            mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
+            if(action.getActionType() == RuleActionType.COMMAND)
+                mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
+            else
+                mWearCommandHost.startSession("Rule Action", action.getTextValue());
         }
     }
 

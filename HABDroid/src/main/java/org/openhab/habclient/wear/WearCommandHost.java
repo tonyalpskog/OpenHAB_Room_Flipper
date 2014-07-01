@@ -16,19 +16,19 @@ import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class WearCommandHost {
-    public static final String EXTRA_REPLY = "Command";
+public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost {
     private static final String ACTION_RESPONSE = "com.zenit.android.wearable.openhab.COMMAND";
     private BroadcastReceiver mReceiver;
-    private HABApplication mApplication;
-    private final ICommandAnalyzer mCommandAnalyzer;
+    @Inject HABApplication mApplication;
+    @Inject ICommandAnalyzer mCommandAnalyzer;
 
-    public WearCommandHost(HABApplication application, ICommandAnalyzer commandAnalyzer) {
+    public WearCommandHost(HABApplication application) {
         mApplication = application;
-        mCommandAnalyzer = commandAnalyzer;
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -38,15 +38,18 @@ public class WearCommandHost {
         };
     }
 
+    @Override
     public void registerReceiver() {
         mApplication.registerReceiver(mReceiver, new IntentFilter(ACTION_RESPONSE));
     }
 
+    @Override
     public void unregisterReceiver() {
         NotificationManagerCompat.from(mApplication).cancel(0);
         mApplication.unregisterReceiver(mReceiver);
     }
 
+    @Override
     public void startSession(String title, String message) {
         showNotification(title, message);
     }
