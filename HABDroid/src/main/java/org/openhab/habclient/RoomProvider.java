@@ -1,9 +1,5 @@
 package org.openhab.habclient;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
@@ -20,7 +16,6 @@ import javax.inject.Inject;
 public class RoomProvider implements IRoomProvider {
     private HashMap<UUID, Room> roomHash;
     private UUID initialRoomId;
-    private Context mContext;
     private final ILogger mLogger;
     private final IColorParser mColorParser;
     private final IOpenHABSetting mOpenHABSetting;
@@ -28,9 +23,8 @@ public class RoomProvider implements IRoomProvider {
     private Room mNewRoom = null;
 
     @Inject
-    public RoomProvider(Context context, ILogger logger, IColorParser colorParser,
+    public RoomProvider(ILogger logger, IColorParser colorParser,
                         IOpenHABSetting openHABSetting, IOpenHABWidgetProvider widgetProvider) {
-        mContext = context;
         mLogger = logger;
         mColorParser = colorParser;
         mOpenHABSetting = openHABSetting;
@@ -88,13 +82,9 @@ public class RoomProvider implements IRoomProvider {
         return roomHash.get(initialRoomId);
     }
 
-    private Bitmap getBitmap(int bitmapResourceId) {
-        return BitmapFactory.decodeResource(mContext.getResources(), bitmapResourceId);
-    }
-
     @Override
     public Room createNewRoom() {
-        mNewRoom = new Room(null, "New room", R.drawable.empty_room, mContext, mLogger,
+        mNewRoom = new Room(null, "New room", R.drawable.empty_room, mLogger,
                 mColorParser, mWidgetProvider);
         return mNewRoom;
     }
@@ -115,35 +105,35 @@ public class RoomProvider implements IRoomProvider {
         if (!mOpenHABSetting.runningInDemoMode()) {
             //Initializing basement
             Room roomBasementLaundry = addRoom(new Room("FF_Bath", "Tvättstuga", R.drawable.basement_laundry,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementStaircase = addRoom(new Room("FF_Office", "Källar hall", R.drawable.basement_staircase,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementBath = addRoom(new Room("FF_Child", "Källar bad", R.drawable.basement_bath,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementHobby = addRoom(new Room("GF_Living", "Hobbyrum", R.drawable.basement_hobby,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementSauna = addRoom(new Room("GF_Kitchen", "Bastu", R.drawable.basement_sauna,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementStorage = addRoom(new Room("FF_Bed", "Källar förråd", R.drawable.basement_storage,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomBasementSouth = addRoom(new Room("GF_Toilet", "Krypgrund", R.drawable.basement_south,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
 
             //Initializing ground floor
             Room roomGroundFloorHallway = addRoom(new Room("FF_Bath", "Hall", R.drawable.groundfloor_hallway,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorBath = addRoom(new Room("FF_Child", "Gästtoa", R.drawable.groundfloor_bath,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorStorage = addRoom(new Room("GF_Living", "Förråd", R.drawable.groundfloor_storage,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorCleaning = addRoom(new Room("GF_Kitchen", "Städskrubb", R.drawable.groundfloor_cleaning,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorKitchen = addRoom(new Room("FF_Bed", "Kök", R.drawable.groundfloor_kitchen,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorLivingroom = addRoom(new Room("GF_Toilet", "Vardagsrum", R.drawable.groundfloor_livingroom,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room roomGroundFloorDiningroom = addRoom(new Room("GF_Toilet", "Matsal", R.drawable.groundfloor_diningroom,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
 
             initialRoomId = roomBasementStaircase.getId();
 
@@ -243,61 +233,61 @@ public class RoomProvider implements IRoomProvider {
         } else {
             //Demo
             Room room0Center = addRoom(new Room("FF_Bath", "Källare mitten", R.drawable.room_0_c,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0East = addRoom(new Room("FF_Office", "Källare öster", R.drawable.room_0_e,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0North = addRoom(new Room("FF_Child", "Källare norr", R.drawable.room_0_n,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0NorthEast = addRoom(new Room("GF_Living", "Källare nordost", R.drawable.room_0_ne,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0NorthWest = addRoom(new Room("GF_Kitchen", "Källare nordväst", R.drawable.room_0_nw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0South = addRoom(new Room("FF_Bed", "Källare söder", R.drawable.room_0_s,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0SouthEast = addRoom(new Room("GF_Toilet", "Källare sydost", R.drawable.room_0_se,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0SouthWest = addRoom(new Room("GF_Corridor", "Källare sydväst", R.drawable.room_0_sw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room0West = addRoom(new Room("FF_Corridor", "Källare väster", R.drawable.room_0_w,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
 
             Room room1Center = addRoom(new Room("Outdoor", "Entré plan mitten", R.drawable.room_1_c,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1East = addRoom(new Room("Shutters", "Entré plan öster", R.drawable.room_1_e,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1North = addRoom(new Room("Weather", "Entré plan norr", R.drawable.room_1_n,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1NorthEast = addRoom(new Room("Status", "Entré plan nordost", R.drawable.room_1_ne,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1NorthWest = addRoom(new Room("Lights", "Entré plan nordväst", R.drawable.room_1_nw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1South = addRoom(new Room("Heating", "Entré plan söder", R.drawable.room_1_s,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1SouthEast = addRoom(new Room("Temperature", "Entré plan sydost", R.drawable.room_1_se,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1SouthWest = addRoom(new Room("Windows", "Entré plan sydväst", R.drawable.room_1_sw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room1West = addRoom(new Room("Weather_Chart", "Entré plan väster", R.drawable.room_1_w,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
 
             Room room2Center = addRoom(new Room("FF_Bath", "Övre plan mitten", R.drawable.room_2_c,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2East = addRoom(new Room("FF_Bath", "Övre plan öster", R.drawable.room_2_e,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2North = addRoom(new Room("FF_Bath", "Övre plan norr", R.drawable.room_2_n,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2NorthEast = addRoom(new Room("FF_Bath", "Övre plan nordost", R.drawable.room_2_ne,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2NorthWest = addRoom(new Room("FF_Bath", "Övre plan nordväst", R.drawable.room_2_nw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2South = addRoom(new Room("FF_Bath", "Övre plan söder", R.drawable.room_2_s,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2SouthEast = addRoom(new Room("FF_Bath", "Övre plan sydost", R.drawable.room_2_se,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2SouthWest = addRoom(new Room("FF_Bath", "Övre plan sydväst", R.drawable.room_2_sw,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
             Room room2West = addRoom(new Room("FF_Bath", "Övre plan väster", R.drawable.room_2_w,
-                    mContext, mLogger, mColorParser, mWidgetProvider));
+                    mLogger, mColorParser, mWidgetProvider));
 
             initialRoomId = room0Center.getId();
 

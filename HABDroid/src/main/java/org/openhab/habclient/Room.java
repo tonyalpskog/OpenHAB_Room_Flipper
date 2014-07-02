@@ -1,8 +1,5 @@
 package org.openhab.habclient;
 
-import android.content.Context;
-import android.util.Log;
-
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IColorParser;
@@ -27,18 +24,16 @@ public class Room {
     private HashMap<UUID, GraphicUnit> unitHash = null;
     private UUID mLatestWidgetUpdateUUID;
     private OpenHABWidget mLocalWidget;
-    private Context mContext;
     private int mBackgroundImageResourceId;
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final ILogger mLogger;
     private final IColorParser mColorParser;
 
-    public Room(String groupItemName, String name, int backgroundImageResourceId, Context context,
+    public Room(String groupItemName, String name, int backgroundImageResourceId,
                 ILogger logger, IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
         this(groupItemName, name, logger, colorParser, widgetProvider);
 
         mBackgroundImageResourceId = backgroundImageResourceId;
-        mContext = context;
     }
 
     public Room(String groupItemId, String name, ILogger logger, IColorParser colorParser,
@@ -68,7 +63,6 @@ public class Room {
         copy.unitHash = (HashMap<UUID, GraphicUnit>) this.unitHash.clone();
         copy.mLatestWidgetUpdateUUID = this.mLatestWidgetUpdateUUID;
         copy.mLocalWidget = this.mLocalWidget;
-        copy.mContext = this.mContext;
         copy.mBackgroundImageResourceId = this.mBackgroundImageResourceId;
 
         return copy;
@@ -136,7 +130,7 @@ public class Room {
             if (gu.getOpenHABWidget().getId().equals(widget.getId()))
                 isContained = true;
         }
-        Log.d(TAG, "contains() -> " + widget.getId() + " is " + (isContained? "": "NOT") + " contained in " + strLogAll);
+        mLogger.d(TAG, "contains() -> " + widget.getId() + " is " + (isContained? "": "NOT") + " contained in " + strLogAll);
         return isContained;
     }
 

@@ -138,7 +138,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 // Start launch activity
                 getActivity().startActivity(widgetListIntent);
-                
+
                 return true;
             case R.id.action_start_wear_app:
                 mWearCommandHost.startSession("Room navigation", "Please, response with the name of a room");
