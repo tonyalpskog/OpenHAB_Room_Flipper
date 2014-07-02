@@ -80,6 +80,7 @@ import org.openhab.habclient.MainActivity;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
 import org.openhab.habdroid.core.OpenHABTracker;
 import org.openhab.habdroid.core.OpenHABTrackerReceiver;
@@ -92,7 +93,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -159,8 +159,8 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     private List<OpenHABSitemap> mSitemapList;
     private List<OpenHABSitemap> mNavDrawerItemList;
 
-    @Inject
-    IOpenHABSetting mOpenHABSetting;
+    @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject IDocumentFactory mDocumentFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -410,16 +410,15 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         String restURL = baseUrl + "rest/sitemaps";
         Log.d(TAG, "[AsyncHttpClient] GET Request from: " + restURL);
         startProgressIndicator();
-        mAsyncHttpClient.get(restURL, new DocumentHttpResponseHandler() {
+        mAsyncHttpClient.get(restURL, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 stopProgressIndicator();
                 Log.d(TAG, "[AsyncHttpClient] Response: " + document.toString());
 
                 //Remove all sitemap items in navigator drawer.
-                Iterator<OpenHABSitemap> iterator = mSitemapList.iterator();
-                while(iterator.hasNext()) {
-                    mNavDrawerItemList.remove(iterator.next());
+                for (OpenHABSitemap aMSitemapList : mSitemapList) {
+                    mNavDrawerItemList.remove(aMSitemapList);
                 }
 
                 mSitemapList.clear();

@@ -3,6 +3,8 @@ package org.openhab.test.habclient.command;
 import android.test.AndroidTestCase;
 
 import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
@@ -17,15 +19,15 @@ import org.openhab.domain.util.RegExResult;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IRoomProvider;
-import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.CommandAnalyzerResult;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.OpenHABWidgetCommandType;
-import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.habclient.dagger.AndroidModule;
 import org.openhab.habclient.dagger.ClientModule;
+import org.openhab.domain.IDocumentFactory;
+import org.openhab.domain.DocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -185,11 +187,11 @@ public class CommandTest extends AndroidTestCase {
 
     //-------------------------- UNITS -------------------------------
     private void requestOpenHABData(String htmlResponseData) {
-        DocumentHttpResponseHandlerWrapper documentHandler = new DocumentHttpResponseHandlerWrapper();
+        final IDocumentFactory responseParser = new DocumentFactory();
         Document document = null;
         try {
             assertTrue("htmlResponseData is NULL!", htmlResponseData != null);
-            document = documentHandler.parseResponse(htmlResponseData);
+            document = responseParser.build(htmlResponseData);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {

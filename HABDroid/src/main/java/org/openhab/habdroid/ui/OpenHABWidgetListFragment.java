@@ -59,6 +59,7 @@ import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
 import org.w3c.dom.Document;
@@ -122,6 +123,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
     @Inject IWidgetTypeLayoutProvider mWidgetLayoutProvider;
     @Inject ILogger mLogger;
     @Inject IColorParser mColorParser;
+    @Inject IDocumentFactory mDocumentFactory;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -340,7 +342,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
         }
         //TA - Calling REST Get method, requesting data from server.
-        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mActivity) {
+        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mActivity, mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 if (document != null) {

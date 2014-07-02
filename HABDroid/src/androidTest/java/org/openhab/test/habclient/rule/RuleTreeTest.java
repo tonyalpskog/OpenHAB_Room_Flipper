@@ -1,9 +1,12 @@
 package org.openhab.test.habclient.rule;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
+import org.openhab.domain.DocumentFactory;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
@@ -17,7 +20,6 @@ import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.RegularExpression;
-import org.openhab.domain.OpenHABWidgetProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleTreeTest extends AndroidTestCase {
+public class RuleTreeTest extends TestCase {
     private IRuleOperationProvider mRop;
     private IOpenHABWidgetProvider mWidgetProvider;
 
@@ -39,9 +41,9 @@ public class RuleTreeTest extends AndroidTestCase {
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
         mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
-
-        final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, mWidgetProvider);
-        httpDataSetup.loadHttpDataFromString();
+        final IDocumentFactory documentFactory = new DocumentFactory();
+        final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
+        mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
 
         mRop = new RuleOperationProvider();
     }

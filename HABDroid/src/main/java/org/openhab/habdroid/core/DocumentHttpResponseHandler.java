@@ -29,31 +29,25 @@
 
 package org.openhab.habdroid.core;
 
-import android.content.Context;
 import android.os.Message;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.apache.http.Header;
+import org.openhab.domain.IDocumentFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class DocumentHttpResponseHandler extends AsyncHttpResponseHandler {
-Context mContext = null;
+    private final IDocumentFactory mResponseParser;
 
-    public DocumentHttpResponseHandler(Context context) {
-        mContext = context;
-    }
-
-    public DocumentHttpResponseHandler() {
+    public DocumentHttpResponseHandler(IDocumentFactory responseParser) {
+        mResponseParser = responseParser;
     }
 
     public void onSuccess(Document response) {}
@@ -75,6 +69,7 @@ Context mContext = null;
     }
 
     // Methods which emulate android's Handler and Message methods
+    @Override
     protected void handleMessage(Message msg) {
         Object[] response;
 
@@ -85,8 +80,8 @@ Context mContext = null;
                 Log.d("DocumentHttpResponseHandler", String.format("response[%d]", response.length));
                 try {
                     Log.d("DocumentHttpResponseHandler", "Got response = " + (String) response[2]);
-                    responseDocument = parseResponse((String) response[2]);
-                    handleSuccessMessage(((Integer) response[0]).intValue(), (Header[]) response[1], responseDocument);
+                    responseDocument = mResponseParser.build((String) response[2]);
+                    handleSuccessMessage((Integer) response[0], (Header[]) response[1], responseDocument);
                 } catch (ParserConfigurationException e) {
                     handleFailureMessage(e, (String) response[2]);
                 } catch (IOException e) {
@@ -107,33 +102,4 @@ Context mContext = null;
                 break;
         }
     }
-
-    protected Document parseResponse(String responseBody) throws ParserConfigurationException, IOException, SAXException {
-//        writeDataToFile(responseBody);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document;
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        if (responseBody != null) {
-            document = builder.parse(new ByteArrayInputStream(responseBody.getBytes()));
-            return document;
-        } else
-            return null;
-    }
-
-//    private void writeDataToFile(String stringData) {
-//        OutputStreamWriter outputStreamWriter = null;
-//        try {
-//            mContext.deleteFile("MyTestDataFile.txt");
-//            outputStreamWriter = new OutputStreamWriter(mContext.openFileOutput("MyTestDataFile.txt", mContext.MODE_PRIVATE));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            outputStreamWriter.write(stringData);
-//            outputStreamWriter.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

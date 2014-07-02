@@ -13,6 +13,7 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
+import org.openhab.domain.IDocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -27,24 +28,28 @@ public class RestCommunication implements IRestCommunication {
     private final IOpenHABSetting mOpenHABSetting;
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final Context mContext;
+    private final IDocumentFactory mDocumentFactory;
 
     @Inject
     public RestCommunication(Context context,
                              ILogger logger,
                              IColorParser colorParser,
                              IOpenHABSetting openHABSetting,
-                             IOpenHABWidgetProvider widgetProvider) {
+                             IOpenHABWidgetProvider widgetProvider,
+                             IDocumentFactory documentFactory) {
         if(context == null) throw new IllegalArgumentException("context is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");
         if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
         if(openHABSetting == null) throw new IllegalArgumentException("openHABSetting is null");
         if(widgetProvider == null) throw new IllegalArgumentException("widgetProvider is null");
+        if(documentFactory == null) throw new IllegalArgumentException("documentFactory is null");
 
         mContext = context;
         mLogger = logger;
         mColorParser = colorParser;
         mOpenHABSetting = openHABSetting;
         mWidgetProvider = widgetProvider;
+        mDocumentFactory = documentFactory;
     }
 
     @Override
@@ -77,7 +82,7 @@ public class RestCommunication implements IRestCommunication {
         final AsyncHttpClient asyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
 
         mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
-        asyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler() {
+        asyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 if (document == null) {

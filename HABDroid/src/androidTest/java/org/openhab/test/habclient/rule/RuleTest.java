@@ -1,10 +1,14 @@
 package org.openhab.test.habclient.rule;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
+import org.openhab.domain.DocumentFactory;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.PopularNameProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IOperator;
@@ -22,10 +26,6 @@ import org.openhab.domain.rule.operators.WithinNumberRuleOperator;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.RegularExpression;
-import org.openhab.habclient.AndroidLogger;
-import org.openhab.habclient.ColorParser;
-import org.openhab.domain.OpenHABWidgetProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -35,10 +35,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleTest extends AndroidTestCase {
+public class RuleTest extends TestCase {
+
     private UnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     private IRuleOperationProvider mRuleOperationProvider;
@@ -46,16 +49,14 @@ public class RuleTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        final ILogger logger = new AndroidLogger();
-        final IColorParser colorParser = new ColorParser();
+        final ILogger logger = mock(ILogger.class);
+        final IColorParser colorParser = mock(IColorParser.class);
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
         mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
-
-        final HttpDataSetup httpDataSetup = new HttpDataSetup(logger,
-                colorParser,
-                mWidgetProvider);
-        httpDataSetup.loadHttpDataFromString();
+        final IDocumentFactory documentFactory = new DocumentFactory();
+        final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
+        mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
 
         mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
         mRuleOperationProvider = new RuleOperationProvider();
