@@ -1,4 +1,4 @@
-package org.openhab.test.habclient.rule;
+package org.openhab.domain.rule;
 
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;

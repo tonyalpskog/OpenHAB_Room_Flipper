@@ -1,7 +1,8 @@
-package org.openhab.test.habclient.rule;
+package org.openhab.domain.rule;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetProvider;
@@ -10,14 +11,6 @@ import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.rule.IEntityDataType;
-import org.openhab.domain.rule.IOperator;
-import org.openhab.domain.rule.IRuleOperationProvider;
-import org.openhab.domain.rule.OnValueChangedListener;
-import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.RuleOperationProvider;
-import org.openhab.domain.rule.RuleOperatorType;
-import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.AfterDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.EqualNumberRuleOperator;
 import org.openhab.domain.rule.operators.LessThanNumberRuleOperator;
@@ -40,14 +33,13 @@ import static org.mockito.Mockito.mock;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleTest extends TestCase {
-
+public class RuleTest {
     private UnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
-
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
+
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
 
         final ILogger logger = mock(ILogger.class);
         final IColorParser colorParser = mock(IColorParser.class);
@@ -64,27 +56,31 @@ public class RuleTest extends TestCase {
 
     //================================= UNITS ===================================
 
+    @Test
     public void testSimple1() throws Exception {
         final int expected = 3;
         final int reality = 3;
-        assertEquals(expected, reality);
+        Assert.assertEquals(expected, reality);
     }
 
+    @Test
     public void testSimple2() {
-        assertTrue(true);
+        Assert.assertTrue(true);
     }
 
+    @Test
     public void testGetWidgetById() {
         OpenHABWidget unit = mWidgetProvider.getWidgetByID("GF_Kitchen_0");
-        assertEquals("Ceiling", unit.getLabel());
-        assertEquals("Light_GF_Kitchen_Ceiling", unit.getItem().getName());
+        Assert.assertEquals("Ceiling", unit.getLabel());
+        Assert.assertEquals("Light_GF_Kitchen_Ceiling", unit.getItem().getName());
     }
 
+    @Test
     public void testMathEpsilonDiff() {
         Float f = 34.7f;
         Double d = 34.7;
-        assertEquals(true, Math.abs(f.doubleValue() - d) < 8E-7f);
-        assertEquals(true, Math.abs(d - f.doubleValue()) < 8E-7f);
+        Assert.assertEquals(true, Math.abs(f.doubleValue() - d) < 8E-7f);
+        Assert.assertEquals(true, Math.abs(d - f.doubleValue()) < 8E-7f);
     }
 
 //    Calculate EPSILON
@@ -94,6 +90,7 @@ public class RuleTest extends TestCase {
 //        assertEquals(0, Math.abs(f.doubleValue() - d.doubleValue()));
 //    }
 
+    @Test
     public void test_Verify_value_and_name_in_UnitEntityDataType() {
         UnitEntityDataType rue = new UnitEntityDataType("Test Value", 50.7) {
             @Override
@@ -107,10 +104,10 @@ public class RuleTest extends TestCase {
             }
         };
 
-        assertTrue(rue.getValue() != null);
-        assertEquals(50.7, rue.getValue());
-        assertEquals("50.7", rue.getFormattedString());
-        assertEquals("Test Value", rue.getName());
+        Assert.assertTrue(rue.getValue() != null);
+        Assert.assertEquals(50.7, rue.getValue());
+        Assert.assertEquals("50.7", rue.getFormattedString());
+        Assert.assertEquals("Test Value", rue.getName());
 
         //Now with a custom getFormattedString() method.
         rue = new UnitEntityDataType("Test Value", 50.7) {
@@ -129,10 +126,10 @@ public class RuleTest extends TestCase {
             }
         };
 
-        assertTrue(rue.getValue() != null);
-        assertEquals(50.7, rue.getValue());
-        assertEquals("50.7%Rh", rue.getFormattedString());
-        assertEquals("Test Value", rue.getName());
+        Assert.assertTrue(rue.getValue() != null);
+        Assert.assertEquals(50.7, rue.getValue());
+        Assert.assertEquals("50.7%Rh", rue.getFormattedString());
+        Assert.assertEquals("Test Value", rue.getName());
     }
 
     private List<IEntityDataType> getOperandsAsList() {
@@ -155,6 +152,7 @@ public class RuleTest extends TestCase {
         return operands;
     }
 
+    @Test
     public void test_should_be_able_to_use_a_List_of_IUnitEntityDataType_as_RuleOperator_input() {
         RuleOperator<Float> testOperatorNum = new RuleOperator<Float>(RuleOperatorType.Equal, false) {
             @Override
@@ -173,14 +171,15 @@ public class RuleTest extends TestCase {
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
         try {
             testOperatorNum.getOperationResult(operands);
-            assertTrue(true);
+            Assert.assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
-            assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
+            Assert.assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
             //assertFalse(e instanceof IllegalArgumentException);
         }
     }
 
+    @Test
     public void test_should_be_able_to_use_a_List_of_IUnitEntityDataType_as_RuleOperator_input2() {
         RuleOperator<Number> testOperatorNum = new RuleOperator<Number>(RuleOperatorType.Equal, false) {
             @Override
@@ -195,7 +194,7 @@ public class RuleTest extends TestCase {
                     result = result.floatValue() + ((Number)iterator.next()).floatValue();
                 }
 
-                assertEquals(101.4f, result);
+                Assert.assertEquals(101.4f, result);
                 return true;
             }
 
@@ -210,14 +209,15 @@ public class RuleTest extends TestCase {
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
         try {
             testOperatorNum.getOperationResult(operands);
-            assertTrue(true);
+            Assert.assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
-            assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
+            Assert.assertEquals("This should not happen", e.toString()/*getClass().getDescription()*/);
             //assertFalse(e instanceof IllegalArgumentException);
         }
     }
 
+    @Test
     public void test_should_be_able_to_use_a_List_of_IUnitEntityDataType_as_RuleOperator_input3() {
         RuleOperator<Boolean> testOperatorNum = new RuleOperator<Boolean>(RuleOperatorType.Equal, false) {
             @Override
@@ -246,45 +246,47 @@ public class RuleTest extends TestCase {
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
         try {
             testOperatorNum.getOperationResult(operands);
-            assertTrue(false);
+            Assert.assertTrue(false);
         } catch (Exception e) {
-            assertEquals("java.lang.ClassCastException", e.getClass().getName());
+            Assert.assertEquals("java.lang.ClassCastException", e.getClass().getName());
         }
     }
 
+    @Test
     public void test_RuleOperator_should_accept_both_values_in_list_as_operands() {
         IOperator<Number> roEqual = new EqualNumberRuleOperator();
 
         List<IEntityDataType> operands = getOperandsAsList();
 
-        assertTrue(operands.get(0) != null);
-        assertTrue(operands.get(1) != null);
+        Assert.assertTrue(operands.get(0) != null);
+        Assert.assertTrue(operands.get(1) != null);
 
-        assertTrue(operands.get(0).getValue() != null);
-        assertTrue(operands.get(1).getValue() != null);
+        Assert.assertTrue(operands.get(0).getValue() != null);
+        Assert.assertTrue(operands.get(1).getValue() != null);
 
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
         try {
             roEqual.getOperationResult(Double.valueOf(operands.get(0).getValue().toString()), Double.valueOf(operands.get(1).getValue().toString()));
             roEqual.getOperationResult(roEqual.parseValue(operands.get(0).getValue().toString()), roEqual.parseValue(operands.get(1).getValue().toString()));
             roEqual.getOperationResult(operands);
-            assertTrue(true);
+            Assert.assertTrue(true);
         } catch (Exception e) {
-            assertEquals("Something whent wrong", e.toString());
+            Assert.assertEquals("Something whent wrong", e.toString());
         }
 
         //IllegalArgumentException shall be thrown if there isn´t exactly 3 numbers of operation values.
         try {
             roEqual.getOperationResult(Double.valueOf(operands.get(0).getValue().toString()), Double.valueOf(operands.get(1).getValue().toString()));
-            assertTrue(true);
+            Assert.assertTrue(true);
         } catch (Exception e) {
-            assertEquals("This should not happen", e.getClass().getName());
+            Assert.assertEquals("This should not happen", e.getClass().getName());
         }
     }
 
+    @Test
     public void test_Create_RuleOperation_object_and_validate_operation_result() {
-        assertEquals("Humidity percentage", mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
-        assertEquals(50.7, mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
+        Assert.assertEquals("Humidity percentage", mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
+        Assert.assertEquals(50.7, mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
 
         List<IEntityDataType> operands = getOperandsAsList();
 
@@ -292,29 +294,29 @@ public class RuleTest extends TestCase {
         RuleOperator<Number> operator =  new EqualNumberRuleOperator();
 
         RuleOperation roA = new RuleOperation(operator, operands);
-        assertEquals("Humidity percentage [50.7%Rh] = Test Value [50.7]", roA.toString());
-        assertEquals(true, roA.getValue().booleanValue());
+        Assert.assertEquals("Humidity percentage [50.7%Rh] = Test Value [50.7]", roA.toString());
+        Assert.assertEquals(true, roA.getValue().booleanValue());
 
         //Second operation (Rule B)
         RuleOperator<Number> operator2 =  new LessThanNumberRuleOperator();
 
         List<IEntityDataType> operands2 = getOperandsAsList();
         RuleOperation roB = new RuleOperation(operator2, operands2);
-        assertEquals("Humidity percentage [50.7%Rh] < Test Value [50.7]", roB.toString());
-        assertEquals(false, roB.getValue().booleanValue());
+        Assert.assertEquals("Humidity percentage [50.7%Rh] < Test Value [50.7]", roB.toString());
+        Assert.assertEquals(false, roB.getValue().booleanValue());
 
-        assertEquals(false, roA.getValue() && roB.getValue());
+        Assert.assertEquals(false, roA.getValue() && roB.getValue());
 
         //Test if a value change on first operator in second operation will update itself and the sub-operations
         UnitEntityDataType operand1 = ((UnitEntityDataType)operands2.get(0));
-        assertEquals(50.7d, operand1.getValue());
+        Assert.assertEquals(50.7d, operand1.getValue());
         operand1.setValue(59.2d);
-        assertEquals(59.2d, operand1.getValue());
+        Assert.assertEquals(59.2d, operand1.getValue());
         ((OnValueChangedListener)operands2.get(0)).onValueChanged(operands2.get(0).getDataSourceId(), "43.5");
-        assertEquals(43.5d, operand1.getValue());
-        assertEquals(true, roA.getValue().booleanValue());
-        assertEquals(true, roB.getValue().booleanValue());
-        assertEquals(true, roA.getValue() && roB.getValue());
+        Assert.assertEquals(43.5d, operand1.getValue());
+        Assert.assertEquals(true, roA.getValue().booleanValue());
+        Assert.assertEquals(true, roB.getValue().booleanValue());
+        Assert.assertEquals(true, roA.getValue() && roB.getValue());
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {
@@ -337,28 +339,29 @@ public class RuleTest extends TestCase {
         return operands;
     }
 
+    @Test
     public void test_Create_RuleOperation_object_from_provider_units_and_validate_operation_result() {
         OpenHABWidget widget = mWidgetProvider.getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", roA.toString());
-        assertEquals(true, roA.getValue().booleanValue());
+        Assert.assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", roA.toString());
+        Assert.assertEquals(true, roA.getValue().booleanValue());
 
         widget = mWidgetProvider.getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
-        assertEquals("Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]", roA.toString());
-        assertEquals(false, roA.getValue().booleanValue());
+        Assert.assertEquals("Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]", roA.toString());
+        Assert.assertEquals(false, roA.getValue().booleanValue());
 
         widget = mWidgetProvider.getWidgetByID("FF_Bed_3");
         RuleOperation roB = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
-        assertEquals("Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]", roB.toString());
-        assertEquals(true, roB.getValue().booleanValue());
+        Assert.assertEquals("Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]", roB.toString());
+        Assert.assertEquals(true, roB.getValue().booleanValue());
 
         widget = mWidgetProvider.getWidgetByID("GF_Toilet_4");
         roB = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), getOperandsAsList3(2));
-        assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", roB.toString());
-        assertEquals(false, roB.getValue().booleanValue());
+        Assert.assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", roB.toString());
+        Assert.assertEquals(false, roB.getValue().booleanValue());
 
-        assertEquals(false, roA.getValue() && roB.getValue());
+        Assert.assertEquals(false, roA.getValue() && roB.getValue());
     }
 
     private List<IEntityDataType> getListOfRuleOperationsForTest() {
@@ -388,69 +391,72 @@ public class RuleTest extends TestCase {
         return ro;
     }
 
+    @Test
     public void test_RuleOperation_toString_methods_on_nameless_operation_and_sub_operations() {
         RuleOperation ro = getNestedRuleOperationForTest(false, RuleOperatorType.And);
 
-        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
-        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
-        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(false, true));
-        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(false, false));
-        assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(true, true));
+        Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
+        Assert.assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
+        Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(false, true));
+        Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(false, false));
+        Assert.assertEquals("[Sant] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]) [Sant]", ro.toString(true, true));
     }
 
+    @Test
     public void test_RuleOperation_toString_methods_on_named_operation_and_mixed_sub_operations() {
         RuleOperation ro = getNestedRuleOperationForTest(true, RuleOperatorType.NotEqual);
 
-        assertEquals(LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
-        assertEquals("[Falskt] " + LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
+        Assert.assertEquals(LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString());
+        Assert.assertEquals("[Falskt] " + LEFT_OPERAND_NAME + " [Sant] != (Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5])", ro.toString(true, false));
 
         //Name the main operation
         final String OPERATION_NAME = "My sweet operation name";
         ro.setName(OPERATION_NAME);
-        assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
-        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
-        assertEquals(OPERATION_NAME, ro.toString(false, false));
-        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
+        Assert.assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
+        Assert.assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
+        Assert.assertEquals(OPERATION_NAME, ro.toString(false, false));
+        Assert.assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
     }
 
+    @Test
     public void test_RuleOperation_toString_methods_on_null_objects() {
         List<IEntityDataType> operandList = getListOfRuleOperationsForTest();
         ((RuleOperation) operandList.get(0)).setRuleOperator(null);
         ((RuleOperation) operandList.get(1)).setOperand(1, null);
         RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("(Light_GF_Kitchen_Ceiling [OFF] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(1, null);
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(0, null);
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
-        assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
 
         //Name the main operation
         final String OPERATION_NAME = "My sweet operation name";
         ro.setName(OPERATION_NAME);
-        assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
-        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
-        assertEquals(OPERATION_NAME, ro.toString(false, false));
-        assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
+        Assert.assertEquals("[Falskt] " + OPERATION_NAME, ro.toString(true, false));
+        Assert.assertEquals(OPERATION_NAME + " [Falskt]", ro.toString(false, true));
+        Assert.assertEquals(OPERATION_NAME, ro.toString(false, false));
+        Assert.assertEquals(OPERATION_NAME + " [Falskt]", ro.toString());
     }
 
     //mRuleOperator.getOperationResult(mOperands.get(0).getValue(), mRuleOperator.parseValue("10"));
@@ -488,6 +494,7 @@ public class RuleTest extends TestCase {
         return operands;
     }
 
+    @Test
     public void test_RuleOperator_should_accept_all_3_values_in_list_as_operands() {
         RuleOperator<Number> roWithin =  new WithinNumberRuleOperator();
 
@@ -497,14 +504,14 @@ public class RuleTest extends TestCase {
         try {
             roWithin.getOperationResult((Number)operands.get(0).getValue(), (Number)operands.get(1).getValue(), (Number)operands.get(2).getValue());
             roWithin.getOperationResult(operands);
-            assertTrue(true);
+            Assert.assertTrue(true);
         } catch (Exception e) {
-            assertEquals("This should not happen", e.getClass().getName());
+            Assert.assertEquals("This should not happen", e.getClass().getName());
             //assertFalse(e instanceof IllegalArgumentException);
         }
 
         //Float 12 within 10 and 13 = True
-        assertTrue(roWithin.getOperationResult(12f, 10f, 13f));
+        Assert.assertTrue(roWithin.getOperationResult(12f, 10f, 13f));
     }
 
     private Calendar getCalendar(Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second, Integer ms) {
@@ -520,47 +527,48 @@ public class RuleTest extends TestCase {
         return cal;
     }
 
+    @Test
     public void testDateTimeParse() {
         RuleOperator<java.util.Date> roAfter = new AfterDateTimeRuleOperator();
 
         //ParseException shall be thrown if the value cannot be parsed.
         try {
             roAfter.parseValue("12.15");
-            assertFalse(true);
+            Assert.assertFalse(true);
         } catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            Assert.assertTrue(e instanceof ParseException);
         }
 
         //ParseException shall NOT be thrown.
         try {
             java.util.Date parsedDate = roAfter.parseValue("12:15");
-            assertEquals(getCalendar(1970, 0, 1, 12, 15, 0, 0).getTime(), parsedDate);
+            Assert.assertEquals(getCalendar(1970, 0, 1, 12, 15, 0, 0).getTime(), parsedDate);
         } catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            Assert.assertTrue(e instanceof ParseException);
         }
 
         //ParseException shall be thrown if the value cannot be parsed.
         try {
             roAfter.parseValue("2014/03/02");
-            assertFalse(true);
+            Assert.assertFalse(true);
         } catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            Assert.assertTrue(e instanceof ParseException);
         }
 
         //ParseException shall NOT be thrown.
         try {
             java.util.Date parsedDate = roAfter.parseValue("2014-03-02");
-            assertEquals(getCalendar(2014, 2, 2, 0, 0, 0, 0).getTime(), parsedDate);
+            Assert.assertEquals(getCalendar(2014, 2, 2, 0, 0, 0, 0).getTime(), parsedDate);
         } catch (Exception e) {
-            assertFalse(e instanceof ParseException);
+            Assert.assertFalse(e instanceof ParseException);
         }
 
         //ParseException shall NOT be thrown.
         try {
             java.util.Date parsedDate = roAfter.parseValue("20:39 2014-03-02");
-            assertEquals(getCalendar(2014, 2, 2, 20, 39, 0, 0).getTime(), parsedDate);
+            Assert.assertEquals(getCalendar(2014, 2, 2, 20, 39, 0, 0).getTime(), parsedDate);
         } catch (Exception e) {
-            assertFalse(e instanceof ParseException);
+            Assert.assertFalse(e instanceof ParseException);
         }
 
     }
