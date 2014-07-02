@@ -1,4 +1,4 @@
-package org.openhab.habclient;
+package org.openhab.domain;
 
 import org.openhab.domain.rule.UnitEntityDataType;
 
@@ -24,7 +24,7 @@ public class UnitEntityDataTypeProvider {
         mUnitDataTypeList.add(new UnitEntityDataType<Boolean>("Switch", false)
         {
             public String getFormattedString(){
-                return mValue.booleanValue()? "On": "Off";//TODO - Language independent
+                return mValue ? "On": "Off";//TODO - Language independent
             }
 
             @Override

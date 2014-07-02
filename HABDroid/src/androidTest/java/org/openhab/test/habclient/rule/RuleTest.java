@@ -23,7 +23,7 @@ import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.OpenHABWidgetProvider;
-import org.openhab.habclient.UnitEntityDataTypeProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.Map;
  * Created by Tony Alpskog in 2014.
  */
 public class RuleTest extends AndroidTestCase {
-    private UnitEntityDataTypeProvider _unitEntityDataTypeProvider;
+    private UnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
@@ -54,7 +54,7 @@ public class RuleTest extends AndroidTestCase {
                 mWidgetProvider);
         httpDataSetup.loadHttpDataFromString();
 
-        _unitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
+        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
         mRuleOperationProvider = new RuleOperationProvider();
     }
 
@@ -133,7 +133,7 @@ public class RuleTest extends AndroidTestCase {
 
     private List<IEntityDataType> getOperandsAsList() {
         List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
-        operands.add(_unitEntityDataTypeProvider.getUnitDataTypeList().get(2));
+        operands.add(mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
         UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override
@@ -279,8 +279,8 @@ public class RuleTest extends AndroidTestCase {
     }
 
     public void test_Create_RuleOperation_object_and_validate_operation_result() {
-        assertEquals("Humidity percentage", _unitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
-        assertEquals(50.7, _unitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
+        assertEquals("Humidity percentage", mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
+        assertEquals(50.7, mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
 
         List<IEntityDataType> operands = getOperandsAsList();
 
@@ -453,7 +453,7 @@ public class RuleTest extends AndroidTestCase {
 
     private List<IEntityDataType> getOperandsAsList2() {
         List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
-        operands.add(_unitEntityDataTypeProvider.getUnitDataTypeList().get(2));
+        operands.add(mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
         UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override
