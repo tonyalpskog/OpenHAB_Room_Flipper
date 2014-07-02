@@ -15,6 +15,7 @@ import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
@@ -70,6 +71,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     @Inject IColorParser mColorParser;
     @Inject OpenHABWidgetProvider mWidgetProvider;
     @Inject IRoomProvider mRoomProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     public CommandTest() {
         super(HABApplication.class);
@@ -575,12 +577,12 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     public void test_getCommandReply() {
         List<String> commandPhrases = new ArrayList<String>();
         commandPhrases.add("Get outside temperature");
-        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mHABApplication.getAppMode(), mContext);
+        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode(), mContext);
         assertEquals("Outside Temperature is 10.0 °C", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
 
         commandPhrases.clear();
         commandPhrases.add("Set toilet temperature to 15.0");
-        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mHABApplication.getAppMode(), mContext);
+        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode(), mContext);
         assertEquals("Toilet Temperature was set to 15.0", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
     }
 

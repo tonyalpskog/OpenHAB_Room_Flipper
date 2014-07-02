@@ -33,7 +33,6 @@ public class HABApplication extends Application {
         super.onCreate();
 
         mObjectGraph = ObjectGraph.create(new AndroidModule(this), new ClientModule());
-        inject(this);
     }
 
     public void inject(Object object) {
