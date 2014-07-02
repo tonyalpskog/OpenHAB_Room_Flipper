@@ -5,7 +5,10 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -429,5 +432,19 @@ public class RoomProvider implements IRoomProvider {
             room2NorthEast.setAlignment(room2East, Direction.DOWN);
             room2NorthEast.setAlignment(room1NorthEast, Direction.BELOW);
         }
+    }
+
+    @Override
+    public Map<String, Room> getMapOfRoomNames() {
+        // could have heard
+        List<Room> roomList = new ArrayList<Room>();
+        roomList.addAll(getRoomHash().values());
+
+        Map<String, Room> roomNameMap = new HashMap<String, Room>();
+        for (Room nextRoom : roomList) {
+            roomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
+        }
+
+        return roomNameMap;
     }
 }

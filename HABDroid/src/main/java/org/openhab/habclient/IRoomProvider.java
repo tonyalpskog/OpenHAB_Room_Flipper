@@ -1,6 +1,7 @@
 package org.openhab.habclient;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IRoomProvider {
@@ -19,4 +20,6 @@ public interface IRoomProvider {
     Room addRoom(Room room);
 
     Room removeRoom(Room room);
+
+    Map<String, Room> getMapOfRoomNames();
 }

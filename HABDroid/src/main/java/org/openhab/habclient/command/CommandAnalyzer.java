@@ -41,8 +41,8 @@ import javax.inject.Inject;
  */
 public class CommandAnalyzer implements ICommandAnalyzer {
 
-    protected IRoomProvider mRoomProvider;
-    protected IOpenHABWidgetProvider mOpenHABWidgetProvider;
+    private final IRoomProvider mRoomProvider;
+    private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
     private final Context mContext;
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
@@ -198,27 +198,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return result;
     }
 
-    protected Map<String, Room> getMapOfRoomNamesFromProvider() {
-        // could have heard
-        List<Room> roomList = new ArrayList<Room>();
-
-        if(mRoomProvider != null)
-            roomList.addAll(mRoomProvider.getRoomHash().values());
-
-        Iterator<Room> iterator = roomList.iterator();
-        Map<String, Room> roomNameMap = new HashMap<String, Room>();
-        while (iterator.hasNext()) {
-            Room nextRoom = iterator.next();
-            roomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
-        }
-
-        return roomNameMap;
-    }
-
     protected List<Room> getRoomsFromPhrases(ArrayList<String> speechResult, ApplicationMode applicationMode) {
         List<Room> resultList = new ArrayList<Room>();
 
-        Map<String, Room> roomNameMap = getMapOfRoomNamesFromProvider();
+        Map<String, Room> roomNameMap = mRoomProvider.getMapOfRoomNames();
 
         if(applicationMode == ApplicationMode.RoomFlipper) {
             for(String roomName : roomNameMap.keySet()) {

@@ -36,10 +36,6 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
         super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression, popularNameProvider);
     }
 
-    public Map<String, Room> getMapOfRoomNamesFromProvider() {
-        return super.getMapOfRoomNamesFromProvider();
-    }
-
     public List<Room> getRoomsFromPhrases(ArrayList<String> speechResult, ApplicationMode applicationMode) {
         return super.getRoomsFromPhrases(speechResult, applicationMode);
     }
