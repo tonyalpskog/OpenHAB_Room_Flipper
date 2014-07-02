@@ -285,7 +285,7 @@ public class CommandTest extends AndroidTestCase {
         List<String> ls = new ArrayList<String>();
         ls.add("Terrace door");
 
-        List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(getContext(), ls, null);
+        List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(ls, null);
         StringBuilder sb = new StringBuilder();
         for (OpenHABWidget widget : resultingUnitList)
             sb.append(sb.length() > 0 ? ", " : "").append(widget.getId());
@@ -294,7 +294,7 @@ public class CommandTest extends AndroidTestCase {
         assertFalse("Returned OpenHABWidget was NULL", foundOhw == null);
         assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0), foundOhw.getLabel());
         assertEquals("First item name: " + (foundOhw.hasItem() ? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
-        assertFalse(mCommandAnalyzer.getUnitsFromPhrases(getContext(), mListOfTestPhrases2, null).isEmpty());
+        assertFalse(mCommandAnalyzer.getUnitsFromPhrases(mListOfTestPhrases2, null).isEmpty());
     }
 
     private String getCommandPhraseMatchResultStringData(CommandPhraseMatchResult commandMatchResult) {
@@ -374,7 +374,7 @@ public class CommandTest extends AndroidTestCase {
     public void test_getCommandsFromPhrases() {
         List<String> inputValue = new ArrayList<String>();
         inputValue.add("Switch on kitchen ceiling lights");
-        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals("Resulting List size = " + result.size(), 1, result.size());
         assertEquals(OpenHABWidgetCommandType.SwitchOn, result.get(0).getCommandType());
         assertEquals(2, result.get(0).getPoint());
@@ -385,7 +385,7 @@ public class CommandTest extends AndroidTestCase {
 
         inputValue.clear();
         inputValue.add("Get terrace door status");
-        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals("Resulting List size = " + result.size(), 2, result.size());
         assertEquals(OpenHABWidgetCommandType.GetStatus, result.get(0).getCommandType());
         assertEquals(2, result.get(0).getPoint());
@@ -403,14 +403,14 @@ public class CommandTest extends AndroidTestCase {
 
         inputValue.clear();
         inputValue.add("Just some mambo jumbo");
-        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals("Resulting List size = " + result.size(), 0, result.size());
     }
 
     public void testGetUnitPhrase() {
         List<String> inputValue = new ArrayList<String>();
         inputValue.add("Get terrace door status");
-        List<CommandPhraseMatchResult> listOfCommandResult = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        List<CommandPhraseMatchResult> listOfCommandResult = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals(2, listOfCommandResult.size());
         assertEquals(2, listOfCommandResult.get(0).getPoint());
         assertEquals(1, listOfCommandResult.get(1).getPoint());
@@ -423,7 +423,7 @@ public class CommandTest extends AndroidTestCase {
     public void testGetWidgetFromCommandMatchResult() {
         List<String> inputValue = new ArrayList<String>();
         inputValue.add("Get terrace door status");
-        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         WidgetPhraseMatchResult widgetMatch = mCommandAnalyzer.getMostProbableWidgetFromCommandMatchResult(result.get(0));
         assertEquals(100, widgetMatch.getMatchPercent());
         assertEquals("GF_Living_4", widgetMatch.getWidget().getId());
@@ -436,7 +436,7 @@ public class CommandTest extends AndroidTestCase {
     public void testThatCommandReallyMatch() {
         List<String> commandPhrases = new ArrayList<String>();
         commandPhrases.add("Get terrace door status");
-        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases);
 
         assertEquals(2, commandMatchResultList.size());
         assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(0).getCommandType());
@@ -445,7 +445,7 @@ public class CommandTest extends AndroidTestCase {
     public void test_getCommandValue() {
         List<String> commandPhrases = new ArrayList<String>();
         commandPhrases.add("Set widget temperature to 15.0");
-        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases);
         assertEquals(2, commandMatchResultList.size());
         assertEquals("15.0", mCommandAnalyzer.getCommandValue(commandMatchResultList.get(0)));
     }
@@ -453,12 +453,12 @@ public class CommandTest extends AndroidTestCase {
     public void test_getCommandReply() {
         List<String> commandPhrases = new ArrayList<String>();
         commandPhrases.add("Get outside temperature");
-        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode(), mContext);
+        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
         assertEquals("Outside Temperature is 10.0 °C", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
 
         commandPhrases.clear();
         commandPhrases.add("Set toilet temperature to 15.0");
-        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode(), mContext);
+        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
         assertEquals("Toilet Temperature was set to 15.0", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
     }
 
@@ -471,7 +471,7 @@ public class CommandTest extends AndroidTestCase {
         commandPhrases.add(4, "Get outdoor temperature");//8
         commandPhrases.add(5, "Set widget temperature to 15.0");//11
 
-        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases, mContext);
+        List<CommandPhraseMatchResult> commandMatchResultList = mCommandAnalyzer.getCommandsFromPhrases(commandPhrases);
 
         assertEquals(7, commandMatchResultList.size());
         assertEquals(OpenHABWidgetCommandType.GetStatus, commandMatchResultList.get(0).getCommandType());
@@ -538,7 +538,7 @@ public class CommandTest extends AndroidTestCase {
 
     private void ExecuteCommandAsPhrase(List<String> inputValue, String test_UnitToLookFor, int test_NoOfFoundUnitMatches, String test_WidgetID
             , String test_WholeWidgetLabel, OpenHABItemType test_WidgetItemType, String test_WidgetLabelValue) {
-        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue, mContext);
+        List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
         assertEquals(test_UnitToLookFor, result.get(0).getTagPhrases()[0]);
         List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);

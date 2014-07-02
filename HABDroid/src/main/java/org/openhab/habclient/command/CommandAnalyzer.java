@@ -39,6 +39,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     protected IRoomProvider mRoomProvider;
     protected OpenHABWidgetProvider mOpenHABWidgetProvider;
+    private final Context mContext;
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
     protected RoomFlipper mRoomFlipper;
@@ -53,6 +54,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                            IRegularExpression regularExpression) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
+        mContext = context;
         mWidgetControl = widgetControl;
         mRegularExpression = regularExpression;
 
@@ -116,10 +118,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     @Override
-    public CommandAnalyzerResult analyzeCommand(List<String> commandPhrases, ApplicationMode applicationMode, Context context) {
+    public CommandAnalyzerResult analyzeCommand(List<String> commandPhrases, ApplicationMode applicationMode) {
         CommandAnalyzerResult result = null;
 
-        List<CommandPhraseMatchResult> commandMatchResultList = getCommandsFromPhrases(commandPhrases, context);
+        List<CommandPhraseMatchResult> commandMatchResultList = getCommandsFromPhrases(commandPhrases);
         Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> unitMatchResult = getHighestWidgetsFromCommandMatchResult(commandMatchResultList);
         if(unitMatchResult.size() == 0)
             return null;
@@ -285,11 +287,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return resultList;
     }
 
-    protected List<OpenHABWidget> getUnitsFromPhrases2(List<String> commandPhrases, List<Room> listOfRooms, Context context) {
+    protected List<OpenHABWidget> getUnitsFromPhrases2(List<String> commandPhrases) {
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
-        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
-        widgetList = mOpenHABWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null);
+        List<OpenHABWidget> widgetList = mOpenHABWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null);
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
         Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
         while (iterator.hasNext()) {
@@ -298,8 +299,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         }
 
         //Look for match
-        for(String match : commandPhrases.toArray(new String[0])) {
-            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
+        for(String match : commandPhrases) {
+            for(String unitName : widgetNameMap.keySet()) {
                 if (match.toUpperCase().contains(unitName)) {
                     //Got a unit match.
                     OpenHABWidget foundWidget = widgetNameMap.get(unitName);
@@ -338,12 +339,12 @@ public class CommandAnalyzer implements ICommandAnalyzer {
      * @param commandPhrases
      * @return a Map of keys as upper case phrase strings with the command excluded and command types as values.
      */
-    public List<CommandPhraseMatchResult> getCommandsFromPhrases(List<String> commandPhrases, Context context) {
+    public List<CommandPhraseMatchResult> getCommandsFromPhrases(List<String> commandPhrases) {
         List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
         for(String phrase : commandPhrases.toArray(new String[0])) {
             phrase = phrase.toUpperCase();
             for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
-                for(String commandAsText : commandType.getTextCommands(context)) {
+                for(String commandAsText : getTextCommands(commandType.ArrayNameId)) {
                     commandAsText = commandAsText.toUpperCase();
                     int matchPoints = StringHandler.replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
                     String regexCommand = "\\A" + StringHandler.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
@@ -370,6 +371,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             }
         }
         return  commandPhraseMatchResultList;
+    }
+
+    private String[] getTextCommands(int arrayNameId) {
+        return mContext.getResources().getStringArray(arrayNameId);
     }
 
     public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {

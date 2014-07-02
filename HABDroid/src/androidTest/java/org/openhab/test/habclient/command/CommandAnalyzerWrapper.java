@@ -50,8 +50,8 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //        return super.getUnitsFromPhrases(commandPhrases, listOfRooms);
 //    }
 
-    public List<OpenHABWidget> getUnitsFromPhrases(Context context, List<String> commandPhrases, List<Room> listOfRooms) {
-        return super.getUnitsFromPhrases2(commandPhrases, listOfRooms, context);
+    public List<OpenHABWidget> getUnitsFromPhrases(List<String> commandPhrases, List<Room> listOfRooms) {
+        return super.getUnitsFromPhrases2(commandPhrases);
 //        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 //
 //        // Fill the list view with the strings the recognizer thought it

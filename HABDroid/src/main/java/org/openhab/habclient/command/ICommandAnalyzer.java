@@ -1,7 +1,5 @@
 package org.openhab.habclient.command;
 
-import android.content.Context;
-
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.RoomFlipper;
 import org.openhab.habclient.SpeechAnalyzerResult;
@@ -19,5 +17,5 @@ public interface ICommandAnalyzer {
 
     SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode);
 
-    CommandAnalyzerResult analyzeCommand(List<String> speechResult, ApplicationMode applicationMode, Context context);
+    CommandAnalyzerResult analyzeCommand(List<String> speechResult, ApplicationMode applicationMode);
 }

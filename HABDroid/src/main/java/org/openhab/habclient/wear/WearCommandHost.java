@@ -94,7 +94,7 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
-            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode(), mContext);
+            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
 
             showNotification("Reply", "Hard coded message");
         }

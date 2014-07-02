@@ -1,9 +1,7 @@
 package org.openhab.habclient.command;
 
-import android.content.Context;
-
-import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.habdroid.R;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -46,9 +44,5 @@ public enum OpenHABWidgetCommandType {
         Name = name;
         ArrayNameId = arrayNameId;
         WidgetType = widgetType;
-    }
-
-    public String[] getTextCommands(Context context) {
-        return context.getResources().getStringArray(ArrayNameId);
     }
 }
