@@ -1,6 +1,5 @@
 package org.openhab.habclient;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -8,19 +7,18 @@ import android.util.Log;
  * Created by Tony Alpskog in 2013.
  */
 public class RoomFlipperAdapter {
-
-    private final String TAG = "RoomFlipperAdapter";
-    private Context mContext = null;
+    private static final String TAG = "RoomFlipperAdapter";
+    private final IRoomImageProvider mRoomImageProvider;
     private Room currentRoom;
-    private IRoomProvider roomProvider;
 
-    public RoomFlipperAdapter(Context context, Room initialRoom) {
-        mContext = context;
+    public RoomFlipperAdapter(Room initialRoom,
+                              IRoomImageProvider roomImageProvider) {
         currentRoom = initialRoom;
+        mRoomImageProvider = roomImageProvider;
     }
 
     public Bitmap getCurrentBitmap() {
-        return currentRoom.getRoomImage();
+        return mRoomImageProvider.getRoomImage(currentRoom);
     }
 
     public Room getCurrentRoom() {

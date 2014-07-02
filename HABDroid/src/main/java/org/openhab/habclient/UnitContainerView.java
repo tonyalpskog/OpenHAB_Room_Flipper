@@ -38,6 +38,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private View mAddedControlView = null;
     @Inject OpenHABWidgetControl mOpenHABWidgetControl;
     @Inject IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    @Inject IRoomImageProvider mRoomImageProvider;
 
     public UnitContainerView(Context context) {
         this(context, null);
@@ -203,12 +204,9 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     }
 
     public void setRoom(Room nextRoom) {
-        if(mRoom != null)
-            mRoom.dispose();
-
         mRoom = nextRoom;
         mBlockUnitRedraw = true;
-        setImageBitmap(mRoom.getRoomImage());
+        setImageBitmap(mRoomImageProvider.getRoomImage(mRoom));
         mBlockUnitRedraw = false;
         redrawAllUnits();
     }
@@ -223,9 +221,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
     private void removeAllUnitViews() {
         Log.d("Remove unit views", "Child count = " + getChildCount());
-        Iterator iterator = addedUnitViews.iterator();
-        while(iterator.hasNext()) {
-            ViewGroup vg = (ViewGroup) iterator.next();
+        for (View addedUnitView : addedUnitViews) {
+            ViewGroup vg = (ViewGroup) addedUnitView;
             vg.removeAllViewsInLayout();
             removeView(vg);
         }

@@ -36,13 +36,13 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private static final String ARG_SECTION_NUMBER = "section_number";
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
-    private HABApplication mApplication;
     @Inject IWearCommandHost mWearCommandHost;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
+    @Inject IRoomImageProvider mRoomImageProvider;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -77,7 +77,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomViewFlipper.setDisplayedChild(0);//Show middle image as initial image
         mRoomViewFlipper.setGestureListener(new GestureListener(rootView, true));
         mRoomViewFlipper.setOnRoomShiftListener(this);
-        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(rootView.getContext(), mRoomDataContainer.getFlipperRoom()), mRoomDataContainer);
+        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider));
 
         mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
 
@@ -92,7 +92,6 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-        mApplication = (HABApplication) activity.getApplication();
     }
 
     @Override
@@ -138,8 +137,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mRoomDataContainer.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
 
                 // Start launch activity
-                mApplication.getApplicationContext().startActivity(widgetListIntent);
-
+                getActivity().startActivity(widgetListIntent);
+                
                 return true;
             case R.id.action_start_wear_app:
                 mWearCommandHost.startSession("Room navigation", "Please, response with the name of a room");
@@ -156,7 +155,6 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public void onResume() {
         super.onResume();
-        final HABApplication application = (HABApplication) getActivity().getApplication();
         mApplicationModeProvider.setAppMode(ApplicationMode.RoomFlipper);
         mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();

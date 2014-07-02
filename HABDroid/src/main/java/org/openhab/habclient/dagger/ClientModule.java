@@ -15,6 +15,7 @@ import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRestCommunication;
 import org.openhab.habclient.IRoomDataContainer;
+import org.openhab.habclient.IRoomImageProvider;
 import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.MainActivity;
 import org.openhab.habclient.OpenHABSetting;
@@ -25,6 +26,7 @@ import org.openhab.habclient.RoomConfigActivity;
 import org.openhab.habclient.RoomConfigFragment;
 import org.openhab.habclient.RoomDataContainer;
 import org.openhab.habclient.RoomFlipperFragment;
+import org.openhab.habclient.RoomImageProvider;
 import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechService;
 import org.openhab.habclient.UnitContainerView;
@@ -73,6 +75,11 @@ injects = {
         WearCommandHost.class
 })
 public class ClientModule {
+    @Provides @Singleton
+    public IRoomImageProvider provideRoomImageProvider(RoomImageProvider roomImageProvider) {
+        return roomImageProvider;
+    }
+
     @Provides @Singleton
     public IApplicationModeProvider provideApplicationModeProvider(ApplicationModeProvider provider) {
         return provider;
