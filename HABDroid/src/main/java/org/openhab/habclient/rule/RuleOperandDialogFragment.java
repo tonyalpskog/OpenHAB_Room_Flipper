@@ -9,13 +9,19 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
@@ -39,6 +45,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private Button mButtonOperation;
     private TextView mTextOperation;
     private EditText mEditNewOperation;
+    private Spinner mSpinnerValue;
     private EditText mEditStaticValue;
     private boolean mShowNextButton;
 
@@ -81,6 +88,12 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
         mListener = ((RuleEditActivity)activity).getRuleOperationBuildListener();
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
     private View createCustomView(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.fragment_rule_select_operand, null);
@@ -91,6 +104,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mButtonOperation = (Button) view.findViewById(R.id.button_rule_operation_builder_operation);
             mTextOperation = (TextView) view.findViewById(R.id.text_rule_operation_builder_operation);
             mEditNewOperation = (EditText) view.findViewById(R.id.edit_rule_operation_builder_new_operation);
+            mSpinnerValue = (Spinner) view.findViewById(R.id.spinner_rule_operation_builder_static_value);
             mEditStaticValue = (EditText) view.findViewById(R.id.edit_rule_operation_builder_static_value);
 
             mButtonUnit.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +134,24 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                     break;
             }
         }
+
+//TODO - TA: implement this and save the result as STATIC
+//        mSpinnerValue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                if()
+//                if(position > 0) {
+//                    mRuleActionValueType = RuleActionValueType.STATIC;
+//                    clearSourceSelection();
+//                    clearTextSelection();
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                mRuleActionValueType = RuleActionValueType.NA;
+//            }
+//        });
 
         return view;
     }
@@ -151,12 +183,12 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             switch (which) {
                 case DialogInterface.BUTTON_NEUTRAL: //Done
                 case DialogInterface.BUTTON_POSITIVE://Next
-                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE
+                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE//TODO - TA: change to non-static value
                             , which == DialogInterface.BUTTON_POSITIVE?  RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT :RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
                             , new RuleOperation(mEditNewOperation.getText().toString()), mPosition, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE
+                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE//TODO - TA: change to non-static value
                             , RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, mPosition, null);
 

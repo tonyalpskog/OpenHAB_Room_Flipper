@@ -68,10 +68,17 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_marginTop="16dp" />
 
+        <Spinner
+            android:id="@+id/spinner_rule_operation_builder_static_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="8"
+            android:layout_column="0" />
+
         <EditText
             android:id="@+id/edit_rule_operation_builder_static_value"
             android:layout_column="0"
-            android:layout_row="8"
+            android:layout_row="9"
             android:layout_gravity="fill_horizontal"
             android:inputType="text"
             android:layout_marginTop="8dp" />

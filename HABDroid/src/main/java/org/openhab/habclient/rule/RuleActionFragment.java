@@ -209,7 +209,10 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
         } else {
-            final RuleActionDialogFragment dialogFragment = new RuleActionDialogFragment(mActionUnderConstruction, this, this);
+            RuleEditActivity activity = ((RuleEditActivity)getActivity());
+            activity.setActionUnderConstruction(mActionUnderConstruction);
+            activity.setRuleActionBuildListener(this);
+            final RuleActionDialogFragment dialogFragment = RuleActionDialogFragment.newInstance();
             dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
         }
     }
@@ -276,7 +279,10 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             } else
                 mActionUnderConstruction.setSourceOpenHABItemName(operand.getName());
 
-            final RuleActionDialogFragment dialogFragment = new RuleActionDialogFragment(mActionUnderConstruction, this, this);
+            RuleEditActivity activity = ((RuleEditActivity)getActivity());
+            activity.setActionUnderConstruction(mActionUnderConstruction);
+            activity.setRuleActionBuildListener(this);
+            final RuleActionDialogFragment dialogFragment = RuleActionDialogFragment.newInstance();
             dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
         }
     }

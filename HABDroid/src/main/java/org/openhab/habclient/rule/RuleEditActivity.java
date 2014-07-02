@@ -16,6 +16,7 @@ import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
 import org.openhab.domain.rule.Rule;
+import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
@@ -37,8 +38,10 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private Rule mRule;
     private RuleActivityMode mRuleActivityMode;
     private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
+    private RuleActionDialogFragment.RuleActionBuildListener mRuleActionBuildListener;
     @Inject IOpenHABWidgetControl mWidgetControl;
     private IEntityDataType mOperandToEdit;
+    private RuleAction mActionUnderConstruction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +117,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         mViewPager.setCurrentItem(tab.getPosition());
             mRuleActivityMode = tab.getPosition() == 0? RuleActivityMode.OPERATION_EDITOR : RuleActivityMode.ACTION_LIST;
+        setRuleOperationBuildListener((RuleOperandDialogFragment.RuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
     }
 
     @Override
@@ -169,6 +173,22 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         this.mRuleOperationBuildListener = mRuleOperationBuildListener;
     }
 
+    public void setActionUnderConstruction(RuleAction action) {
+        mActionUnderConstruction = action;
+    }
+
+    public RuleAction getActionUnderConstruction() {
+        return mActionUnderConstruction;
+    }
+
+    public void setRuleActionBuildListener(RuleActionDialogFragment.RuleActionBuildListener listener) {
+        mRuleActionBuildListener = listener;
+    }
+
+    public RuleActionDialogFragment.RuleActionBuildListener getRuleActionBuildListener() {
+        return mRuleActionBuildListener;
+    }
+
     public IEntityDataType getOperandToEdit() {
         return mOperandToEdit;
     }
@@ -183,20 +203,24 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        private RuleEditActivity mActivity;
+        private RuleOperationFragment mRuleOperationFragment;
+        private RuleActionFragment mRuleActionFragment;
 
         public SectionsPagerAdapter(FragmentManager fm, RuleEditActivity activity) {
             super(fm);
-            mActivity = activity;
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return RuleOperationFragment.newInstance();
+                    if(mRuleOperationFragment == null)
+                            mRuleOperationFragment = RuleOperationFragment.newInstance();
+                    return mRuleOperationFragment;
                 case 1:
-                    return RuleActionFragment.newInstance();
+                    if(mRuleActionFragment == null)
+                        mRuleActionFragment = RuleActionFragment.newInstance();
+                    return mRuleActionFragment;
             }
             return null;
         }

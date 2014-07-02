@@ -136,6 +136,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         CommandPhraseMatchResult bestKeySoFar = null;
         while(iterator.hasNext()) {
             CommandPhraseMatchResult cpmr = iterator.next();
+            if(unitMatchResult.get(cpmr) == null)
+                continue;
             int currentScore = (cpmr.getPoint() * 30) + unitMatchResult.get(cpmr).getMatchPercent();
             if(currentScore > topScore) {
                 topScore = currentScore;
@@ -144,6 +146,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         }
 
         String commandReply = null;
+        if(bestKeySoFar == null)
+            return null;
         if(bestKeySoFar.getCommandType() != OpenHABWidgetCommandType.GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {

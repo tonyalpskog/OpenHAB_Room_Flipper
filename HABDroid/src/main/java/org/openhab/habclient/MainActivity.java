@@ -42,6 +42,7 @@ public class MainActivity extends Activity
     @Inject IRestCommunication mRestCommunication;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject ICommandAnalyzer mCommandAnalyzer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +163,7 @@ public class MainActivity extends Activity
         mRoomFlipper = roomFlipper;
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES/*LANGUAGE_MODEL_FREE_FORM*/);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_navigate_rooms));
         startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
     }
@@ -172,9 +173,10 @@ public class MainActivity extends Activity
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             final HABApplication application = ((HABApplication) getApplication());
 
-            mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
-            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
+//            mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
+//            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
 
+            mCommandAnalyzer.analyzeCommand(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode(), this);
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

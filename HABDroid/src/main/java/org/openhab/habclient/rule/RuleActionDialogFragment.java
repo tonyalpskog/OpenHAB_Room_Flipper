@@ -11,6 +11,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -55,14 +57,14 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private int mPosition;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
-    public RuleActionDialogFragment(RuleAction ruleAction, RuleActionDialogFragment.RuleActionBuildListener actionListener, RuleOperandDialogFragment.RuleOperationBuildListener operationListener) {
-//        Bundle bundle = new Bundle();
-//        bundle.putInt(ARG_ID, status.value());
-//        this.setArguments(bundle);
-        mAction = ruleAction;
-        mPosition = 1;
-        mActionListener = actionListener;
-        mOperationListener = operationListener;
+    protected static final String ARG_POSITION = "mPosition";
+
+    public static RuleActionDialogFragment newInstance() {
+        final RuleActionDialogFragment fragment = new RuleActionDialogFragment();
+        final Bundle args = new Bundle();
+        args.putInt(ARG_POSITION, 1);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -76,8 +78,22 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
 
         InjectUtils.inject(this);
 
+        final Bundle args = getArguments();
+        if(args == null)
+            return;
+
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
+        mOperationListener = ((RuleEditActivity)activity).getRuleOperationBuildListener();
+        mAction = ((RuleEditActivity)activity).getActionUnderConstruction();
+        mActionListener = ((RuleEditActivity)activity).getRuleActionBuildListener();
+        mPosition = args.getInt(ARG_POSITION);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     private View createCustomView(Context context) {

@@ -12,6 +12,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -78,6 +80,12 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         mDialogTitle = args.getString(ARG_DIALOG_TITLE);
         mStringListSearch = new StringListSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
         mShowNextButton = args.getBoolean(ARG_SHOW_NEXT_BUTTON);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override

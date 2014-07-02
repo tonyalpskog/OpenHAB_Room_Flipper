@@ -13,6 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -85,7 +87,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         mTreeListAdapter = new ExpandableMultiLevelGroupAdapter(getActivity(), mTreeData);
         mTreeView.setAdapter(mTreeListAdapter);
 
-        updateRuleTree(((RuleEditActivity)getActivity()).getRule().getRuleOperation());
+        updateRuleTree(((RuleEditActivity) getActivity()).getRule().getRuleOperation());
 
         ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(this);
 
@@ -334,7 +336,6 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                                     "Select an operator",
                                     true,
                                     operatorList);
-
                             dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                         } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
                             openRuleOperandDialogFragment(mOperationUnderConstruction.getOperand(operandPosition + 1), operandPosition + 1, true);
