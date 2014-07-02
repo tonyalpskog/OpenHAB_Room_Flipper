@@ -3,6 +3,7 @@ package org.openhab.habclient.rule;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
