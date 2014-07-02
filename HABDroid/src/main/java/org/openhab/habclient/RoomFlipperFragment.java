@@ -20,8 +20,6 @@ import android.widget.TextView;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
-import org.openhab.habclient.wear.WearCommandHost;
-
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
@@ -43,6 +41,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject IRoomDataContainer mRoomDataContainer;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -77,9 +77,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomViewFlipper.setDisplayedChild(0);//Show middle image as initial image
         mRoomViewFlipper.setGestureListener(new GestureListener(rootView, true));
         mRoomViewFlipper.setOnRoomShiftListener(this);
-        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(rootView.getContext(), mApplication.getFlipperRoom()), mApplication);
+        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(rootView.getContext(), mRoomDataContainer.getFlipperRoom()), mRoomDataContainer);
 
-        mRoomLabel.setText(mApplication.getFlipperRoom().getName());
+        mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
 
         setHasOptionsMenu(true);
 
@@ -111,9 +111,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_edit_room_from_flipper:
-                Room roomToEdit = mApplication.getFlipperRoom();
+                Room roomToEdit = mRoomDataContainer.getFlipperRoom();
                 Log.d("Edit Room", "onOptionsItemSelected() - Edit room action on room<" + roomToEdit.getId() + ">");
-                mApplication.setConfigRoom(roomToEdit);
+                mRoomDataContainer.setConfigRoom(roomToEdit);
 
                 Intent intent = new Intent(getActivity(), RoomConfigActivity.class);
                 startActivity(intent);
@@ -121,7 +121,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 return true;
             case R.id.action_add_room_from_flipper:
                 Log.d("Add Room", "onOptionsItemSelected() - Add room");
-                mApplication.setConfigRoom(mRoomProvider.createNewRoom());
+                mRoomDataContainer.setConfigRoom(mRoomProvider.createNewRoom());
                 
                 intent = new Intent(getActivity(), RoomConfigActivity.class);
                 startActivity(intent);
@@ -135,7 +135,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 Intent widgetListIntent = new Intent(getActivity().getApplicationContext(), OpenHABMainActivity.class);
                 widgetListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
-                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mApplication.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
+                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mRoomDataContainer.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
 
                 // Start launch activity
                 mApplication.getApplicationContext().startActivity(widgetListIntent);
@@ -157,8 +157,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onResume() {
         super.onResume();
         final HABApplication application = (HABApplication) getActivity().getApplication();
-        application.setAppMode(ApplicationMode.RoomFlipper);
-        mRoomLabel.setText(mApplication.getFlipperRoom().getName());
+        mApplicationModeProvider.setAppMode(ApplicationMode.RoomFlipper);
+        mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
         mWearCommandHost.registerReceiver();
     }
@@ -173,7 +173,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public boolean onRoomShift(Gesture gesture, Room room) {
         Log.d("Flip Room", "onRoomShift() - Shifted to room<" + room.getId() + ">");
         mRoomLabel.setText(room.getName());
-        mApplication.setFlipperRoom(room);
+        mRoomDataContainer.setFlipperRoom(room);
         return false;
     }
 }

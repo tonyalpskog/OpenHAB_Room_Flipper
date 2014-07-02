@@ -8,11 +8,13 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.ApplicationModeProvider;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.GraphicUnitWidget;
-import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRestCommunication;
+import org.openhab.habclient.IRoomDataContainer;
 import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.MainActivity;
 import org.openhab.habclient.OpenHABSetting;
@@ -21,6 +23,7 @@ import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.RestCommunication;
 import org.openhab.habclient.RoomConfigActivity;
 import org.openhab.habclient.RoomConfigFragment;
+import org.openhab.habclient.RoomDataContainer;
 import org.openhab.habclient.RoomFlipperFragment;
 import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechService;
@@ -67,10 +70,19 @@ injects = {
         UnitContainerView.class, //TODO: create adapter for this instead
         RuleOperandDialogFragment.class,
         SpeechService.class,
-        WearCommandHost.class,
-        HABApplication.class
+        WearCommandHost.class
 })
 public class ClientModule {
+    @Provides @Singleton
+    public IApplicationModeProvider provideApplicationModeProvider(ApplicationModeProvider provider) {
+        return provider;
+    }
+
+    @Provides @Singleton
+    public IRoomDataContainer provideRoomDataContainer(RoomDataContainer roomDataContainer)  {
+        return roomDataContainer;
+    }
+
     @Provides @Singleton
     public IWidgetTypeLayoutProvider provideWidgetTypeLayoutProvider(WidgetTypeLayoutProvider provider) {
         return provider;

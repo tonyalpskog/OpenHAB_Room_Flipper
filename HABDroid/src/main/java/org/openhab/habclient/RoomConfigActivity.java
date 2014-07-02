@@ -37,6 +37,8 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
     private Room mConfigRoom;
 
     @Inject IRoomProvider mRoomProvider;
+    @Inject IRoomDataContainer mRoomDataContainer;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +116,9 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
         mViewPager.setCurrentItem(tab.getPosition());
         final HABApplication application = (HABApplication) getApplication();
         if(tab.getPosition() == 0)
-            application.setAppMode(ApplicationMode.RoomEdit);
+            mApplicationModeProvider.setAppMode(ApplicationMode.RoomEdit);
         else
-            application.setAppMode(ApplicationMode.UnitPlacement);
+            mApplicationModeProvider.setAppMode(ApplicationMode.UnitPlacement);
     }
 
     @Override
@@ -128,14 +130,14 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
     }
 
     public boolean isNewRoom() {
-        return ((HABApplication)getApplication()).getConfigRoom() == null;
+        return mRoomDataContainer.getConfigRoom() == null;
     }
 
     public Room getConfigRoom() {
         if(mConfigRoom != null)
             return mConfigRoom;
 
-        Room roomToBeEdited = ((HABApplication)getApplication()).getConfigRoom();
+        Room roomToBeEdited = mRoomDataContainer.getConfigRoom();
 
         if(roomToBeEdited == null)
             mConfigRoom = mRoomProvider.createNewRoom();

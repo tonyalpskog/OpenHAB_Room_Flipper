@@ -237,12 +237,12 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         mOnRoomShiftListener = eventListener;
     }
 
-    public void setRoomFlipperAdapter(RoomFlipperAdapter flipperAdapter, HABApplication application) {
+    public void setRoomFlipperAdapter(RoomFlipperAdapter flipperAdapter, IRoomDataContainer roomDataContainer) {
         mRoomFlipperAdapter = flipperAdapter;
         flipperImages = new UnitContainerView[2];
         flipperImages[0] = (UnitContainerView) findViewById(R.id.flipper_image_1);
         flipperImages[1] = (UnitContainerView) findViewById(R.id.flipper_image_2);
-        flipperImages[getDisplayedChild()].setRoom(application.getFlipperRoom());
+        flipperImages[getDisplayedChild()].setRoom(roomDataContainer.getFlipperRoom());
     }
 
     public UnitContainerView getCurrentUnitContainer() {

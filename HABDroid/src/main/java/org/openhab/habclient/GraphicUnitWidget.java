@@ -30,6 +30,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     private GraphicUnit gUnit;
     private HABApplication mApplication;
     @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     public GraphicUnitWidget(Context context) {
         super(context);
@@ -55,7 +56,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     @Override
     public boolean onLongClick(View v) {
        Log.d("G-Click", "Long click detected");
-       if(mApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+       if(mApplicationModeProvider.getAppMode() == ApplicationMode.UnitPlacement) {
            ClipData clipData = ClipData.newPlainText("label","text");
            this.startDrag(clipData, new DragShadow(this), this, 0);
        }
@@ -65,11 +66,11 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     @Override
     public void onClick(View v) {
         Log.d("G-Click", "Short click detected");
-        if(mApplication.getAppMode() == ApplicationMode.UnitPlacement) {
+        if(mApplicationModeProvider.getAppMode() == ApplicationMode.UnitPlacement) {
             Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
             gUnit.setSelected(!gUnit.isSelected());
             Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
-        } else if(mApplication.getAppMode() == ApplicationMode.RoomFlipper) {
+        } else if(mApplicationModeProvider.getAppMode() == ApplicationMode.RoomFlipper) {
             if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {
                 // Get launch intent for application
                 Intent widgetListIntent = new Intent(getContext(), OpenHABMainActivity.class);

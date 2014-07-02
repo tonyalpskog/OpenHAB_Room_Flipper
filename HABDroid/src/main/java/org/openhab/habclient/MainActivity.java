@@ -41,6 +41,7 @@ public class MainActivity extends Activity
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRestCommunication mRestCommunication;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +173,7 @@ public class MainActivity extends Activity
             final HABApplication application = ((HABApplication) getApplication());
 
             mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
-            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), application.getAppMode());
+            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
 
             super.onActivityResult(requestCode, resultCode, data);
         }

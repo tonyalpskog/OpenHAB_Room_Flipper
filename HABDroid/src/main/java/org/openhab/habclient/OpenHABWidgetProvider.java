@@ -10,14 +10,13 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.WidgetPhraseMatchResult;
 import org.openhab.domain.util.RegExAccuracyResult;
 import org.openhab.domain.util.StringHandler;
+import org.openhab.habclient.command.CommandAnalyzer;
+import org.openhab.habclient.command.WidgetPhraseMatchResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,9 +183,8 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
         if(mOpenHABWidgetTypeMap.containsKey(type)) {
             idList = mOpenHABWidgetTypeMap.get(type);
-            Iterator<String> idIterator = idList.iterator();
-            while(idIterator.hasNext()) {
-                resultList.add(mOpenHABWidgetIdMap.get(idIterator.next()));
+            for (String anIdList : idList) {
+                resultList.add(mOpenHABWidgetIdMap.get(anIdList));
             }
         }
         return resultList;

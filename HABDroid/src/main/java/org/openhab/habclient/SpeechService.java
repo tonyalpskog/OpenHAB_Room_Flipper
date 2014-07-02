@@ -38,6 +38,7 @@ public class SpeechService extends Service
     protected volatile boolean mIsCountDownOn;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     private static final int MSG_RECOGNIZER_START_LISTENING = 1;
     private static final int MSG_RECOGNIZER_CANCEL = 2;
@@ -331,7 +332,7 @@ public class SpeechService extends Service
                         Log.e(HABApplication.getLogTag(), "RemoteException: " + e.toString());
                     }
                     final HABApplication application = (HABApplication) getApplication();
-                    mSpeechResultAnalyzer.analyze(matches, application.getAppMode());
+                    mSpeechResultAnalyzer.analyze(matches, mApplicationModeProvider.getAppMode());
                 } else
                     Log.d(HABApplication.getLogTag(), "Matches = NULL");
             } else

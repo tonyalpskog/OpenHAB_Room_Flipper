@@ -11,7 +11,7 @@ import android.preview.support.wearable.notifications.RemoteInput;
 import android.preview.support.wearable.notifications.WearableNotifications;
 import android.support.v4.app.NotificationCompat;
 
-import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.util.ArrayList;
@@ -23,12 +23,18 @@ import javax.inject.Inject;
  */
 public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost {
     private static final String ACTION_RESPONSE = "com.zenit.android.wearable.openhab.COMMAND";
+    private final Context mContext;
+    private final IApplicationModeProvider mApplicationModeProvider;
     private BroadcastReceiver mReceiver;
-    @Inject HABApplication mApplication;
-    @Inject ICommandAnalyzer mCommandAnalyzer;
+    private ICommandAnalyzer mCommandAnalyzer;
 
-    public WearCommandHost(HABApplication application) {
-        mApplication = application;
+    @Inject
+    public WearCommandHost(Context context,
+                           IApplicationModeProvider applicationModeProvider,
+                           ICommandAnalyzer commandAnalyzer) {
+        mContext = context;
+        mApplicationModeProvider = applicationModeProvider;
+        mCommandAnalyzer = commandAnalyzer;
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -40,13 +46,13 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
 
     @Override
     public void registerReceiver() {
-        mApplication.registerReceiver(mReceiver, new IntentFilter(ACTION_RESPONSE));
+        mContext.registerReceiver(mReceiver, new IntentFilter(ACTION_RESPONSE));
     }
 
     @Override
     public void unregisterReceiver() {
-        NotificationManagerCompat.from(mApplication).cancel(0);
-        mApplication.unregisterReceiver(mReceiver);
+        NotificationManagerCompat.from(mContext).cancel(0);
+        mContext.unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -60,11 +66,11 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
     private void showNotification(String title, String message) {
         // Create intent for reply action
         Intent intent = new Intent(ACTION_RESPONSE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mApplication, 0, intent,
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Build the notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mApplication.getApplicationContext())
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext.getApplicationContext())
                 .setContentTitle(title)
                 .setContentText(message)
                 .setContentIntent(pendingIntent);
@@ -79,7 +85,7 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
                 .addRemoteInputForContentIntent(remoteInput)
                 .build();
 
-        NotificationManagerCompat.from(mApplication).notify(0, notification);
+        NotificationManagerCompat.from(mContext).notify(0, notification);
     }
 
     private void processResponse(Intent intent) {
@@ -88,7 +94,7 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
-            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplication.getAppMode(), mApplication.getApplicationContext());
+            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode(), mContext);
 
             showNotification("Reply", "Hard coded message");
         }
