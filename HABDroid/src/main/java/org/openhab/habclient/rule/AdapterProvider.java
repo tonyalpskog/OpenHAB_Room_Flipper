@@ -30,10 +30,6 @@ public class AdapterProvider {
         return adapterList;
     }
 
-    public static BaseAdapter getRuleOperatorAdapter(Context context, String openHABItemName, IRuleOperationProvider ruleOperationProvider, IOpenHABWidgetProvider widgetProvider) {
-        return new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getRuleOperatorList(context, openHABItemName, true, ruleOperationProvider, widgetProvider));
-    }
-
     public static BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName, IOpenHABWidgetProvider widgetProvider) {
         OpenHABWidget openHABWidget = widgetProvider.getWidgetByItemName(openHABItemName);
         UnitEntityDataType unitEntityDataType = UnitEntityDataType.getUnitEntityDataType(openHABWidget);
