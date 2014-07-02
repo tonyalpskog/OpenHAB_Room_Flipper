@@ -42,6 +42,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     @Inject IOpenHABWidgetControl mWidgetControl;
     private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
+    private RuleOperation mOperationUnderConstruction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +198,13 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         mOperandToEdit = operand;
     }
 
+    public void setOperationToEdit(RuleOperation ruleOperation) {
+        mOperationUnderConstruction = ruleOperation;
+    }
+
+    public RuleOperation getOperationToEdit() {
+        return mOperationUnderConstruction;
+    }
     /**
      * A {@link android.support.v13.app.FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.

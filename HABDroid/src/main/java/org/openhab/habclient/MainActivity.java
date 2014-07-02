@@ -19,6 +19,7 @@ import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habdroid.R;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -176,7 +177,7 @@ public class MainActivity extends Activity
 //            mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
 //            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
 
-            mCommandAnalyzer.analyzeCommand(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode(), this);
+            mCommandAnalyzer.analyzeCommand(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

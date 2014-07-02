@@ -11,23 +11,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.IEntityDataType;
-import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -44,10 +45,13 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private TextView mTextUnit;
     private Button mButtonOperation;
     private TextView mTextOperation;
+    private TextView mTextLabelStaticValue;
     private EditText mEditNewOperation;
     private Spinner mSpinnerValue;
+    private SpinnerAdapter mSpinnerAdapter;
     private EditText mEditStaticValue;
     private boolean mShowNextButton;
+    private OpenHABWidget mFirstOperandWidgetIfAny;
 
     private RuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
@@ -104,6 +108,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mButtonOperation = (Button) view.findViewById(R.id.button_rule_operation_builder_operation);
             mTextOperation = (TextView) view.findViewById(R.id.text_rule_operation_builder_operation);
             mEditNewOperation = (EditText) view.findViewById(R.id.edit_rule_operation_builder_new_operation);
+            mTextLabelStaticValue = (TextView) view.findViewById(R.id.text_rule_operation_builder_static_value_label);
             mSpinnerValue = (Spinner) view.findViewById(R.id.spinner_rule_operation_builder_static_value);
             mEditStaticValue = (EditText) view.findViewById(R.id.edit_rule_operation_builder_static_value);
 
@@ -120,6 +125,26 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             });
         }
 
+        Map<String, ?> staticValuesCompatibleWithFirstOperand = null;
+        boolean enableStaticValueSpinner = false;
+        if(mPosition > 0) {//Try to enable views for static value input if this isn´t the first operand.
+            try {
+                mFirstOperandWidgetIfAny = mWidgetProvider.getWidgetByItemName(((RuleEditActivity) getActivity()).getOperationToEdit().getOperand(0).getDataSourceId());
+                staticValuesCompatibleWithFirstOperand = UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
+                mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mFirstOperandWidgetIfAny);
+            } catch (Exception e) {};
+
+            enableStaticValueSpinner = staticValuesCompatibleWithFirstOperand != null && staticValuesCompatibleWithFirstOperand.size() > 0;
+            mSpinnerValue.setAdapter(mSpinnerAdapter);
+            mEditStaticValue.setVisibility(enableStaticValueSpinner ? View.GONE : View.VISIBLE);
+            mSpinnerValue.setVisibility(enableStaticValueSpinner ? View.VISIBLE : View.GONE);
+            mTextLabelStaticValue.setVisibility(View.VISIBLE);
+        } else {
+            mTextLabelStaticValue.setVisibility(View.GONE);
+            mEditStaticValue.setVisibility(View.GONE);
+            mSpinnerValue.setVisibility(View.GONE);
+        }
+
         mOldOperand = ((RuleEditActivity)getActivity()).getOperandToEdit();
         if(mOldOperand != null) {
             switch (mOldOperand.getSourceType()) {
@@ -130,28 +155,29 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                     mTextOperation.setText(mOldOperand.toString());
                     break;
                 case STATIC:
-                    mEditStaticValue.setText(mOldOperand.toString());
+                    if(mSpinnerValue.getVisibility() == View.VISIBLE) {
+                        //Set current value (if any) in spinner
+                        if(mOldOperand.getValue() != null)
+                            for(int i = 1 ; i < mSpinnerAdapter.getCount(); i++)
+                                if(mSpinnerAdapter.getItem(i).equals(mOldOperand.getValue())){
+                                    mSpinnerValue.setSelection(i);
+                                    continue;
+                                }
+                    } else
+                        mEditStaticValue.setText(mOldOperand.toString());
                     break;
             }
         }
 
-//TODO - TA: implement this and save the result as STATIC
-//        mSpinnerValue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if()
-//                if(position > 0) {
-//                    mRuleActionValueType = RuleActionValueType.STATIC;
-//                    clearSourceSelection();
-//                    clearTextSelection();
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                mRuleActionValueType = RuleActionValueType.NA;
-//            }
-//        });
+        mSpinnerValue.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         return view;
     }
@@ -183,12 +209,26 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             switch (which) {
                 case DialogInterface.BUTTON_NEUTRAL: //Done
                 case DialogInterface.BUTTON_POSITIVE://Next
-                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE//TODO - TA: change to non-static value
+                    RuleOperationBuildListener.RuleOperationSelectionInterface resultingSelectionType;
+                    IEntityDataType operand =  mFirstOperandWidgetIfAny != null? UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny) : null;
+                    if(mEditNewOperation.getText().length() > 0) {
+                        operand = new RuleOperation(mEditNewOperation.getText().toString());
+                        resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
+                    } else if(mEditStaticValue.getVisibility() == View.VISIBLE) {
+                        ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()));
+                        resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                    } else {
+                        Map<String, ?> staticValuesCompatibleWithFirstOperand = UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
+                        ((UnitEntityDataType) operand).setValue(mSpinnerValue.getSelectedItemPosition() > 0 ? staticValuesCompatibleWithFirstOperand.get(mSpinnerValue.getSelectedItem()) : null);
+                        resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                    }
+
+                    mListener.onOperationBuildResult(resultingSelectionType
                             , which == DialogInterface.BUTTON_POSITIVE?  RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT :RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
-                            , new RuleOperation(mEditNewOperation.getText().toString()), mPosition, null);
+                            , operand, mPosition, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_RULE//TODO - TA: change to non-static value
+                    mListener.onOperationBuildResult(RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION//Just a default non-used value since we are aborting.
                             , RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, mPosition, null);
 
@@ -199,8 +239,8 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     public interface RuleOperationBuildListener {
         public enum RuleOperationSelectionInterface {
             UNIT(0),
-            NEW_RULE(1),
-            OLD_RULE(2),
+            NEW_OPERATION(1),
+            OLD_OPERATION(2),
             STATIC(3),
             OPERATOR(4);
 

@@ -13,8 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -312,7 +310,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
             , int operandPosition, RuleOperator ruleOperator) {
         if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
-            mOperationUnderConstruction.setActive(true);
+            if(mOperationUnderConstruction != null)
+                mOperationUnderConstruction.setActive(true);
             return;
         }
 
@@ -325,32 +324,19 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                     if(mOperationUnderConstruction == null)
                         mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
                     mOperationUnderConstruction.setOperand(operandPosition, operand);
-                    if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT){
-                        if(operandPosition == 0) {
-                            final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
-                                    operand.getDataSourceId(),
-                                    false,
-                                    mRuleOperationProvider,
-                                    mWidgetProvider);
-                            final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
-                                    "Select an operator",
-                                    true,
-                                    operatorList);
-                            dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
-                        } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
-                            openRuleOperandDialogFragment(mOperationUnderConstruction.getOperand(operandPosition + 1), operandPosition + 1, true);
-                        }
-                    }
+                    if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                        openNewDialogAfterOperandSelection(operandPosition, operand);
 //                    addTreeItem(Integer.valueOf(mTreeData.size()), operand.getRuleTreeItem(mTreeData.size()));
                 }
                 break;
-            case NEW_RULE:
-            case OLD_RULE:
+            case NEW_OPERATION:
+            case OLD_OPERATION:
             case STATIC:
-                if(getSelectedTreeItem() != null)
-                    addTreeItem(operand);
-                else
-                    addTreeItem(mTreeData.size(), operand.getRuleTreeItem(mTreeData.size()));
+                if(mOperationUnderConstruction == null)
+                    mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
+                mOperationUnderConstruction.setOperand(operandPosition, operand);
+                if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                    openNewDialogAfterOperandSelection(operandPosition, operand);
                 break;
             case OPERATOR:
                 RuleOperation currentOperation;
@@ -372,6 +358,23 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             mOperationUnderConstruction.setActive(true);
             mOperationUnderConstruction.runCalculation();
             updateRuleTree(mOperationUnderConstruction);
+        }
+    }
+
+    private void openNewDialogAfterOperandSelection(int previousOperandPosition, IEntityDataType operand) {
+        if(previousOperandPosition == 0) {
+            final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
+                    operand.getDataSourceId(),
+                    false,
+                    mRuleOperationProvider,
+                    mWidgetProvider);
+            final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
+                    "Select an operator",
+                    true,
+                    operatorList);
+            dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
+        } else if(mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()) {
+            openRuleOperandDialogFragment(mOperationUnderConstruction.getOperand(previousOperandPosition + 1), previousOperandPosition + 1, true);
         }
     }
 
@@ -401,6 +404,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             } else if(operandPosition == -1) {
                 operandPosition = 0;
             }
+            ((RuleEditActivity)getActivity()).setOperationToEdit(mOperationUnderConstruction);
             mOperationUnderConstruction.setActive(false);
             ((RuleEditActivity)getActivity()).setOperandToEdit(mOperationUnderConstruction.getOperand(operandPosition));
             final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(

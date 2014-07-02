@@ -32,6 +32,10 @@ public class AdapterProvider {
 
     public static BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName, IOpenHABWidgetProvider widgetProvider) {
         OpenHABWidget openHABWidget = widgetProvider.getWidgetByItemName(openHABItemName);
+        return getStaticUnitValueAdapter(context, openHABWidget);
+    }
+
+    public static BaseAdapter getStaticUnitValueAdapter(Context context, OpenHABWidget openHABWidget) {
         UnitEntityDataType unitEntityDataType = UnitEntityDataType.getUnitEntityDataType(openHABWidget);
         Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
         if(staticValueHash == null)
