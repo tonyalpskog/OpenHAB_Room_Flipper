@@ -25,6 +25,7 @@ import org.openhab.habclient.TextToSpeechProvider;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -75,7 +76,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     @Override
     public SpeechAnalyzerResult executeSpeech(ArrayList<String> speechResult, ApplicationMode applicationMode) {
-        //
         return SpeechAnalyzerResult.ContinueListening;
     }
 
@@ -96,7 +96,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         }
 
         if(applicationMode == ApplicationMode.RoomFlipper) {
-            for(String match : (String[]) speechResult.toArray(new String[0])) {
+            for(String match : speechResult) {
                 if(roomNameMap.keySet().contains(match.toUpperCase())) {
                     //Got a speech match.
                     Room roomToShow = roomNameMap.get(match.toUpperCase());
@@ -112,7 +112,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             }
         }
 
-        for(String match : (String[]) speechResult.toArray(new String[0])) {
+        for(String match : speechResult) {
             if("hej då huset".equalsIgnoreCase(match)) {
                 //End HAB application
                 Log.d(HABApplication.getLogTag(), "Got a match: '" + match + "'");
@@ -125,52 +125,46 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     @Override
     public CommandAnalyzerResult analyzeCommand(List<String> commandPhrases, ApplicationMode applicationMode) {
-        CommandAnalyzerResult result = null;
-
         List<CommandPhraseMatchResult> commandMatchResultList = getCommandsFromPhrases(commandPhrases);
         Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> unitMatchResult = getHighestWidgetsFromCommandMatchResult(commandMatchResultList);
         if(unitMatchResult.size() == 0)
             return null;
-        Iterator<CommandPhraseMatchResult> iterator = unitMatchResult.keySet().iterator();
         int topScore = 0;
         CommandPhraseMatchResult bestKeySoFar = null;
-        while(iterator.hasNext()) {
-            CommandPhraseMatchResult cpmr = iterator.next();
+
+        for (CommandPhraseMatchResult cpmr : unitMatchResult.keySet()) {
             if(unitMatchResult.get(cpmr) == null)
                 continue;
+
             int currentScore = (cpmr.getPoint() * 30) + unitMatchResult.get(cpmr).getMatchPercent();
-            if(currentScore > topScore) {
+            if (currentScore > topScore) {
                 topScore = currentScore;
                 bestKeySoFar = cpmr;
             }
         }
 
+        final OpenHABWidgetCommandType commandType = bestKeySoFar != null ? bestKeySoFar.getCommandType() : null;
         String commandReply = null;
+
         if(bestKeySoFar == null)
             return null;
+
         if(bestKeySoFar.getCommandType() != OpenHABWidgetCommandType.GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {
                 mWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
-//                commandReply = getPopularNameFromWidgetLabel(unitMatchResult.get(bestKeySoFar).getWidget().getLabel());
                 commandReply = value;
             }
         }
 
-        return new CommandAnalyzerResult(null,  unitMatchResult.get(bestKeySoFar).getWidget(), topScore, commandReply != null? commandReply : unitMatchResult.get(bestKeySoFar).getWidget().getLabelValue(), bestKeySoFar.getCommandType());
-//        getMostProbableWidgetFromCommandMatchResult(commandMatchResultList.get(0)).getWidget().
-//        //TODO - Implement call to method that parses value tag data
-//        //result.setMatchPoint();
-//        List<Room> roomList = getRoomsFromPhrases(commandPhrases, applicationMode);
-//        List<OpenHABWidget> unitList = getUnitsFromPhrases(commandPhrases, roomList);
-//
-//        return result;
-
-        //For execution example see: OpenHABWidgetControl.sendItemCommand(OpenHABItem item, String command)
+        if (commandReply != null)
+            return new CommandAnalyzerResult(null, unitMatchResult.get(bestKeySoFar).getWidget(), topScore, commandReply, commandType);
+        else
+            return new CommandAnalyzerResult(null, unitMatchResult.get(bestKeySoFar).getWidget(), topScore, unitMatchResult.get(bestKeySoFar).getWidget().getLabelValue(), commandType);
     }
 
     public String getCommandValue(CommandPhraseMatchResult commandPhraseMatchResult) {
-        String valueTypeToLookFor = null;
+        String valueTypeToLookFor;
         switch (commandPhraseMatchResult.getCommandType()) {
             case AdjustSetpoint: valueTypeToLookFor = "<decimal>";
                 break;
@@ -193,7 +187,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     public String getCommandReply(CommandAnalyzerResult commandAnalyzerResult) {
-        String result = null;
+        String result;
         if(commandAnalyzerResult.getCommandType() == OpenHABWidgetCommandType.GetStatus) {
             result = mPopularNameProvider.getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " is " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
 
@@ -227,8 +221,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         Map<String, Room> roomNameMap = getMapOfRoomNamesFromProvider();
 
         if(applicationMode == ApplicationMode.RoomFlipper) {
-            for(String roomName : roomNameMap.keySet().toArray(new String[0])) {
-                for (String match : speechResult.toArray(new String[0])) {
+            for(String roomName : roomNameMap.keySet()) {
+                for (String match : speechResult) {
                     if(match.toUpperCase().contains(roomName.toUpperCase()) && !resultList.contains(roomNameMap.get(roomName.toUpperCase())))
                     {
                         //Got a room match.
@@ -250,12 +244,9 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
         //Get widgets from room list
         if(listOfRooms != null && !listOfRooms.isEmpty()){
-            Iterator<Room> roomIterator = listOfRooms.iterator();
-            Map<String, Room> roomNameMap = new HashMap<String, Room>();
-            while (roomIterator.hasNext()) {
-                Room nextRoom = roomIterator.next();
+            for (Room nextRoom : listOfRooms) {
                 Iterator<GraphicUnit> gunitIterator = nextRoom.getUnitIterator();
-                while(gunitIterator.hasNext())
+                while (gunitIterator.hasNext())
                     widgetList.add(gunitIterator.next().getOpenHABWidget());
             }
         }
@@ -285,7 +276,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         }
 
         //Look for match
-        for(String match : commandPhrases.toArray(new String[0])) {
+        for(String match : commandPhrases) {
             if(widgetNameMap.keySet().contains(match.toUpperCase())) {
                 //Got a unit match.
                 OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
@@ -347,7 +338,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
      */
     public List<CommandPhraseMatchResult> getCommandsFromPhrases(List<String> commandPhrases) {
         List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
-        for(String phrase : commandPhrases.toArray(new String[0])) {
+        for(String phrase : commandPhrases) {
             phrase = phrase.toUpperCase();
             for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
                 for(String commandAsText : getTextCommands(commandType.ArrayNameId)) {
@@ -371,7 +362,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                                 listIndex++;
                             }
                         }
-                        commandPhraseMatchResultList.add(listIndex, new CommandPhraseMatchResult(commandType, tags.toArray(new String[0]), tagPhrases.toArray(new String[0]), matchPoints));
+                        commandPhraseMatchResultList.add(listIndex, new CommandPhraseMatchResult(commandType, tags.toArray(new String[tags.size()]), tagPhrases.toArray(new String[tagPhrases.size()]), matchPoints));
                     }
                 }
             }
@@ -388,16 +379,14 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
         Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> resultMap = new HashMap<CommandPhraseMatchResult, WidgetPhraseMatchResult>();
 
-        Iterator<CommandPhraseMatchResult> iterator = listOfCommandResult.iterator();
-        while(iterator.hasNext()) {
-            CommandPhraseMatchResult commandPhraseMatchResult = iterator.next();
+        for (CommandPhraseMatchResult commandPhraseMatchResult : listOfCommandResult) {
             WidgetPhraseMatchResult widgetMatch = getMostProbableWidgetFromCommandMatchResult(commandPhraseMatchResult);
             //TODO - Implement call to method that compares the tag type with item and widget type. No tag<->type match = No unit result
             String[] valueTags = getValueTagType(commandPhraseMatchResult);
-            if(valueTags.length > 1)
+            if (valueTags.length > 1)
                 Log.w(HABApplication.getLogTag(), "Command phrase contains more than one value tag: " + valueTags.length);
 
-            if(widgetMatch != null && (valueTags.length > 0 && doesTagTypeMatchWidgetType(valueTags[0], widgetMatch.getWidget())) || valueTags.length == 0)
+            if (widgetMatch != null && (valueTags.length > 0 && doesTagTypeMatchWidgetType(valueTags[0], widgetMatch.getWidget())) || valueTags.length == 0)
                 resultMap.put(commandPhraseMatchResult, widgetMatch);
         }
 
@@ -411,7 +400,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                 tagList.add(tag);
         }
 
-        return tagList.toArray(new String[0]);
+        return tagList.toArray(new String[tagList.size()]);
     }
 
     public boolean doesTagTypeMatchWidgetType(String tag, OpenHABWidget widget) {
@@ -426,9 +415,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     public Map<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>> getAllWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
         Map<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>> resultMap = new HashMap<CommandPhraseMatchResult, List<WidgetPhraseMatchResult>>();
 
-        Iterator<CommandPhraseMatchResult> iterator = listOfCommandResult.iterator();
-        while(iterator.hasNext()) {
-            CommandPhraseMatchResult commandPhraseMatchResult = iterator.next();
+        for (CommandPhraseMatchResult commandPhraseMatchResult : listOfCommandResult) {
             resultMap.put(commandPhraseMatchResult, getWidgetsFromCommandMatchResult(commandPhraseMatchResult));
         }
 
@@ -484,22 +471,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     protected void initializeWidgetTypeTagMapping() {
-        List<OpenHABItemType> itemTypes = new ArrayList<OpenHABItemType>();
-        itemTypes.add(OpenHABItemType.Dimmer);
-        itemTypes.add(OpenHABItemType.Number);
-        mItemTypeTagMapping.put("<integer>", itemTypes);
-
-        itemTypes.clear();
-        itemTypes.add(OpenHABItemType.Number);
-        mItemTypeTagMapping.put("<decimal>", itemTypes);
-
-        itemTypes.clear();
-        itemTypes.add(OpenHABItemType.Color);
-        mItemTypeTagMapping.put("<color>", itemTypes);
-
-        itemTypes.clear();
-        itemTypes.add(OpenHABItemType.String);
-        mItemTypeTagMapping.put("<text>", itemTypes);
+        mItemTypeTagMapping.put("<integer>", Arrays.asList(OpenHABItemType.Dimmer, OpenHABItemType.Number));
+        mItemTypeTagMapping.put("<decimal>", Arrays.asList(OpenHABItemType.Number));
+        mItemTypeTagMapping.put("<color>", Arrays.asList(OpenHABItemType.Color));
+        mItemTypeTagMapping.put("<text>", Arrays.asList(OpenHABItemType.String));
     }
 
     protected void initializeCommandTagMapping(Context context) {
