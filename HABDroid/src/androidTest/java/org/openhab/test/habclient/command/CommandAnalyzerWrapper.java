@@ -6,7 +6,6 @@ import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.ApplicationMode;
-import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
@@ -51,8 +50,8 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //        return super.getUnitsFromPhrases(commandPhrases, listOfRooms);
 //    }
 
-    public List<OpenHABWidget> getUnitsFromPhrases(HABApplication habApplication, List<String> commandPhrases, List<Room> listOfRooms) {
-        return super.getUnitsFromPhrases2(commandPhrases, listOfRooms, habApplication);
+    public List<OpenHABWidget> getUnitsFromPhrases(Context context, List<String> commandPhrases, List<Room> listOfRooms) {
+        return super.getUnitsFromPhrases2(commandPhrases, listOfRooms, context);
 //        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 //
 //        // Fill the list view with the strings the recognizer thought it

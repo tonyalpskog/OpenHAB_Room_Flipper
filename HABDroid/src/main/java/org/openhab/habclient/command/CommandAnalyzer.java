@@ -285,7 +285,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return resultList;
     }
 
-    protected List<OpenHABWidget> getUnitsFromPhrases2(List<String> commandPhrases, List<Room> listOfRooms, HABApplication habApplication) {
+    protected List<OpenHABWidget> getUnitsFromPhrases2(List<String> commandPhrases, List<Room> listOfRooms, Context context) {
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
         List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
@@ -304,7 +304,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                     //Got a unit match.
                     OpenHABWidget foundWidget = widgetNameMap.get(unitName);
                     resultList.add(foundWidget);
-                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
+                    Log.d("CommandAnalyzer", "Found unit in command phrase <" + foundWidget.getLabel() + ">");
                 }
             }
         }

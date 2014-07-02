@@ -1,5 +1,7 @@
 package org.openhab.test.habclient.command;
 
+import android.test.AndroidTestCase;
+
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
@@ -14,7 +16,6 @@ import org.openhab.domain.util.RegExResult;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.ColorParser;
-import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.OpenHABWidgetProvider;
@@ -53,8 +54,7 @@ import dagger.Provides;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class CommandTest extends android.test.ApplicationTestCase<HABApplication> {
-    private HABApplication mHABApplication;
+public class CommandTest extends AndroidTestCase {
     private Map<String, Room> mRoomNameMap;
     private ArrayList<String> mListOfTestPhrases;
     private ArrayList<String> mListOfTestPhrases2;
@@ -73,18 +73,10 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
     @Inject IRoomProvider mRoomProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
 
-    public CommandTest() {
-        super(HABApplication.class);
-    }
-
     public void setUp() throws Exception {
         super.setUp();
 
-        createApplication();
-        mHABApplication = getApplication();
-
-        ObjectGraph graph = mHABApplication.getObjectGraph()
-                .plus(new AndroidModule(mHABApplication), new TestModule(mHABApplication));
+        ObjectGraph graph = ObjectGraph.create(new AndroidModule(getContext()), new TestModule());
         graph.inject(this);
 
         loadHttpDataFromString();
@@ -124,12 +116,6 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
 
     @Module(injects = CommandTest.class, includes = ClientModule.class, overrides = true)
     public class TestModule {
-        private final HABApplication mApp;
-
-        public TestModule(HABApplication app) {
-            mApp = app;
-        }
-
         @Provides @Singleton
         public CommandAnalyzer provideCommandAnalyzer(CommandAnalyzerWrapper wrapper) {
             return wrapper;
@@ -387,7 +373,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         ls.add("Terrace door");
 //        ls.add("Terrace door status");
 
-        List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, ls, null);
+        List<OpenHABWidget> resultingUnitList = mCommandAnalyzer.getUnitsFromPhrases(getContext(), ls, null);
         StringBuffer sb = new StringBuffer();
         for (OpenHABWidget widget : resultingUnitList)
             sb.append((sb.length() > 0 ? ", " : "") + widget.getId());
@@ -396,7 +382,7 @@ public class CommandTest extends android.test.ApplicationTestCase<HABApplication
         assertFalse("Returned OpenHABWidget was NULL", foundOhw == null);
         assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0), foundOhw.getLabel());
         assertEquals("First item name: " + (foundOhw.hasItem() ? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
-        assertFalse(mCommandAnalyzer.getUnitsFromPhrases(mHABApplication, mListOfTestPhrases2, null).isEmpty());
+        assertFalse(mCommandAnalyzer.getUnitsFromPhrases(getContext(), mListOfTestPhrases2, null).isEmpty());
     }
 
     private String getCommandPhraseMatchResultStringData(CommandPhraseMatchResult commandMatchResult) {
