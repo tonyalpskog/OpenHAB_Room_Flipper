@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
@@ -13,8 +15,9 @@ import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.GraphicUnit;
 import org.openhab.habclient.HABApplication;
+import org.openhab.domain.IPopularNameProvider;
 import org.openhab.habclient.IRoomProvider;
-import org.openhab.habclient.OpenHABWidgetProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.RoomFlipper;
 import org.openhab.habclient.SpeechAnalyzerResult;
@@ -38,10 +41,11 @@ import javax.inject.Inject;
 public class CommandAnalyzer implements ICommandAnalyzer {
 
     protected IRoomProvider mRoomProvider;
-    protected OpenHABWidgetProvider mOpenHABWidgetProvider;
+    protected IOpenHABWidgetProvider mOpenHABWidgetProvider;
     private final Context mContext;
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
+    private final IPopularNameProvider mPopularNameProvider;
     protected RoomFlipper mRoomFlipper;
     protected TextToSpeechProvider mTextToSpeechProvider;
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
@@ -51,12 +55,14 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     @Inject
     public CommandAnalyzer(IRoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
                            Context context, IOpenHABWidgetControl widgetControl,
-                           IRegularExpression regularExpression) {
+                           IRegularExpression regularExpression,
+                           IPopularNameProvider popularNameProvider) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
         mContext = context;
         mWidgetControl = widgetControl;
         mRegularExpression = regularExpression;
+        mPopularNameProvider = popularNameProvider;
 
         initializeWidgetTypeTagMapping();
         initializeCommandTagMapping(context);
@@ -185,10 +191,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     public String getCommandReply(CommandAnalyzerResult commandAnalyzerResult) {
         String result = null;
         if(commandAnalyzerResult.getCommandType() == OpenHABWidgetCommandType.GetStatus) {
-            result = getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " is " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
+            result = mPopularNameProvider.getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " is " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
 
         } else {
-            result = getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " was set to " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
+            result = mPopularNameProvider.getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " was set to " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
         }
 
         return result;
@@ -295,7 +301,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
         while (iterator.hasNext()) {
             OpenHABWidget nextWidget = iterator.next();
-            widgetNameMap.put(getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
+            widgetNameMap.put(mPopularNameProvider.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
         }
 
         //Look for match
@@ -311,10 +317,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         }
 
         return resultList;
-    }
-
-    public String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
-        return StringHandler.replaceSubStrings(openHABWidgetLabel, "[", "]", "");
     }
 
     public String replaceCommandTagsWithRegEx(String source) {
@@ -434,7 +436,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         String unitTagPhrase = getUnitPhrase(commandPhraseMatchResult);
 
         //Add all found widgets no matter their match points.
-        return mOpenHABWidgetProvider.getWidgetByLabel(unitTagPhrase, this);
+        return mOpenHABWidgetProvider.getWidgetByLabel(unitTagPhrase);
     }
 
     public WidgetPhraseMatchResult getMostProbableWidgetFromCommandMatchResult(CommandPhraseMatchResult commandPhraseMatchResult) {
@@ -444,7 +446,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         int matchPoint = 0;
         WidgetPhraseMatchResult widgetMatch = null;
         WidgetPhraseMatchResult matchResult = null;
-        List<WidgetPhraseMatchResult> widgetList = mOpenHABWidgetProvider.getWidgetByLabel(unitTagPhrase, this);
+        List<WidgetPhraseMatchResult> widgetList = mOpenHABWidgetProvider.getWidgetByLabel(unitTagPhrase);
         for (WidgetPhraseMatchResult aWidgetList : widgetList) {
             matchResult = aWidgetList;
             if (matchResult.getMatchPercent() > matchPoint) {

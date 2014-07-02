@@ -2,6 +2,7 @@ package org.openhab.test.habclient.command;
 
 import android.test.AndroidTestCase;
 
+import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
@@ -16,13 +17,13 @@ import org.openhab.domain.util.RegExResult;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.IApplicationModeProvider;
 import org.openhab.habclient.IRoomProvider;
-import org.openhab.habclient.OpenHABWidgetProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.CommandAnalyzerResult;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
 import org.openhab.habclient.command.OpenHABWidgetCommandType;
-import org.openhab.habclient.command.WidgetPhraseMatchResult;
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.habclient.dagger.AndroidModule;
 import org.openhab.habclient.dagger.ClientModule;
 import org.w3c.dom.Document;
@@ -70,6 +71,7 @@ public class CommandTest extends AndroidTestCase {
     @Inject OpenHABWidgetProvider mWidgetProvider;
     @Inject IRoomProvider mRoomProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject IPopularNameProvider mPopularNameProvider;
 
     public void setUp() throws Exception {
         super.setUp();
@@ -311,20 +313,20 @@ public class CommandTest extends AndroidTestCase {
 
     public void testGetSubStringsFromWidgetLabel() {
         String testLabel = "Temperature [20.1 °C]";
-        assertEquals("Temperature", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature", mPopularNameProvider.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "Temperature [20.1 °C] Something else [Joo% man]";
-        assertEquals("Temperature  Something else", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else", mPopularNameProvider.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "Temperature [20.1 °C] Something else [Joo% man] yeah";
-        assertEquals("Temperature  Something else  yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else  yeah", mPopularNameProvider.getPopularNameFromWidgetLabel(testLabel));
 
         testLabel = "[bas€) (#umba] Temperature [20.1 °C] Something else [Joo% man] yeah";
-        assertEquals("Temperature  Something else  yeah", mCommandAnalyzer.getPopularNameFromWidgetLabel(testLabel));
+        assertEquals("Temperature  Something else  yeah", mPopularNameProvider.getPopularNameFromWidgetLabel(testLabel));
     }
 
     public void testGetWidgetByLabel() {
-        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel("TERRACE DOOR", mCommandAnalyzer);
+        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel("TERRACE DOOR");
         assertEquals(getAllStringItemsInOneString(resultList), 3, resultList.size());
         assertEquals(100, resultList.get(0).getMatchPercent());
         assertEquals("GF_Living_4", resultList.get(0).getWidget().getId());
@@ -345,7 +347,7 @@ public class CommandTest extends AndroidTestCase {
         while (iterator.hasNext()) {
             OpenHABWidget nextWidget = iterator.next();
             if (!nextWidget.getLabel().isEmpty()) {
-                String popularName = mCommandAnalyzer.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase();
+                String popularName = mPopularNameProvider.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase();
                 widgetLabelList.add(popularName);
                 widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */popularName, nextWidget);
             }
@@ -363,7 +365,7 @@ public class CommandTest extends AndroidTestCase {
                 if (match.toUpperCase().contains(aWidgetNameArray) && matchPoint < aWidgetNameArray.length()) {
                     OpenHABWidget foundWidget = widgetNameMap.get(aWidgetNameArray);
                     matchPoint = aWidgetNameArray.length();
-                    sbMatchingWidgetLabels.append(sbMatchingWidgetLabels.length() > 0 ? ", " : "").append(mCommandAnalyzer.getPopularNameFromWidgetLabel(foundWidget.getLabel()));
+                    sbMatchingWidgetLabels.append(sbMatchingWidgetLabels.length() > 0 ? ", " : "").append(mPopularNameProvider.getPopularNameFromWidgetLabel(foundWidget.getLabel()));
                 }
             }
         }
@@ -541,7 +543,7 @@ public class CommandTest extends AndroidTestCase {
         List<CommandPhraseMatchResult> result = mCommandAnalyzer.getCommandsFromPhrases(inputValue);
         assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
         assertEquals(test_UnitToLookFor, result.get(0).getTagPhrases()[0]);
-        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel(result.get(0).getTagPhrases()[0], mCommandAnalyzer);
+        List<WidgetPhraseMatchResult> resultList = mWidgetProvider.getWidgetByLabel(result.get(0).getTagPhrases()[0]);
         assertEquals(getAllStringItemsInOneString(resultList), test_NoOfFoundUnitMatches, resultList.size());
         assertEquals(test_WidgetID, resultList.get(0).getWidget().getId());
         assertEquals(test_WholeWidgetLabel, resultList.get(0).getWidget().getLabel());

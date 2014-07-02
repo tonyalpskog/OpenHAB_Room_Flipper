@@ -1,5 +1,7 @@
 package org.openhab.habclient.command;
 
+import org.openhab.domain.command.WidgetPhraseMatchResult;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

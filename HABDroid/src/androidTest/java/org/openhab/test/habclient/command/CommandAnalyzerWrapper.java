@@ -3,15 +3,16 @@ package org.openhab.test.habclient.command;
 import android.content.Context;
 
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.habclient.ApplicationMode;
 import org.openhab.habclient.IRoomProvider;
-import org.openhab.habclient.OpenHABWidgetProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.habclient.Room;
 import org.openhab.habclient.command.CommandAnalyzer;
 import org.openhab.habclient.command.CommandPhraseMatchResult;
-import org.openhab.habclient.command.WidgetPhraseMatchResult;
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,9 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
     public CommandAnalyzerWrapper(IRoomProvider roomProvider,
                                   OpenHABWidgetProvider openHABWidgetProvider, Context context,
                                   IOpenHABWidgetControl widgetControl,
-                                  IRegularExpression regularExpression) {
-        super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression);
+                                  IRegularExpression regularExpression,
+                                  IPopularNameProvider popularNameProvider) {
+        super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression, popularNameProvider);
     }
 
     public Map<String, Room> getMapOfRoomNamesFromProvider() {
@@ -118,10 +120,6 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
 //
 //        return resultList;
 //    }
-
-    public String getPopularNameFromWidgetLabel(String openHABWidgetLabel) {
-        return super.getPopularNameFromWidgetLabel(openHABWidgetLabel);
-    }
 
     @Override
     public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {

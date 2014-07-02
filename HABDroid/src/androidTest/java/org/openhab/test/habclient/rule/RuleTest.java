@@ -3,6 +3,8 @@ package org.openhab.test.habclient.rule;
 import android.test.AndroidTestCase;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IOperator;
@@ -22,7 +24,7 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.RegularExpression;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.habclient.ColorParser;
-import org.openhab.habclient.OpenHABWidgetProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 
 import java.text.ParseException;
@@ -47,7 +49,8 @@ public class RuleTest extends AndroidTestCase {
         final ILogger logger = new AndroidLogger();
         final IColorParser colorParser = new ColorParser();
         final RegularExpression regularExpression = new RegularExpression();
-        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger);
+        final IPopularNameProvider popularNameProvider = new PopularNameProvider();
+        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
 
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger,
                 colorParser,

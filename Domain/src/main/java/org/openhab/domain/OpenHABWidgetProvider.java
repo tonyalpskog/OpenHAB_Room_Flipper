@@ -1,8 +1,6 @@
-package org.openhab.habclient;
+package org.openhab.domain;
 
-import android.util.Log;
-
-import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
@@ -12,8 +10,6 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.RegExAccuracyResult;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.WidgetPhraseMatchResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,14 +34,18 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
     private Map<OpenHABItemType, List<String>> mOpenHABItemTypeMap;
     private UUID mUpdateSetUUID;
+    private IPopularNameProvider mPopularNameProvider;
 
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
-                                 ILogger logger) {
+                                 ILogger logger,
+                                 IPopularNameProvider popularNameProvider) {
         if(regularExpression == null) throw new IllegalArgumentException("regularExpression is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");
+
         mRegularExpression = regularExpression;
         mLogger = logger;
+        mPopularNameProvider = popularNameProvider;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
@@ -200,7 +200,8 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private static final double APPROVED_PARENT_ACCURACY_VALUE = 0.6;
     private static final double COMBINED_ACCURACY_FACTOR = 1.6;
 
-    public List<WidgetPhraseMatchResult> getWidgetByLabel(String searchLabel, CommandAnalyzer commandAnalyzer) {
+    @Override
+    public List<WidgetPhraseMatchResult> getWidgetByLabel(String searchLabel) {
         String[] splittedSearchLabel = searchLabel.split(" ");
         List<String> sourceWordsList = new ArrayList<String>();
         for(String sourceWord : splittedSearchLabel)
@@ -208,7 +209,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
         for(OpenHABWidget widget : mOpenHABWidgetIdMap.values().toArray(new OpenHABWidget[0])) {
-            RegExAccuracyResult regExResult = mRegularExpression.getStringMatchAccuracy(sourceWordsList, commandAnalyzer.getPopularNameFromWidgetLabel(widget.getLabel()));
+            RegExAccuracyResult regExResult = mRegularExpression.getStringMatchAccuracy(sourceWordsList, mPopularNameProvider.getPopularNameFromWidgetLabel(widget.getLabel()));
             double accuracy = regExResult.getAccuracy();
             if(accuracy < APPROVED_UNIT_ACCURACY_VALUE && accuracy > DENIED_UNIT_ACCURACY_VALUE) {
                 List<String> sitemapGroupWordList = StringHandler.getStringListDiff(sourceWordsList, regExResult.getMatchingWords());
@@ -267,7 +268,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     public OpenHABWidget getWidgetByID(String widgetID) {
         OpenHABWidget widget = mOpenHABWidgetIdMap.get(widgetID);
         if(widget == null)
-            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetID));
+            mLogger.w(TAG, String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetID));
 
         return widget;
     }
@@ -278,7 +279,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         boolean result = mOpenHABWidgetIdMap.containsKey(widgetId);
         if(!result)
-            Log.w(HABApplication.getLogTag(), String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetId));
+            mLogger.w(TAG, String.format("Widget ID '%s' doesn't exist i current widget mapping", widgetId));
         return result;
     }
 
@@ -286,7 +287,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     public OpenHABWidget getWidgetByItemName(String openHabItemName) {
         OpenHABWidget widget = mOpenHABItemNameMap.get(openHabItemName);
         if(widget == null)
-            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
+            mLogger.w(TAG, String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
         return widget;
     }
 
@@ -296,7 +297,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         boolean result = mOpenHABItemNameMap.containsKey(openHabItemName);
         if(!result)
-            Log.w(HABApplication.getLogTag(), String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
+            mLogger.w(TAG, String.format("Item name '%s' doesn't exist i current widget mapping", openHabItemName));
         return result;
     }
 

@@ -2,6 +2,8 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
@@ -20,7 +22,7 @@ import org.openhab.habclient.IRoomProvider;
 import org.openhab.habclient.MainActivity;
 import org.openhab.habclient.OpenHABSetting;
 import org.openhab.habclient.OpenHABWidgetControl;
-import org.openhab.habclient.OpenHABWidgetProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.habclient.RestCommunication;
 import org.openhab.habclient.RoomConfigActivity;
 import org.openhab.habclient.RoomConfigFragment;
@@ -75,6 +77,11 @@ injects = {
         WearCommandHost.class
 })
 public class ClientModule {
+    @Provides @Singleton
+    public IPopularNameProvider providePopularNameProvider(PopularNameProvider popularNameProvider) {
+        return popularNameProvider;
+    }
+
     @Provides @Singleton
     public IRoomImageProvider provideRoomImageProvider(RoomImageProvider roomImageProvider) {
         return roomImageProvider;

@@ -1,5 +1,6 @@
 package org.openhab.domain;
 
+import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
@@ -19,6 +20,8 @@ public interface IOpenHABWidgetProvider {
     UUID getUpdateUUID();
 
     List<OpenHABWidget> getWidgetList(Set<OpenHABWidgetType> category);
+
+    List<WidgetPhraseMatchResult> getWidgetByLabel(String searchLabel);
 
     OpenHABWidget getWidgetByID(String id);
 
