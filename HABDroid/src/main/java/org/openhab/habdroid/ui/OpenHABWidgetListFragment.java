@@ -342,7 +342,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
         }
         //TA - Calling REST Get method, requesting data from server.
-        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mActivity, mDocumentFactory) {
+        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 if (document != null) {

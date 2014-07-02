@@ -6,6 +6,7 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class DocumentFactory implements IDocumentFactory {
     private final DocumentBuilderFactory mBuilderFactory;
 
+    @Inject
     public DocumentFactory() {
         mBuilderFactory = DocumentBuilderFactory.newInstance();
     }

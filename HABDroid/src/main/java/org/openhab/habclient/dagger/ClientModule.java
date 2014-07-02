@@ -1,5 +1,7 @@
 package org.openhab.habclient.dagger;
 
+import org.openhab.domain.DocumentFactory;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
@@ -77,6 +79,11 @@ injects = {
         WearCommandHost.class
 })
 public class ClientModule {
+    @Provides @Singleton
+    public IDocumentFactory provideDocumentFactory(DocumentFactory documentFactory) {
+        return documentFactory;
+    }
+
     @Provides @Singleton
     public IPopularNameProvider providePopularNameProvider(PopularNameProvider popularNameProvider) {
         return popularNameProvider;

@@ -3,9 +3,9 @@ package org.openhab.test.habclient.command;
 import android.content.Context;
 
 import com.loopj.android.http.AsyncHttpClient;
-import org.openhab.habclient.HABApplication;
 
 import org.apache.http.Header;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;
@@ -20,6 +20,7 @@ import javax.inject.Inject;
 public class AsyncHttpClientAsAsyncTask implements IAsyncHttpClientAsAsyncTask {
     @Inject Context mContext;
     @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject IDocumentFactory mDocumentFactory;
 
     @Override
     public void doAsync(final Listener l) {
@@ -27,7 +28,7 @@ public class AsyncHttpClientAsAsyncTask implements IAsyncHttpClientAsAsyncTask {
 //        headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
         AsyncHttpClient asyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
 //        MyAsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(habApplication.getApplicationContext());
-        asyncHttpClient.get(mContext, "https://demo.openhab.org:8443/rest/sitemaps/demo/demo", headers, null, new DocumentHttpResponseHandler() {
+        asyncHttpClient.get(mContext, "https://demo.openhab.org:8443/rest/sitemaps/demo/demo", headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 l.onValueChanged("onSuccess", document);
