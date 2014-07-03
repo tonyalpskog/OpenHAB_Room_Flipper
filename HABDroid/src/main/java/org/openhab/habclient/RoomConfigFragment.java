@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -158,9 +157,7 @@ public class RoomConfigFragment extends Fragment {
         mSpinnerHashMap.put(Direction.ABOVE, aboveRoomSpinner);
         mSpinnerHashMap.put(Direction.BELOW, belowRoomSpinner);
 
-        iterator = mSpinnerHashMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            Direction direction = (Direction) iterator.next();
+        for(Direction direction : mSpinnerHashMap.keySet()) {
             Spinner spinner = mSpinnerHashMap.get(direction);
             if(mCurrentRoom.getRoomByAlignment(direction) != null) {
                 spinner.setSelection(roomSpinnerAdapter.getPosition(mCurrentRoom.getRoomByAlignment(direction)));
