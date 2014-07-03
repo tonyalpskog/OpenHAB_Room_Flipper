@@ -44,78 +44,9 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
         return super.getListOfWidgetsFromListOfRooms(listOfRooms);
     }
 
-//    public List<OpenHABWidget> getUnitsFromPhrases(List<String> commandPhrases, List<Room> listOfRooms) {
-//        return super.getUnitsFromPhrases(commandPhrases, listOfRooms);
-//    }
-
     public List<OpenHABWidget> getUnitsFromPhrases(List<String> commandPhrases, List<Room> listOfRooms) {
         return super.getUnitsFromPhrases2(commandPhrases);
-//        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
-//
-//        // Fill the list view with the strings the recognizer thought it
-//        // could have heard
-//        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();// getListOfWidgetsFromListOfRooms(listOfRooms);
-////        if(widgetList.size() == 0) {
-//            widgetList = habApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
-////        }
-//        //Create widget name Map
-//        Iterator<OpenHABWidget> iterator = widgetList.iterator();
-//        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
-//        while (iterator.hasNext()) {
-//            OpenHABWidget nextWidget = iterator.next();
-//            widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
-//        }
-//
-//        //Look for match
-//        for(String match : commandPhrases.toArray(new String[0])) {
-////            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
-////            resultList.add(foundWidget);
-//            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
-//                if (match.toUpperCase().contains(unitName)) {
-//                    //Got a unit match.
-//                    OpenHABWidget foundWidget = widgetNameMap.get(unitName);
-//                    resultList.add(foundWidget);
-//                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
-//                }
-//            }
-//        }
-//
-//        return resultList;
     }
-
-//    public List<OpenHABWidget> getUnitsFromPhrases(HABApplication habApplication, List<String> commandPhrases) {
-//        List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
-//
-//        // Fill the list view with the strings the recognizer thought it
-//        // could have heard
-//        List<OpenHABWidget> widgetList = getListOfWidgetsFromListOfRooms(listOfRooms);
-//        if(widgetList.size() == 0) {
-//            widgetList = habApplication.getOpenHABWidgetProvider2().getWidgetList((Set<OpenHABWidgetType>) null);
-//        }
-//        //Create widget name Map
-//        Iterator<OpenHABWidget> iterator = widgetList.iterator();
-//        Map<String, OpenHABWidget> widgetNameMap = new HashMap<String, OpenHABWidget>();
-//        while (iterator.hasNext()) {
-//            OpenHABWidget nextWidget = iterator.next();
-//            widgetNameMap.put(/*nextWidget.hasItem()? nextWidget.getItem().getName() : */getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
-//        }
-//
-//        //Look for match
-//        for(String match : commandPhrases.toArray(new String[0])) {
-////            OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
-////            resultList.add(foundWidget);
-//            for(String unitName : widgetNameMap.keySet().toArray(new String[0])) {
-//                if (match.toUpperCase().contains(unitName)) {
-//                    //Got a unit match.
-//                    OpenHABWidget foundWidget = widgetNameMap.get(unitName);
-//                    resultList.add(foundWidget);
-//                    Log.d(habApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
-//                }
-//            }
-//        }
-//
-//        return resultList;
-//    }
 
     @Override
     public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
