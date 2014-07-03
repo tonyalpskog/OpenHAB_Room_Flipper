@@ -88,7 +88,7 @@ public class OpenHABWidgetDataSource {
     }
 
     public void setSourceNode(Node rootNode) {
-        setSourceNode(rootNode, new OpenHABWidget(logger, colorParser));
+        setSourceNode(rootNode, new OpenHABWidget(logger));
     }
 
     private void setSourceNode(Node rootNode, OpenHABWidget widget) {

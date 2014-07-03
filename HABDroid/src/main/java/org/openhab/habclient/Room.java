@@ -41,7 +41,7 @@ public class Room {
         this(logger, colorParser, widgetProvider);
         mGroupWidgetId = groupItemId;
         if(groupItemId == null || groupItemId.isEmpty())
-            mLocalWidget = new OpenHABWidget(logger, colorParser);
+            mLocalWidget = new OpenHABWidget(logger);
         mName = name;
         id = UUID.randomUUID();
         roomAlignment = new HashMap<Direction, Room>(6);

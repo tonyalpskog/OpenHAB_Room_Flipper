@@ -57,7 +57,7 @@ public class RoomConfigFragment extends Fragment {
 
         InjectUtils.inject(this);
 
-        mNullGroupWidget = new OpenHABWidget(mLogger, mColorParser);
+        mNullGroupWidget = new OpenHABWidget(mLogger);
         mNullRoom = new Room(null, "<Undefined room>",  mLogger, mColorParser,
                 mOpenHABWidgetProvider);//TA: TODO - Fix name problem. (now sitemapID)
 
