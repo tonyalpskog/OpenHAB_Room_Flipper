@@ -1,5 +1,6 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.StringHandler;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -264,4 +266,62 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
         }
         return operationIdHash;
     }
+
+    public Map<String, LogicBoolean> getStaticValues() {
+        Map<String, LogicBoolean> nameValueMap = new HashMap<String, LogicBoolean>(2);
+        nameValueMap.put("TRUE", new LogicBoolean(Boolean.TRUE));
+        nameValueMap.put("FALSE", new LogicBoolean(Boolean.FALSE));
+        return nameValueMap;
+    }
+
+    public static RuleOperation getStaticEntityDataType(String staticValue) {
+        RuleOperation staticEntityDataType = null;
+
+        //TODO - TA: replace static values with constants (TRUE, FALSE, Undefined)
+        LogicBoolean aLogicBoolean;
+
+        if(staticValue == null || staticValue.equalsIgnoreCase("Undefined"))
+            aLogicBoolean = null;
+        else
+            aLogicBoolean = new LogicBoolean(staticValue.equalsIgnoreCase("TRUE"));
+
+        staticEntityDataType = new RuleOperation()
+        {
+            @Override
+            public String getFormattedString(){
+                return mValue.getValue()? "TRUE": "FALSE";
+            }
+
+            @Override
+            public LogicBoolean valueOf(String input) {
+                if(input.equalsIgnoreCase("TRUE"))
+                    return new LogicBoolean(Boolean.valueOf(true));
+
+                if(input.equalsIgnoreCase("FALSE"))
+                    return new LogicBoolean(Boolean.valueOf(false));
+
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return getFormattedString();
+            }
+
+            @Override
+            public String toString(boolean addResultAsPrefix, boolean addResultAsPostfix) {
+                return toString();
+            }
+
+            @Override
+            public LogicBoolean getValue() {
+                return mValue;
+            }
+        };
+
+        staticEntityDataType.mValue = aLogicBoolean;
+
+        return staticEntityDataType;
+    }
+
 }

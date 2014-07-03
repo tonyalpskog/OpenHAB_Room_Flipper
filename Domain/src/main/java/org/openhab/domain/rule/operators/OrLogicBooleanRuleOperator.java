@@ -14,7 +14,6 @@ public class OrLogicBooleanRuleOperator extends BooleanRuleOperator<LogicBoolean
     public boolean getOperationResult2(List<LogicBoolean> args) {
         validateArgumentNumber(args);
 
-        int index = 0;
         boolean result = false;
 
         for(LogicBoolean value : args) {

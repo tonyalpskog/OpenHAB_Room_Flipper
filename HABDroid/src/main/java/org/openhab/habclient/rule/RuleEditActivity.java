@@ -190,10 +190,14 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         return mRuleActionBuildListener;
     }
 
+    @Deprecated
+    //TODO - TA: Replace this with getOperationToEdit().getOperand(index)
     public IEntityDataType getOperandToEdit() {
         return mOperandToEdit;
     }
 
+    @Deprecated
+    //TODO - TA: Replace this with getOperationToEdit().setOperand(index, value)
     public void setOperandToEdit(IEntityDataType operand) {
         mOperandToEdit = operand;
     }

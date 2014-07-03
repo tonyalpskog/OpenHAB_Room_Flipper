@@ -21,6 +21,7 @@ import android.widget.TextView;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.UnitEntityDataType;
@@ -46,12 +47,14 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private Button mButtonOperation;
     private TextView mTextOperation;
     private TextView mTextLabelStaticValue;
+    private TextView mTextLabelOperation;
     private EditText mEditNewOperation;
     private Spinner mSpinnerValue;
     private SpinnerAdapter mSpinnerAdapter;
     private EditText mEditStaticValue;
     private boolean mShowNextButton;
     private OpenHABWidget mFirstOperandWidgetIfAny;
+    private IEntityDataType mLeftSideOperand;
 
     private RuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
@@ -106,6 +109,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mButtonUnit = (Button) view.findViewById(R.id.button_rule_operation_builder_unit);
             mTextUnit = (TextView) view.findViewById(R.id.text_rule_operation_builder_unit);
             mButtonOperation = (Button) view.findViewById(R.id.button_rule_operation_builder_operation);
+            mTextLabelOperation = (TextView) view.findViewById(R.id.text_rule_operation_builder_operation_label);
             mTextOperation = (TextView) view.findViewById(R.id.text_rule_operation_builder_operation);
             mEditNewOperation = (EditText) view.findViewById(R.id.edit_rule_operation_builder_new_operation);
             mTextLabelStaticValue = (TextView) view.findViewById(R.id.text_rule_operation_builder_static_value_label);
@@ -129,9 +133,15 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
         boolean enableStaticValueSpinner = false;
         if(mPosition > 0) {//Try to enable views for static value input if this isn´t the first operand.
             try {
-                mFirstOperandWidgetIfAny = mWidgetProvider.getWidgetByItemName(((RuleEditActivity) getActivity()).getOperationToEdit().getOperand(0).getDataSourceId());
-                staticValuesCompatibleWithFirstOperand = UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
-                mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mFirstOperandWidgetIfAny);
+                mLeftSideOperand = ((RuleEditActivity) getActivity()).getOperationToEdit().getOperand(0);
+                if(mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION) {
+                    staticValuesCompatibleWithFirstOperand = RuleOperation.getStaticEntityDataType(null).getStaticValues();
+                    mSpinnerAdapter = AdapterProvider.getStaticOperationValueAdapter(getActivity(), true);
+                } else {
+                    mFirstOperandWidgetIfAny = mWidgetProvider.getWidgetByItemName(mLeftSideOperand.getDataSourceId());
+                    staticValuesCompatibleWithFirstOperand = UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
+                    mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mFirstOperandWidgetIfAny);
+                }
             } catch (Exception e) {};
 
             enableStaticValueSpinner = staticValuesCompatibleWithFirstOperand != null && staticValuesCompatibleWithFirstOperand.size() > 0;
@@ -139,10 +149,31 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mEditStaticValue.setVisibility(enableStaticValueSpinner ? View.GONE : View.VISIBLE);
             mSpinnerValue.setVisibility(enableStaticValueSpinner ? View.VISIBLE : View.GONE);
             mTextLabelStaticValue.setVisibility(View.VISIBLE);
+
+            //Set operation selection visibility
+            int operationVisibility = mLeftSideOperand == null || mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION? View.VISIBLE : View.GONE;
+            mTextLabelOperation.setVisibility(operationVisibility);
+            mButtonOperation.setVisibility(operationVisibility);
+            mTextOperation.setVisibility(operationVisibility);
+            mEditNewOperation.setVisibility(operationVisibility);
+
+            int unitVisibility = mLeftSideOperand == null || mLeftSideOperand.getSourceType() != EntityDataTypeSource.OPERATION? View.VISIBLE : View.GONE;
+            mButtonUnit.setVisibility(unitVisibility);
+            mTextUnit.setVisibility(unitVisibility);
+
         } else {
+            mButtonUnit.setVisibility(View.VISIBLE);
+            mTextUnit.setVisibility(View.VISIBLE);
+
             mTextLabelStaticValue.setVisibility(View.GONE);
             mEditStaticValue.setVisibility(View.GONE);
             mSpinnerValue.setVisibility(View.GONE);
+
+            //Set operation selection visibility
+            mTextLabelOperation.setVisibility(View.VISIBLE);
+            mButtonOperation.setVisibility(View.VISIBLE);
+            mTextOperation.setVisibility(View.VISIBLE);
+            mEditNewOperation.setVisibility(View.VISIBLE);
         }
 
         mOldOperand = ((RuleEditActivity)getActivity()).getOperandToEdit();
@@ -210,12 +241,16 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 case DialogInterface.BUTTON_NEUTRAL: //Done
                 case DialogInterface.BUTTON_POSITIVE://Next
                     RuleOperationBuildListener.RuleOperationSelectionInterface resultingSelectionType;
-                    IEntityDataType operand =  mFirstOperandWidgetIfAny != null? UnitEntityDataType.getStaticEntityDataType(mFirstOperandWidgetIfAny, null) : null;
-                    if(mEditNewOperation.getText().length() > 0) {
+                    IEntityDataType operand = mFirstOperandWidgetIfAny != null ? UnitEntityDataType.getStaticEntityDataType(mFirstOperandWidgetIfAny, null) : null;
+                    if (mEditNewOperation.getText().length() > 0) {
                         operand = new RuleOperation(mEditNewOperation.getText().toString());
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
-                    } else if(mEditStaticValue.getVisibility() == View.VISIBLE) {
+                    } else if (mEditStaticValue.getVisibility() == View.VISIBLE) {
                         ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()));
+                        resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                    } else if (mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION) {
+                        Map<String, ?> staticValuesCompatibleWithFirstOperand = RuleOperation.getStaticEntityDataType(null).getStaticValues();
+                        operand = RuleOperation.getStaticEntityDataType(mSpinnerValue.getSelectedItemPosition() > 0 ? mSpinnerValue.getSelectedItem().toString() : null);
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                     } else {
                         Map<String, ?> staticValuesCompatibleWithFirstOperand = UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
