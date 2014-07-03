@@ -320,37 +320,62 @@ public class CommandAnalyzer implements ICommandAnalyzer {
      * @return a Map of keys as upper case phrase strings with the command excluded and command types as values.
      */
     public List<CommandPhraseMatchResult> getCommandsFromPhrases(List<String> commandPhrases) {
-        List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
+        final List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
         for(String phrase : commandPhrases) {
-            phrase = phrase.toUpperCase();
-            for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
-                for(String commandAsText : getTextCommands(commandType.ArrayNameId)) {
-                    commandAsText = commandAsText.toUpperCase();
-                    int matchPoints = StringHandler.replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
-                    String regexCommand = "\\A" + StringHandler.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
-                    Pattern pattern = Pattern.compile(replaceCommandTagsWithRegEx(commandAsText), Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(phrase);
-                    if(matcher.find()) {
-                        List<String> tagPhrases = new ArrayList<String>();
-                        for(int i = 1; i <= matcher.groupCount(); i++)
-                            if(matcher.group(i) != null && !matcher.group(i).isEmpty())
-                                tagPhrases.add(matcher.group(i));
+            if(phrase == null)
+                continue;
 
-                        List<String> tags = getMatchingRegExGroups(regexCommand, commandAsText);
-                        int listIndex = 0;
-                        if(commandPhraseMatchResultList.size() > 0) {
-                            for(; listIndex < commandPhraseMatchResultList.size();) {
-                                if(commandPhraseMatchResultList.get(listIndex).getPoint() < matchPoints)
-                                    break;
-                                listIndex++;
-                            }
-                        }
-                        commandPhraseMatchResultList.add(listIndex, new CommandPhraseMatchResult(commandType, tags.toArray(new String[tags.size()]), tagPhrases.toArray(new String[tagPhrases.size()]), matchPoints));
-                    }
-                }
-            }
+            commandPhraseMatchResultList.addAll(getCommandsFromPhrase(phrase.toUpperCase()));
         }
         return  commandPhraseMatchResultList;
+    }
+
+    private List<CommandPhraseMatchResult> getCommandsFromPhrase(String phrase) {
+        final List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
+        for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
+            if(commandType == null)
+                continue;
+
+            commandPhraseMatchResultList.addAll(getCommandsFromCommandType(phrase, commandType));
+        }
+        return commandPhraseMatchResultList;
+    }
+
+    private List<CommandPhraseMatchResult> getCommandsFromCommandType(String phrase, OpenHABWidgetCommandType commandType) {
+        final List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
+
+        for(String commandAsText : getTextCommands(commandType.ArrayNameId)) {
+            commandAsText = commandAsText.toUpperCase();
+            final int matchPoints = StringHandler.replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
+            final String regexCommand = "\\A" + StringHandler.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
+            final Pattern pattern = Pattern.compile(replaceCommandTagsWithRegEx(commandAsText), Pattern.CASE_INSENSITIVE);
+            final Matcher matcher = pattern.matcher(phrase);
+
+            if (!matcher.find())
+                continue;
+
+            final List<String> tagPhrases = new ArrayList<String>();
+            for(int i = 1; i <= matcher.groupCount(); i++)
+                if(matcher.group(i) != null && !matcher.group(i).isEmpty())
+                    tagPhrases.add(matcher.group(i));
+
+            final List<String> tags = getMatchingRegExGroups(regexCommand, commandAsText);
+            int listIndex = 0;
+            if(commandPhraseMatchResultList.size() > 0) {
+                for(; listIndex < commandPhraseMatchResultList.size();) {
+                    if(commandPhraseMatchResultList.get(listIndex).getPoint() < matchPoints)
+                        break;
+                    listIndex++;
+                }
+            }
+
+            commandPhraseMatchResultList.add(listIndex, new CommandPhraseMatchResult(commandType,
+                    tags.toArray(new String[tags.size()]),
+                    tagPhrases.toArray(new String[tagPhrases.size()]),
+                    matchPoints));
+        }
+
+        return commandPhraseMatchResultList;
     }
 
     private String[] getTextCommands(int arrayNameId) {
