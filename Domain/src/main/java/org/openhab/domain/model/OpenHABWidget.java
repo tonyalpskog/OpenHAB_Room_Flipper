@@ -65,7 +65,6 @@ public class OpenHABWidget {
 	private OpenHABLinkedPage linkedPage;
 	private ArrayList<OpenHABWidget> children;
 	private ArrayList<OpenHABWidgetMapping> mappings;
-    private boolean mChildrenHasLinkedPages = false;
     private Integer iconcolor;
     private Integer labelcolor;
     private Integer valuecolor;
@@ -112,13 +111,13 @@ public class OpenHABWidget {
                 } else if (childNode.getNodeName().equals("url")) {
                     this.setUrl(childNode.getTextContent());
                 } else if (childNode.getNodeName().equals("minValue")) {
-                    setMinValue(Float.valueOf(childNode.getTextContent()).floatValue());
+                    setMinValue(Float.valueOf(childNode.getTextContent()));
                 } else if (childNode.getNodeName().equals("maxValue")) {
-                    setMaxValue(Float.valueOf(childNode.getTextContent()).floatValue());
+                    setMaxValue(Float.valueOf(childNode.getTextContent()));
                 } else if (childNode.getNodeName().equals("step")) {
-                    setStep(Float.valueOf(childNode.getTextContent()).floatValue());
+                    setStep(Float.valueOf(childNode.getTextContent()));
                 } else if (childNode.getNodeName().equals("refresh")) {
-                    setRefresh(Integer.valueOf(childNode.getTextContent()).intValue());
+                    setRefresh(Integer.valueOf(childNode.getTextContent()));
                 } else if (childNode.getNodeName().equals("period")) {
                     setPeriod(childNode.getTextContent());
                 } else if (childNode.getNodeName().equals("height")) {
@@ -183,19 +182,11 @@ public class OpenHABWidget {
     }
 	
 	public boolean hasItem() {
-		if (this.getItem() != null) {
-			return true;
-		} else {
-			return false;
-		}
+        return this.getItem() != null;
 	}
 	
 	public boolean hasLinkedPage() {
-		if (this.linkedPage != null) {
-			return true;
-		} else {
-			return false;
-		}
+        return this.linkedPage != null;
 	}
 	
 	public OpenHABWidgetType getType() {
@@ -218,19 +209,19 @@ public class OpenHABWidget {
                 setType(OpenHABWidgetType.Switch);
             }
             return;
-        } else {
-            for(OpenHABWidgetType oType : OpenHABWidgetType.values()) {
-                if(type.equalsIgnoreCase(oType.Name)) {
-                    setType(oType);
-                    logger.v("OpenHABWidget", String.format("Found openHABWidget type '%s'. Widget ID = %s", oType.Name, getId()));
-                    return;
-                }
-            }
-
-            //Type not found by name => Generic
-            logger.e("OpenHABWidget", String.format("Unknown openHABWidget type '%s'. Widget ID = %s", type, getId()));
-            setType(OpenHABWidgetType.GenericItem);
         }
+
+        for(OpenHABWidgetType oType : OpenHABWidgetType.values()) {
+            if(type.equalsIgnoreCase(oType.Name)) {
+                setType(oType);
+                logger.v("OpenHABWidget", String.format("Found openHABWidget type '%s'. Widget ID = %s", oType.Name, getId()));
+                return;
+            }
+        }
+
+        //Type not found by name => Generic
+        logger.e("OpenHABWidget", String.format("Unknown openHABWidget type '%s'. Widget ID = %s", type, getId()));
+        setType(OpenHABWidgetType.GenericItem);
     }
 
     public OpenHABItem getItem() {
@@ -274,11 +265,8 @@ public class OpenHABWidget {
 	}
 	
 	public boolean hasMappings() {
-		if (mappings.size() > 0) {
-			return true;
-		}
-		return false;
-	}
+        return mappings.size() > 0;
+    }
 	
 	public OpenHABWidgetMapping getMapping(int index) {
 		return mappings.get(index);
