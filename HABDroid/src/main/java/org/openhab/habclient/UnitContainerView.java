@@ -173,7 +173,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private ImageView getView(GraphicUnit graphicUnit) {
         GraphicUnitWidget view = mGraphicUnitWidgets.get(graphicUnit);
         if(view == null) {
-            view = new GraphicUnitWidget(getContext(), graphicUnit);
+            view = new GraphicUnitWidget(getContext(), graphicUnit, this);
 
             view.setMinimumWidth(UNIT_SIZE);
             view.setMinimumHeight(UNIT_SIZE);

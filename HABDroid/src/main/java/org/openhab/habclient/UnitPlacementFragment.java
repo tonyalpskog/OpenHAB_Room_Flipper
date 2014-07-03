@@ -263,7 +263,7 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                roomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item).getId(), roomView, mWidgetProvider), 50, 50);
+                roomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item)), 50, 50);
                 Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
@@ -430,7 +430,7 @@ public class UnitPlacementFragment extends Fragment {
 
         for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
-                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget().getId(), roomView, mWidgetProvider), 50, 50);
+                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget()), 50, 50);
                 selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());
             }
         }

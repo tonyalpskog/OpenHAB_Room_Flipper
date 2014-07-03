@@ -28,6 +28,7 @@ import javax.inject.Inject;
 public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnClickListener, View.OnLongClickListener {
 
     private GraphicUnit gUnit;
+    private UnitContainerView mUnitContainerView;
     private HABApplication mApplication;
     @Inject IOpenHABSetting mOpenHABSetting;
     @Inject IApplicationModeProvider mApplicationModeProvider;
@@ -38,10 +39,11 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
         mApplication = (HABApplication) context.getApplicationContext();
         mApplication.inject(this);
     }
-    public GraphicUnitWidget(Context context, GraphicUnit graphicUnit) {
+    public GraphicUnitWidget(Context context, GraphicUnit graphicUnit, UnitContainerView unitContainerView) {
         this(context);
 
         gUnit = graphicUnit;
+        mUnitContainerView = unitContainerView;
 
         String iconUrl = mOpenHABSetting.getBaseUrl() + "images/" + Uri.encode(gUnit.getOpenHABWidget().getIcon() + ".png");
         setImageUrl(iconUrl, R.drawable.openhabiconsmall, mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
@@ -84,7 +86,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
                 getContext().startActivity(widgetListIntent);
             } else
                 if(gUnit.getOpenHABWidget().getType().HasDynamicControl)
-                    gUnit.getUnitContainerView().drawControlInRoom(gUnit);
+                    mUnitContainerView.drawControlInRoom(gUnit);
                 else
                     Toast.makeText(getContext(), "Unit action is not (yet) supported for this unit type", Toast.LENGTH_SHORT).show();
         }

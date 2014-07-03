@@ -1,6 +1,5 @@
 package org.openhab.habclient;
 
-import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 
@@ -10,22 +9,16 @@ import java.util.UUID;
  * Created by Tony Alpskog in 2013.
  */
 public class GraphicUnit {
+    private final OpenHABWidget mOpenHABWidget;
     private UUID id;
 //    private OpenHABWidgetType type;
     private float roomRelativeX = 0;
     private float roomRelativeY = 0;
-    UnitContainerView mRoomView;
-    private final IOpenHABWidgetProvider mWidgetProvider;
-    private String mWidgetId;
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
-    public GraphicUnit(String widgetId, UnitContainerView roomView,
-                       IOpenHABWidgetProvider widgetProvider) {
-        mWidgetId = widgetId;
-        mLatestWidgetUpdateUUID = widgetProvider.getUpdateUUID();
-        mRoomView = roomView;
-        mWidgetProvider = widgetProvider;
+    public GraphicUnit(OpenHABWidget openHABWidget) {
+        mOpenHABWidget = openHABWidget;
 
         isSelected = false;
         this.id = UUID.randomUUID();
@@ -67,14 +60,6 @@ public class GraphicUnit {
     }
 
     public OpenHABWidget getOpenHABWidget() {
-        return mWidgetProvider.getWidgetByID(mWidgetId);
-    }
-
-    public void setOpenHABWidget(String itemName) {
-        mWidgetId = itemName;
-    }
-
-    public UnitContainerView getUnitContainerView() {
-        return mRoomView;
+        return mOpenHABWidget;
     }
 }
