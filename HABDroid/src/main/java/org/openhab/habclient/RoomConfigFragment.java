@@ -22,6 +22,7 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -99,11 +100,9 @@ public class RoomConfigFragment extends Fragment {
         habGroupSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //Create adapter for Room spinners
-        List<Room> roomArrayList = new ArrayList<Room>(mRoomProvider.getRoomHash().size());
-        Iterator iterator = mRoomProvider.getRoomHash().values().iterator();
-        while(iterator.hasNext()) {
-            Room room = (Room) iterator.next();
-
+        final Collection<Room> allRooms = mRoomProvider.getAllRooms();
+        List<Room> roomArrayList = new ArrayList<Room>(allRooms.size());
+        for(Room room : allRooms) {
             //TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
             if(room.getGroupWidgetId() == null) {
                 OpenHABWidget groupWidget = mOpenHABWidgetProvider.getWidgetByID(room.getRoomWidget().getId());

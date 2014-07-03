@@ -56,7 +56,6 @@ import dagger.Provides;
  * Created by Tony Alpskog in 2014.
  */
 public class CommandTest extends AndroidTestCase {
-    private Map<String, Room> mRoomNameMap;
     private ArrayList<String> mListOfTestPhrases;
     private ArrayList<String> mListOfTestPhrases2;
     private String[] mTestedRoomsNameArray;
@@ -100,12 +99,6 @@ public class CommandTest extends AndroidTestCase {
         mListOfTestPhrases2.add("hej hopp " + mTestedRoomsNameArray[2] + " Windows");
         mListOfTestPhrases2.add("Det var Window_FF_Office_Window en gång en " + mTestedRoomsNameArray[3] + " som mådde dåligt");
         mListOfTestPhrases2.add("Shutter_FF_Bath " + mTestedRoomsNameArray[4] + " är bra Light_Outdoor_Frontdoor att ha");
-
-        mRoomNameMap = new HashMap<String, Room>();
-        for (Room nextRoom : mRoomProvider.getRoomHash().values()) {
-            mRoomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
-        }
-
     }
 
     @Module(injects = CommandTest.class, includes = ClientModule.class, overrides = true)
@@ -118,7 +111,7 @@ public class CommandTest extends AndroidTestCase {
 
     public void testFinalArrayOfNamesUsedInTests() {
         assertEquals(14, mFullRoomNameArray.length);
-        assertEquals(14, mRoomProvider.getRoomHash().size());
+        assertEquals(14, mRoomProvider.getAllRooms().size());
 
         assertFalse("No MapOfRoomNames items available.", mRoomProvider.getMapOfRoomNames().isEmpty());
 
@@ -130,7 +123,7 @@ public class CommandTest extends AndroidTestCase {
         String availableRoomsResult = "";
         String unavailableRoomsResult = "";
         for (String roomName : mFullRoomNameArray) {
-            if (!mRoomNameMap.keySet().contains(roomName.toUpperCase()))
+            if (!mRoomProvider.getMapOfRoomNames().keySet().contains(roomName.toUpperCase()))
                 unavailableRoomsResult += roomName.toUpperCase() + " , ";
             else
                 availableRoomsResult += roomName.toUpperCase() + " , ";

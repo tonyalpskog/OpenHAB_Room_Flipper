@@ -5,9 +5,8 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,8 +36,8 @@ public class RoomProvider implements IRoomProvider {
     }
 
     @Override
-    public HashMap<UUID, Room> getRoomHash() {
-        return roomHash;
+    public Collection<Room> getAllRooms() {
+        return roomHash.values();
     }
 
     @Override
@@ -437,11 +436,8 @@ public class RoomProvider implements IRoomProvider {
     @Override
     public Map<String, Room> getMapOfRoomNames() {
         // could have heard
-        List<Room> roomList = new ArrayList<Room>();
-        roomList.addAll(getRoomHash().values());
-
         Map<String, Room> roomNameMap = new HashMap<String, Room>();
-        for (Room nextRoom : roomList) {
+        for (Room nextRoom : getAllRooms()) {
             roomNameMap.put(nextRoom.getName().toUpperCase(), nextRoom);
         }
 

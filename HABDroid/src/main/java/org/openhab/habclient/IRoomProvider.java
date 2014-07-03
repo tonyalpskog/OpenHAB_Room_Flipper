@@ -1,11 +1,11 @@
 package org.openhab.habclient;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
 public interface IRoomProvider {
-    HashMap<UUID, Room> getRoomHash();
+    Collection<Room> getAllRooms();
 
     UUID getInitialRoomId();
 

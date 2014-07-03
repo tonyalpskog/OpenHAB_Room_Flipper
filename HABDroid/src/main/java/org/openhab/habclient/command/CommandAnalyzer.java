@@ -86,7 +86,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         List<Room> roomList = new ArrayList<Room>();
 
         if(mRoomProvider != null)
-            roomList.addAll(mRoomProvider.getRoomHash().values());
+            roomList.addAll(mRoomProvider.getAllRooms());
 
         Iterator<Room> iterator = roomList.iterator();
         Map<String, Room> roomNameMap = new HashMap<String, Room>();
