@@ -125,14 +125,14 @@ public class RuleTreeTest {
         Assert.assertEquals("[Sant] Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", rti1.toString());
         Assert.assertEquals(0, rti1.getPosition());
         Assert.assertEquals(0, rti1.getChildren().size());
-        Assert.assertEquals(true, ron1.getValue().booleanValue());
+        Assert.assertEquals(true, ron1.getValue().getValue());
 
         RuleOperation ron2 = mock_getRuleOperation(4);
         RuleTreeItem rti2 = new RuleTreeItem(1, ron2.getRuleTreeItem(1).toString(), RuleTreeItem.ItemType.OPERAND);
         Assert.assertEquals("[Falskt] Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", rti2.toString());
         Assert.assertEquals(1, rti2.getPosition());
         Assert.assertEquals(0, rti2.getChildren().size());
-        Assert.assertEquals(false, ron2.getValue().booleanValue());
+        Assert.assertEquals(false, ron2.getValue().getValue());
 
         RuleOperator ror = mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
@@ -141,7 +141,7 @@ public class RuleTreeTest {
         RuleOperation mainOperation = new RuleOperation(ror, operandList);
         RuleTreeItem mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         Assert.assertEquals(3, mainRuleTreeItem.getPosition());
-        Assert.assertEquals(false, mainOperation.getValue().booleanValue());
+        Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5])", mainOperation.toString());
         Assert.assertEquals("[Falskt] (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]) AND (Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5])", mainRuleTreeItem.toString());
         Assert.assertEquals(3, mainRuleTreeItem.getChildren().size());
@@ -163,7 +163,7 @@ public class RuleTreeTest {
         mainOperation = new RuleOperation(ror, operandList);
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         Assert.assertEquals(3, mainRuleTreeItem.getPosition());
-        Assert.assertEquals(false, mainOperation.getValue().booleanValue());
+        Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("First_Operation [Sant] AND Second_Operation [Falskt]", mainOperation.toString());
         Assert.assertEquals("[Falskt] First_Operation [Sant] AND Second_Operation [Falskt]", mainRuleTreeItem.toString());
         Assert.assertEquals(3, mainRuleTreeItem.getChildren().size());
@@ -185,20 +185,20 @@ public class RuleTreeTest {
         RuleTreeItem rti1 = new RuleTreeItem(0, ron1.getRuleTreeItem(0).toString(), RuleTreeItem.ItemType.OPERAND);
         String rti1String = RuleOperatorType.MISSING_OPERAND + " = Light_FF_Bath_Mirror [OFF]";
         Assert.assertEquals("[Falskt] " + rti1String, rti1.toString());
-        Assert.assertEquals(false, ron1.getValue().booleanValue());
+        Assert.assertEquals(false, ron1.getValue().getValue());
 
         RuleOperation ron2 = mock_getRuleOperation(4);
         ron2.setRuleOperator(null);
         RuleTreeItem rti2 = new RuleTreeItem(1, ron2.getRuleTreeItem(1).toString(), RuleTreeItem.ItemType.OPERAND);
         String rti2String = "Temperature_FF_Bed [19.2] " + RuleOperator.MISSING_OPERATOR;
         Assert.assertEquals("[Falskt] " + rti2String, rti2.toString());
-        Assert.assertEquals(false, ron2.getValue().booleanValue());
+        Assert.assertEquals(false, ron2.getValue().getValue());
 
         RuleOperation ron3 = new RuleOperation("Empty operation");
         RuleTreeItem rti3 = new RuleTreeItem(1, ron3.getRuleTreeItem(1).toString(), RuleTreeItem.ItemType.OPERAND);
         String rti3String = "Empty operation";
         Assert.assertEquals("[Falskt] " + rti3String + " <Incomplete>", rti3.toString());
-        Assert.assertEquals(false, ron3.getValue().booleanValue());
+        Assert.assertEquals(false, ron3.getValue().getValue());
 
         RuleOperator ror = mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
@@ -208,7 +208,7 @@ public class RuleTreeTest {
         RuleOperation mainOperation = new RuleOperation(ror, operandList);
         RuleTreeItem mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         Assert.assertEquals(3, mainRuleTreeItem.getPosition());
-        Assert.assertEquals(false, mainOperation.getValue().booleanValue());
+        Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("(" + rti1String + ") AND (" + rti2String + ") AND " + rti3String + " <Incomplete> [Falskt]", mainOperation.toString());
         Assert.assertEquals("[Falskt] (" + rti1String + ") AND (" + rti2String + ") AND " + rti3String + " <Incomplete> [Falskt]", mainRuleTreeItem.toString());
         Assert.assertEquals(5, mainRuleTreeItem.getChildren().size());
@@ -230,7 +230,7 @@ public class RuleTreeTest {
 
         mainOperation.setRuleOperator(mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.Or));
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
-        Assert.assertEquals(false, mainOperation.getValue().booleanValue());
+        Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("(" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt]", mainOperation.toString());
         Assert.assertEquals("[Falskt] (" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt]", mainRuleTreeItem.toString());
         Assert.assertEquals(5, mainRuleTreeItem.getChildren().size());
@@ -254,7 +254,7 @@ public class RuleTreeTest {
         operandList.add(mock_getRuleOperation(1));
         mainOperation = new RuleOperation(ror, operandList);
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
-        Assert.assertEquals(true, mainOperation.getValue().booleanValue());
+        Assert.assertEquals(true, mainOperation.getValue().getValue());
         Assert.assertEquals("(" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt] OR (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF])", mainOperation.toString());
         Assert.assertEquals("[Sant] (" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt] OR (Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF])", mainRuleTreeItem.toString());
         Assert.assertEquals(7, mainRuleTreeItem.getChildren().size());

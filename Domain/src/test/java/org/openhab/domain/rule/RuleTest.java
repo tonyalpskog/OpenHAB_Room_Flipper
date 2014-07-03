@@ -295,7 +295,7 @@ public class RuleTest {
 
         RuleOperation roA = new RuleOperation(operator, operands);
         Assert.assertEquals("Humidity percentage [50.7%Rh] = Test Value [50.7]", roA.toString());
-        Assert.assertEquals(true, roA.getValue().booleanValue());
+        Assert.assertEquals(true, roA.getValue().getValue());
 
         //Second operation (Rule B)
         RuleOperator<Number> operator2 =  new LessThanNumberRuleOperator();
@@ -303,9 +303,9 @@ public class RuleTest {
         List<IEntityDataType> operands2 = getOperandsAsList();
         RuleOperation roB = new RuleOperation(operator2, operands2);
         Assert.assertEquals("Humidity percentage [50.7%Rh] < Test Value [50.7]", roB.toString());
-        Assert.assertEquals(false, roB.getValue().booleanValue());
+        Assert.assertEquals(false, roB.getValue().getValue());
 
-        Assert.assertEquals(false, roA.getValue() && roB.getValue());
+        Assert.assertEquals(false, roA.getValue().getValue() && roB.getValue().getValue());
 
         //Test if a value change on first operator in second operation will update itself and the sub-operations
         UnitEntityDataType operand1 = ((UnitEntityDataType)operands2.get(0));
@@ -314,9 +314,9 @@ public class RuleTest {
         Assert.assertEquals(59.2d, operand1.getValue());
         ((OnValueChangedListener)operands2.get(0)).onValueChanged(operands2.get(0).getDataSourceId(), "43.5");
         Assert.assertEquals(43.5d, operand1.getValue());
-        Assert.assertEquals(true, roA.getValue().booleanValue());
-        Assert.assertEquals(true, roB.getValue().booleanValue());
-        Assert.assertEquals(true, roA.getValue() && roB.getValue());
+        Assert.assertEquals(true, roA.getValue().getValue());
+        Assert.assertEquals(true, roB.getValue().getValue());
+        Assert.assertEquals(true, roA.getValue().getValue() && roB.getValue().getValue());
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {
@@ -344,24 +344,24 @@ public class RuleTest {
         OpenHABWidget widget = mWidgetProvider.getWidgetByID("GF_Kitchen_0");
         RuleOperation roA = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(1));
         Assert.assertEquals("Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]", roA.toString());
-        Assert.assertEquals(true, roA.getValue().booleanValue());
+        Assert.assertEquals(true, roA.getValue().getValue());
 
         widget = mWidgetProvider.getWidgetByID("FF_Bath_1");
         roA = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), getOperandsAsList3(1));
         Assert.assertEquals("Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]", roA.toString());
-        Assert.assertEquals(false, roA.getValue().booleanValue());
+        Assert.assertEquals(false, roA.getValue().getValue());
 
         widget = mWidgetProvider.getWidgetByID("FF_Bed_3");
         RuleOperation roB = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), getOperandsAsList3(2));
         Assert.assertEquals("Temperature_FF_Bed [19.2] < Temperature_GF_Toilet [21.5]", roB.toString());
-        Assert.assertEquals(true, roB.getValue().booleanValue());
+        Assert.assertEquals(true, roB.getValue().getValue());
 
         widget = mWidgetProvider.getWidgetByID("GF_Toilet_4");
         roB = new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), getOperandsAsList3(2));
         Assert.assertEquals("Temperature_FF_Bed [19.2] > Temperature_GF_Toilet [21.5]", roB.toString());
-        Assert.assertEquals(false, roB.getValue().booleanValue());
+        Assert.assertEquals(false, roB.getValue().getValue());
 
-        Assert.assertEquals(false, roA.getValue() && roB.getValue());
+        Assert.assertEquals(false, roA.getValue().getValue() && roB.getValue().getValue());
     }
 
     private List<IEntityDataType> getListOfRuleOperationsForTest() {
