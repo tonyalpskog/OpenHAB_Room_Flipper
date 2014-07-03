@@ -386,7 +386,7 @@ public class RuleTest {
 
         List<IEntityDataType> operandList = getListOfRuleOperationsForTest();
         if(nameTheLeftOperand) ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
-        RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) rop.getOperatorHash().get(operandList.get(0).getDataType()).get(ruleType), operandList);
+        RuleOperation ro = new RuleOperation((RuleOperator<LogicBoolean>) rop.getOperatorHash().get(operandList.get(0).getDataType()).get(ruleType), operandList);
 
         return ro;
     }
@@ -426,29 +426,29 @@ public class RuleTest {
         RuleOperation ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
         Assert.assertEquals("(Light_GF_Kitchen_Ceiling [OFF] " + RuleOperator.MISSING_OPERATOR + ") OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue().getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue().getValue());
 
         ((RuleOperation) operandList.get(0)).setName("Operation as left operand");
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
         Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue().getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue().getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(1, null);
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
         Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue().getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue().getValue());
 
         ((RuleOperation) operandList.get(0)).setOperand(0, null);
         ro = new RuleOperation((RuleOperator<Boolean>) mRuleOperationProvider.getOperatorHash().get(operandList.get(0).getDataType()).get(RuleOperatorType.Or), operandList);
 
         Assert.assertEquals("Operation as left operand <Incomplete> [Falskt] OR (Temperature_FF_Bed [19.2] < " + RuleOperatorType.MISSING_OPERAND + ")", ro.toString());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue());
-        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(0)).getValue().getValue());
+        Assert.assertEquals(Boolean.FALSE, ((RuleOperation) operandList.get(1)).getValue().getValue());
 
         //Name the main operation
         final String OPERATION_NAME = "My sweet operation name";

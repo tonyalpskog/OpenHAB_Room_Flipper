@@ -32,6 +32,7 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
     }
 
     public RuleOperation(RuleOperator ruleOperator, List<IEntityDataType> operands) {
+        setActive(true);
         mRuleOperator = ruleOperator;
         mOperands = operands;
         mDataSourceId = UUID.randomUUID().toString();
@@ -159,7 +160,10 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
         LogicBoolean oldValue = mValue;
 
         if(getRuleOperator() == null) {
-            mValue.setValue(false);//Missing operator shall result as FALSE.
+            if(mValue == null)
+                mValue = new LogicBoolean(Boolean.FALSE);
+            else
+                mValue.setValue(false);//Missing operator shall result as FALSE.
         } else
             mValue = new LogicBoolean(getRuleOperator().getOperationResult(mOperands));
 

@@ -134,7 +134,7 @@ public class RuleTreeTest {
         Assert.assertEquals(0, rti2.getChildren().size());
         Assert.assertEquals(false, ron2.getValue().getValue());
 
-        RuleOperator ror = mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror = mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.And);
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(ron1);
         operandList.add(ron2);
@@ -200,7 +200,7 @@ public class RuleTreeTest {
         Assert.assertEquals("[Falskt] " + rti3String + " <Incomplete>", rti3.toString());
         Assert.assertEquals(false, ron3.getValue().getValue());
 
-        RuleOperator ror = mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror = mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.And);
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(ron1);
         operandList.add(ron2);
@@ -228,7 +228,7 @@ public class RuleTreeTest {
         Assert.assertEquals(4, mainRuleTreeItem.getChildren().get(4).getPosition());
         Assert.assertEquals(0, mainRuleTreeItem.getChildren().get(4).getChildren().size());
 
-        mainOperation.setRuleOperator(mRop.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.Or));
+        mainOperation.setRuleOperator(mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.Or));
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("(" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt]", mainOperation.toString());
