@@ -34,6 +34,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -450,15 +451,15 @@ public class CommandTest extends AndroidTestCase {
         assertEquals("15.0", mCommandAnalyzer.getCommandValue(commandMatchResultList.get(0)));
     }
 
-    public void test_getCommandReply() {
-        List<String> commandPhrases = new ArrayList<String>();
-        commandPhrases.add("Get outside temperature");
-        CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
+    public void test_getCommandReply_getTemperature() {
+        final List<String> commandPhrases = Arrays.asList("Get outside temperature");
+        final CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
         assertEquals("Outside Temperature is 10.0 °C", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
+    }
 
-        commandPhrases.clear();
-        commandPhrases.add("Set toilet temperature to 15.0");
-        commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
+    public void test_getCommandReply_setTemperature() {
+        final List<String> commandPhrases = Arrays.asList("Set toilet temperature to 15.0");
+        final CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandPhrases, mApplicationModeProvider.getAppMode());
         assertEquals("Toilet Temperature was set to 15.0", mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
     }
 
