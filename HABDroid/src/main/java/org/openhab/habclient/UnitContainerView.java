@@ -36,9 +36,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private boolean mBlockUnitRedraw = false;
     private View mAddedControlView = null;
     @Inject OpenHABWidgetControl mOpenHABWidgetControl;
-    @Inject IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
     @Inject IRoomImageProvider mRoomImageProvider;
-
+    
     public UnitContainerView(Context context) {
         this(context, null);
     }
