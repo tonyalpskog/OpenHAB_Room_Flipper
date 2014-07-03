@@ -189,26 +189,24 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void removeSelectedUnits() {
-        List<GraphicUnit> unitsToBeRemovedList = new ArrayList<GraphicUnit>();
+        final List<GraphicUnit> unitsToBeRemovedList = new ArrayList<GraphicUnit>();
 
-        Iterator iterator = roomView.getRoom().getUnitIterator();
-        while(iterator.hasNext()) {
-            GraphicUnit gu = (GraphicUnit) iterator.next();
+        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             if(gu.isSelected())
                 unitsToBeRemovedList.add(gu);
         }
 
-        for(GraphicUnit gu : unitsToBeRemovedList)
+        for(GraphicUnit gu : unitsToBeRemovedList) {
             roomView.getRoom().removeUnit(gu);
+        }
 
         roomView.redrawAllUnits();//TA: TODO - Ugly way too remove a single View.
     }
 
     private void showAddUnitDialog(Context context) {
         List<OpenHABWidget> list = mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null);
-        Iterator<OpenHABWidget> iter = list.iterator();
-        while(iter.hasNext())
-            Log.d(HABApplication.getLogTag(), "WidgetProvider data ID = " + iter.next().getId());
+        for (OpenHABWidget aList : list)
+            Log.d(HABApplication.getLogTag(), "WidgetProvider data ID = " + aList.getId());
 
 //        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
         //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
@@ -304,11 +302,9 @@ public class UnitPlacementFragment extends Fragment {
                         multiUnitSelection(false);
                         break;
                     case 2:
-                        ArrayList<OpenHABWidgetType> selectedTypes = getSelectedWidgetsType();
+                        final ArrayList<OpenHABWidgetType> selectedTypes = getSelectedWidgetsType();
 
-                        Iterator iterator = roomView.getRoom().getUnitIterator();
-                        while(iterator.hasNext()) {
-                            GraphicUnit gu = (GraphicUnit) iterator.next();
+                        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
                             if(!gu.isSelected() && selectedTypes.contains(gu.getType()))
                                 gu.setSelected(true);
                         }
@@ -316,9 +312,7 @@ public class UnitPlacementFragment extends Fragment {
                     case 3:
                         ArrayList<String> selectedId = getSelectedWidgetsId();
 
-                        iterator = roomView.getRoom().getUnitIterator();
-                        while(iterator.hasNext()) {
-                            GraphicUnit gu = (GraphicUnit) iterator.next();
+                        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
                             if(!gu.isSelected() && selectedId.contains(gu.getOpenHABWidget().getId()))
                                 gu.setSelected(true);
                         }
@@ -334,9 +328,7 @@ public class UnitPlacementFragment extends Fragment {
     private ArrayList<OpenHABWidgetType> getSelectedWidgetsType() {
         ArrayList<OpenHABWidgetType> selectedTypeList = new ArrayList<OpenHABWidgetType>();
 
-        Iterator iterator = roomView.getRoom().getUnitIterator();
-        while(iterator.hasNext()) {
-            GraphicUnit gu = (GraphicUnit) iterator.next();
+        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedTypeList.contains(gu.getType()))
                 selectedTypeList.add(gu.getType());
         }
@@ -347,9 +339,7 @@ public class UnitPlacementFragment extends Fragment {
     private ArrayList<String> getSelectedWidgetsId() {
         ArrayList<String> selectedIdList = new ArrayList<String>();
 
-        Iterator iterator = roomView.getRoom().getUnitIterator();
-        while(iterator.hasNext()) {
-            GraphicUnit gu = (GraphicUnit) iterator.next();
+        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedIdList.contains(gu.getOpenHABWidget().getId()))
                 selectedIdList.add(gu.getOpenHABWidget().getId());
         }
@@ -420,9 +410,7 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void multiUnitSelection(boolean doSelect) {
-        Iterator iterator = roomView.getRoom().getUnitIterator();
-        while(iterator.hasNext()) {
-            GraphicUnit gu = (GraphicUnit) iterator.next();
+        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             setSelected(gu, doSelect);
         }
     }
@@ -435,9 +423,7 @@ public class UnitPlacementFragment extends Fragment {
     private boolean cloneSelectedWidgets() {
         ArrayList<String> selectedWidgetsIdList = new ArrayList<String>();
 
-        Iterator iterator = roomView.getRoom().getUnitIterator();
-        while(iterator.hasNext()) {
-            GraphicUnit gu = (GraphicUnit) iterator.next();
+        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
                 roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget().getId(), roomView, mWidgetProvider, mOpenHABSetting), 50, 50);
                 selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());

@@ -5,8 +5,8 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -118,8 +118,8 @@ public class Room {
         //TA: TODO - Add widget removal here too
     }
 
-    public Iterator<GraphicUnit> getUnitIterator() {
-        return unitHash.values().iterator();
+    public Collection<GraphicUnit> getUnits() {
+        return unitHash.values();
     }
 
     public boolean contains(OpenHABWidget widget) {

@@ -17,7 +17,6 @@ import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -113,10 +112,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
         removeAllUnitViews();
 
-        Iterator unitIterator = mRoom.getUnitIterator();
-        GraphicUnit graphicUnit;
-        while (unitIterator.hasNext()) {
-            graphicUnit = (GraphicUnit) unitIterator.next();
+        for(GraphicUnit graphicUnit : mRoom.getUnits()) {
             graphicUnit.resetView();
             drawUnitInRoom(graphicUnit);
         }

@@ -228,9 +228,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         //Get widgets from room list
         if(listOfRooms != null && !listOfRooms.isEmpty()){
             for (Room nextRoom : listOfRooms) {
-                Iterator<GraphicUnit> gunitIterator = nextRoom.getUnitIterator();
-                while (gunitIterator.hasNext())
-                    widgetList.add(gunitIterator.next().getOpenHABWidget());
+                for(GraphicUnit gu : nextRoom.getUnits())
+                    widgetList.add(gu.getOpenHABWidget());
             }
         }
 
