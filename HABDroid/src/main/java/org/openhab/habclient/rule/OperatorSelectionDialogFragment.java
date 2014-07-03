@@ -6,7 +6,11 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.rule.EntityDataTypeSource;
+import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.habclient.InjectUtils;
@@ -24,6 +28,7 @@ import javax.inject.Inject;
  */
 public class OperatorSelectionDialogFragment extends StringSelectionDialogFragment {
     private static final String ARG_OPEN_HAB_ITEM_NAME = "openHABItemName";
+    private static final String ARG_SOURCE_TYPE = "EntityDataTypeSource";
 
     private Map<String, RuleOperator<?>> mOperatorMap;
     private String mOpenHABItemName;
@@ -32,6 +37,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
+                                                              EntityDataTypeSource sourceType,
                                                               String dialogTitle,
                                                               boolean showNextButton,
                                                               List<String> ruleOperatorList) {
@@ -39,6 +45,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
         final Bundle args = new Bundle();
         args.putStringArrayList(ARG_SOURCE, new ArrayList<String>(ruleOperatorList));
+        args.putString(ARG_SOURCE_TYPE, sourceType.name());
         args.putString(ARG_DIALOG_TITLE, dialogTitle);
         args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
         args.putString(ARG_OPEN_HAB_ITEM_NAME, openHABItemName);
@@ -61,11 +68,12 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
             return;
 
         mOpenHABItemName = args.getString(ARG_OPEN_HAB_ITEM_NAME);
-        mOperatorMap = getRuleOperatorMap(mOpenHABItemName);
+        EntityDataTypeSource sourceType = EntityDataTypeSource.valueOf(args.getString(ARG_SOURCE_TYPE));
+        mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
     }
 
-    public Map<String, RuleOperator<?>> getRuleOperatorMap(String openHABItemName) {
-        HashMap<RuleOperatorType, RuleOperator<?>> operatorTypeHash = mRuleOperationProvider.getUnitRuleOperator(mWidgetProvider.getWidgetByItemName(openHABItemName));
+    public Map<String, RuleOperator<?>> getRuleOperatorMap(Class operandClassType) {
+        HashMap<RuleOperatorType, RuleOperator<?>> operatorTypeHash = mRuleOperationProvider.getUnitRuleOperatorHash(operandClassType);
         HashMap<String, RuleOperator<?>> operatorNameHash = new HashMap<String, RuleOperator<?>>();
         for(RuleOperatorType operatorType : operatorTypeHash.keySet())
             operatorNameHash.put(operatorType.getName(), operatorTypeHash.get(operatorType));

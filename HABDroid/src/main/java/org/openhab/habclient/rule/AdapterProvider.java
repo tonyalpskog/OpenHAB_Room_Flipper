@@ -6,6 +6,7 @@ import android.widget.BaseAdapter;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
@@ -21,8 +22,8 @@ import java.util.Map;
  * Created by Tony Alpskog in 2014.
  */
 public class AdapterProvider {
-    public static List<String> getRuleOperatorList(Context context, String openHABItemName, boolean includeNonSelectionValue, IRuleOperationProvider ruleOperationProvider, IOpenHABWidgetProvider widgetProvider) {
-        HashMap<RuleOperatorType, RuleOperator<?>> operatorHash = ruleOperationProvider.getUnitRuleOperator(widgetProvider.getWidgetByItemName(openHABItemName));
+    public static List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue, IRuleOperationProvider ruleOperationProvider) {
+        HashMap<RuleOperatorType, RuleOperator<?>> operatorHash = ruleOperationProvider.getUnitRuleOperatorHash(operand.getDataType());
         List<String> adapterList = new ArrayList<String>();
         if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
         for(RuleOperatorType operatorType : operatorHash.keySet())

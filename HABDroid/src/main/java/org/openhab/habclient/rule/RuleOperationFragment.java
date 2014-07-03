@@ -364,11 +364,11 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     private void openNewDialogAfterOperandSelection(int previousOperandPosition, IEntityDataType operand) {
         if(previousOperandPosition == 0) {
             final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
-                    operand.getDataSourceId(),
+                    operand,
                     false,
-                    mRuleOperationProvider,
-                    mWidgetProvider);
+                    mRuleOperationProvider);
             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
+                    operand.getSourceType(),
                     "Select an operator",
                     true,
                     operatorList);

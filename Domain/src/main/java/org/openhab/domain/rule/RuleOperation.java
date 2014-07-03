@@ -214,7 +214,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
             if(operand == null)
                 return "Falskt";
 
-        return getValue()? "Sant": "Falskt";//TODO - Language independent
+        return getValue()? "Sant": "Falskt";//TODO - TA: Language independent
     }
 
     @Override
@@ -223,8 +223,8 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     @Override
-    public Class<Boolean> getDataType() {
-        return Boolean.class;
+    public Class<LogicBoolean> getDataType() {
+        return LogicBoolean.class;
     }
 
     @Override

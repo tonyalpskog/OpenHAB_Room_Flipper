@@ -2,14 +2,14 @@ package org.openhab.domain.rule.operators;
 
 import junit.framework.TestCase;
 
-public class OrBooleanRuleOperatorTest extends TestCase {
-    private OrBooleanRuleOperator mSut;
+public class OrLogicBooleanRuleOperatorTest extends TestCase {
+    private OrLogicBooleanRuleOperator mSut;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         
-        mSut = new OrBooleanRuleOperator();
+        mSut = new OrLogicBooleanRuleOperator();
     }
 
     public void testBooleanOr() {

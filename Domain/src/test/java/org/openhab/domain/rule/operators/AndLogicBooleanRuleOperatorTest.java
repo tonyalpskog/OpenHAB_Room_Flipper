@@ -2,14 +2,14 @@ package org.openhab.domain.rule.operators;
 
 import junit.framework.TestCase;
 
-public class AndBooleanRuleOperatorTest extends TestCase {
-    private AndBooleanRuleOperator mSut;
+public class AndLogicBooleanRuleOperatorTest extends TestCase {
+    private AndLogicBooleanRuleOperator mSut;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         
-        mSut = new AndBooleanRuleOperator();
+        mSut = new AndLogicBooleanRuleOperator();
     }
 
     public void testBooleanAnd() {

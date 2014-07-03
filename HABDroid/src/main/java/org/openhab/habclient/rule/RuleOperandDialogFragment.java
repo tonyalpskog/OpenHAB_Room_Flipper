@@ -210,7 +210,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 case DialogInterface.BUTTON_NEUTRAL: //Done
                 case DialogInterface.BUTTON_POSITIVE://Next
                     RuleOperationBuildListener.RuleOperationSelectionInterface resultingSelectionType;
-                    IEntityDataType operand =  mFirstOperandWidgetIfAny != null? UnitEntityDataType.getUnitEntityDataType(mFirstOperandWidgetIfAny) : null;
+                    IEntityDataType operand =  mFirstOperandWidgetIfAny != null? UnitEntityDataType.getStaticEntityDataType(mFirstOperandWidgetIfAny, null) : null;
                     if(mEditNewOperation.getText().length() > 0) {
                         operand = new RuleOperation(mEditNewOperation.getText().toString());
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;

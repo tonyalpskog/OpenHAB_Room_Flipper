@@ -28,7 +28,7 @@ public abstract class EntityDataType<T> implements IEntityDataType<T> {
 
     @Override
     public String getFormattedString(){
-        return mValue.toString();
+        return mValue != null? mValue.toString() : "Undefined";
     }
 //
 //    public boolean isReadable() {

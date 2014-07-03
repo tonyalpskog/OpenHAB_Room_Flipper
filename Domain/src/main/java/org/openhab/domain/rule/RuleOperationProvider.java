@@ -3,13 +3,14 @@ package org.openhab.domain.rule;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.operators.AfterDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.AfterOrEqualDateTimeRuleOperator;
-import org.openhab.domain.rule.operators.AndBooleanRuleOperator;
+import org.openhab.domain.rule.operators.AndLogicBooleanRuleOperator;
 import org.openhab.domain.rule.operators.BeforeOrEqualDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.BetweenDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.BetweenNumberRuleOperator;
 import org.openhab.domain.rule.operators.EqualBooleanRuleOperator;
 import org.openhab.domain.rule.operators.EqualDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.EqualDateTimeStringRuleOperator;
+import org.openhab.domain.rule.operators.EqualLogicBooleanRuleOperator;
 import org.openhab.domain.rule.operators.EqualNumberRuleOperator;
 import org.openhab.domain.rule.operators.LessOrEqualNumberRuleOperator;
 import org.openhab.domain.rule.operators.LessThanNumberRuleOperator;
@@ -18,8 +19,9 @@ import org.openhab.domain.rule.operators.MoreThanNumberRuleOperator;
 import org.openhab.domain.rule.operators.NotEqualBooleanRuleOperator;
 import org.openhab.domain.rule.operators.NotEqualDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.NotEqualDateTimeStringRuleOperator;
+import org.openhab.domain.rule.operators.NotEqualLogicBooleanRuleOperator;
 import org.openhab.domain.rule.operators.NotEqualNumberRuleOperator;
-import org.openhab.domain.rule.operators.OrBooleanRuleOperator;
+import org.openhab.domain.rule.operators.OrLogicBooleanRuleOperator;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.operators.WithinDateTimeRuleOperator;
 import org.openhab.domain.rule.operators.WithinNumberRuleOperator;
@@ -49,6 +51,7 @@ public class RuleOperationProvider implements IRuleOperationProvider {
 
     private void createLogicOperators() {
         mOperatorHash.put(Number.class, createNumericLogicOperators());
+        mOperatorHash.put(LogicBoolean.class, createLogicBooleanLogicOperators());
         mOperatorHash.put(Boolean.class, createBooleanLogicOperators());
         mOperatorHash.put(String.class, createDateTimeStringLogicOperators());
         mOperatorHash.put(Date.class, createDateLogicOperators());
@@ -84,14 +87,26 @@ public class RuleOperationProvider implements IRuleOperationProvider {
         return numberOperatorHash;
     }
 
+    private HashMap<RuleOperatorType, RuleOperator<LogicBoolean>> createLogicBooleanLogicOperators() {
+        final HashMap<RuleOperatorType, RuleOperator<LogicBoolean>> logicBooleanOperatorHash = new HashMap<RuleOperatorType, RuleOperator<LogicBoolean>>();
+
+        final RuleOperator<LogicBoolean> orOperator = new OrLogicBooleanRuleOperator();
+        logicBooleanOperatorHash.put(orOperator.getType(), orOperator);
+
+        final RuleOperator<LogicBoolean> andOperator = new AndLogicBooleanRuleOperator();
+        logicBooleanOperatorHash.put(andOperator.getType(), andOperator);
+
+        final RuleOperator<LogicBoolean> equalBool = new EqualLogicBooleanRuleOperator();
+        logicBooleanOperatorHash.put(equalBool.getType(), equalBool);
+
+        final RuleOperator<LogicBoolean> notEqualBool = new NotEqualLogicBooleanRuleOperator();
+        logicBooleanOperatorHash.put(notEqualBool.getType(), notEqualBool);
+
+        return logicBooleanOperatorHash;
+    }
+
     private HashMap<RuleOperatorType, RuleOperator<Boolean>> createBooleanLogicOperators() {
         final HashMap<RuleOperatorType, RuleOperator<Boolean>> booleanOperatorHash = new HashMap<RuleOperatorType, RuleOperator<Boolean>>();
-
-        final RuleOperator<Boolean> orOperator = new OrBooleanRuleOperator();
-        booleanOperatorHash.put(orOperator.getType(), orOperator);
-
-        final RuleOperator<Boolean> andOperator = new AndBooleanRuleOperator();
-        booleanOperatorHash.put(andOperator.getType(), andOperator);
 
         final RuleOperator<Boolean> equalBool = new EqualBooleanRuleOperator();
         booleanOperatorHash.put(equalBool.getType(), equalBool);
