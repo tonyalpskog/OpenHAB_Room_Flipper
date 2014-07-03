@@ -17,6 +17,7 @@ import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -25,9 +26,10 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2013.
  */
 public class UnitContainerView extends FrameLayout implements RoomImageView.OnBackgroundDrawn {
+    private static final int UNIT_SIZE = 64;
+    private static final String TAG = "UnitContainerView";
 
     OnContainerBackgroundDrawn mOnContainerBackgroundDrawn;
-    private final String TAG = "UnitContainerView";
 
     //TA: TODO - Will disposal of unused RoomImageView save some memory?
     private RoomImageView roomImage;
@@ -35,6 +37,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     private List<View> addedUnitViews;
     private boolean mBlockUnitRedraw = false;
     private View mAddedControlView = null;
+    private final HashMap<GraphicUnit, GraphicUnitWidget> mGraphicUnitWidgets = new HashMap<GraphicUnit, GraphicUnitWidget>();
+
     @Inject OpenHABWidgetControl mOpenHABWidgetControl;
     @Inject IRoomImageProvider mRoomImageProvider;
 
@@ -112,7 +116,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         removeAllUnitViews();
 
         for(GraphicUnit graphicUnit : mRoom.getUnits()) {
-            graphicUnit.resetView();
+            mGraphicUnitWidgets.remove(graphicUnit);
             drawUnitInRoom(graphicUnit);
         }
     }
@@ -160,10 +164,24 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         params.setMargins(x, y, 0, 0);
         Log.d("UnitPos", params.leftMargin + "/" + params.topMargin);
 
-        ImageView gView = gUnit.getView(getContext());
+        ImageView gView = getView(gUnit);
         layout.addView(gView, params);
         addedUnitViews.add(layout);
         addView(layout);
+    }
+
+    private ImageView getView(GraphicUnit graphicUnit) {
+        GraphicUnitWidget view = mGraphicUnitWidgets.get(graphicUnit);
+        if(view == null) {
+            view = new GraphicUnitWidget(getContext(), graphicUnit);
+
+            view.setMinimumWidth(UNIT_SIZE);
+            view.setMinimumHeight(UNIT_SIZE);
+            view.setTag(graphicUnit.getId());
+            view.setSelected(graphicUnit.isSelected());
+            mGraphicUnitWidgets.put(graphicUnit, view);
+        }
+        return view;
     }
 
     private void drawControlInRoom(GraphicUnit gUnit, int x, int y) {
@@ -234,5 +252,12 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         }
 
         mAddedControlView = null;
+    }
+
+    public void setSelected(GraphicUnit graphicUnit) {
+        GraphicUnitWidget graphicUnitWidget = mGraphicUnitWidgets.get(graphicUnit);
+        if(graphicUnitWidget != null) {
+            graphicUnitWidget.setSelected(graphicUnit.isSelected());
+        }
     }
 }

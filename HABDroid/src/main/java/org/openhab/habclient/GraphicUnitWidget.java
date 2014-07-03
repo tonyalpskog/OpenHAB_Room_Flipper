@@ -69,6 +69,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
         if(mApplicationModeProvider.getAppMode() == ApplicationMode.UnitPlacement) {
             Log.d("G-Click", "View status BEFORE = " + (v.isSelected() ? "Selected" : "Not selected"));
             gUnit.setSelected(!gUnit.isSelected());
+            setSelected(gUnit.isSelected());
+            drawSelection(gUnit.isSelected());
             Log.d("G-Click", "View status AFTER = " + (v.isSelected()? "Selected" : "Not selected"));
         } else if(mApplicationModeProvider.getAppMode() == ApplicationMode.RoomFlipper) {
             if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Group) {

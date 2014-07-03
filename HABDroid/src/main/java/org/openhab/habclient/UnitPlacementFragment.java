@@ -53,7 +53,6 @@ public class UnitPlacementFragment extends Fragment {
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IRestCommunication mRestCommunication;
-    @Inject IOpenHABSetting mOpenHABSetting;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -305,16 +304,20 @@ public class UnitPlacementFragment extends Fragment {
                         final ArrayList<OpenHABWidgetType> selectedTypes = getSelectedWidgetsType();
 
                         for(GraphicUnit gu : roomView.getRoom().getUnits()) {
-                            if(!gu.isSelected() && selectedTypes.contains(gu.getType()))
+                            if(!gu.isSelected() && selectedTypes.contains(gu.getType())) {
                                 gu.setSelected(true);
+                                roomView.setSelected(gu);
+                            }
                         }
                         break;
                     case 3:
                         ArrayList<String> selectedId = getSelectedWidgetsId();
 
                         for(GraphicUnit gu : roomView.getRoom().getUnits()) {
-                            if(!gu.isSelected() && selectedId.contains(gu.getOpenHABWidget().getId()))
+                            if(!gu.isSelected() && selectedId.contains(gu.getOpenHABWidget().getId())) {
                                 gu.setSelected(true);
+                                roomView.setSelected(gu);
+                            }
                         }
                         break;
                 }
@@ -416,8 +419,10 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void setSelected(GraphicUnit gu, boolean selected) {
-        if(gu != null && gu.isSelected() != selected)
+        if(gu != null && gu.isSelected() != selected) {
             gu.setSelected(selected);
+            roomView.setSelected(gu);
+        }
     }
 
     private boolean cloneSelectedWidgets() {
