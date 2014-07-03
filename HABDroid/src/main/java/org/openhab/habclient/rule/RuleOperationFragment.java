@@ -428,7 +428,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getRuleOperator(Boolean.class, RuleOperatorType.And);
         RuleOperation ron = new RuleOperation(ror, operandList);
         ron.setName("The is the name of the root operation.");
 
@@ -440,7 +440,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getRuleOperator(Boolean.class, RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -486,7 +486,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(getRuleOperation());
         operandList.add(getRuleOperation());
-        RuleOperator ror =  mRuleOperationProvider.getUnitRuleOperatorHash(Boolean.class).get(RuleOperatorType.And);
+        RuleOperator ror =  mRuleOperationProvider.getRuleOperator(Boolean.class, RuleOperatorType.And);
         RuleOperation ron2 = new RuleOperation(ror, operandList);
         RuleOperation ron3 = new RuleOperation(ror, operandList);
         ron3.setName("The is the name of the ron3 rule.");
@@ -509,7 +509,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     private RuleOperation getRuleOperation() {
         final HABApplication application = (HABApplication) getActivity().getApplication();
         OpenHABWidget widget = mWidgetProvider.getWidgetByID("demo_1_0");
-        return new RuleOperation(mRuleOperationProvider.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), getOperandsAsList3(2));
+        return new RuleOperation(mRuleOperationProvider.getRuleOperator(widget, RuleOperatorType.Equal), getOperandsAsList3(2));
     }
 
     private List<IEntityDataType> getOperandsAsList3(int operandPairNumber) {

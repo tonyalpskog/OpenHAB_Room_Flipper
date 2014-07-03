@@ -9,25 +9,24 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class AdapterProvider {
     public static List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue, IRuleOperationProvider ruleOperationProvider) {
-        HashMap<RuleOperatorType, RuleOperator<?>> operatorHash = ruleOperationProvider.getUnitRuleOperatorHash(operand.getDataType());
+        Set<RuleOperatorType> ruleOperatorTypes = ruleOperationProvider.getRuleOperatorTypes(operand.getDataType());
         List<String> adapterList = new ArrayList<String>();
         if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
-        for(RuleOperatorType operatorType : operatorHash.keySet())
+        for(RuleOperatorType operatorType : ruleOperatorTypes)
             adapterList.add(operatorType.getName());
         return adapterList;
     }

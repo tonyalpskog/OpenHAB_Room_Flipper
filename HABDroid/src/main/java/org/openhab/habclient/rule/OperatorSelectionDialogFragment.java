@@ -3,16 +3,14 @@ package org.openhab.habclient.rule;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.WindowManager;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.rule.EntityDataTypeSource;
-import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperation;
+import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
-import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
@@ -20,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -73,10 +72,10 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     }
 
     public Map<String, RuleOperator<?>> getRuleOperatorMap(Class operandClassType) {
-        HashMap<RuleOperatorType, RuleOperator<?>> operatorTypeHash = mRuleOperationProvider.getUnitRuleOperatorHash(operandClassType);
+        Set<RuleOperatorType> ruleOperatorTypes = mRuleOperationProvider.getRuleOperatorTypes(operandClassType);
         HashMap<String, RuleOperator<?>> operatorNameHash = new HashMap<String, RuleOperator<?>>();
-        for(RuleOperatorType operatorType : operatorTypeHash.keySet())
-            operatorNameHash.put(operatorType.getName(), operatorTypeHash.get(operatorType));
+        for(RuleOperatorType operatorType : ruleOperatorTypes)
+            operatorNameHash.put(operatorType.getName(), mRuleOperationProvider.getRuleOperator(operandClassType, operatorType));
         return operatorNameHash;
     }
 

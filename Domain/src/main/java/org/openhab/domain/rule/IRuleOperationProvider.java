@@ -3,12 +3,12 @@ package org.openhab.domain.rule;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.operators.RuleOperator;
 
-import java.util.HashMap;
+import java.util.Set;
 
 public interface IRuleOperationProvider {
-    HashMap<Class<?>, HashMap<RuleOperatorType, ?>> getOperatorHash();
+    RuleOperator<?> getRuleOperator(OpenHABWidget openHABWidget, RuleOperatorType type);
 
-    HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget);
+    RuleOperator<?> getRuleOperator(Class<?> operandClass, RuleOperatorType type);
 
-    HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperatorHash(Class<?> operandClass);
+    Set<RuleOperatorType> getRuleOperatorTypes(Class<?> operandClass);
 }

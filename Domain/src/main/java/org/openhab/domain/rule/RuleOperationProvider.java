@@ -28,6 +28,7 @@ import org.openhab.domain.rule.operators.WithinNumberRuleOperator;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -42,11 +43,6 @@ public class RuleOperationProvider implements IRuleOperationProvider {
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
 
         createLogicOperators();
-    }
-
-    @Override
-    public HashMap<Class<?>, HashMap<RuleOperatorType, ?>> getOperatorHash() {
-        return mOperatorHash;
     }
 
     private void createLogicOperators() {
@@ -160,32 +156,44 @@ public class RuleOperationProvider implements IRuleOperationProvider {
     }
 
     @Override
-    public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperator(OpenHABWidget openHABWidget) {
+    public RuleOperator<?> getRuleOperator(OpenHABWidget openHABWidget, RuleOperatorType type) {
         if(openHABWidget == null)
             return null;
 
-        HashMap<RuleOperatorType, RuleOperator<?>> result = null;
         switch(openHABWidget.getItem().getType()) {
             case Contact:
             case Switch:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(Boolean.class);
-                break;
+                return getRuleOperator(Boolean.class, type);
             case Number:
             case Dimmer:
             case Rollershutter:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(Number.class);
-                break;
+                return getRuleOperator(Number.class, type);
             case String:
             case Color:
-                result = (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(String.class);
-                break;
+                return getRuleOperator(String.class, type);
+            default:
+                return null;
         }
-
-        return result;
     }
 
     @Override
-    public HashMap<RuleOperatorType, RuleOperator<?>> getUnitRuleOperatorHash(Class<?> operandClass) {
-        return (HashMap<RuleOperatorType, RuleOperator<?>>) mOperatorHash.get(operandClass);
+    public RuleOperator<?> getRuleOperator(Class<?> operandClass, RuleOperatorType type) {
+        if(operandClass == null) throw new IllegalArgumentException("operandClass is null");
+        if(type == null) throw new IllegalArgumentException("type is null");
+
+        final HashMap<RuleOperatorType, ?> hashMap = mOperatorHash.get(operandClass);
+        if(hashMap == null)
+            return null;
+
+        return (RuleOperator<?>) hashMap.get(type);
+    }
+
+    @Override
+    public Set<RuleOperatorType> getRuleOperatorTypes(Class<?> operandClass) {
+        final HashMap<RuleOperatorType, ?> hashMap = mOperatorHash.get(operandClass);
+        if(hashMap == null)
+            return null;
+
+        return hashMap.keySet();
     }
 }

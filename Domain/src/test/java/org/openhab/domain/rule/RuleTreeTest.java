@@ -89,22 +89,22 @@ public class RuleTreeTest {
         switch (operationNumber) {
             case 1:
                 widget = mWidgetProvider.getWidgetByID("GF_Kitchen_0");
-                result = new RuleOperation(mRop.getUnitRuleOperator(widget).get(RuleOperatorType.Equal), mock_getOperandsAsList(1));
+                result = new RuleOperation(mRop.getRuleOperator(widget, RuleOperatorType.Equal), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] = Light_FF_Bath_Mirror [OFF]
                 break;
             case 2:
                 widget = mWidgetProvider.getWidgetByID("FF_Bath_1");
-                result = new RuleOperation(mRop.getUnitRuleOperator(widget).get(RuleOperatorType.NotEqual), mock_getOperandsAsList(1));
+                result = new RuleOperation(mRop.getRuleOperator(widget, RuleOperatorType.NotEqual), mock_getOperandsAsList(1));
                 // Light_GF_Kitchen_Ceiling [OFF] != Light_FF_Bath_Mirror [OFF]
                 break;
             case 3:
                 widget = mWidgetProvider.getWidgetByID("FF_Bed_3");
-                result = new RuleOperation(mRop.getUnitRuleOperator(widget).get(RuleOperatorType.LessThan), mock_getOperandsAsList(2));
+                result = new RuleOperation(mRop.getRuleOperator(widget, RuleOperatorType.LessThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] < Temperature_GF_Toilet [21.50]
                 break;
             case 4:
                 widget = mWidgetProvider.getWidgetByID("GF_Toilet_4");
-                result = new RuleOperation(mRop.getUnitRuleOperator(widget).get(RuleOperatorType.MoreThan), mock_getOperandsAsList(2));
+                result = new RuleOperation(mRop.getRuleOperator(widget, RuleOperatorType.MoreThan), mock_getOperandsAsList(2));
                 // Temperature_FF_Bed [19.20] > Temperature_GF_Toilet [21.50]
                 break;
         }
@@ -134,7 +134,8 @@ public class RuleTreeTest {
         Assert.assertEquals(0, rti2.getChildren().size());
         Assert.assertEquals(false, ron2.getValue().getValue());
 
-        RuleOperator ror = mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.And);
+        RuleOperator ror = mRop.getRuleOperator(LogicBoolean.class, RuleOperatorType.And);
+        
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(ron1);
         operandList.add(ron2);
@@ -200,7 +201,8 @@ public class RuleTreeTest {
         Assert.assertEquals("[Falskt] " + rti3String + " <Incomplete>", rti3.toString());
         Assert.assertEquals(false, ron3.getValue().getValue());
 
-        RuleOperator ror = mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.And);
+        RuleOperator ror = mRop.getRuleOperator(LogicBoolean.class, RuleOperatorType.And);
+
         List<IEntityDataType> operandList = new ArrayList<IEntityDataType>();
         operandList.add(ron1);
         operandList.add(ron2);
@@ -228,7 +230,8 @@ public class RuleTreeTest {
         Assert.assertEquals(4, mainRuleTreeItem.getChildren().get(4).getPosition());
         Assert.assertEquals(0, mainRuleTreeItem.getChildren().get(4).getChildren().size());
 
-        mainOperation.setRuleOperator(mRop.getUnitRuleOperatorHash(LogicBoolean.class).get(RuleOperatorType.Or));
+        mainOperation.setRuleOperator(mRop.getRuleOperator(LogicBoolean.class, RuleOperatorType.Or));
+
         mainRuleTreeItem = mainOperation.getRuleTreeItem(3);
         Assert.assertEquals(false, mainOperation.getValue().getValue());
         Assert.assertEquals("(" + rti1String + ") OR (" + rti2String + ") OR " + rti3String + " <Incomplete> [Falskt]", mainOperation.toString());
