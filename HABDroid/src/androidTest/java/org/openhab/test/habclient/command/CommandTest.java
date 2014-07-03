@@ -113,17 +113,18 @@ public class CommandTest extends AndroidTestCase {
         assertEquals(14, mFullRoomNameArray.length);
         assertEquals(14, mRoomProvider.getAllRooms().size());
 
-        assertFalse("No MapOfRoomNames items available.", mRoomProvider.getMapOfRoomNames().isEmpty());
+        final Map<String, Room> roomNamesMap = mRoomProvider.getMapOfRoomNames();
+        assertFalse("No MapOfRoomNames items available.", roomNamesMap.isEmpty());
 
         String availableRooms = "";
-        for (String roomName : mRoomProvider.getMapOfRoomNames().keySet()) {
+        for (String roomName : roomNamesMap.keySet()) {
             availableRooms += roomName + " , ";
         }
 
         String availableRoomsResult = "";
         String unavailableRoomsResult = "";
         for (String roomName : mFullRoomNameArray) {
-            if (!mRoomProvider.getMapOfRoomNames().keySet().contains(roomName.toUpperCase()))
+            if (!roomNamesMap.keySet().contains(roomName.toUpperCase()))
                 unavailableRoomsResult += roomName.toUpperCase() + " , ";
             else
                 availableRoomsResult += roomName.toUpperCase() + " , ";
@@ -160,11 +161,13 @@ public class CommandTest extends AndroidTestCase {
         for (Room room : roomList)
             roomNameResultList.add(room.getName().toUpperCase());
 
+        final Map<String, Room> roomMap = mRoomProvider.getMapOfRoomNames();
+
         for (int i = 0; i < mTestedRoomsNameArray.length; i++) {
-            assertTrue("MapOfRoomNames does not contain <" + mTestedRoomsNameArray[i].toUpperCase() + ">: " + mRoomProvider.getMapOfRoomNames().keySet().toString(), mRoomProvider.getMapOfRoomNames().containsKey(mTestedRoomsNameArray[i].toUpperCase()));
+            assertTrue("MapOfRoomNames does not contain <" + mTestedRoomsNameArray[i].toUpperCase() + ">: " + roomMap.keySet().toString(), roomMap.containsKey(mTestedRoomsNameArray[i].toUpperCase()));
 
             assertTrue("Room name nr " + i + " <" + mTestedRoomsNameArray[i].toUpperCase() + "> could not be found in the result: " + getAllStringItemsInOneString(roomNameResultList)
-                    , roomNameResultList.contains(mRoomProvider.getMapOfRoomNames().get(mTestedRoomsNameArray[i].toUpperCase()).getName().toUpperCase()));
+                    , roomNameResultList.contains(roomMap.get(mTestedRoomsNameArray[i].toUpperCase()).getName().toUpperCase()));
         }
 
         List<UUID> uuidResultList = new ArrayList<UUID>();
@@ -172,9 +175,9 @@ public class CommandTest extends AndroidTestCase {
             uuidResultList.add(room.getId());
 
         for (int i = 0; i < mTestedRoomsNameArray.length; i++) {
-            assertTrue("Room UUID nr " + i + " <" + mRoomProvider.getMapOfRoomNames().get(mTestedRoomsNameArray[i].toUpperCase()).getId()
+            assertTrue("Room UUID nr " + i + " <" + roomMap.get(mTestedRoomsNameArray[i].toUpperCase()).getId()
                     + "> could not be found in the result: " + getAllStringItemsInOneString(uuidResultList)
-                    , uuidResultList.contains(mRoomProvider.getMapOfRoomNames().get(mTestedRoomsNameArray[i].toUpperCase()).getId()));
+                    , uuidResultList.contains(roomMap.get(mTestedRoomsNameArray[i].toUpperCase()).getId()));
         }
     }
 
