@@ -11,4 +11,8 @@ public class LogicBoolean {
     public Boolean getValue() {
         return mValue;
     }
+
+    public void setValue(Boolean value) {
+        mValue = value;
+    }
 }

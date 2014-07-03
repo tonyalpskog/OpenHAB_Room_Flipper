@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild, OnOperandValueChangedListener {
+public class RuleOperation extends EntityDataType<LogicBoolean> implements IRuleChild, OnOperandValueChangedListener {
     private List<IEntityDataType> mOperands;
     private RuleOperator mRuleOperator;
     private String mDescription;
@@ -154,12 +154,12 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     public void runCalculation() {
         if(!isActive()) return;
 
-        Boolean oldValue = mValue;
+        LogicBoolean oldValue = mValue;
 
         if(getRuleOperator() == null) {
-            mValue = false;//Missing operator shall result as FALSE.
+            mValue.setValue(false);//Missing operator shall result as FALSE.
         } else
-            mValue = getRuleOperator().getOperationResult(mOperands);
+            mValue = new LogicBoolean(getRuleOperator().getOperationResult(mOperands));
 
         if(!mValue.equals(oldValue) && mOnOperandValueChangedListener != null)
             mOnOperandValueChangedListener.onOperandValueChanged(this);
@@ -214,7 +214,7 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
             if(operand == null)
                 return "Falskt";
 
-        return getValue()? "Sant": "Falskt";//TODO - TA: Language independent
+        return getValue().getValue()? "Sant": "Falskt";//TODO - TA: Language independent
     }
 
     @Override
@@ -228,17 +228,17 @@ public class RuleOperation extends EntityDataType<Boolean> implements IRuleChild
     }
 
     @Override
-    public Boolean valueOf(String input) {
-        return Boolean.valueOf(input);
+    public LogicBoolean valueOf(String input) {
+        return new LogicBoolean(new Boolean(input));
     }
 
     @Override
     /**
      * The latest resulting value OR null.
      */
-    public Boolean getValue() {
+    public LogicBoolean getValue() {
         //Returns mValue instead of calling runCalculation() to prevent from multiple calls to getResult().
-        return mValue == null? false: mValue;
+        return mValue == null? new LogicBoolean(false): mValue;
     }
 
     public RuleOperator getRuleOperator() { return mRuleOperator; }
