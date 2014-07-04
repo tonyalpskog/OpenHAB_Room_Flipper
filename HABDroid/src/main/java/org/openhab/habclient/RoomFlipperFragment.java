@@ -32,7 +32,7 @@ import javax.inject.Inject;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomShiftListener {
+public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomShiftListener, ICommandAnalyzer.OnShowRoomListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -89,7 +89,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         setHasOptionsMenu(true);
 
-        mSpeechResultAnalyzer.setRoomFlipper(mRoomViewFlipper);
+        mSpeechResultAnalyzer.setOnShowRoomListener(this);
 
         return rootView;
     }
@@ -179,6 +179,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomLabel.setText(room.getName());
         mRoomDataContainer.setFlipperRoom(room);
         return false;
+    }
+
+    @Override
+    public void onShowRoom(Room room) {
+        mRoomViewFlipper.showRoom(room);
     }
 }
 

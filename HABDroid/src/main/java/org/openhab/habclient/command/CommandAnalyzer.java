@@ -5,21 +5,20 @@ import android.util.Log;
 
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.command.WidgetPhraseMatchResult;
+import org.openhab.domain.model.ApplicationMode;
+import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.domain.model.ApplicationMode;
-import org.openhab.domain.model.GraphicUnit;
 import org.openhab.habclient.HABApplication;
-import org.openhab.domain.IPopularNameProvider;
-import org.openhab.domain.IRoomProvider;
-import org.openhab.domain.OpenHABWidgetProvider;
-import org.openhab.domain.model.Room;
-import org.openhab.habclient.RoomFlipper;
 import org.openhab.habclient.SpeechAnalyzerResult;
 import org.openhab.habclient.TextToSpeechProvider;
 import org.openhab.habdroid.R;
@@ -47,11 +46,11 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
     private final IPopularNameProvider mPopularNameProvider;
-    protected RoomFlipper mRoomFlipper;
     protected TextToSpeechProvider mTextToSpeechProvider;
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
     protected Map<String, List<OpenHABItemType>> mItemTypeTagMapping = new HashMap<String, List<OpenHABItemType>>();
     protected Map<String, String> mCommandTagsRegex = new HashMap<String, String>();
+    private OnShowRoomListener mOnShowRoomListener;
 
     @Inject
     public CommandAnalyzer(IRoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
@@ -67,11 +66,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
         initializeWidgetTypeTagMapping();
         initializeCommandTagMapping(context);
-    }
-
-    @Override
-    public void setRoomFlipper(RoomFlipper roomFlipper) {
-        mRoomFlipper = roomFlipper;
     }
 
     @Override
@@ -101,8 +95,8 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                     //Got a speech match.
                     Room roomToShow = roomNameMap.get(match.toUpperCase());
                     Log.d(HABApplication.getLogTag(), "showRoom() - Show room<" + roomToShow.getId() + ">");
-                    if(mRoomFlipper != null)
-                        mRoomFlipper.showRoom(roomToShow);
+                    if(mOnShowRoomListener != null)
+                        mOnShowRoomListener.onShowRoom(roomToShow);
 
                     if(mTextToSpeechProvider != null)
                         mTextToSpeechProvider.speakText(roomToShow.getName());
@@ -161,6 +155,11 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             return new CommandAnalyzerResult(null, unitMatchResult.get(bestKeySoFar).getWidget(), topScore, commandReply, commandType);
         else
             return new CommandAnalyzerResult(null, unitMatchResult.get(bestKeySoFar).getWidget(), topScore, unitMatchResult.get(bestKeySoFar).getWidget().getLabelValue(), commandType);
+    }
+
+    @Override
+    public void setOnShowRoomListener(OnShowRoomListener listener) {
+        mOnShowRoomListener = listener;
     }
 
     public String getCommandValue(CommandPhraseMatchResult commandPhraseMatchResult) {
