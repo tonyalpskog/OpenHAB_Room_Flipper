@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habclient.command.ICommandAnalyzer;
@@ -19,7 +21,6 @@ import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habdroid.R;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -40,9 +41,11 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject IRestCommunication mRestCommunication;
+    @Inject
+    IRestCommunication mRestCommunication;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject
+    IApplicationModeProvider mApplicationModeProvider;
     @Inject ICommandAnalyzer mCommandAnalyzer;
 
     @Override

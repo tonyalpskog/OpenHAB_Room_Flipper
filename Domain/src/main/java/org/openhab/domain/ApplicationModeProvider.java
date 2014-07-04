@@ -1,4 +1,6 @@
-package org.openhab.habclient;
+package org.openhab.domain;
+
+import org.openhab.domain.model.ApplicationMode;
 
 import javax.inject.Inject;
 

@@ -15,8 +15,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IRestCommunication;
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.model.Direction;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
@@ -41,9 +45,11 @@ public class RoomConfigFragment extends Fragment {
     private Room mNullRoom;
     private HashMap<Direction, Spinner> mSpinnerHashMap;
 
-    @Inject IRoomProvider mRoomProvider;
+    @Inject
+    IRoomProvider mRoomProvider;
     @Inject IOpenHABWidgetProvider mOpenHABWidgetProvider;
-    @Inject IRestCommunication mRestCommunication;
+    @Inject
+    IRestCommunication mRestCommunication;
     @Inject ILogger mLogger;
     @Inject IColorParser mColorParser;
 

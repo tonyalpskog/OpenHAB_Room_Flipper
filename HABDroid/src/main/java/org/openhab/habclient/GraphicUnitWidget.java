@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.model.ApplicationMode;
+import org.openhab.domain.model.GraphicUnit;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -31,7 +34,8 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     private UnitContainerView mUnitContainerView;
     private HABApplication mApplication;
     @Inject IOpenHABSetting mOpenHABSetting;
-    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject
+    IApplicationModeProvider mApplicationModeProvider;
 
     public GraphicUnitWidget(Context context) {
         super(context);

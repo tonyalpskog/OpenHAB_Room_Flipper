@@ -1,7 +1,6 @@
-package org.openhab.habclient;
+package org.openhab.domain.model;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 

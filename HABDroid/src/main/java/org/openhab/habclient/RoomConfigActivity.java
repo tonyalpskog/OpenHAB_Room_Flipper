@@ -11,6 +11,10 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.model.ApplicationMode;
+import org.openhab.domain.model.Room;
 import org.openhab.habdroid.R;
 
 import java.util.Locale;
@@ -36,9 +40,11 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
 
     private Room mConfigRoom;
 
-    @Inject IRoomProvider mRoomProvider;
+    @Inject
+    IRoomProvider mRoomProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
-    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject
+    IApplicationModeProvider mApplicationModeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

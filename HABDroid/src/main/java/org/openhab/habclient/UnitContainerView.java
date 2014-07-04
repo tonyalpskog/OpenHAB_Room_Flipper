@@ -11,7 +11,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.Room;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;

@@ -6,6 +6,7 @@ import com.loopj.android.http.AsyncHttpClient;
 
 import org.apache.http.Header;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.util.IColorParser;

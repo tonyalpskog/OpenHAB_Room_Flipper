@@ -17,6 +17,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
+import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.lang.ref.WeakReference;
@@ -38,7 +39,8 @@ public class SpeechService extends Service
     protected volatile boolean mIsCountDownOn;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject
+    IApplicationModeProvider mApplicationModeProvider;
 
     private static final int MSG_RECOGNIZER_START_LISTENING = 1;
     private static final int MSG_RECOGNIZER_CANCEL = 2;

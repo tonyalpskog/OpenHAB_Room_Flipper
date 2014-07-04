@@ -1,6 +1,6 @@
 package org.openhab.habclient.command;
 
-import org.openhab.habclient.ApplicationMode;
+import org.openhab.domain.model.ApplicationMode;
 import org.openhab.habclient.RoomFlipper;
 import org.openhab.habclient.SpeechAnalyzerResult;
 

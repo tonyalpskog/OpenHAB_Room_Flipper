@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ViewFlipper;
 
+import org.openhab.domain.model.Room;
 import org.openhab.habdroid.R;
 
 /**

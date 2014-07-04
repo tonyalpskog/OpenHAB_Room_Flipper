@@ -1,6 +1,6 @@
 package org.openhab.habclient.command;
 
-import org.openhab.habclient.Room;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.model.OpenHABWidget;
 
 /**

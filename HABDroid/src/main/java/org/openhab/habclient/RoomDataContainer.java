@@ -1,5 +1,7 @@
 package org.openhab.habclient;
 
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.ILogger;
 
 import java.util.UUID;

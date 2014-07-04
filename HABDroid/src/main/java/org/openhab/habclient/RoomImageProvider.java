@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
+import org.openhab.domain.model.Room;
+
 import javax.inject.Inject;
 
 public class RoomImageProvider implements IRoomImageProvider {

@@ -3,6 +3,9 @@ package org.openhab.habclient;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import org.openhab.domain.model.Direction;
+import org.openhab.domain.model.Room;
+
 /**
  * Created by Tony Alpskog in 2013.
  */

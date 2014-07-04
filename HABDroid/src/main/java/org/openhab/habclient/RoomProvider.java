@@ -1,6 +1,9 @@
 package org.openhab.habclient;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.model.Direction;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;

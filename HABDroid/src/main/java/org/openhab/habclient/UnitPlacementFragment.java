@@ -23,6 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IRestCommunication;
+import org.openhab.domain.model.GraphicUnit;
+import org.openhab.domain.model.Room;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
@@ -52,7 +55,8 @@ public class UnitPlacementFragment extends Fragment {
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject IRestCommunication mRestCommunication;
+    @Inject
+    IRestCommunication mRestCommunication;
 
     /**
      * Returns a new instance of this fragment for the given section

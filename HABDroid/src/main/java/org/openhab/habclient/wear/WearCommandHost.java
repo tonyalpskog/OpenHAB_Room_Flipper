@@ -11,7 +11,7 @@ import android.preview.support.wearable.notifications.RemoteInput;
 import android.preview.support.wearable.notifications.WearableNotifications;
 import android.support.v4.app.NotificationCompat;
 
-import org.openhab.habclient.IApplicationModeProvider;
+import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.habclient.command.ICommandAnalyzer;
 
 import java.util.ArrayList;

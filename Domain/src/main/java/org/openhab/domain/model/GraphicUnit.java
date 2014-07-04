@@ -1,7 +1,4 @@
-package org.openhab.habclient;
-
-import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.model.OpenHABWidgetType;
+package org.openhab.domain.model;
 
 import java.util.UUID;
 

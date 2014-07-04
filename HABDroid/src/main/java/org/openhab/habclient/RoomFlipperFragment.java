@@ -17,6 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.model.ApplicationMode;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.habclient.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
@@ -39,8 +43,10 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Inject IWearCommandHost mWearCommandHost;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject IRoomProvider mRoomProvider;
-    @Inject IApplicationModeProvider mApplicationModeProvider;
+    @Inject
+    IRoomProvider mRoomProvider;
+    @Inject
+    IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
 

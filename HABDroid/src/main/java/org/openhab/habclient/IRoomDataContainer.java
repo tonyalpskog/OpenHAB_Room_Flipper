@@ -1,5 +1,7 @@
 package org.openhab.habclient;
 
+import org.openhab.domain.model.Room;
+
 public interface IRoomDataContainer {
     Room getConfigRoom();
 

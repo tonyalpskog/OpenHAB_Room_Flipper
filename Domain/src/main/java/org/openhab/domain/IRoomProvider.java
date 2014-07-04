@@ -1,4 +1,6 @@
-package org.openhab.habclient;
+package org.openhab.domain;
+
+import org.openhab.domain.model.Room;
 
 import java.util.Collection;
 import java.util.Map;
