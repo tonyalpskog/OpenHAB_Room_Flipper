@@ -5,6 +5,7 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.Room;
 
 import java.util.List;
 import java.util.Set;
@@ -28,4 +29,6 @@ public interface IOpenHABWidgetProvider {
     List<String> getItemNameListByWidgetType(Set<OpenHABWidgetType> widgetTypes);
 
     List<String> getItemNamesByType(OpenHABItemType type);
+
+    List<OpenHABWidget> getListOfWidgetsFromListOfRooms(List<Room> listOfRooms);
 }

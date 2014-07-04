@@ -1,11 +1,14 @@
 package org.openhab.domain;
 
 import org.openhab.domain.command.WidgetPhraseMatchResult;
+import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.RegExAccuracyResult;
@@ -179,7 +182,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
     @Override
     public List<OpenHABWidget> getWidgetList(OpenHABWidgetType type) {
-        List<String> idList = new ArrayList<String>();
+        List<String> idList;
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
         if(mOpenHABWidgetTypeMap.containsKey(type)) {
             idList = mOpenHABWidgetTypeMap.get(type);
@@ -244,20 +247,15 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     }
 
     public double getHighestWidgetParentMatch(OpenHABWidget unit, List<String> sourceWordsList) {
-        //"Switch on kitchen ceiling lights" => "KITCHEN CEILING LIGHTS" => "KITCHEN LIGHTS"
-//        OpenHABWidget resultingParentWidget = null;
-
         double maxResult = 0;
         while(unit.hasParent()) {
             unit = unit.getParent();
             if(!unit.hasLinkedPage())
                 continue;
             String linkTitle = unit.getLinkedPage().getTitle();
-//            double result = mCommandAnalyzer.getStringMatchAccuracy(sourceWordsList, regExString, linkTitle);
             double result = mRegularExpression.getStringMatchAccuracy(sourceWordsList, linkTitle).getAccuracy();
             if (result > maxResult) {
                 maxResult = result;
-//                resultingParentWidget = unit;
             }
         }
 
@@ -316,5 +314,21 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
                 itemNameList.add(widget.getItemName());
         }
         return itemNameList;
+    }
+
+    @Override
+    public List<OpenHABWidget> getListOfWidgetsFromListOfRooms(List<Room> listOfRooms) {
+        //Get widgets from room list
+        if(listOfRooms != null && !listOfRooms.isEmpty()){
+            final List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();
+            for (Room nextRoom : listOfRooms) {
+                for(GraphicUnit gu : nextRoom.getUnits())
+                    widgetList.add(gu.getOpenHABWidget());
+            }
+            return widgetList;
+        }
+
+        //Get all unit widgets
+        return getWidgetList(OpenHABWidgetTypeSet.UnitItem);
     }
 }

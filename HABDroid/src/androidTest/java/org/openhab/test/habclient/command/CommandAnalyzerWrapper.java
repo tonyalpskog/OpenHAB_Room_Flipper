@@ -44,10 +44,6 @@ public class CommandAnalyzerWrapper extends CommandAnalyzer {
         return super.getRoomsFromPhrases(speechResult, applicationMode);
     }
 
-    public List<OpenHABWidget> getListOfWidgetsFromListOfRooms(List<Room> listOfRooms) {
-        return super.getListOfWidgetsFromListOfRooms(listOfRooms);
-    }
-
     public List<OpenHABWidget> getUnitsFromPhrases(List<String> commandPhrases, List<Room> listOfRooms) {
         return super.getUnitsFromPhrases2(commandPhrases);
     }

@@ -282,7 +282,7 @@ public class CommandTest extends AndroidTestCase {
     public void testMethod_getListOfWidgetsFromListOfRooms() {
         assertEquals(122, mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null).size());
 
-        assertFalse("getListOfWidgetsFromListOfRooms(null) returned an empty list of units", mCommandAnalyzer.getListOfWidgetsFromListOfRooms(null).isEmpty());
+        assertFalse("getListOfWidgetsFromListOfRooms(null) returned an empty list of units", mWidgetProvider.getListOfWidgetsFromListOfRooms(null).isEmpty());
         List<String> ls = new ArrayList<String>();
         ls.add("Terrace door");
 

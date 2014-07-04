@@ -7,11 +7,9 @@ import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.ITextToSpeechProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.model.ApplicationMode;
-import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
@@ -225,32 +223,12 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return resultList;
     }
 
-    protected List<OpenHABWidget> getListOfWidgetsFromListOfRooms(List<Room> listOfRooms) {
-        // Fill the list view with the strings the recognizer thought it
-        // could have heard
-        List<OpenHABWidget> widgetList = new ArrayList<OpenHABWidget>();
-
-        //Get widgets from room list
-        if(listOfRooms != null && !listOfRooms.isEmpty()){
-            for (Room nextRoom : listOfRooms) {
-                for(GraphicUnit gu : nextRoom.getUnits())
-                    widgetList.add(gu.getOpenHABWidget());
-            }
-        }
-
-        //Get all unit widgets
-        else if(mOpenHABWidgetProvider != null)
-            widgetList = mOpenHABWidgetProvider.getWidgetList(OpenHABWidgetTypeSet.UnitItem);
-
-        return widgetList;
-    }
-
     protected List<OpenHABWidget> getUnitsFromPhrases(List<String> commandPhrases, List<Room> listOfRooms) {
         List<OpenHABWidget> resultList = new ArrayList<OpenHABWidget>();
 
         // Fill the list view with the strings the recognizer thought it
         // could have heard
-        List<OpenHABWidget> widgetList = getListOfWidgetsFromListOfRooms(listOfRooms);
+        List<OpenHABWidget> widgetList = mOpenHABWidgetProvider.getListOfWidgetsFromListOfRooms(listOfRooms);
         if(widgetList.size() == 0) {
             widgetList = mOpenHABWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null);
         }
@@ -431,7 +409,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     public List<WidgetPhraseMatchResult> getWidgetsFromCommandMatchResult(CommandPhraseMatchResult commandPhraseMatchResult) {
-        List<WidgetPhraseMatchResult> resultList = new ArrayList<WidgetPhraseMatchResult>();
         String unitTagPhrase = getUnitPhrase(commandPhraseMatchResult);
 
         //Add all found widgets no matter their match points.
