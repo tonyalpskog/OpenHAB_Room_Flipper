@@ -21,6 +21,8 @@ public class Rule implements OnOperandValueChangedListener {
     protected List<RuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
     protected final IOpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
+    protected AccessModifier mAccess;
+
     @Inject IWearCommandHost mWearCommandHost;
 
     public Rule(IOpenHABWidgetControl widgetControl) {
@@ -101,5 +103,14 @@ public class Rule implements OnOperandValueChangedListener {
 
     public List<RuleAction> getActions() {
         return mActions;
+    }
+
+
+    public AccessModifier getAccess() {
+        return mAccess;
+    }
+
+    public void setAccess(AccessModifier access) {
+        mAccess = access;
     }
 }
