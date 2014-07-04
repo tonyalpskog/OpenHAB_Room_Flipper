@@ -45,7 +45,7 @@ public class HttpDataSetup {
 
         Node rootNode = document.getElementsByTagName("homepage").item(0);
 
-        OpenHABWidget rootWidget = new OpenHABWidget(mLogger, mColorParser);
+        OpenHABWidget rootWidget = new OpenHABWidget(mLogger);
         int childWidgetsFound = 0, childTitlesFound = 0, childIDsFound = 0, childIconsFound = 0, childLinksFound = 0;
 
         OpenHABWidgetDataSource openHABWidgetDataSource = new OpenHABWidgetDataSource(mLogger, mColorParser);
