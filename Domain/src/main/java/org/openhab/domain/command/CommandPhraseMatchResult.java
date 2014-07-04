@@ -1,5 +1,6 @@
-package org.openhab.habclient.command;
+package org.openhab.domain.command;
 
+import org.openhab.domain.command.OpenHABWidgetCommandType;
 import org.openhab.domain.util.StringHandler;
 
 /**

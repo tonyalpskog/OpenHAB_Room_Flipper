@@ -4,12 +4,14 @@ import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import org.openhab.domain.ITextToSpeechProvider;
+
 import java.util.Locale;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class TextToSpeechProvider {
+public class TextToSpeechProvider implements ITextToSpeechProvider {
 
     private TextToSpeech mTextToSpeech;
 
@@ -46,6 +48,7 @@ public class TextToSpeechProvider {
     }
 
 
+    @Override
     public boolean setExternalTTSEngine(String ttsPackageName) {
         int result = mTextToSpeech.setEngineByPackageName(ttsPackageName);
         if( result == TextToSpeech.ERROR ) {
@@ -55,6 +58,7 @@ public class TextToSpeechProvider {
         return true;
     }
 
+    @Override
     public boolean setLanguage(Locale locale) {
         int result = mTextToSpeech.setLanguage(locale);
 
@@ -67,6 +71,7 @@ public class TextToSpeechProvider {
         return true;
     }
 
+    @Override
     public void speakText(String textToSpeak) {
         mTextToSpeech.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null);
     }

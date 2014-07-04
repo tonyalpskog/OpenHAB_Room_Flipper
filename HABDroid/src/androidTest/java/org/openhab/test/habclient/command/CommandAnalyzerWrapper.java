@@ -1,18 +1,19 @@
 package org.openhab.test.habclient.command;
 
-import android.content.Context;
-
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IPopularNameProvider;
-import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.util.IRegularExpression;
-import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
-import org.openhab.domain.model.Room;
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.CommandPhraseMatchResult;
+import org.openhab.domain.command.CommandAnalyzer;
+import org.openhab.domain.command.CommandPhraseMatchResult;
+import org.openhab.domain.command.ICommandColorProvider;
+import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.command.WidgetPhraseMatchResult;
+import org.openhab.domain.model.ApplicationMode;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.Room;
+import org.openhab.domain.util.ILogger;
+import org.openhab.domain.util.IRegularExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,14 @@ import javax.inject.Singleton;
 public class CommandAnalyzerWrapper extends CommandAnalyzer {
     @Inject
     public CommandAnalyzerWrapper(IRoomProvider roomProvider,
-                                  OpenHABWidgetProvider openHABWidgetProvider, Context context,
+                                  OpenHABWidgetProvider openHABWidgetProvider,
                                   IOpenHABWidgetControl widgetControl,
                                   IRegularExpression regularExpression,
-                                  IPopularNameProvider popularNameProvider) {
-        super(roomProvider, openHABWidgetProvider, context, widgetControl, regularExpression, popularNameProvider);
+                                  IPopularNameProvider popularNameProvider,
+                                  ICommandPhrasesProvider commandPhrasesProvider,
+                                  ILogger logger, ICommandColorProvider commandColorProvider) {
+        super(roomProvider, openHABWidgetProvider, widgetControl, regularExpression, popularNameProvider,
+                commandPhrasesProvider, logger, commandColorProvider);
     }
 
     public List<Room> getRoomsFromPhrases(ArrayList<String> speechResult, ApplicationMode applicationMode) {

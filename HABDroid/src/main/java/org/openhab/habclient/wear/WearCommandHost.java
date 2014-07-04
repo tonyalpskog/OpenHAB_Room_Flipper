@@ -12,7 +12,7 @@ import android.preview.support.wearable.notifications.WearableNotifications;
 import android.support.v4.app.NotificationCompat;
 
 import org.openhab.domain.IApplicationModeProvider;
-import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.domain.command.ICommandAnalyzer;
 
 import java.util.ArrayList;
 

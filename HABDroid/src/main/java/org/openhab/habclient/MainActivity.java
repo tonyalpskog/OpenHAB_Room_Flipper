@@ -16,7 +16,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habdroid.R;
 

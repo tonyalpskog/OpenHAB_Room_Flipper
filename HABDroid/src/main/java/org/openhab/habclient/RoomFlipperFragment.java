@@ -22,7 +22,7 @@ import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.wear.IWearCommandHost;
-import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;

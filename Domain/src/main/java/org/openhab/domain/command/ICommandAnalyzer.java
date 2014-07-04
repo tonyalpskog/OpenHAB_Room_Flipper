@@ -1,8 +1,7 @@
-package org.openhab.habclient.command;
+package org.openhab.domain.command;
 
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
-import org.openhab.habclient.SpeechAnalyzerResult;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,6 +6,8 @@ import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.PopularNameProvider;
+import org.openhab.domain.command.ICommandColorProvider;
+import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.util.IColorParser;
@@ -35,8 +37,10 @@ import org.openhab.habclient.RoomProvider;
 import org.openhab.habclient.SpeechService;
 import org.openhab.habclient.UnitContainerView;
 import org.openhab.habclient.UnitPlacementFragment;
-import org.openhab.habclient.command.CommandAnalyzer;
-import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.domain.command.CommandAnalyzer;
+import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.habclient.command.CommandColorProvider;
+import org.openhab.habclient.command.CommandPhrasesProvider;
 import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
@@ -79,6 +83,16 @@ injects = {
         WearCommandHost.class
 })
 public class ClientModule {
+    @Provides @Singleton
+    public ICommandColorProvider provideCommandColorProvider(CommandColorProvider provider) {
+        return provider;
+    }
+    
+    @Provides @Singleton
+    public ICommandPhrasesProvider provideCommandPhrasesProvider(CommandPhrasesProvider provider) {
+        return provider;
+    }
+
     @Provides @Singleton
     public IDocumentFactory provideDocumentFactory(DocumentFactory documentFactory) {
         return documentFactory;

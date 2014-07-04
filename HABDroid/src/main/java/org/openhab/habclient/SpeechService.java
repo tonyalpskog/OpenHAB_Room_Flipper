@@ -18,7 +18,7 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import org.openhab.domain.IApplicationModeProvider;
-import org.openhab.habclient.command.ICommandAnalyzer;
+import org.openhab.domain.command.ICommandAnalyzer;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

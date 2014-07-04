@@ -1,14 +1,11 @@
-package org.openhab.habclient.command;
-
-import android.content.Context;
-import android.util.Log;
+package org.openhab.domain.command;
 
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.ITextToSpeechProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
-import org.openhab.domain.command.WidgetPhraseMatchResult;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABItemType;
@@ -16,12 +13,9 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.SpeechAnalyzerResult;
-import org.openhab.habclient.TextToSpeechProvider;
-import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,37 +29,49 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import static org.openhab.domain.command.OpenHABWidgetCommandType.GetStatus;
+import static org.openhab.domain.command.OpenHABWidgetCommandType.values;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class CommandAnalyzer implements ICommandAnalyzer {
 
+    private static final String TAG = "CommandAnalyzer";
     private final IRoomProvider mRoomProvider;
     private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
-    private final Context mContext;
     private final IOpenHABWidgetControl mWidgetControl;
     private final IRegularExpression mRegularExpression;
     private final IPopularNameProvider mPopularNameProvider;
-    protected TextToSpeechProvider mTextToSpeechProvider;
+    private final ICommandPhrasesProvider mCommandPhrasesProvider;
+    private final ILogger mLogger;
+    private final ICommandColorProvider mCommandColorProvider;
+    protected ITextToSpeechProvider mTextToSpeechProvider;
     protected Map<String, List<OpenHABWidgetType>> mWidgetTypeTagMapping = new HashMap<String, List<OpenHABWidgetType>>();
     protected Map<String, List<OpenHABItemType>> mItemTypeTagMapping = new HashMap<String, List<OpenHABItemType>>();
     protected Map<String, String> mCommandTagsRegex = new HashMap<String, String>();
     private OnShowRoomListener mOnShowRoomListener;
 
     @Inject
-    public CommandAnalyzer(IRoomProvider roomProvider, OpenHABWidgetProvider openHABWidgetProvider,
-                           Context context, IOpenHABWidgetControl widgetControl,
+    public CommandAnalyzer(IRoomProvider roomProvider,
+                           OpenHABWidgetProvider openHABWidgetProvider,
+                           IOpenHABWidgetControl widgetControl,
                            IRegularExpression regularExpression,
-                           IPopularNameProvider popularNameProvider) {
+                           IPopularNameProvider popularNameProvider,
+                           ICommandPhrasesProvider commandPhrasesProvider,
+                           ILogger logger,
+                           ICommandColorProvider commandColorProvider) {
         mRoomProvider = roomProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
-        mContext = context;
         mWidgetControl = widgetControl;
         mRegularExpression = regularExpression;
         mPopularNameProvider = popularNameProvider;
+        mCommandPhrasesProvider = commandPhrasesProvider;
+        mLogger = logger;
+        mCommandColorProvider = commandColorProvider;
 
         initializeWidgetTypeTagMapping();
-        initializeCommandTagMapping(context);
+        initializeCommandTagMapping();
     }
 
     @Override
@@ -94,14 +100,14 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                 if(roomNameMap.keySet().contains(match.toUpperCase())) {
                     //Got a speech match.
                     Room roomToShow = roomNameMap.get(match.toUpperCase());
-                    Log.d(HABApplication.getLogTag(), "showRoom() - Show room<" + roomToShow.getId() + ">");
+                    mLogger.d(TAG, "showRoom() - Show room<" + roomToShow.getId() + ">");
                     if(mOnShowRoomListener != null)
                         mOnShowRoomListener.onShowRoom(roomToShow);
 
                     if(mTextToSpeechProvider != null)
                         mTextToSpeechProvider.speakText(roomToShow.getName());
                     else
-                        Log.e(HABApplication.getLogTag(), "TextToSpeechProvider is NULL!");
+                        mLogger.e(TAG, "TextToSpeechProvider is NULL!");
                 }
             }
         }
@@ -109,7 +115,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         for(String match : speechResult) {
             if("hej då huset".equalsIgnoreCase(match)) {
                 //End HAB application
-                Log.d(HABApplication.getLogTag(), "Got a match: '" + match + "'");
+                mLogger.d(TAG, "Got a match: '" + match + "'");
                 break;
             }
         }
@@ -143,7 +149,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         if(bestKeySoFar == null)
             return null;
 
-        if(bestKeySoFar.getCommandType() != OpenHABWidgetCommandType.GetStatus) {
+        if(bestKeySoFar.getCommandType() != GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {
                 mWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
@@ -187,7 +193,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     public String getCommandReply(CommandAnalyzerResult commandAnalyzerResult) {
         String result;
-        if(commandAnalyzerResult.getCommandType() == OpenHABWidgetCommandType.GetStatus) {
+        if(commandAnalyzerResult.getCommandType() == GetStatus) {
             result = mPopularNameProvider.getPopularNameFromWidgetLabel(commandAnalyzerResult.getOpenHABWidget().getLabel()) + " is " + commandAnalyzerResult.getOpenHABItemState();//TODO add language support
 
         } else {
@@ -262,7 +268,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                 //Got a unit match.
                 OpenHABWidget foundWidget = widgetNameMap.get(match.toUpperCase());
                 resultList.add(foundWidget);
-                Log.d(HABApplication.getLogTag(), "Found unit in command phrase <" + foundWidget.getLabel() + ">");
+                mLogger.d(TAG, "Found unit in command phrase <" + foundWidget.getLabel() + ">");
             }
         }
 
@@ -287,7 +293,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
                     //Got a unit match.
                     OpenHABWidget foundWidget = widgetNameMap.get(unitName);
                     resultList.add(foundWidget);
-                    Log.d("CommandAnalyzer", "Found unit in command phrase <" + foundWidget.getLabel() + ">");
+                    mLogger.d("CommandAnalyzer", "Found unit in command phrase <" + foundWidget.getLabel() + ">");
                 }
             }
         }
@@ -330,7 +336,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
 
     private List<CommandPhraseMatchResult> getCommandsFromPhrase(String phrase) {
         final List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
-        for(OpenHABWidgetCommandType commandType : OpenHABWidgetCommandType.values()) {
+        for(OpenHABWidgetCommandType commandType : values()) {
             if(commandType == null)
                 continue;
 
@@ -342,7 +348,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     private List<CommandPhraseMatchResult> getCommandsFromCommandType(String phrase, OpenHABWidgetCommandType commandType) {
         final List<CommandPhraseMatchResult> commandPhraseMatchResultList = new ArrayList<CommandPhraseMatchResult>();
 
-        for(String commandAsText : getTextCommands(commandType.ArrayNameId)) {
+        for(String commandAsText : mCommandPhrasesProvider.getCommandPhrases(commandType)) {
             commandAsText = commandAsText.toUpperCase();
             final int matchPoints = StringHandler.replaceSubStrings(commandAsText, "<", ">", "").split("\\s+").length;
             final String regexCommand = "\\A" + StringHandler.replaceSubStrings(commandAsText, "<", ">", "(.+)").toUpperCase() + "\\z";
@@ -376,10 +382,6 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         return commandPhraseMatchResultList;
     }
 
-    private String[] getTextCommands(int arrayNameId) {
-        return mContext.getResources().getStringArray(arrayNameId);
-    }
-
     public Map<CommandPhraseMatchResult, WidgetPhraseMatchResult> getHighestWidgetsFromCommandMatchResult(List<CommandPhraseMatchResult> listOfCommandResult) {
         //TODO - Compare the tag type with item and widget type. No tag<->type match = No unit result.
 
@@ -390,7 +392,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             //TODO - Implement call to method that compares the tag type with item and widget type. No tag<->type match = No unit result
             String[] valueTags = getValueTagType(commandPhraseMatchResult);
             if (valueTags.length > 1)
-                Log.w(HABApplication.getLogTag(), "Command phrase contains more than one value tag: " + valueTags.length);
+                mLogger.w(TAG, "Command phrase contains more than one value tag: " + valueTags.length);
 
             if (widgetMatch != null && (valueTags.length > 0 && doesTagTypeMatchWidgetType(valueTags[0], widgetMatch.getWidget())) || valueTags.length == 0)
                 resultMap.put(commandPhraseMatchResult, widgetMatch);
@@ -483,7 +485,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         mItemTypeTagMapping.put("<text>", Arrays.asList(OpenHABItemType.String));
     }
 
-    protected void initializeCommandTagMapping(Context context) {
+    protected void initializeCommandTagMapping() {
         mCommandTagsRegex.put("<integer>", "([0-9]+)");
         mCommandTagsRegex.put("<decimal>", "([0-9.,]+)");
         mCommandTagsRegex.put("<text>", "(.+)");
@@ -491,7 +493,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         mCommandTagsRegex.put("<selection>", "(.+)");
 
         //<color> is a bit special...
-        String[] colorNames = context.getResources().getStringArray(R.array.command_colors);
+        String[] colorNames = mCommandColorProvider.getColorNames();
         StringBuilder colorRegEx = new StringBuilder();
         for(String colorName : colorNames)
             colorRegEx.append(colorRegEx.length() == 0? colorName : "|" + colorName);
