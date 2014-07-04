@@ -2,32 +2,33 @@ package org.openhab.test.habclient.command;
 
 import android.test.AndroidTestCase;
 
+import org.openhab.domain.DocumentFactory;
+import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
+import org.openhab.domain.command.CommandAnalyzer;
+import org.openhab.domain.command.CommandAnalyzerResult;
+import org.openhab.domain.command.CommandPhraseMatchResult;
+import org.openhab.domain.command.OpenHABWidgetCommandType;
 import org.openhab.domain.command.WidgetPhraseMatchResult;
+import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.model.Room;
 import org.openhab.domain.util.DecimalHandler;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.RegExAccuracyResult;
 import org.openhab.domain.util.RegExResult;
-import org.openhab.domain.model.ApplicationMode;
-import org.openhab.domain.IApplicationModeProvider;
-import org.openhab.domain.IRoomProvider;
-import org.openhab.domain.model.Room;
-import org.openhab.domain.command.CommandAnalyzer;
-import org.openhab.domain.command.CommandAnalyzerResult;
-import org.openhab.domain.command.CommandPhraseMatchResult;
-import org.openhab.domain.command.OpenHABWidgetCommandType;
+import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.dagger.AndroidModule;
 import org.openhab.habclient.dagger.ClientModule;
-import org.openhab.domain.IDocumentFactory;
-import org.openhab.domain.DocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -107,6 +108,11 @@ public class CommandTest extends AndroidTestCase {
         @Provides @Singleton
         public CommandAnalyzer provideCommandAnalyzer(CommandAnalyzerWrapper wrapper) {
             return wrapper;
+        }
+
+        @Provides @Singleton
+        public IOpenHABSetting provideOpenHABSetting() {
+            return new TestOpenHABSetting();
         }
     }
 
@@ -774,7 +780,7 @@ public class CommandTest extends AndroidTestCase {
         assertEquals("Kitchen", resultingParentWidget.getLinkedPage().getTitle());
         assertEquals("GF_Kitchen", resultingParentWidget.getLinkedPage().getId());
         assertEquals("Kitchen", resultingParentWidget.getLabel());
-        assertEquals("0001_1",  resultingParentWidget.getId());
+        assertEquals("0001_1", resultingParentWidget.getId());
         assertEquals(0.67, DecimalHandler.getFixNumberOfDecimals(maxResult, 2));
     }
 

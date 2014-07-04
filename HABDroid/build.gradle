@@ -9,6 +9,8 @@ buildscript {
 apply plugin: 'com.android.application'
 
 dependencies {
+    compile 'com.google.android.gms:play-services:4.4.52'
+    compile 'com.android.support:support-v13:19.1.0'
     compile project(':Domain')
     compile fileTree(dir: 'libs', include: '*.jar')
 
