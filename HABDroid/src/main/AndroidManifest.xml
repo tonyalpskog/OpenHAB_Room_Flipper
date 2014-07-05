@@ -92,6 +92,11 @@
             android:label="@string/title_activity_room_config"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
+        <activity
+            android:name="org.openhab.habclient.rule.RuleListActivity"
+            android:label="@string/title_activity_rule_list"
+            android:windowSoftInputMode="stateUnchanged" >
+        </activity>
 
         <!-- BroadcastReceiver -->
 

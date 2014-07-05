@@ -25,6 +25,7 @@ public class RuleProvider implements IRuleProvider {
     @Override
     public List<Rule> getUserRules(String userId) {
         List<Rule> result = new ArrayList<Rule>();
+        if(mUserRules.get(userId) == null) return result;
         result.addAll(mUserRules.get(userId).get(AccessModifier.Private));
         result.addAll(mUserRules.get(userId).get(AccessModifier.ReadOnly));
         result.addAll(mUserRules.get(userId).get(AccessModifier.Writable));

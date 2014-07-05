@@ -47,6 +47,7 @@ import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
 import org.openhab.habclient.rule.RuleEditActivity;
+import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habclient.rule.RuleOperandDialogFragment;
 import org.openhab.habclient.rule.RuleOperationFragment;
 import org.openhab.habclient.rule.UnitOperandSelectionDialogFragment;
@@ -77,6 +78,7 @@ injects = {
         RuleActionFragment.class,
         RuleOperationFragment.class,
         RuleEditActivity.class,
+        RuleListActivity.class,
         UnitOperandSelectionDialogFragment.class,
         GraphicUnitWidget.class, //TODO: create adapter for this instead
         UnitContainerView.class, //TODO: create adapter for this instead

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -23,6 +24,7 @@ public class Rule implements OnOperandValueChangedListener {
     protected final IOpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
     protected AccessModifier mAccessModifier;
+    protected UUID mRuleId;
 
     @Inject IWearCommandHost mWearCommandHost;
 
@@ -113,5 +115,13 @@ public class Rule implements OnOperandValueChangedListener {
 
     public void setAccess(AccessModifier access) {
         mAccessModifier = access;
+    }
+
+    public UUID getRuleId() {
+        return mRuleId;
+    }
+
+    public void setRuleId(UUID ruleId) {
+        mRuleId = ruleId;
     }
 }

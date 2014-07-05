@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import org.openhab.habclient.rule.RuleEditActivity;
 
+import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 
 /**
@@ -254,7 +255,7 @@ public class NavigationDrawerFragment extends Fragment {
 
         if (item.getItemId() == R.id.action_example) {
             Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(getActivity(), RuleEditActivity.class);
+            Intent i = new Intent(getActivity(), RuleListActivity.class);
             startActivity(i);
             return true;
         }

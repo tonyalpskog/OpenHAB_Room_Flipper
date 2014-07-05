@@ -24,6 +24,7 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
+import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
@@ -150,7 +151,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 mWearCommandHost.startSession("Room navigation", "Please, response with the name of a room");
                 return true;
             case R.id.action_open_rules:
-                Intent i = new Intent(getActivity(), RuleEditActivity.class);
+                Intent i = new Intent(getActivity(), RuleListActivity.class);
                 startActivity(i);
                 return true;
             default:

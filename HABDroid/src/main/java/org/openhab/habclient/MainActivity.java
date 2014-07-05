@@ -18,6 +18,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
+import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 
 import java.util.EnumSet;
@@ -97,7 +98,7 @@ public class MainActivity extends Activity
                         .commit();
                 break;
             default:
-                Intent i = new Intent(this, RuleEditActivity.class);
+                Intent i = new Intent(this, RuleListActivity.class);
                 startActivity(i);
                 break;
 
