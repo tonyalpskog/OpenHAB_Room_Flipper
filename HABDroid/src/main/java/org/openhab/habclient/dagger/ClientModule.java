@@ -10,6 +10,8 @@ import org.openhab.domain.command.ICommandColorProvider;
 import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.IRuleProvider;
+import org.openhab.domain.rule.RuleProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.wear.IWearCommandHost;
@@ -147,6 +149,9 @@ public class ClientModule {
     public IRuleOperationProvider provideRuleOperationProvider(RuleOperationProvider provider) {
         return provider;
     }
+
+    @Provides @Singleton
+    public IRuleProvider provideRuleProvider(RuleProvider provider) { return provider; }
 
     @Provides @Singleton
     public IRoomProvider provideRoomProvider(RoomProvider roomProvider) {

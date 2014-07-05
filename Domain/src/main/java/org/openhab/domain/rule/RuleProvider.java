@@ -1,5 +1,7 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.user.AccessModifier;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

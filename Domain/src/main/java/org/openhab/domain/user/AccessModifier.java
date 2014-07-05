@@ -1,4 +1,4 @@
-package org.openhab.domain.rule;
+package org.openhab.domain.user;
 
 /**
  * Created by Tony Alpskog in 2014.

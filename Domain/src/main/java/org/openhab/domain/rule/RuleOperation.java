@@ -1,7 +1,7 @@
 package org.openhab.domain.rule;
 
-import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
@@ -19,11 +19,13 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
     private RuleOperator mRuleOperator;
     private String mDescription;
     private boolean mIsActive;
+    private AccessModifier mAccessModifier;
 
     public RuleOperation() {
         mOperands = new ArrayList<IEntityDataType>();
         mOperands.add(null);
         mDataSourceId = UUID.randomUUID().toString();
+        mAccessModifier = mAccessModifier.ReadOnly;
     }
 
     public RuleOperation(String name) {
@@ -327,5 +329,14 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
 
         return staticEntityDataType;
     }
+
+    public AccessModifier getAccessModifier() {
+        return mAccessModifier;
+    }
+
+    public void setAccessModifier(AccessModifier accessModifier) {
+        mAccessModifier = accessModifier;
+    }
+
 
 }

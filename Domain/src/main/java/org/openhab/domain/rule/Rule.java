@@ -1,6 +1,7 @@
 package org.openhab.domain.rule;
 
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.domain.wear.IWearCommandHost;
 
@@ -21,7 +22,7 @@ public class Rule implements OnOperandValueChangedListener {
     protected List<RuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
     protected final IOpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
-    protected AccessModifier mAccess;
+    protected AccessModifier mAccessModifier;
 
     @Inject IWearCommandHost mWearCommandHost;
 
@@ -107,10 +108,10 @@ public class Rule implements OnOperandValueChangedListener {
 
 
     public AccessModifier getAccess() {
-        return mAccess;
+        return mAccessModifier;
     }
 
     public void setAccess(AccessModifier access) {
-        mAccess = access;
+        mAccessModifier = access;
     }
 }
