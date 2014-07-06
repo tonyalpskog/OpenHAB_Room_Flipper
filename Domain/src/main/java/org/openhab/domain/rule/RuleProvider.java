@@ -28,6 +28,8 @@ public class RuleProvider implements IRuleProvider {
 
     @Override
     public List<Rule> getUserRules(String userId) {
+        if(!mUserRules.containsKey(userId))
+            return new ArrayList<Rule>();
         return mUserRules.get(userId);
     }
 
@@ -36,10 +38,8 @@ public class RuleProvider implements IRuleProvider {
         if(ruleId == null || userId == null)
             return null;
         List<Rule> ruleList = getUserRules(userId);
-        if(ruleList == null)
-            return null;
         for(Rule rule : ruleList) {
-            if(ruleId.endsWith(rule.getRuleId().toString()))
+            if(ruleId.equalsIgnoreCase(rule.getRuleId().toString()))
                 return rule;
         }
 

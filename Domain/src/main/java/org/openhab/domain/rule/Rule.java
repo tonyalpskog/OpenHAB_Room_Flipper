@@ -35,6 +35,7 @@ public class Rule implements OnOperandValueChangedListener {
     }
 
     public Rule(String name, IOpenHABWidgetControl openHABWidgetControl) {
+        setRuleId(UUID.randomUUID());
         setName(name);
         mOpenHABWidgetControl = openHABWidgetControl;
         mActions = new ArrayList<RuleAction>();

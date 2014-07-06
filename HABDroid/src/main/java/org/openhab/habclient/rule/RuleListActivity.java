@@ -33,8 +33,10 @@ import de.duenndns.ssl.MemorizingTrustManager;
 public class RuleListActivity extends ListActivity {
 
 //    public static final int RULE_REQUEST_CODE = 4321;
-    @Inject IRuleProvider mRuleProvider;
     private String mTemporaryHardCodedUserId = "Admin123";//TODO - TA: Replace this with data from user module/provider
+    private ArrayAdapter<Rule> mListAdapter;
+
+    @Inject IRuleProvider mRuleProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +45,13 @@ public class RuleListActivity extends ListActivity {
 //        setContentView(R.layout.activity_rule_list);
 //        if(mRuleProvider.getUserRules(mTemporaryHardCodedUserId).size() < 1)
 //            mRuleProvider.saveRule(new Rule("<No data>", null),mTemporaryHardCodedUserId );
-        List<Rule> ruleList = mRuleProvider.getUserRules(mTemporaryHardCodedUserId);
-        ArrayAdapter<Rule> adapter = new ArrayAdapter<Rule>(this, android.R.layout.simple_list_item_1, ruleList != null? ruleList : new ArrayList<Rule>());
-        setListAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mListAdapter = new ArrayAdapter<Rule>(this, android.R.layout.simple_list_item_1, mRuleProvider.getUserRules(mTemporaryHardCodedUserId));
+        setListAdapter(mListAdapter);
     }
 
     @Override
@@ -55,7 +61,7 @@ public class RuleListActivity extends ListActivity {
 
         Intent intent = new Intent(this, RuleEditActivity.class);
         intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
-        intent.putExtra(Rule.ARG_RULE_ID, itemValue.getRuleId());
+        intent.putExtra(Rule.ARG_RULE_ID, itemValue.getRuleId().toString());
         startActivity(intent);
     }
 
