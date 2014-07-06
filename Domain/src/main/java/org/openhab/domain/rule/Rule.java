@@ -23,22 +23,20 @@ public class Rule implements OnOperandValueChangedListener {
     protected RuleOperation mRuleOperation;
     protected Map<String, RuleOperation> mRuleOperationDataSourceIdMap;
     protected List<RuleAction> mActions;//OpenHABNFCActionList, Intent writeTagIntent
-    protected final IOpenHABWidgetControl mOpenHABWidgetControl;
     protected boolean mEnabled;
     protected AccessModifier mAccessModifier;
     protected UUID mRuleId;
 
+    private IOpenHABWidgetControl mOpenHABWidgetControl;
     @Inject IWearCommandHost mWearCommandHost;
 
-    public Rule(IOpenHABWidgetControl widgetControl) {
-        this("New Rule", widgetControl);
+    public Rule(IOpenHABWidgetControl openHABWidgetControl) {
+        this("New Rule", openHABWidgetControl);
     }
 
-    public Rule(String name, IOpenHABWidgetControl widgetControl) {
-        if(widgetControl == null) throw new IllegalArgumentException("widgetControl is null");
-
+    public Rule(String name, IOpenHABWidgetControl openHABWidgetControl) {
         setName(name);
-        mOpenHABWidgetControl = widgetControl;
+        mOpenHABWidgetControl = openHABWidgetControl;
         mActions = new ArrayList<RuleAction>();
         mRuleOperationDataSourceIdMap = new HashMap<String, RuleOperation>();
     }

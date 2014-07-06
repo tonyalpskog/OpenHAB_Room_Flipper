@@ -28,14 +28,12 @@ import javax.inject.Inject;
  */
 public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
-    private final IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     @Inject
-    public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
+    public OpenHABWidgetControl(Context context) {
         if(context == null) throw new IllegalArgumentException("context is null");
-        if(widgetProvider == null) throw new IllegalArgumentException("widgetProvider is null");
         mContext = context;
-        mWidgetProvider = widgetProvider;
         mAsyncHttpClient = new MyAsyncHttpClient(context);
     }
 

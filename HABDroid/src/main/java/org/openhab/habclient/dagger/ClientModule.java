@@ -9,6 +9,7 @@ import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.command.ICommandColorProvider;
 import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.RuleProvider;
@@ -84,6 +85,7 @@ injects = {
         UnitContainerView.class, //TODO: create adapter for this instead
         RuleOperandDialogFragment.class,
         SpeechService.class,
+        Rule.class,
         WearCommandHost.class
 })
 public class ClientModule {

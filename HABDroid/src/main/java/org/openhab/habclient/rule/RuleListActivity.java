@@ -53,8 +53,10 @@ public class RuleListActivity extends ListActivity {
         super.onListItemClick(l, v, position, id);
         Rule itemValue = (Rule) l.getItemAtPosition(position);
 
-        Intent i = new Intent(this, RuleEditActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, RuleEditActivity.class);
+        intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
+        intent.putExtra(Rule.ARG_RULE_ID, itemValue.getRuleId());
+        startActivity(intent);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
@@ -41,10 +42,11 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private RuleActivityMode mRuleActivityMode;
     private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
     private RuleActionDialogFragment.RuleActionBuildListener mRuleActionBuildListener;
-    @Inject IOpenHABWidgetControl mWidgetControl;
     private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
     private RuleOperation mOperationUnderConstruction;
+
+    @Inject IOpenHABWidgetControl mWidgetControl;
     @Inject IRuleProvider mRuleProvider;
 
     @Override
@@ -54,20 +56,14 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
 
         InjectUtils.inject(this);
 
-        if(mRule == null) {
-            mRule = new Rule(mWidgetControl);
-            mRule.setName("Initial rule name");
-            mRule.setEnabled(true);
-        }
-
         String userId = getIntent().getExtras().getString(User.ARG_USER_ID);
         String ruleId = getIntent().getExtras().getString(Rule.ARG_RULE_ID);
-        mRule = mRuleProvider.getUserRule(userId, ruleId);
-        final Bundle args = getArguments();
-        if(args == null)
-            return;
 
-        mOpenHABItemName = args.getString(ARG_OPEN_HAB_ITEM_NAME);
+        mRule = mRuleProvider.getUserRule(userId, ruleId);
+        if(mRule == null) {
+            mRule = mRuleProvider.createNewRule(userId, AccessModifier.ReadOnly ,"Initial rule name");
+            mRule.setEnabled(true);
+        }
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();

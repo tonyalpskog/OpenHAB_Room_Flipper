@@ -1,6 +1,8 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.user.AccessModifier;
+import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import javax.inject.Inject;
 public class RuleProvider implements IRuleProvider {
     Map<String, List<Rule>> mUserRules;
     Map<AccessModifier, List<Rule>> mRulesAccessMap;
+
+    @Inject IOpenHABWidgetControl mOpenHABWidgetControl;
 
     @Inject
     public RuleProvider() {
@@ -31,12 +35,15 @@ public class RuleProvider implements IRuleProvider {
     public Rule getUserRule(String userId, String ruleId) {
         if(ruleId == null || userId == null)
             return null;
-
         List<Rule> ruleList = getUserRules(userId);
+        if(ruleList == null)
+            return null;
         for(Rule rule : ruleList) {
             if(ruleId.endsWith(rule.getRuleId().toString()))
                 return rule;
         }
+
+        return null;
     }
 
     @Override
@@ -49,15 +56,33 @@ public class RuleProvider implements IRuleProvider {
 
     @Override
     public void saveRule(Rule rule, String userId) {
+        if(mUserRules.get(userId) == null)
+            mUserRules.put(userId, new ArrayList<Rule>());
+        if(mRulesAccessMap.get(rule.getAccess()) == null)
+            mRulesAccessMap.put(rule.getAccess(), new ArrayList<Rule>());
+
         for(AccessModifier accessModifier : AccessModifier.values()) {
-            if (mUserRules.get(userId).contains(rule))
+            if (mUserRules.get(userId) != null && mUserRules.get(userId).contains(rule))
                 mUserRules.get(userId).remove(rule);
-            if(mRulesAccessMap.get(accessModifier).contains(rule))
+            if(mRulesAccessMap.get(accessModifier) != null && mRulesAccessMap.get(accessModifier).contains(rule))
                 mRulesAccessMap.get(accessModifier).remove(rule);
             break;
         }
+
         mUserRules.get(userId).add(rule);
         mRulesAccessMap.get(rule.getAccess()).add(rule);
+    }
+
+    @Override
+    public Rule createNewRule(String userId, AccessModifier accessModifier, String ruleName) {
+        if(StringHandler.isNullOrEmpty(userId))
+            throw new IllegalArgumentException("userId is null or empty");
+        String name = StringHandler.isNullOrEmpty(ruleName)? "New rule" : ruleName;
+        Rule rule = new Rule(ruleName, mOpenHABWidgetControl);
+        if(accessModifier != null)
+            rule.setAccess(accessModifier);
+        saveRule(rule, userId);
+        return rule;
     }
 }
 

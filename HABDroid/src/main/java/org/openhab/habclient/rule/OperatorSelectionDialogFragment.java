@@ -31,8 +31,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
     private Map<String, RuleOperator<?>> mOperatorMap;
     private String mOpenHABItemName;
-    @Inject
-    IRuleOperationProvider mRuleOperationProvider;
+    @Inject IRuleOperationProvider mRuleOperationProvider;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
