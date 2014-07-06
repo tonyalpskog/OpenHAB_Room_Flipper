@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.inject.Inject;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -27,15 +25,16 @@ public class Rule implements OnOperandValueChangedListener {
     protected AccessModifier mAccessModifier;
     protected UUID mRuleId;
 
-    @Inject IOpenHABWidgetControl mOpenHABWidgetControl;
-    @Inject IWearCommandHost mWearCommandHost;
+    private final IOpenHABWidgetControl mOpenHABWidgetControl;
+    private final IWearCommandHost mWearCommandHost;
 
-    @Inject
-    public Rule() {
-        this("New Rule");
+    public Rule(IOpenHABWidgetControl widgetControl, IWearCommandHost wearCommandHost) {
+        this("New Rule", widgetControl, wearCommandHost);
     }
 
-    public Rule(String name) {
+    public Rule(String name, IOpenHABWidgetControl widgetControl, IWearCommandHost wearCommandHost) {
+        mOpenHABWidgetControl = widgetControl;
+        mWearCommandHost = wearCommandHost;
         setRuleId(UUID.randomUUID());
         setName(name);
         mActions = new ArrayList<RuleAction>();
