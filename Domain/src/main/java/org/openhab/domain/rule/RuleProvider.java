@@ -18,8 +18,6 @@ public class RuleProvider implements IRuleProvider {
     Map<String, List<Rule>> mUserRules;
     Map<AccessModifier, List<Rule>> mRulesAccessMap;
 
-    @Inject IOpenHABWidgetControl mOpenHABWidgetControl;
-
     @Inject
     public RuleProvider() {
         mUserRules = new HashMap<String,List<Rule>>();
@@ -78,7 +76,7 @@ public class RuleProvider implements IRuleProvider {
         if(StringHandler.isNullOrEmpty(userId))
             throw new IllegalArgumentException("userId is null or empty");
         String name = StringHandler.isNullOrEmpty(ruleName)? "New rule" : ruleName;
-        Rule rule = new Rule(ruleName, mOpenHABWidgetControl);
+        Rule rule = new Rule(ruleName);
         if(accessModifier != null)
             rule.setAccess(accessModifier);
         saveRule(rule, userId);

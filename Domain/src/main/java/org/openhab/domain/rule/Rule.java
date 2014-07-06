@@ -27,17 +27,17 @@ public class Rule implements OnOperandValueChangedListener {
     protected AccessModifier mAccessModifier;
     protected UUID mRuleId;
 
-    private IOpenHABWidgetControl mOpenHABWidgetControl;
+    @Inject IOpenHABWidgetControl mOpenHABWidgetControl;
     @Inject IWearCommandHost mWearCommandHost;
 
-    public Rule(IOpenHABWidgetControl openHABWidgetControl) {
-        this("New Rule", openHABWidgetControl);
+    @Inject
+    public Rule() {
+        this("New Rule");
     }
 
-    public Rule(String name, IOpenHABWidgetControl openHABWidgetControl) {
+    public Rule(String name) {
         setRuleId(UUID.randomUUID());
         setName(name);
-        mOpenHABWidgetControl = openHABWidgetControl;
         mActions = new ArrayList<RuleAction>();
         mRuleOperationDataSourceIdMap = new HashMap<String, RuleOperation>();
     }
