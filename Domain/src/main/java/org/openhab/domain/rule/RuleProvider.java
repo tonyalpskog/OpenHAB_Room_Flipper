@@ -13,23 +13,30 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class RuleProvider implements IRuleProvider {
-    Map<String, Map<AccessModifier, List<Rule>>> mUserRules;
+    Map<String, List<Rule>> mUserRules;
     Map<AccessModifier, List<Rule>> mRulesAccessMap;
 
     @Inject
     public RuleProvider() {
-        mUserRules = new HashMap<String, Map<AccessModifier, List<Rule>>>();
+        mUserRules = new HashMap<String,List<Rule>>();
         mRulesAccessMap = new HashMap<AccessModifier, List<Rule>>();
     }
 
     @Override
     public List<Rule> getUserRules(String userId) {
-        List<Rule> result = new ArrayList<Rule>();
-        if(mUserRules.get(userId) == null) return result;
-        result.addAll(mUserRules.get(userId).get(AccessModifier.Private));
-        result.addAll(mUserRules.get(userId).get(AccessModifier.ReadOnly));
-        result.addAll(mUserRules.get(userId).get(AccessModifier.Writable));
-        return result;
+        return mUserRules.get(userId);
+    }
+
+    @Override
+    public Rule getUserRule(String userId, String ruleId) {
+        if(ruleId == null || userId == null)
+            return null;
+
+        List<Rule> ruleList = getUserRules(userId);
+        for(Rule rule : ruleList) {
+            if(ruleId.endsWith(rule.getRuleId().toString()))
+                return rule;
+        }
     }
 
     @Override
@@ -43,13 +50,13 @@ public class RuleProvider implements IRuleProvider {
     @Override
     public void saveRule(Rule rule, String userId) {
         for(AccessModifier accessModifier : AccessModifier.values()) {
-            if (mUserRules.get(userId).get(accessModifier).contains(rule))
-                mUserRules.get(userId).get(accessModifier).remove(rule);
+            if (mUserRules.get(userId).contains(rule))
+                mUserRules.get(userId).remove(rule);
             if(mRulesAccessMap.get(accessModifier).contains(rule))
                 mRulesAccessMap.get(accessModifier).remove(rule);
             break;
         }
-        mUserRules.get(userId).get(rule.getAccess()).add(rule);
+        mUserRules.get(userId).add(rule);
         mRulesAccessMap.get(rule.getAccess()).add(rule);
     }
 }

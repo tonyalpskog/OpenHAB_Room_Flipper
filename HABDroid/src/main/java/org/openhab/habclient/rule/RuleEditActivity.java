@@ -15,10 +15,12 @@ import android.view.MenuItem;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
+import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.domain.user.User;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 
@@ -43,6 +45,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
     private RuleOperation mOperationUnderConstruction;
+    @Inject IRuleProvider mRuleProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,15 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
             mRule.setName("Initial rule name");
             mRule.setEnabled(true);
         }
+
+        String userId = getIntent().getExtras().getString(User.ARG_USER_ID);
+        String ruleId = getIntent().getExtras().getString(Rule.ARG_RULE_ID);
+        mRule = mRuleProvider.getUserRule(userId, ruleId);
+        final Bundle args = getArguments();
+        if(args == null)
+            return;
+
+        mOpenHABItemName = args.getString(ARG_OPEN_HAB_ITEM_NAME);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();

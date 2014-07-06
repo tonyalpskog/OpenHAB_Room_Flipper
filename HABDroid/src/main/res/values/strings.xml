@@ -130,4 +130,7 @@
     <string name="action_edit_operation_member">Edit operation</string>
     <string name="speech_navigate_rooms">Room name</string>
     <string name="title_activity_rule_list">RuleListActivity</string>
+    <string name="action_delete_rule">Remove rule</string>
+    <string name="action_edit_rule">Edit rule</string>
+    <string name="action_add_rule">Add rule</string>
 </resources>

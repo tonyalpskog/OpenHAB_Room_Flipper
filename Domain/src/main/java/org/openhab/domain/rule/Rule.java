@@ -17,6 +17,8 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class Rule implements OnOperandValueChangedListener {
+    public final static String ARG_RULE_ID = "Rule ID";
+
     private String mName;
     protected RuleOperation mRuleOperation;
     protected Map<String, RuleOperation> mRuleOperationDataSourceIdMap;
