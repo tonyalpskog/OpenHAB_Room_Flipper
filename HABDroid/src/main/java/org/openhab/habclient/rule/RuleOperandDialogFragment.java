@@ -245,10 +245,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                     if (mEditNewOperation.getText().length() > 0) {
                         operand = new RuleOperation(mEditNewOperation.getText().toString());
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
-                    } else if (mEditStaticValue.getVisibility() == View.VISIBLE) {
+                    } else if (mEditStaticValue.getVisibility() == View.VISIBLE && mEditStaticValue.getText().length() > 0) {
                         ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()));
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
-                    } else if (mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION) {
+                    } else if (mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION) {//TODO - TA: Fix this shit.
                         Map<String, ?> staticValuesCompatibleWithFirstOperand = RuleOperation.getStaticEntityDataType(null).getStaticValues();
                         operand = RuleOperation.getStaticEntityDataType(mSpinnerValue.getSelectedItemPosition() > 0 ? mSpinnerValue.getSelectedItem().toString() : null);
                         resultingSelectionType = RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
