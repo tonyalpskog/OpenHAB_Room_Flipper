@@ -22,6 +22,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.RuleAction;
@@ -52,10 +53,12 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private TextWatcher mTextChangedListener;
 
     private RuleActionBuildListener mActionListener;
-    private RuleOperandDialogFragment.RuleOperationBuildListener mOperationListener;
+    private UnitEntityDataTypeProvider.RuleOperationBuildListener mOperationListener;
     private RuleAction mAction;
     private int mPosition;
+
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject IAdapterProvider mAdapterProvider;
 
     protected static final String ARG_POSITION = "mPosition";
 
@@ -188,7 +191,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             //Set visibility
             mButtonTargetUnit.setVisibility(View.VISIBLE);
             mTextTargetUnit.setVisibility(View.VISIBLE);
-            mSpinnerValue.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) || AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider) == null? View.GONE : View.VISIBLE) : View.VISIBLE);
+            mSpinnerValue.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()) || mAdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName()) == null? View.GONE : View.VISIBLE) : View.VISIBLE);
             mButtonSourceUnit.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName())? View.GONE : View.VISIBLE) : View.VISIBLE);
             mTextSourceUnit.setVisibility(mAction.getValueType() == RuleActionValueType.NA? (StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName())? View.GONE : View.VISIBLE) : View.VISIBLE);
             mTextValueLabel.setVisibility(mAction.getValueType() == RuleActionValueType.TEXT? View.VISIBLE: View.GONE);
@@ -197,11 +200,11 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             //Set content
             if(StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName()))
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
-            else if(AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider) == null) {
+            else if(mAdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName()) == null) {
                 mSpinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, new String[]{getString(R.string.no_value)});
                 mSpinnerValue.setVisibility(View.GONE);
             } else
-                mSpinnerAdapter = AdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName(), mWidgetProvider);
+                mSpinnerAdapter = mAdapterProvider.getStaticUnitValueAdapter(getActivity(), mAction.getTargetOpenHABItemName());
             
             mSpinnerValue.setAdapter(mSpinnerAdapter);
 

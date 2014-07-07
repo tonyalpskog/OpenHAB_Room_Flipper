@@ -5,11 +5,12 @@ import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.PopularNameProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.command.ICommandColorProvider;
 import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.rule.IRuleOperationProvider;
-import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleOperationProvider;
 import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.RuleProvider;
@@ -44,6 +45,8 @@ import org.openhab.domain.command.CommandAnalyzer;
 import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.command.CommandColorProvider;
 import org.openhab.habclient.command.CommandPhrasesProvider;
+import org.openhab.habclient.rule.AdapterProvider;
+import org.openhab.habclient.rule.IAdapterProvider;
 import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
@@ -85,7 +88,7 @@ injects = {
         UnitContainerView.class, //TODO: create adapter for this instead
         RuleOperandDialogFragment.class,
         SpeechService.class,
-        Rule.class,
+        AdapterProvider.class,
         WearCommandHost.class
 })
 public class ClientModule {
@@ -184,4 +187,10 @@ public class ClientModule {
 
     @Provides @Singleton
     public IWearCommandHost provideWearCommandHost(WearCommandHost wearCommandHost) { return wearCommandHost; }
+
+    @Provides @Singleton
+    public IUnitEntityDataTypeProvider provideUnitEntityDataTypeProvider(UnitEntityDataTypeProvider provider) { return provider; }
+
+    @Provides @Singleton
+    public IAdapterProvider provideAdapterProvider(AdapterProvider provider) { return provider; }
 }

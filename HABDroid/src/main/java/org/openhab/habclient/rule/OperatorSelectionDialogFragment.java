@@ -5,11 +5,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperatorType;
-import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
@@ -33,6 +34,8 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     private String mOpenHABItemName;
     @Inject IRuleOperationProvider mRuleOperationProvider;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject
+    IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
                                                               EntityDataTypeSource sourceType,
@@ -67,7 +70,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
         mOpenHABItemName = args.getString(ARG_OPEN_HAB_ITEM_NAME);
         EntityDataTypeSource sourceType = EntityDataTypeSource.valueOf(args.getString(ARG_SOURCE_TYPE));
-        mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
+        mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
     }
 
     public Map<String, RuleOperator<?>> getRuleOperatorMap(Class operandClassType) {
@@ -78,7 +81,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
         return operatorNameHash;
     }
 
-    private RuleOperandDialogFragment.RuleOperationBuildListener getListener() {
+    private UnitEntityDataTypeProvider.RuleOperationBuildListener getListener() {
         return ((RuleEditActivity)getActivity()).getRuleOperationBuildListener();
     }
 
@@ -88,15 +91,15 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
             case DialogInterface.BUTTON_POSITIVE:
             case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
-                    getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
-                            , which == DialogInterface.BUTTON_POSITIVE? RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
+                    getListener().onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
+                            , which == DialogInterface.BUTTON_POSITIVE? UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
                             , null, 0, mOperatorMap.get(mSelectedString));
                 }
                 break;
             default:
                 if(getListener() != null) {
-                    getListener().onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
-                            , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                    getListener().onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
+                            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
                 }
                 break;

@@ -5,6 +5,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationProvider;
@@ -18,12 +19,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class AdapterProvider {
-    public static List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue, IRuleOperationProvider ruleOperationProvider) {
-        Set<RuleOperatorType> ruleOperatorTypes = ruleOperationProvider.getRuleOperatorTypes(operand.getDataType());
+@Singleton
+public class AdapterProvider implements IAdapterProvider {
+    @Inject IRuleOperationProvider mRuleOperationProvider;
+    @Inject IOpenHABWidgetProvider mOpenHABWidgetProvider;
+    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+
+    @Inject
+    public AdapterProvider() {
+    }
+
+    @Override
+    public List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue) {
+        Set<RuleOperatorType> ruleOperatorTypes = mRuleOperationProvider.getRuleOperatorTypes(operand.getDataType());
         List<String> adapterList = new ArrayList<String>();
         if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
         for(RuleOperatorType operatorType : ruleOperatorTypes)
@@ -31,13 +45,15 @@ public class AdapterProvider {
         return adapterList;
     }
 
-    public static BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName, IOpenHABWidgetProvider widgetProvider) {
-        OpenHABWidget openHABWidget = widgetProvider.getWidgetByItemName(openHABItemName);
+    @Override
+    public BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName) {
+        OpenHABWidget openHABWidget = mOpenHABWidgetProvider.getWidgetByItemName(openHABItemName);
         return getStaticUnitValueAdapter(context, openHABWidget);
     }
 
-    public static BaseAdapter getStaticUnitValueAdapter(Context context, OpenHABWidget openHABWidget) {
-        UnitEntityDataType unitEntityDataType = UnitEntityDataType.getUnitEntityDataType(openHABWidget);
+    @Override
+    public BaseAdapter getStaticUnitValueAdapter(Context context, OpenHABWidget openHABWidget) {
+        UnitEntityDataType unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(openHABWidget);
         Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
         if(staticValueHash == null)
             return null;
@@ -47,7 +63,8 @@ public class AdapterProvider {
         return new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, toList);
     }
 
-    public static BaseAdapter getStaticOperationValueAdapter(Context context, boolean includeNonSelectionValue) {
+    @Override
+    public BaseAdapter getStaticOperationValueAdapter(Context context, boolean includeNonSelectionValue) {
         RuleOperation staticOperation = RuleOperation.getStaticEntityDataType(null);
         Map<String, ?> staticValueHash = staticOperation.getStaticValues();
         if(staticValueHash == null)

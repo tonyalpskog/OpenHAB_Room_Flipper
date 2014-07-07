@@ -65,8 +65,14 @@ public class Rule implements OnOperandValueChangedListener {
 
     @Override
     public String toString() {
+        if(mRuleOperation == null)
+            return "<Missing operation>";//TODO - TA: Language independent
+
         StringBuilder result = new StringBuilder();
-        result.append("[" + mRuleOperation.getFormattedString() + "]  ");
+        if(!mRuleOperation.isValid())
+            result.append("<Invalid operation> ");//TODO - TA: Language independent
+        else
+            result.append("[" + mRuleOperation.getFormattedString() + "]  ");
         if(!StringHandler.isNullOrEmpty(getName())) {
             result.append(getName());
         } else {

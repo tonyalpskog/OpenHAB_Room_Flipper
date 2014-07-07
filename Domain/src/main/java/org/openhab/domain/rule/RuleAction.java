@@ -1,6 +1,7 @@
 package org.openhab.domain.rule;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.StringHandler;
@@ -15,21 +16,18 @@ public class RuleAction {
     protected String mTargetOpenHABItemName;
     protected String mSourceOpenHABItemName;
     protected RuleActionType mActionType;
-    private final IOpenHABWidgetProvider widgetProvider;
     protected String mStaticValue;
     protected String mTextValue;
     protected String mID;
 
-    public RuleAction(RuleActionType mActionType, IOpenHABWidgetProvider widgetProvider, String id) {
-        this.mActionType = mActionType;
-        this.widgetProvider = widgetProvider;
-        mID = UUID.randomUUID().toString();
-    }
+    private final IOpenHABWidgetProvider widgetProvider;
+    private final IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
 
-    public RuleAction(RuleActionType mActionType, IOpenHABWidgetProvider widgetProvider) {
+    public RuleAction(RuleActionType mActionType, IOpenHABWidgetProvider widgetProvider, IUnitEntityDataTypeProvider IUnitEntityDataTypeProvider) {
         this.mActionType = mActionType;
         this.widgetProvider = widgetProvider;
         mID = UUID.randomUUID().toString();
+        mIUnitEntityDataTypeProvider = IUnitEntityDataTypeProvider;
     }
 
     public boolean validate() {
@@ -46,7 +44,7 @@ public class RuleAction {
             }
             //Check if target getUnitEntityDataType has getStaticValues() that match mStaticValue if it´s not null.
             if(!StringHandler.isNullOrEmpty(mStaticValue)) {
-                UnitEntityDataType unitEntityDataType = UnitEntityDataType.getUnitEntityDataType(targetWidget);
+                UnitEntityDataType unitEntityDataType = mIUnitEntityDataTypeProvider.getUnitEntityDataType(targetWidget);
                 Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
                 if(staticValueHash == null || !staticValueHash.containsKey(mStaticValue))
                     mStaticValue = null;

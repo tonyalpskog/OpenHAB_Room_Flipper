@@ -3,11 +3,14 @@ package org.openhab.habclient.rule;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
-import org.openhab.domain.rule.UnitEntityDataType;
+import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
@@ -22,9 +25,12 @@ import javax.inject.Inject;
 public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFragment {
     private static final String ARG_POSITION = "position";
 
-    @Inject IOpenHABWidgetProvider mWidgetProvider;
     private int mOperandIndex;
-    private RuleOperandDialogFragment.RuleOperationBuildListener mListener;
+    private UnitEntityDataTypeProvider.RuleOperationBuildListener mListener;
+
+    @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject
+    IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
 
     public static UnitOperandSelectionDialogFragment newInstance(List<String> source,
                                                               String dialogTitle,
@@ -67,14 +73,18 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                 case DialogInterface.BUTTON_NEUTRAL:
+                    if(StringHandler.isNullOrEmpty(mSelectedString)) {
+                        Toast.makeText(getActivity(), "No selection", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                     final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
-                    final IEntityDataType entityDataType = UnitEntityDataType.getUnitEntityDataType(widget);
-                    final RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
-                    mListener.onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
+                    final IEntityDataType entityDataType = mIUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
+                    final UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
+                    mListener.onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
-                            , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                    mListener.onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
+                            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
                     break;
             }

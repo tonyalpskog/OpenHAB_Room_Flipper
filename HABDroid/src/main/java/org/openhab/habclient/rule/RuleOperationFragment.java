@@ -19,8 +19,11 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
@@ -30,7 +33,6 @@ import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.RuleTreeItem;
-import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class RuleOperationFragment extends Fragment implements RuleOperandDialogFragment.RuleOperationBuildListener {
+public class RuleOperationFragment extends Fragment implements UnitEntityDataTypeProvider.RuleOperationBuildListener {
     private final String TAG = "RuleOperationFragment";
 
     private ExpandableMultiLevelGroupAdapter mTreeListAdapter;
@@ -48,6 +50,8 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     private RuleOperation mOperationUnderConstruction;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IRuleOperationProvider mRuleOperationProvider;
+    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    @Inject IAdapterProvider mAdapterProvider;
 
     public static RuleOperationFragment newInstance() {
         return new RuleOperationFragment();
@@ -273,7 +277,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 break;
             case R.id.action_delete_rule_operation_member:
                 //TODO - TA: Implement this.
-                Toast.makeText(getActivity(), "Not implemented.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not implemented", Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
@@ -306,28 +310,37 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
     }
 
     @Override
-    public void onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
-            , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
+    public void onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
+            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
             , int operandPosition, RuleOperator ruleOperator) {
-        if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
+        if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
             if(mOperationUnderConstruction != null)
                 mOperationUnderConstruction.setActive(true);
             return;
         }
 
         switch(ruleOperationSelectionInterface) {
+            case NA:
+                break;
             case UNIT:
                 if (getSelectedTreeItem() != null) {
-                    RuleOperation selectedOperation = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(operand.getDataSourceId());
-                    selectedOperation.setOperand(operandPosition, operand);
+                    //Edit selected operation
+                    mOperationUnderConstruction = ((RuleEditActivity)getActivity()).getOperationByOperandSourceId(operand.getDataSourceId());
                 } else {
+                    //Create new operation
                     if(mOperationUnderConstruction == null)
                         mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
-                    mOperationUnderConstruction.setOperand(operandPosition, operand);
-                    if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
-                        openNewDialogAfterOperandSelection(operandPosition, operand);
-//                    addTreeItem(Integer.valueOf(mTreeData.size()), operand.getRuleTreeItem(mTreeData.size()));
                 }
+
+                IEntityDataType oldOperand = mOperationUnderConstruction.getOperand(operandPosition);
+                if(oldOperand != null && oldOperand.getSourceType() == EntityDataTypeSource.UNIT)
+                    mWidgetProvider.removeItemListener((UnitEntityDataType)oldOperand);
+                mOperationUnderConstruction.setOperand(operandPosition, operand);
+                mWidgetProvider.addItemListener((UnitEntityDataType) operand);
+
+                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                    openNewDialogAfterOperandSelection(operandPosition, operand);
+
                 break;
             case NEW_OPERATION:
             case OLD_OPERATION:
@@ -335,7 +348,7 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                 if(mOperationUnderConstruction == null)
                     mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
                 mOperationUnderConstruction.setOperand(operandPosition, operand);
-                if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
                     openNewDialogAfterOperandSelection(operandPosition, operand);
                 break;
             case OPERATOR:
@@ -346,14 +359,14 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
                     currentOperation = mOperationUnderConstruction;
                 }
                 currentOperation.setRuleOperator(ruleOperator);
-                if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT) {
+                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT) {
                     openOperationBuilderDialog(operandPosition + 1, mSelectedTreeItem);
                     return;
                 }
                 break;
         }
 
-        if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
+        if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
             ((RuleEditActivity)getActivity()).getRule().setRuleOperation(mOperationUnderConstruction);
             mOperationUnderConstruction.setActive(true);
             mOperationUnderConstruction.runCalculation();
@@ -363,10 +376,9 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
 
     private void openNewDialogAfterOperandSelection(int previousOperandPosition, IEntityDataType operand) {
         if(previousOperandPosition == 0) {
-            final List<String> operatorList = AdapterProvider.getRuleOperatorList(getActivity(),
+            final List<String> operatorList = mAdapterProvider.getRuleOperatorList(getActivity(),
                     operand,
-                    false,
-                    mRuleOperationProvider);
+                    false);
             final OperatorSelectionDialogFragment dialogFragment = OperatorSelectionDialogFragment.newInstance(operand.getDataSourceId(),
                     operand.getSourceType(),
                     "Select an operator",
@@ -409,7 +421,11 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
             ((RuleEditActivity)getActivity()).setOperandToEdit(mOperationUnderConstruction.getOperand(operandPosition));
             final RuleOperandDialogFragment dialogFragment = RuleOperandDialogFragment.newInstance(
                     operandPosition != -1 ? operandPosition : 0
-                    , operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations()));
+                    , operandPosition < 1
+                            || (operandPosition > 1 && (mOperationUnderConstruction.getRuleOperator() != null
+                                && mOperationUnderConstruction.getRuleOperator().supportsMultipleOperations())
+                    )
+            );
             dialogFragment.show(getFragmentManager(), "Operation_Builder_Tag");
         } else if (rti.getItemType() == RuleTreeItem.ItemType.OPERATOR) {
             //TODO - TA: open an operator selection dialog.
@@ -518,14 +534,14 @@ public class RuleOperationFragment extends Fragment implements RuleOperandDialog
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_1")));
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Corridor_1")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_1")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Corridor_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//"demo_1_0"
-                operands.add(UnitEntityDataType.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//ekafallettest_1
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//"demo_1_0"
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//ekafallettest_1
                 break;
         }
 

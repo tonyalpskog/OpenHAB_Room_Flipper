@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
 import org.openhab.domain.rule.IRuleProvider;
@@ -40,7 +41,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private ViewPager mViewPager;
     private Rule mRule;
     private RuleActivityMode mRuleActivityMode;
-    private RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener;
+    private UnitEntityDataTypeProvider.RuleOperationBuildListener mRuleOperationBuildListener;
     private RuleActionDialogFragment.RuleActionBuildListener mRuleActionBuildListener;
     private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
@@ -126,7 +127,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         mViewPager.setCurrentItem(tab.getPosition());
             mRuleActivityMode = tab.getPosition() == 0? RuleActivityMode.OPERATION_EDITOR : RuleActivityMode.ACTION_LIST;
-        setRuleOperationBuildListener((RuleOperandDialogFragment.RuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
+        setRuleOperationBuildListener((UnitEntityDataTypeProvider.RuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
     }
 
     @Override
@@ -174,12 +175,12 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         return entityMap.get(dataSourceId);
     }
 
-    public RuleOperandDialogFragment.RuleOperationBuildListener getRuleOperationBuildListener() {
+    public UnitEntityDataTypeProvider.RuleOperationBuildListener getRuleOperationBuildListener() {
         return mRuleOperationBuildListener;
     }
 
-    public void setRuleOperationBuildListener(RuleOperandDialogFragment.RuleOperationBuildListener mRuleOperationBuildListener) {
-        this.mRuleOperationBuildListener = mRuleOperationBuildListener;
+    public void setRuleOperationBuildListener(UnitEntityDataTypeProvider.RuleOperationBuildListener ruleOperationBuildListener) {
+        this.mRuleOperationBuildListener = ruleOperationBuildListener;
     }
 
     public void setActionUnderConstruction(RuleAction action) {

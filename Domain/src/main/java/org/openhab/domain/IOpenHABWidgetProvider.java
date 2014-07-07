@@ -6,6 +6,8 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.UnitEntityDataType;
 
 import java.util.List;
 import java.util.Set;
@@ -31,4 +33,8 @@ public interface IOpenHABWidgetProvider {
     List<String> getItemNamesByType(OpenHABItemType type);
 
     List<OpenHABWidget> getListOfWidgetsFromListOfRooms(List<Room> listOfRooms);
+
+    void addItemListener(UnitEntityDataType listener);
+
+    void removeItemListener(UnitEntityDataType listener);
 }

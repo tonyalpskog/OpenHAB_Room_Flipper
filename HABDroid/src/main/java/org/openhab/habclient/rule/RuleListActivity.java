@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -82,11 +83,15 @@ public class RuleListActivity extends ListActivity {
 //                startActivityForResult(intent, RULE_REQUEST_CODE);
                 break;
             case R.id.action_edit_rule:
-                intent = new Intent(this, RuleEditActivity.class);
-                intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
-                intent.putExtra(Rule.ARG_RULE_ID, getSelectedItemId());
-                startActivity(intent);
+                if(getSelectedItemId() == AdapterView.INVALID_ROW_ID)
+                    Toast.makeText(this, "No selected rule", Toast.LENGTH_SHORT).show();
+                else {
+                    intent = new Intent(this, RuleEditActivity.class);
+                    intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
+                    intent.putExtra(Rule.ARG_RULE_ID, getSelectedItemId());
+                    startActivity(intent);
 //                startActivityForResult(intent, RULE_REQUEST_CODE);
+                }
                 break;
             case R.id.action_delete_rule:
                 //TODO - TA: Implement this.

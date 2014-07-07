@@ -6,6 +6,7 @@ import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,8 +135,18 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
         boolean isRuleAndUseGeneratedString = getIsRuleAndUseGeneratedString(mLeftOperand);
         String format = isRuleAndUseGeneratedString? "(%s)%s" : "%s%s";
 
+        String rightOperandString;
+        if(getRuleOperator() == null)
+            rightOperandString = " " + RuleOperator.MISSING_OPERATOR;
+        else {
+            try {
+                rightOperandString = getRuleOperator().getType().getFormattedString(operandsAsStringArray);
+            } catch(IllegalArgumentException ex) {
+                rightOperandString = " " + getRuleOperator().getName() + " <Missing operand(s)>";//TODO - TA: Language independent
+            }
+        }
         return String.format(format, mLeftOperand == null? RuleOperatorType.MISSING_OPERAND : mLeftOperand.toString()
-                , getRuleOperator() == null? " " + RuleOperator.MISSING_OPERATOR : getRuleOperator().getType().getFormattedString(operandsAsStringArray));
+                , rightOperandString);
     }
 
     public String toString(boolean addResultAsPrefix, boolean addResultAsPostfix) {
@@ -156,8 +167,23 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
         return operand == null? false : operand.getSourceType() == EntityDataTypeSource.OPERATION && StringHandler.isNullOrEmpty(operand.getName());
     }
 
+    public boolean isValid() {
+        if(mRuleOperator == null)
+            return false;
+
+        if(mOperands.size() < mRuleOperator.getType().getMinimumNumberOfSupportedOperationArgs()
+                || mOperands.size() > mRuleOperator.getType().getMaximumNumberOfSupportedOperationArgs())
+            return false;
+
+        for(IEntityDataType operand : mOperands) {
+            if(operand. getValue() == null)
+                return false;
+        }
+
+        return true;
+    }
     public void runCalculation() {
-        if(!isActive()) return;
+        if(!isActive() || !isValid()) return;
 
         LogicBoolean oldValue = mValue;
 

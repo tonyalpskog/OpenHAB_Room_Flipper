@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.IUnitEntityDataTypeProvider;
+import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
@@ -30,7 +32,7 @@ import org.openhab.domain.rule.operators.RuleOperator;
 
 import javax.inject.Inject;
 
-public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, RuleOperandDialogFragment.RuleOperationBuildListener {
+public class RuleActionFragment extends Fragment implements RuleActionDialogFragment.RuleActionBuildListener, UnitEntityDataTypeProvider.RuleOperationBuildListener {
 
     private final String TAG = "RuleActionFragment";
     private ListView mListView;
@@ -39,6 +41,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     private RuleAction mActionUnderConstruction;
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject
+    IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
 
     public static RuleActionFragment newInstance() {
         return new RuleActionFragment();
@@ -204,7 +208,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         if(mSelectedActionPosition > -1)
             mActionUnderConstruction = mListAdapter.getItem(mSelectedActionPosition);
         else
-            mActionUnderConstruction = new RuleAction(actionType, mWidgetProvider);
+            mActionUnderConstruction = new RuleAction(actionType, mWidgetProvider, mIUnitEntityDataTypeProvider);
 
         if (mActionUnderConstruction == null ) {
             Toast.makeText(getActivity(), "Select a target item first.", Toast.LENGTH_SHORT).show();
@@ -265,14 +269,14 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     }
 
     @Override
-    public void onOperationBuildResult(RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
-            , RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
+    public void onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
+            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
             , int operandPosition, RuleOperator ruleOperator) {
-        if(ruleOperationDialogButtonInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL)
+        if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL)
             return;
 
         //THEN tab
-        if(ruleOperationSelectionInterface == RuleOperandDialogFragment.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT && mActionUnderConstruction != null) {
+        if(ruleOperationSelectionInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT && mActionUnderConstruction != null) {
             if (operandPosition == 0) {
                 mActionUnderConstruction.setTargetOpenHABItemName(operand.getName());
                 mActionUnderConstruction.validate();
