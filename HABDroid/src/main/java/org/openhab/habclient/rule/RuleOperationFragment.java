@@ -22,6 +22,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;
@@ -40,7 +41,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class RuleOperationFragment extends Fragment implements UnitEntityDataTypeProvider.RuleOperationBuildListener {
+public class RuleOperationFragment extends Fragment implements IRuleOperationBuildListener {
     private final String TAG = "RuleOperationFragment";
 
     private ExpandableMultiLevelGroupAdapter mTreeListAdapter;
@@ -310,10 +311,10 @@ public class RuleOperationFragment extends Fragment implements UnitEntityDataTyp
     }
 
     @Override
-    public void onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
-            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
+    public void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
+            , IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
             , int operandPosition, RuleOperator ruleOperator) {
-        if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
+        if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
             if(mOperationUnderConstruction != null)
                 mOperationUnderConstruction.setActive(true);
             return;
@@ -338,7 +339,7 @@ public class RuleOperationFragment extends Fragment implements UnitEntityDataTyp
                 mOperationUnderConstruction.setOperand(operandPosition, operand);
                 mWidgetProvider.addItemListener((UnitEntityDataType) operand);
 
-                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
                     openNewDialogAfterOperandSelection(operandPosition, operand);
 
                 break;
@@ -348,7 +349,7 @@ public class RuleOperationFragment extends Fragment implements UnitEntityDataTyp
                 if(mOperationUnderConstruction == null)
                     mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
                 mOperationUnderConstruction.setOperand(operandPosition, operand);
-                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
+                if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
                     openNewDialogAfterOperandSelection(operandPosition, operand);
                 break;
             case OPERATOR:
@@ -359,14 +360,14 @@ public class RuleOperationFragment extends Fragment implements UnitEntityDataTyp
                     currentOperation = mOperationUnderConstruction;
                 }
                 currentOperation.setRuleOperator(ruleOperator);
-                if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT) {
+                if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT) {
                     openOperationBuilderDialog(operandPosition + 1, mSelectedTreeItem);
                     return;
                 }
                 break;
         }
 
-        if(ruleOperationDialogButtonInterface == UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
+        if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE) {
             ((RuleEditActivity)getActivity()).getRule().setRuleOperation(mOperationUnderConstruction);
             mOperationUnderConstruction.setActive(true);
             mOperationUnderConstruction.runCalculation();

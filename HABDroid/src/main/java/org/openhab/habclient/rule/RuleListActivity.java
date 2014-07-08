@@ -51,6 +51,7 @@ public class RuleListActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+//        mListAdapter.notifyDataSetChanged();
         mListAdapter = new ArrayAdapter<Rule>(this, android.R.layout.simple_list_item_1, mRuleProvider.getUserRules(mTemporaryHardCodedUserId));
         setListAdapter(mListAdapter);
     }

@@ -10,6 +10,7 @@ import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
@@ -26,11 +27,10 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     private static final String ARG_POSITION = "position";
 
     private int mOperandIndex;
-    private UnitEntityDataTypeProvider.RuleOperationBuildListener mListener;
+    private IRuleOperationBuildListener mListener;
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject
-    IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
+    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     public static UnitOperandSelectionDialogFragment newInstance(List<String> source,
                                                               String dialogTitle,
@@ -78,13 +78,13 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
                         break;
                     }
                     final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
-                    final IEntityDataType entityDataType = mIUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
-                    final UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
-                    mListener.onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
+                    final IEntityDataType entityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
+                    final IRuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
+                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
-                            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
+                            , IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
                     break;
             }

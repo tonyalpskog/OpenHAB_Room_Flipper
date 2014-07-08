@@ -1,7 +1,7 @@
 package org.openhab.domain.wear;
 
 /**
- * Created by Tony Alpskog on 2014-07-01.
+ * Created by Tony Alpskog in 2014.
  */
 public interface IWearCommandHost {
     String EXTRA_REPLY = "Command";

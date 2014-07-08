@@ -16,6 +16,7 @@ import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleAction;
@@ -41,7 +42,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     private ViewPager mViewPager;
     private Rule mRule;
     private RuleActivityMode mRuleActivityMode;
-    private UnitEntityDataTypeProvider.RuleOperationBuildListener mRuleOperationBuildListener;
+    private IRuleOperationBuildListener mRuleOperationBuildListener;
     private RuleActionDialogFragment.RuleActionBuildListener mRuleActionBuildListener;
     private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
@@ -127,7 +128,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         mViewPager.setCurrentItem(tab.getPosition());
             mRuleActivityMode = tab.getPosition() == 0? RuleActivityMode.OPERATION_EDITOR : RuleActivityMode.ACTION_LIST;
-        setRuleOperationBuildListener((UnitEntityDataTypeProvider.RuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
+        setRuleOperationBuildListener((IRuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
     }
 
     @Override
@@ -175,11 +176,11 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         return entityMap.get(dataSourceId);
     }
 
-    public UnitEntityDataTypeProvider.RuleOperationBuildListener getRuleOperationBuildListener() {
+    public IRuleOperationBuildListener getRuleOperationBuildListener() {
         return mRuleOperationBuildListener;
     }
 
-    public void setRuleOperationBuildListener(UnitEntityDataTypeProvider.RuleOperationBuildListener ruleOperationBuildListener) {
+    public void setRuleOperationBuildListener(IRuleOperationBuildListener ruleOperationBuildListener) {
         this.mRuleOperationBuildListener = ruleOperationBuildListener;
     }
 

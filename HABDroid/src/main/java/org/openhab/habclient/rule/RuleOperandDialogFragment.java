@@ -25,6 +25,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
@@ -38,7 +39,7 @@ import javax.inject.Inject;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperandDialogFragment extends DialogFragment implements DialogInterface.OnClickListener, UnitEntityDataTypeProvider.RuleOperationBuildListener {
+public class RuleOperandDialogFragment extends DialogFragment implements DialogInterface.OnClickListener, IRuleOperationBuildListener {
     private static final String ARG_ID = "operand";
     //    protected static final String ARG_DIALOG_TITLE = "dialogTitle";
     protected static final String ARG_POSITION = "mPosition";
@@ -58,7 +59,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     private OpenHABWidget mFirstOperandWidgetIfAny;
     private IEntityDataType mLeftSideOperand;
 
-    private UnitEntityDataTypeProvider.RuleOperationBuildListener mListener;
+    private IRuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
     private int mPosition;
 
@@ -121,7 +122,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
             mSpinnerValue = (Spinner) view.findViewById(R.id.spinner_rule_operation_builder_static_value);
             mEditStaticValue = (EditText) view.findViewById(R.id.edit_rule_operation_builder_static_value);
 
-            final UnitEntityDataTypeProvider.RuleOperationBuildListener localListener = this;
+            final IRuleOperationBuildListener localListener = this;
             mButtonUnit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -247,28 +248,28 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                 case DialogInterface.BUTTON_POSITIVE://Next
                     //This code shall handle new/edited/unchanged values for EntityDataTypeSource.STATIC and EntityDataTypeSource.OPERATION selection
                     //AND unchanged EntityDataTypeSource.UNIT values.
-                    UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface resultingSelectionType;
+                    IRuleOperationBuildListener.RuleOperationSelectionInterface resultingSelectionType;
                     IEntityDataType operand = mFirstOperandWidgetIfAny != null ? mUnitEntityDataTypeProvider.getStaticEntityDataType(mFirstOperandWidgetIfAny, null) : null;
                     if (mEditNewOperation.getText().length() > 0) {
                         //User selected a new RuleOperation as an operand.
                         operand = new RuleOperation(mEditNewOperation.getText().toString());
-                        resultingSelectionType = UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
+                        resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
                     } else if (mEditStaticValue.getVisibility() == View.VISIBLE && mEditStaticValue.getText().length() > 0) {
                         //The operand is a static text vale entered by the user.
                         ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()));
-                        resultingSelectionType = UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                        resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                     } else if (mSpinnerValue.getSelectedItemPosition() > 0) {
                         //Spinner selection
                         if (mLeftSideOperand != null && mLeftSideOperand.getSourceType() == EntityDataTypeSource.OPERATION) {//TODO - TA: Fix this shit.
                             //The user has selected a static operation result (true or false).
                             Map<String, ?> staticValuesCompatibleWithFirstOperand = RuleOperation.getStaticEntityDataType(null).getStaticValues();
                             operand = RuleOperation.getStaticEntityDataType(mSpinnerValue.getSelectedItemPosition() > 0 ? mSpinnerValue.getSelectedItem().toString() : null);
-                            resultingSelectionType = UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                            resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                         } else {
                             //The user has selected a static operand value.
                             Map<String, ?> staticValuesCompatibleWithFirstOperand = mUnitEntityDataTypeProvider.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
                             ((UnitEntityDataType) operand).setValue(mSpinnerValue.getSelectedItemPosition() > 0 ? staticValuesCompatibleWithFirstOperand.get(mSpinnerValue.getSelectedItem()) : null);
-                            resultingSelectionType = UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
+                            resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                         }
                     } else {
                         //Unchanged value of any type
@@ -277,12 +278,12 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                     }
 
                     mListener.onOperationBuildResult(resultingSelectionType
-                            , which == DialogInterface.BUTTON_POSITIVE?  UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
+                            , which == DialogInterface.BUTTON_POSITIVE?  IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
                             , operand, mPosition, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION//Just a default non-used value since we are aborting.
-                            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION//Just a default non-used value since we are aborting.
+                            , IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, mPosition, null);
 
             }
@@ -290,8 +291,8 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     }
 
     @Override
-    public <T> void onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface, UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType<T> operand, int operandPosition, RuleOperator<T> ruleOperator) {
-        if(ruleOperationDialogButtonInterface != UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
+    public <T> void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface, IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType<T> operand, int operandPosition, RuleOperator<T> ruleOperator) {
+        if(ruleOperationDialogButtonInterface != IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
             mListener.onOperationBuildResult(ruleOperationSelectionInterface, ruleOperationDialogButtonInterface, operand, operandPosition, ruleOperator);
             dismiss();
         }

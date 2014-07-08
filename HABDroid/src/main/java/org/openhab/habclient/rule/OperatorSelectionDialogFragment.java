@@ -8,6 +8,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.EntityDataTypeSource;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperatorType;
@@ -34,8 +35,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     private String mOpenHABItemName;
     @Inject IRuleOperationProvider mRuleOperationProvider;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject
-    IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
+    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     public static OperatorSelectionDialogFragment newInstance(String openHABItemName,
                                                               EntityDataTypeSource sourceType,
@@ -70,7 +70,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
 
         mOpenHABItemName = args.getString(ARG_OPEN_HAB_ITEM_NAME);
         EntityDataTypeSource sourceType = EntityDataTypeSource.valueOf(args.getString(ARG_SOURCE_TYPE));
-        mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
+        mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
     }
 
     public Map<String, RuleOperator<?>> getRuleOperatorMap(Class operandClassType) {
@@ -81,7 +81,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
         return operatorNameHash;
     }
 
-    private UnitEntityDataTypeProvider.RuleOperationBuildListener getListener() {
+    private IRuleOperationBuildListener getListener() {
         return ((RuleEditActivity)getActivity()).getRuleOperationBuildListener();
     }
 
@@ -91,15 +91,15 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
             case DialogInterface.BUTTON_POSITIVE:
             case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
-                    getListener().onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
-                            , which == DialogInterface.BUTTON_POSITIVE? UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
+                    getListener().onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
+                            , which == DialogInterface.BUTTON_POSITIVE? IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE
                             , null, 0, mOperatorMap.get(mSelectedString));
                 }
                 break;
             default:
                 if(getListener() != null) {
-                    getListener().onOperationBuildResult(UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
-                            , UnitEntityDataTypeProvider.RuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
+                    getListener().onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.OPERATOR
+                            , IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
                 }
                 break;

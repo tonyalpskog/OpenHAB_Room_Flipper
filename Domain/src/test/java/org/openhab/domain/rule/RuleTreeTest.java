@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 public class RuleTreeTest {
     private IRuleOperationProvider mRop;
     private IOpenHABWidgetProvider mWidgetProvider;
-    private IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
+    private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     @Before
     public void setUp() throws Exception {
@@ -38,7 +38,7 @@ public class RuleTreeTest {
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
         mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
-        mIUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
+        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
@@ -72,14 +72,14 @@ public class RuleTreeTest {
         switch (operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Kitchen_0")));
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bath_1")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Kitchen_0")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bed_3")));
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_4")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bed_3")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_4")));
                 break;
         }
 

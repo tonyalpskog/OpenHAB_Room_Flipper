@@ -3,7 +3,7 @@ package org.openhab.domain;
 import org.openhab.domain.model.OpenHABWidget;
 
 /**
- * Created by Tony Alpskog on 2014-06-30.
+ * Created by Tony Alpskog in 2014.
  */
 public interface IRestCommunication {
     void requestOpenHABSitemap(OpenHABWidget widget);

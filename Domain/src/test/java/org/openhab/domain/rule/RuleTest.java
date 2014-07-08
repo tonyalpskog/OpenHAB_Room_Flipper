@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
 public class RuleTest {
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
-    private IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
+    private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     @Before
     public void setUp() throws Exception {
@@ -50,7 +50,7 @@ public class RuleTest {
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
-        mIUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
+        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
         mRuleOperationProvider = new RuleOperationProvider();
     }
 
@@ -134,7 +134,7 @@ public class RuleTest {
 
     private List<IEntityDataType> getOperandsAsList() {
         List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
-        operands.add(mIUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
+        operands.add(mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
         UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override
@@ -285,8 +285,8 @@ public class RuleTest {
 
     @Test
     public void test_Create_RuleOperation_object_and_validate_operation_result() {
-        Assert.assertEquals("Humidity percentage", mIUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
-        Assert.assertEquals(50.7, mIUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
+        Assert.assertEquals("Humidity percentage", mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getName());
+        Assert.assertEquals(50.7, mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2).getValue());
 
         List<IEntityDataType> operands = getOperandsAsList();
 
@@ -325,14 +325,14 @@ public class RuleTest {
         switch(operandPairNumber) {
             case 1:
                 //Switch
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Kitchen_0")));
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bath_1")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Kitchen_0")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bath_1")));
                 break;
 
             case 2:
                 //Number
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bed_3")));
-                operands.add(mIUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_4")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bed_3")));
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("GF_Toilet_4")));
                 break;
         }
 
@@ -462,7 +462,7 @@ public class RuleTest {
 
     private List<IEntityDataType> getOperandsAsList2() {
         List<IEntityDataType> operands = new ArrayList<IEntityDataType>();
-        operands.add(mIUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
+        operands.add(mUnitEntityDataTypeProvider.getUnitDataTypeList().get(2));
 
         UnitEntityDataType rue = new UnitEntityDataType<Double>("Test Value", 50.7) {
             @Override

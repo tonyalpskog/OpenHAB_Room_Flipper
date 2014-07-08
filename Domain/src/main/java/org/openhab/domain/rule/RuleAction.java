@@ -14,20 +14,20 @@ import java.util.UUID;
  */
 public class RuleAction {
     protected String mTargetOpenHABItemName;
-    protected String mSourceOpenHABItemName;
+    protected UnitEntityDataType mSourceUnit;
     protected RuleActionType mActionType;
     protected String mStaticValue;
     protected String mTextValue;
     protected String mID;
 
     private final IOpenHABWidgetProvider widgetProvider;
-    private final IUnitEntityDataTypeProvider mIUnitEntityDataTypeProvider;
+    private final IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     public RuleAction(RuleActionType mActionType, IOpenHABWidgetProvider widgetProvider, IUnitEntityDataTypeProvider IUnitEntityDataTypeProvider) {
         this.mActionType = mActionType;
         this.widgetProvider = widgetProvider;
         mID = UUID.randomUUID().toString();
-        mIUnitEntityDataTypeProvider = IUnitEntityDataTypeProvider;
+        mUnitEntityDataTypeProvider = IUnitEntityDataTypeProvider;
     }
 
     public boolean validate() {
@@ -36,15 +36,15 @@ public class RuleAction {
         } else {
             //Check if target getUnitEntityDataType match the source unit if any.
             final OpenHABWidget targetWidget = widgetProvider.getWidgetByItemName(mTargetOpenHABItemName);
-            final OpenHABWidget sourceWidget = widgetProvider.getWidgetByItemName(mSourceOpenHABItemName);
+            final OpenHABWidget sourceWidget = mSourceUnit == null? null : widgetProvider.getWidgetByItemName(mSourceUnit.mDataSourceId);
 
             OpenHABItemType targetType = targetWidget.getItem().getType();
-            if(!targetType.equals(OpenHABItemType.String) && !StringHandler.isNullOrEmpty(mSourceOpenHABItemName) && sourceWidget.getItem().getType().equals(targetType)) {
-                mSourceOpenHABItemName = null;
+            if(!targetType.equals(OpenHABItemType.String) && mSourceUnit != null && !mSourceUnit.getSourceType().equals(targetType)) {
+                removeSourceUnit();
             }
             //Check if target getUnitEntityDataType has getStaticValues() that match mStaticValue if it´s not null.
             if(!StringHandler.isNullOrEmpty(mStaticValue)) {
-                UnitEntityDataType unitEntityDataType = mIUnitEntityDataTypeProvider.getUnitEntityDataType(targetWidget);
+                UnitEntityDataType unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(targetWidget);
                 Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
                 if(staticValueHash == null || !staticValueHash.containsKey(mStaticValue))
                     mStaticValue = null;
@@ -60,7 +60,7 @@ public class RuleAction {
 
     public String getCommand() {
         switch(getValueType()) {
-            case SOURCE_UNIT: return widgetProvider.getWidgetByItemName(getSourceOpenHABItemName()).getItem().getState();
+            case SOURCE_UNIT: return getSourceUnit().getFormattedString();/*widgetProvider.getWidgetByItemName(getSourceUnit().getDataSourceId()).getItem().getState()*/
             case STATIC: return getStaticValue();
             case TEXT: return getTextValue();
             default: return null;
@@ -68,7 +68,7 @@ public class RuleAction {
     }
 
     public RuleActionValueType getValueType() {
-        if(mSourceOpenHABItemName != null)
+        if(mSourceUnit != null)
             return RuleActionValueType.SOURCE_UNIT;
         if(mStaticValue != null)
             return RuleActionValueType.STATIC;
@@ -92,14 +92,29 @@ public class RuleAction {
         mTargetOpenHABItemName = targetOpenHABItemName;
     }
 
-    public String getSourceOpenHABItemName() {
-        return mSourceOpenHABItemName;
+    public UnitEntityDataType getSourceUnit() {
+        return mSourceUnit;
     }
 
     public void setSourceOpenHABItemName(String sourceOpenHABItemName) {
-        mSourceOpenHABItemName = sourceOpenHABItemName;
-        if(mSourceOpenHABItemName != null)
-            mStaticValue = mTextValue = null;
+        if(mSourceUnit != null && mSourceUnit.getDataSourceId().equalsIgnoreCase(sourceOpenHABItemName))
+                return;
+        removeSourceUnit();
+        if(!StringHandler.isNullOrEmpty(sourceOpenHABItemName)) {
+            OpenHABWidget widget = widgetProvider.getWidgetByItemName(sourceOpenHABItemName);
+            if(widget != null) {
+                mSourceUnit = mUnitEntityDataTypeProvider.getUnitEntityDataType(widgetProvider.getWidgetByItemName(sourceOpenHABItemName));
+                widgetProvider.addItemListener(mSourceUnit);
+                mStaticValue = mTextValue = null;
+            } else
+                throw new IllegalArgumentException("Unable to find widget containing item '" + sourceOpenHABItemName + "'");
+        }
+    }
+
+    private void removeSourceUnit() {
+        if(mSourceUnit != null)
+            widgetProvider.removeItemListener(mSourceUnit);
+        mSourceUnit = null;
     }
 
     public String getStaticValue() {
@@ -108,8 +123,10 @@ public class RuleAction {
 
     public void setStaticValue(String staticValue) {
         mStaticValue = staticValue;
-        if(mStaticValue != null)
-            mSourceOpenHABItemName = mTextValue = null;
+        if(mStaticValue != null) {
+            mTextValue = null;
+            removeSourceUnit();
+        }
     }
 
     public String getTextValue() {
@@ -118,13 +135,15 @@ public class RuleAction {
 
     public void setTextValue(String textValue) {
         mTextValue = textValue;
-        if(mTextValue != null)
-            mSourceOpenHABItemName = mStaticValue = null;
+        if(mTextValue != null) {
+            mStaticValue = null;
+            removeSourceUnit();
+        }
     }
 
     @Override
     public String toString() {
-        //TODO - TA: use resource strings (missing context)
+        //TODO - TA: use resource strings (language independent)
         StringBuilder sb = new StringBuilder();
         if(getActionType() == RuleActionType.COMMAND) {
             sb.append(StringHandler.isNullOrEmpty(mTargetOpenHABItemName) ? "<No target>" : mTargetOpenHABItemName);
@@ -133,7 +152,7 @@ public class RuleAction {
             sb.append("Send message: ");
         }
         switch (getValueType()) {
-            case SOURCE_UNIT: sb.append(mSourceOpenHABItemName);
+            case SOURCE_UNIT: sb.append(mSourceUnit.getDataSourceId());
                 break;
             case STATIC: sb.append(mStaticValue);
                 break;

@@ -22,12 +22,14 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
+import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
+import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
@@ -39,7 +41,7 @@ import javax.inject.Inject;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleActionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class RuleActionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener, IRuleOperationBuildListener {
     private static final String ARG_ID = "operand";
     private Button mButtonTargetUnit;
     private TextView mTextTargetUnit;
@@ -53,7 +55,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     private TextWatcher mTextChangedListener;
 
     private RuleActionBuildListener mActionListener;
-    private UnitEntityDataTypeProvider.RuleOperationBuildListener mOperationListener;
+    private IRuleOperationBuildListener mOperationListener;
     private RuleAction mAction;
     private int mPosition;
 
@@ -112,15 +114,15 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mTextValueLabel = (TextView) view.findViewById(R.id.text_rule_action_builder_text_value_label);
             mEditTextValue = (EditText) view.findViewById(R.id.edit_rule_action_builder_text_value);
 
+            final IRuleOperationBuildListener localListener = this;
             mButtonTargetUnit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(mOperationListener);
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
                             , mButtonTargetUnit.getText().toString(), 0, false);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
-                    dismiss();
                 }
             });
 
@@ -131,13 +133,12 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                     OpenHABItemType type = mWidgetProvider.getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
                     List<String> itemNameList = mWidgetProvider.getItemNamesByType(type);
                     itemNameList.remove(mAction.getTargetOpenHABItemName());
-                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(mOperationListener);
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
                             = UnitOperandSelectionDialogFragment.newInstance(itemNameList
                             , mButtonTargetUnit.getText().toString(), 1, false);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
-                    dismiss();
                 }
             });
 
@@ -208,7 +209,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             
             mSpinnerValue.setAdapter(mSpinnerAdapter);
 
-            mTextSourceUnit.setText((StringHandler.isNullOrEmpty(mAction.getSourceOpenHABItemName())? getString(R.string.no_value) : mAction.getSourceOpenHABItemName()).toString());
+            mTextSourceUnit.setText((mAction.getSourceUnit() == null? getString(R.string.no_value) : mAction.getSourceUnit().getDataSourceId()).toString());
 
             mEditTextValue.setSingleLine();
             mEditTextValue.removeTextChangedListener(mTextChangedListener);
@@ -264,6 +265,14 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
         mEditTextValue.setText("");
         mEditTextValue.setHint(R.string.no_value);
         mEditTextValue.addTextChangedListener(mTextChangedListener);
+    }
+
+    @Override
+    public <T> void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface, IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType<T> operand, int operandPosition, RuleOperator<T> ruleOperator) {
+        if(ruleOperationDialogButtonInterface != IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
+            mOperationListener.onOperationBuildResult(ruleOperationSelectionInterface, ruleOperationDialogButtonInterface, operand, operandPosition, ruleOperator);
+            dismiss();
+        }
     }
 
     @Override
