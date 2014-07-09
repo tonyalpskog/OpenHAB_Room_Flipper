@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.ParseException;
+import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -44,6 +45,9 @@ public class AfterDateTimeRuleOperatorTest {
     
     @Test
     public void getOperationResult_givenDateTimeAfter_returnTrue() throws ParseException {
-        assertThat(mSut.getOperationResult(mSut.parseValue("11:30 2014-03-23"), mSut.parseValue("10:15 2014-03-24")), is(equalTo(true)));
+        final Date first = mSut.parseValue("10:15 2014-03-24");
+        final Date second = mSut.parseValue("11:30 2014-03-23");
+
+        assertThat(mSut.getOperationResult(first, second), is(equalTo(true)));
     }
 }

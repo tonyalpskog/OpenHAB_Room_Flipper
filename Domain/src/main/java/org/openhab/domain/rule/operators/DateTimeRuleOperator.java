@@ -1,7 +1,6 @@
 package org.openhab.domain.rule.operators;
 
 import org.openhab.domain.rule.RuleOperatorType;
-import org.openhab.domain.rule.operators.RuleOperator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,9 +19,14 @@ public abstract class DateTimeRuleOperator<T> extends RuleOperator<T> {
     public final SimpleDateFormat TimeMinuteDateStringFormat = new SimpleDateFormat("HH:mm yyyy-MM-dd");
     public final SimpleDateFormat TimeSecondsDateFormat = new SimpleDateFormat("HH:mm:ss yyyy-MM-dd");
 
-    protected final SimpleDateFormat[] DateStringFormatArray = new SimpleDateFormat[]{
-            TimeMinuteStringFormat, TimeSecondsFormat, DateStringFormat
-            , WeekTimerStringFormat, TimeMinuteDateStringFormat, TimeSecondsDateFormat};
+    protected final SimpleDateFormat[] DateStringFormatArray = new SimpleDateFormat[] {
+            TimeSecondsDateFormat,
+            TimeMinuteDateStringFormat,
+            WeekTimerStringFormat,
+            DateStringFormat,
+            TimeSecondsFormat,
+            TimeMinuteStringFormat
+    };
 
     public DateTimeRuleOperator(RuleOperatorType type, Boolean supportsMultipleOperations) {
         super(type, supportsMultipleOperations);
@@ -31,21 +35,16 @@ public abstract class DateTimeRuleOperator<T> extends RuleOperator<T> {
     @Override
     public T parseValue(String valueAsString) throws ParseException {
         Calendar cal = GregorianCalendar.getInstance();
-        cal.setTime(new java.util.Date());
-        boolean successfulParse = false;
         ParseException parseException = null;
         for(SimpleDateFormat sdf : DateStringFormatArray) {
             try {
                 cal.setTime(sdf.parse(valueAsString));
-                successfulParse = true;
-                break;
+                return (T) cal.getTime();
             } catch(ParseException e) {
                 parseException = e;
             }
         }
 
-        if(!successfulParse) throw parseException;
-
-        return (T) cal.getTime();
+        throw parseException;
     }
 }
