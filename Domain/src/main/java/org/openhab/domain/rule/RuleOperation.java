@@ -176,14 +176,24 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
             return false;
 
         for(IEntityDataType operand : mOperands) {
-            if(operand. getValue() == null)
+            if(operand == null || operand.getValue() == null)
                 return false;
         }
 
         return true;
     }
     public void runCalculation() {
-        if(!isActive() || !isValid()) return;
+        if(!isActive())
+            return;
+
+        if(!isValid()) {
+            if(mValue == null)
+                mValue = new LogicBoolean(Boolean.FALSE);
+            else
+                mValue.setValue(false);//Missing operator shall result as FALSE.
+
+            return;
+        }
 
         LogicBoolean oldValue = mValue;
 
@@ -279,6 +289,7 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
 
     public void setRuleOperator(RuleOperator ruleOperator) {
         mRuleOperator = ruleOperator;
+        if(!isValid())
         runCalculation();
     }
 

@@ -4,7 +4,7 @@ package org.openhab.domain.rule;
  * Created by Tony Alpskog in 2014.
  */
 public class LogicBoolean {
-    private Boolean mValue;
+    private Boolean mValue = false;
 
     public LogicBoolean(Boolean value) {
         mValue = value;

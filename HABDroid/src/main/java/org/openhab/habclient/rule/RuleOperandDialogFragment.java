@@ -256,7 +256,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                         resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.NEW_OPERATION;
                     } else if (mEditStaticValue.getVisibility() == View.VISIBLE && mEditStaticValue.getText().length() > 0) {
                         //The operand is a static text vale entered by the user.
-                        ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()));
+                        ((UnitEntityDataType) operand).setValue(operand.valueOf(mEditStaticValue.getText().toString()), false);
                         resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                     } else if (mSpinnerValue.getSelectedItemPosition() > 0) {
                         //Spinner selection
@@ -268,7 +268,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                         } else {
                             //The user has selected a static operand value.
                             Map<String, ?> staticValuesCompatibleWithFirstOperand = mUnitEntityDataTypeProvider.getUnitEntityDataType(mFirstOperandWidgetIfAny).getStaticValues();
-                            ((UnitEntityDataType) operand).setValue(mSpinnerValue.getSelectedItemPosition() > 0 ? staticValuesCompatibleWithFirstOperand.get(mSpinnerValue.getSelectedItem()) : null);
+                            ((UnitEntityDataType) operand).setValue(mSpinnerValue.getSelectedItemPosition() > 0 ? staticValuesCompatibleWithFirstOperand.get(mSpinnerValue.getSelectedItem()) : null, false);
                             resultingSelectionType = IRuleOperationBuildListener.RuleOperationSelectionInterface.STATIC;
                         }
                     } else {

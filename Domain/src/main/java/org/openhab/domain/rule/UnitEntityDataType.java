@@ -13,6 +13,7 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
 
     protected UnitValueChangedListener mUnitValueChangedListener;
     protected boolean mIsRegistered = false;
+    private boolean mLatestSetWasAValueChange;
 
     public UnitEntityDataType(String name, T value) {
         super(name, value);
@@ -44,10 +45,27 @@ public abstract class UnitEntityDataType<T> extends EntityDataType<T> implements
     }
 
     public void setValue(T value) {
-        boolean changed = mValue != null? !mValue.equals(value) : value != null;
+        setValue(value, true);
+    }
+
+    public void setValue(T value, boolean recalculateOnValueChanged) {
+        mLatestSetWasAValueChange = mValue != null? !mValue.equals(value) : value != null;
         mValue = value;
-        if(changed && mOnOperandValueChangedListener != null)
+        if(recalculateOnValueChanged)
+            resumeOnValueChangedEvent();
+    }
+
+    /**
+     *
+     * @return true if onOperandValueChanged was invoked.
+     */
+    public boolean resumeOnValueChangedEvent() {
+        if(mLatestSetWasAValueChange && mOnOperandValueChangedListener != null) {
             mOnOperandValueChangedListener.onOperandValueChanged(this);
+            mLatestSetWasAValueChange = false;//Consumed
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -43,6 +43,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private UUID mUpdateSetUUID;
     private IPopularNameProvider mPopularNameProvider;
     private Map<String, List<UnitEntityDataType>> mOpenHABItemListenerMap;
+    private List<UnitEntityDataType> mRecalculationListenerList;
 
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
@@ -59,6 +60,8 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
         mOpenHABItemNameMap = new HashMap<String, OpenHABWidget>();
         mOpenHABItemListenerMap = new HashMap<String, List<UnitEntityDataType>>();
+
+        mRecalculationListenerList = new ArrayList<UnitEntityDataType>();
     }
 
     //Long polling method..?
@@ -101,7 +104,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
             return;
 
         clearData();
-        addOpenHABWidget(openHABWidgetDataSource.getRootWidget());
+        addOpenHABWidget(openHABWidgetDataSource.getRootWidget(), true);
     }
 
     private void clearData() {
@@ -116,7 +119,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         return mUpdateSetUUID;
     }
 
-    private void addOpenHABWidget(OpenHABWidget widget) {
+    private void addOpenHABWidget(OpenHABWidget widget, boolean isStartOfBatch) {
         if(widget == null)
             return;
 
@@ -160,9 +163,18 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         if(widget.hasChildren()) {
             for (OpenHABWidget widget1 : widget.getChildren()) {
-                addOpenHABWidget(widget1);
+                addOpenHABWidget(widget1, false);
             }
         }
+
+        if(isStartOfBatch) {
+            recalculateUnits();
+        }
+    }
+
+    private void recalculateUnits() {
+        for(UnitEntityDataType unit : mRecalculationListenerList)
+            unit.resumeOnValueChangedEvent();
     }
 
     public Map<OpenHABWidgetType, List<OpenHABWidget>> getWidgetMap(Set<OpenHABWidgetType> category) {
@@ -361,7 +373,9 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private void updateListeners(OpenHABItem item) {
         if(mOpenHABItemListenerMap.containsKey(item.getName()))
             for(UnitEntityDataType listener : mOpenHABItemListenerMap.get(item.getName()))
-                if(!listener.valueOf(item.getState()).equals(listener.getFormattedString()/*getValue()*/))
-                    listener.setValue(listener.valueOf(item.getState()));
+                if(!listener.valueOf(item.getState()).equals(listener.getFormattedString()/*getValue()*/)) {
+                    listener.setValue(listener.valueOf(item.getState()), false);
+                    mRecalculationListenerList.add(listener);
+                }
     }
 }
