@@ -299,7 +299,7 @@ public class CommandTest extends AndroidTestCase {
         assertEquals("'" + ls.get(0) + "' was found in: " + sb.toString() + " as => " + getAllStringItemsInOneString(resultingUnitList), 1, resultingUnitList.size());
         OpenHABWidget foundOhw = resultingUnitList.get(0);
         assertFalse("Returned OpenHABWidget was NULL", foundOhw == null);
-        assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0), foundOhw.getLabel());
+        assertEquals("Non-matching widget name: " + foundOhw.getLabel(), ls.get(0) + " [closed]", foundOhw.getLabel());
         assertEquals("First item name: " + (foundOhw.hasItem() ? foundOhw.getItem().getName() : foundOhw.getId()), 5, 1);
         assertFalse(mCommandAnalyzer.getUnitsFromPhrases(mListOfTestPhrases2, null).isEmpty());
     }

@@ -264,10 +264,10 @@ public class CommandAnalyzer implements ICommandAnalyzer {
             widgetNameMap.put(mPopularNameProvider.getPopularNameFromWidgetLabel(nextWidget.getLabel()).toUpperCase(), nextWidget);
         }
 
-        //Look for match
-        for(String match : commandPhrases) {
+        //Look for phrases
+        for(String phrase : commandPhrases) {
             for(String unitName : widgetNameMap.keySet()) {
-                if (match.toUpperCase().contains(unitName)) {
+                if (!StringHandler.isNullOrEmpty(unitName) && unitName.contains(phrase.toUpperCase())) {
                     //Got a unit match.
                     OpenHABWidget foundWidget = widgetNameMap.get(unitName);
                     resultList.add(foundWidget);
