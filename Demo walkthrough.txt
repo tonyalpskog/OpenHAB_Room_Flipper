@@ -1,0 +1,56 @@
+Application demo walk through:
+
+1. Start the OpenHAB app and make sure the app is in demo mode. (options menu -> Settings -> Demo mode)
+2. Go to Ground Floor -> Corridor
+3. Note the status of the tree upper units
+4. Options menu -> Flipper Navigation
+5. On Basement Center swipe right, then up to get to Basement Southwest
+- Lets do some room configuration and add some OpenHAB widgets to it:
+6. Press the action bar edit icon (pen)
+7. Write your own room alias (This is the name that speech recognition will recognize)
+8. Select the (Group)0001_3::Corridor sitemap group in the HAB group spinner 
+9. At the Up Right spinner, select Basement Center. (Creates a diagonal shortcut between Basement Southwest and Basement Center)
+10. Scroll down and press Save.
+11. Swipe to the Unit Placement tab
+12. Press the action bar Add icon (plus sign)
+13. Select the ceiling light widget.
+14. Long press the light widget to start the drag-n-drop process.
+15. Press the Back button to navigate back to the room flipper view
+- Try out the room navigation first:
+16. Swipe diagonal down/left to navigate to the center of the basement. (This is the shortcut that was created in item no. 9)
+17. Pinch in twice to navigate to Second Floor Center.
+18. Swipe to the left to get to Second Floor East.
+19. Press the action bar microphone icon and say "Basement southwest". (It will help if you have English enabled as a speech language)
+- Try out the widgets in the room:
+20. Back in Basement Southwest, press the ceiling lamp widget to toggle lamp status.
+21. Press action bar widget list icon (sort by size). This is a shortcut to current sitemap group in the original OpenHAB app view.
+22. Make sure that ceiling light, wardrobe light and heating are all OFF
+23. Options menu -> Flipper Navigation
+- Create a rule that will give the wardrobe light the same value as the ceiling light when the corridor heating is turned on: 
+24. Press action bar rules icon (cogwheel with flash)
+25. Press the add icon (plus sign)
+26. Name the rule "My special rule"
+27. Press action bar edit operation (pen)
+28. Press the Pick a unit button.
+29. Select Heating_GF_Corridor
+30. Select the equal operator (=)
+31. Select static value ON in the spinner and press Done
+32. Swipe to the THEN tab
+33. Press add command (flash with plus sign)
+34. Press button Pick a target unit
+35. Select Light_GF_Corridor_Wardrobe
+36. Press button Pick a source unit
+37. Select Light_GF_Corridor_Ceiling
+38. Press Done
+- Lets also add a notification:
+39. Press action bar Add notification (balloon with plus sign)
+40. Press the text box and write a message
+- Now we will try out that rule:
+41. Press the Back button until the original OpenHAB app view is shown.
+42. Set Ceiling light to ON
+41. Set GF Corridor (heating) to ON (After a short while the Wardrobe light should get status ON)
+- If you got a Wear device connected:
+43. A new notification will be shown.
+44. Swipe left and select Reply
+45. Speak a command: "Turn off corridor ceiling light"
+46. The ceiling light should now be turned off.
