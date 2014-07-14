@@ -150,7 +150,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
         if(bestKeySoFar.getCommandType() != GetStatus) {
             String value = getCommandValue(bestKeySoFar);
             if(value != null) {
-                mWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget().getItem(), value);
+                mWidgetControl.sendItemCommand(unitMatchResult.get(bestKeySoFar).getWidget(), value);
                 commandReply = value;
             }
         }

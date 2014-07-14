@@ -29,6 +29,7 @@ import javax.inject.Inject;
 public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private Context mContext;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
+    @Inject RestCommunication mRestCommunication;
 
     @Inject
     public OpenHABWidgetControl(Context context) {
@@ -52,24 +53,25 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
         OpenHABWidget widget = mWidgetProvider.getWidgetByID(widgetId);
         if(widget == null || !widget.hasItem())
             return false;
-        sendItemCommand(widget.getItem(), command);
+        sendItemCommand(widget, command);
         return true;
     }
 
     @Override
     public void sendItemCommand(String itemName, String command) {
-        sendItemCommand(mWidgetProvider.getWidgetByItemName(itemName).getItem(), command);
+        sendItemCommand(mWidgetProvider.getWidgetByItemName(itemName), command);
     }
 
     @Override
-    public void sendItemCommand(OpenHABItem item, String command) {
+    public void sendItemCommand(final OpenHABWidget habWidget, String command) {
         try {
-            Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
+            Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", habWidget.getItem().getLink(), command));
             StringEntity se = new StringEntity(command);
-            mAsyncHttpClient.post(mContext, item.getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
+            mAsyncHttpClient.post(mContext, habWidget.getItem().getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(String response) {
                     Log.d(HABApplication.getLogTag(), "Command was sent successfully");
+                    mRestCommunication.requestOpenHABSitemap(habWidget);
                 }
                 @Override
                 public void onFailure(Throwable error, String errorResponse) {
@@ -84,7 +86,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
         }
     }
 
-    public View initializeSwitchWidget(OpenHABWidget openHABWidget, View inflatedView) {
+    public View initializeSwitchWidget(final OpenHABWidget openHABWidget, View inflatedView) {
         final Switch switchView = (Switch)inflatedView.findViewById(R.id.switchswitch);
 
         if(switchView == null || openHABWidget.getItem() == null) {
@@ -105,9 +107,9 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
                 OpenHABItem linkedItem = (OpenHABItem) switchSwitch.getTag();
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
                     if (!switchSwitch.isChecked()) {
-                        sendItemCommand(linkedItem, "ON");
+                        sendItemCommand(openHABWidget, "ON");
                     } else {
-                        sendItemCommand(linkedItem, "OFF");
+                        sendItemCommand(openHABWidget, "OFF");
                     }
                 return false;
             }
