@@ -2,11 +2,13 @@ package org.openhab.domain.model;
 
 import java.util.UUID;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by Tony Alpskog in 2013.
  */
 public class GraphicUnit {
-    private final OpenHABWidget mOpenHABWidget;
+    private OpenHABWidget mOpenHABWidget;
     private UUID id;
 //    private OpenHABWidgetType type;
     private float roomRelativeX = 0;
@@ -22,6 +24,8 @@ public class GraphicUnit {
 
         setRoomRelativeX(3);
         setRoomRelativeY(4);
+
+        EventBus.getDefault().registerSticky(this);
     }
 
     public boolean isSelected() {
@@ -58,5 +62,10 @@ public class GraphicUnit {
 
     public OpenHABWidget getOpenHABWidget() {
         return mOpenHABWidget;
+    }
+
+    public void onEvent(OpenHABWidgetEvent widgetEvent){
+        if(mOpenHABWidget.getId().equalsIgnoreCase(widgetEvent.getOpenHABWidget().getId()))
+            mOpenHABWidget = widgetEvent.getOpenHABWidget();
     }
 }

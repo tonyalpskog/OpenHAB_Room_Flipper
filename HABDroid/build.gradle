@@ -13,7 +13,6 @@ dependencies {
     compile 'com.android.support:support-v13:19.1.0'
     compile project(':Domain')
     compile fileTree(dir: 'libs', include: '*.jar')
-
     compile 'com.squareup.dagger:dagger:1.2.0'
     provided 'com.squareup.dagger:dagger-compiler:1.2.0'
 }
@@ -24,7 +23,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 16

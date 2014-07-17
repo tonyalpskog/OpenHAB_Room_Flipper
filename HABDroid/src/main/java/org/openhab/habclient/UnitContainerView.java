@@ -36,7 +36,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     //TA: TODO - Will disposal of unused RoomImageView save some memory?
     private RoomImageView roomImage;
     private Room mRoom;
-    private List<View> addedUnitViews;
+    private List<View> mAddedUnitViews;
     private boolean mBlockUnitRedraw = false;
     private View mAddedControlView = null;
     private final HashMap<GraphicUnit, GraphicUnitWidget> mGraphicUnitWidgets = new HashMap<GraphicUnit, GraphicUnitWidget>();
@@ -54,7 +54,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         final HABApplication app = (HABApplication) context.getApplicationContext();
         app.inject(this);
 
-        addedUnitViews = new ArrayList<View>();
+        mAddedUnitViews = new ArrayList<View>();
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
@@ -168,7 +168,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
         ImageView gView = getView(gUnit);
         layout.addView(gView, params);
-        addedUnitViews.add(layout);
+        mAddedUnitViews.add(layout);
         addView(layout);
     }
 
@@ -209,7 +209,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
             params.setMargins(x - 30, y + 64, 0, 0);
             mAddedControlView = inflatedView;
         } else if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.ItemText/* || gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.SitemapText*/) {
-            addedUnitViews.add(inflatedView);
+            mAddedUnitViews.add(inflatedView);
             controlView = mOpenHABWidgetControl.initializeTextWidget(gUnit.getOpenHABWidget(), inflatedView);
             params.setMargins(x - 10, y + 64, 0, 0);
         }
@@ -236,7 +236,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
     private void removeAllUnitViews() {
         Log.d("Remove unit views", "Child count = " + getChildCount());
-        for (View addedUnitView : addedUnitViews) {
+        for (View addedUnitView : mAddedUnitViews) {
             ViewGroup vg = (ViewGroup) addedUnitView;
             vg.removeAllViewsInLayout();
             removeView(vg);
@@ -244,7 +244,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
 
         removeControlView();
 
-        addedUnitViews.clear();
+        mAddedUnitViews.clear();
         Log.d("Remove unit views", "Room<" + getRoom().getId() + ">  Child count = " + getChildCount());
     }
 

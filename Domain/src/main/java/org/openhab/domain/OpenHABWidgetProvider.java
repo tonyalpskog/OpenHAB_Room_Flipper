@@ -6,6 +6,7 @@ import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
+import org.openhab.domain.model.OpenHABWidgetEvent;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import de.greenrobot.event.EventBus;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -126,8 +128,10 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         widget.setUpdateUUID(mUpdateSetUUID);
 
         boolean widgetExists = mOpenHABWidgetIdMap.containsKey(widget.getId());
-        if(widgetExists && widget.hasItem())
+        if(widgetExists && widget.hasItem()) {
+            EventBus.getDefault().postSticky(new OpenHABWidgetEvent(widget));
             updateListeners(widget.getItem());
+        }
 
         if(!widgetExists && widget.getType() != null) {
             //Overwrite / Update widget if it already exists.
