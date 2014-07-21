@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
@@ -27,7 +26,6 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     private static final String ARG_POSITION = "position";
 
     private int mOperandIndex;
-    private IRuleOperationBuildListener mListener;
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
@@ -63,31 +61,21 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
             return;
 
         mOperandIndex = args.getInt(ARG_POSITION);
-
-        mListener = ((RuleEditActivity)getActivity()).getRuleOperationBuildListener();
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        if (mListener != null) {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                case DialogInterface.BUTTON_NEUTRAL:
-                    if(StringHandler.isNullOrEmpty(mSelectedString)) {
-                        Toast.makeText(getActivity(), "No selection", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
-                    final IEntityDataType entityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
-                    final IRuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
-                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
+        switch (which) {
+            case DialogInterface.BUTTON_POSITIVE:
+            case DialogInterface.BUTTON_NEUTRAL:
+                if(StringHandler.isNullOrEmpty(mSelectedString)) {
+                    Toast.makeText(getActivity(), "No selection", Toast.LENGTH_SHORT).show();
                     break;
-                default:
-                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
-                            , IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
-                            , null, 0, null);
-                    break;
-            }
-        } else throw new IllegalArgumentException("listener is null");
+                }
+                final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedString);
+                final IEntityDataType entityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
+                final IRuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
+                break;
+        }
     }
 }

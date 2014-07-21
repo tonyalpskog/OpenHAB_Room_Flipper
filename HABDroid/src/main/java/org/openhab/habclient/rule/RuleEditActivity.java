@@ -8,47 +8,48 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.openhab.domain.IOpenHABWidgetControl;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IEntityDataType;
-import org.openhab.domain.rule.IRuleEditActivity;
-import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.rule.RuleAction;
-import org.openhab.domain.rule.RuleOperation;
-import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.domain.rule.RuleOperatorType;
+import org.openhab.domain.rule.operations.date.AfterDateTimeRuleOperation;
+import org.openhab.domain.rule.operations.date.AfterOrEqualDateTimeRuleOperation;
+import org.openhab.domain.rule.operations.date.BeforeDateTimeRuleOperation;
+import org.openhab.domain.rule.operations.date.BeforeOrEqualDateTimeRuleOperation;
+import org.openhab.domain.rule.operations.number.LessOrEqualNumberRuleOperation;
+import org.openhab.domain.rule.operations.number.LessThanNumberRuleOperation;
+import org.openhab.domain.rule.operations.number.MoreOrEqualNumberRuleOperation;
+import org.openhab.domain.rule.operations.number.MoreThanNumberRuleOperation;
+import org.openhab.domain.rule.operations.NotEqualRuleOperation;
+import org.openhab.domain.rule.operations.RuleOperation;
+import org.openhab.domain.rule.operations.bool.BooleanAndRuleOperation;
+import org.openhab.domain.rule.operations.EqualRuleOperation;
+import org.openhab.domain.rule.operations.bool.BooleanOrRuleOperation;
 import org.openhab.domain.user.AccessModifier;
-import org.openhab.domain.user.User;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 
-public class RuleEditActivity extends Activity implements IRuleEditActivity, ActionBar.TabListener {
-    private enum RuleActivityMode {
-        OPERATION_EDITOR,
-        ACTION_LIST
-    }
-
+public class RuleEditActivity extends Activity implements ActionBar.TabListener,
+        RuleOperationFragment.RuleOperationFragmentListener,
+        RuleActionFragment.RuleActionFragmentListener,
+        RuleOperandDialogFragment.OnRuleOperationChangedListener {
+    private final Set<OnRuleOperationUpdatedListener> mRuleOperationUpdatedListeners = new HashSet<OnRuleOperationUpdatedListener>();
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private Rule mRule;
-    private RuleActivityMode mRuleActivityMode;
-    private IRuleOperationBuildListener mRuleOperationBuildListener;
-    private RuleActionDialogFragment.RuleActionBuildListener mRuleActionBuildListener;
-    private IEntityDataType mOperandToEdit;
     private RuleAction mActionUnderConstruction;
-    private RuleOperation mOperationUnderConstruction;
 
-    @Inject IOpenHABWidgetControl mWidgetControl;
     @Inject IRuleProvider mRuleProvider;
 
     @Override
@@ -56,14 +57,15 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rule_edit);
 
+        mRuleOperationUpdatedListeners.clear();
+
         InjectUtils.inject(this);
 
-        String userId = getIntent().getExtras().getString(User.ARG_USER_ID);
         String ruleId = getIntent().getExtras().getString(Rule.ARG_RULE_ID);
 
-        mRule = mRuleProvider.getUserRule(userId, ruleId);
+        mRule = mRuleProvider.getUserRule(ruleId);
         if(mRule == null) {
-            mRule = mRuleProvider.createNewRule(userId, AccessModifier.ReadOnly ,"Initial rule name");
+            mRule = mRuleProvider.createNewRule(AccessModifier.ReadOnly ,"Initial rule name");
             mRule.setEnabled(true);
         }
 
@@ -71,7 +73,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager(), this);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.rule_edit_pager);
@@ -91,18 +93,6 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("LifeCycle.RuleEditActivity", "onResume()");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("LifeCycle.RuleEditActivity", "onPause()");
     }
 
     @Override
@@ -127,8 +117,6 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         mViewPager.setCurrentItem(tab.getPosition());
-            mRuleActivityMode = tab.getPosition() == 0? RuleActivityMode.OPERATION_EDITOR : RuleActivityMode.ACTION_LIST;
-        setRuleOperationBuildListener((IRuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
     }
 
     @Override
@@ -139,51 +127,6 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    private IEntityDataType getEntityDataBySourceId(String dataSourceId) {
-        if(dataSourceId == null) return null;
-        //TODO - TA: implement
-        return null;
-    }
-
-    public RuleOperator getOperatorBySourceId(String dataSourceId) {
-        //TODO - TA: implement
-        return null;
-    }
-
-    @Override
-    public String getRuleName() {
-        return mRule.getName();
-    }
-
-    @Override
-    public void setRuleName(String name) {
-        mRule.setName(name);
-    }
-
-    @Override
-    public Rule getRule() {
-        return mRule;
-    }
-
-    @Override
-    public void setRule(Rule rule) {
-        mRule = rule;
-        //TODO - TA: Update Table, List and UI
-    }
-
-    public RuleOperation getOperationByOperandSourceId(String dataSourceId) {
-        HashMap<String, RuleOperation> entityMap = getRule().getRuleOperation().getRuleOperationHash();
-        return entityMap.get(dataSourceId);
-    }
-
-    public IRuleOperationBuildListener getRuleOperationBuildListener() {
-        return mRuleOperationBuildListener;
-    }
-
-    public void setRuleOperationBuildListener(IRuleOperationBuildListener ruleOperationBuildListener) {
-        this.mRuleOperationBuildListener = ruleOperationBuildListener;
-    }
-
     public void setActionUnderConstruction(RuleAction action) {
         mActionUnderConstruction = action;
     }
@@ -192,33 +135,112 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         return mActionUnderConstruction;
     }
 
-    public void setRuleActionBuildListener(RuleActionDialogFragment.RuleActionBuildListener listener) {
-        mRuleActionBuildListener = listener;
+    @Override
+    public void onShowChangeOperationDialog() {
+        final RuleOperandDialogFragment fragment = RuleOperandDialogFragment.newInstance(RuleOperatorType.And);
+        fragment.show(getFragmentManager(), "changeOperationDialog");
     }
 
-    public RuleActionDialogFragment.RuleActionBuildListener getRuleActionBuildListener() {
-        return mRuleActionBuildListener;
+    @Override
+    public void onChangeLeftEntity() {
+        //TODO: show dialog and store result in provider
     }
 
-    @Deprecated
-    //TODO - TA: Replace this with getOperationToEdit().getOperand(index)
-    public IEntityDataType getOperandToEdit() {
-        return mOperandToEdit;
+    @Override
+    public void onChangeRightEntity() {
+        //TODO: show dialog and store result in provider
     }
 
-    @Deprecated
-    //TODO - TA: Replace this with getOperationToEdit().setOperand(index, value)
-    public void setOperandToEdit(IEntityDataType operand) {
-        mOperandToEdit = operand;
+    @Override
+    public void onRuleOperationChanged(RuleOperatorType ruleOperatorType) {
+        IEntityDataType left = null;
+        IEntityDataType right = null;
+        RuleOperation<?> op = mRule.getRuleOperation();
+        if(op != null) {
+            left = op.getLeft();
+            right = op.getRight();
+        }
+
+        op = createOperation(ruleOperatorType);
+        op.setLeft(left);
+        op.setRight(right);
+        mRule.setRuleOperation(op);
+        notifyRuleOperationUpdated();
     }
 
-    public void setOperationToEdit(RuleOperation ruleOperation) {
-        mOperationUnderConstruction = ruleOperation;
+    private RuleOperation<?> createOperation(RuleOperatorType type) {
+        switch (type) {
+            case Or:
+                return new BooleanOrRuleOperation();
+            case And:
+                return new BooleanAndRuleOperation();
+            case After:
+                return new AfterDateTimeRuleOperation();
+            case AfterOrEqual:
+                return new AfterOrEqualDateTimeRuleOperation();
+            case Before:
+                return new BeforeDateTimeRuleOperation();
+            case BeforeOrEqual:
+                return new BeforeOrEqualDateTimeRuleOperation();
+            case Equal:
+                return new EqualRuleOperation();
+            case LessOrEqual:
+                return new LessOrEqualNumberRuleOperation();
+            case LessThan:
+                return new LessThanNumberRuleOperation();
+            case MoreThan:
+                return new MoreThanNumberRuleOperation();
+            case MoreOrEqual:
+                return new MoreOrEqualNumberRuleOperation();
+            case NotEqual:
+                return new NotEqualRuleOperation<Object>();
+            default:
+                throw new IllegalStateException(type + " not supported");
+        }
     }
 
-    public RuleOperation getOperationToEdit() {
-        return mOperationUnderConstruction;
+    @Override
+    public RuleOperation<?> getRuleOperation() {
+        return mRule.getRuleOperation();
     }
+
+    @Override
+    public List<RuleAction> getRuleActions() {
+        return mRule.getActions();
+    }
+
+    @Override
+    public void setRuleName(String name) {
+        mRule.setName(name);
+    }
+
+    @Override
+    public String getRuleName() {
+        return mRule.getName();
+    }
+
+    private void notifyRuleOperationUpdated() {
+        synchronized (mRuleOperationUpdatedListeners) {
+            for(OnRuleOperationUpdatedListener listener : mRuleOperationUpdatedListeners) {
+                listener.onRuleOperationUpdated(mRule.getRuleOperation());
+            }
+        }
+    }
+
+    @Override
+    public void addOnRuleOperationUpdatedListener(OnRuleOperationUpdatedListener listener) {
+        synchronized (mRuleOperationUpdatedListeners) {
+            mRuleOperationUpdatedListeners.add(listener);
+        }
+    }
+
+    @Override
+    public void removeOnRuleOperationUpdatedListener(OnRuleOperationUpdatedListener listener) {
+        synchronized (mRuleOperationUpdatedListeners) {
+            mRuleOperationUpdatedListeners.remove(listener);
+        }
+    }
+
     /**
      * A {@link android.support.v13.app.FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -228,7 +250,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         private RuleOperationFragment mRuleOperationFragment;
         private RuleActionFragment mRuleActionFragment;
 
-        public SectionsPagerAdapter(FragmentManager fm, RuleEditActivity activity) {
+        public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

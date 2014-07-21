@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+         <TextView
+            android:id="@+id/section_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name of rule" />
 
-             <TextView
-                android:id="@+id/section_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Name of rule:" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rule_name_textview"
-                android:layout_gravity="left|top"
-                android:text="SampleRuleName" />
-
-        </LinearLayout>
-
-        <include layout="@layout/merge_rule_if_tree" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="64dp"
+            android:id="@+id/rule_name_textview"
+            tools:text="Sample Rule Name" />
 
     </LinearLayout>
-</ScrollView>
+
+    <Button
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="KITCHEN_LAMP = TRUE AND DATE > 15:00" />
+</LinearLayout>

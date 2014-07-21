@@ -1,7 +1,5 @@
 package org.openhab.domain.rule;
 
-import org.openhab.domain.rule.operators.RuleOperator;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -35,6 +33,5 @@ public interface IRuleOperationBuildListener {
     public <T> void onOperationBuildResult(RuleOperationSelectionInterface ruleOperationSelectionInterface,
                                            RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface,
                                            IEntityDataType<T> operand,
-                                           int operandPosition,
-                                           RuleOperator<T> ruleOperator);
+                                           int operandPosition);
 }

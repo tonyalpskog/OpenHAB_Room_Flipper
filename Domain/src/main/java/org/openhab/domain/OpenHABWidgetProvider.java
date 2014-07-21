@@ -9,7 +9,6 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
-import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
@@ -26,8 +25,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -43,7 +40,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private UUID mUpdateSetUUID;
     private IPopularNameProvider mPopularNameProvider;
     private Map<String, List<UnitEntityDataType>> mOpenHABItemListenerMap;
-    private List<UnitEntityDataType> mRecalculationListenerList;
 
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
@@ -60,8 +56,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
         mOpenHABItemNameMap = new HashMap<String, OpenHABWidget>();
         mOpenHABItemListenerMap = new HashMap<String, List<UnitEntityDataType>>();
-
-        mRecalculationListenerList = new ArrayList<UnitEntityDataType>();
     }
 
     //Long polling method..?
@@ -173,8 +167,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     }
 
     private void recalculateUnits() {
-        for(UnitEntityDataType unit : mRecalculationListenerList)
-            unit.resumeOnValueChangedEvent();
+
     }
 
     public Map<OpenHABWidgetType, List<OpenHABWidget>> getWidgetMap(Set<OpenHABWidgetType> category) {
@@ -371,11 +364,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     }
 
     private void updateListeners(OpenHABItem item) {
-        if(mOpenHABItemListenerMap.containsKey(item.getName()))
-            for(UnitEntityDataType listener : mOpenHABItemListenerMap.get(item.getName()))
-                if(!listener.valueOf(item.getState()).equals(listener.getFormattedString()/*getValue()*/)) {
-                    listener.setValue(listener.valueOf(item.getState()), false);
-                    mRecalculationListenerList.add(listener);
-                }
+
     }
 }

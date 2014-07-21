@@ -29,7 +29,6 @@ import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
-import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
@@ -89,9 +88,8 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
 
         Activity activity = getActivity();
         if(activity == null) throw new IllegalArgumentException("activity is null");
-        mOperationListener = ((RuleEditActivity)activity).getRuleOperationBuildListener();
+
         mAction = ((RuleEditActivity)activity).getActionUnderConstruction();
-        mActionListener = ((RuleEditActivity)activity).getRuleActionBuildListener();
         mPosition = args.getInt(ARG_POSITION);
     }
 
@@ -118,7 +116,6 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
             mButtonTargetUnit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
                             , mButtonTargetUnit.getText().toString(), 0, false);
@@ -133,7 +130,6 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
                     OpenHABItemType type = mWidgetProvider.getWidgetByItemName(mAction.getTargetOpenHABItemName()).getItem().getType();
                     List<String> itemNameList = mWidgetProvider.getItemNamesByType(type);
                     itemNameList.remove(mAction.getTargetOpenHABItemName());
-                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             //TODO - TA: Get a list of items with compatible values (A text target may have any item as source)
                             = UnitOperandSelectionDialogFragment.newInstance(itemNameList
@@ -268,9 +264,9 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     }
 
     @Override
-    public <T> void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface, IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType<T> operand, int operandPosition, RuleOperator<T> ruleOperator) {
+    public <T> void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface, IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType<T> operand, int operandPosition) {
         if(ruleOperationDialogButtonInterface != IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL) {
-            mOperationListener.onOperationBuildResult(ruleOperationSelectionInterface, ruleOperationDialogButtonInterface, operand, operandPosition, ruleOperator);
+            mOperationListener.onOperationBuildResult(ruleOperationSelectionInterface, ruleOperationDialogButtonInterface, operand, operandPosition);
             dismiss();
         }
     }
@@ -295,25 +291,27 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE://Done
-                if(mActionListener != null) {
-                    String value = null;
-                    switch (mRuleActionValueType) {
-                        case STATIC:
-                            value = mSpinnerValue.getSelectedItem().toString();
-                            break;
-                        case SOURCE_UNIT:
-                            value = mTextSourceUnit.getText().toString();
-                            break;
-                        case TEXT:
-                            value = mEditTextValue.getText().toString();
-                            break;
-                        default:
-                            mRuleActionValueType = mAction.getValueType();
-                    }
+//                if (mActionListener == null) {
+//                    throw new IllegalArgumentException("listener is null");
+//                }
 
-                    mActionListener.onActionBuildResult(RuleActionBuildListener.RuleActionDialogButtonInterface.DONE
-                            , mAction.getID(), mRuleActionValueType, value);
-                }  else throw new IllegalArgumentException("listener is null");
+                String value = null;
+                switch (mRuleActionValueType) {
+                    case STATIC:
+                        value = mSpinnerValue.getSelectedItem().toString();
+                        break;
+                    case SOURCE_UNIT:
+                        value = mTextSourceUnit.getText().toString();
+                        break;
+                    case TEXT:
+                        value = mEditTextValue.getText().toString();
+                        break;
+                    default:
+                        mRuleActionValueType = mAction.getValueType();
+                }
+
+//                mActionListener.onActionBuildResult(RuleActionBuildListener.RuleActionDialogButtonInterface.DONE
+//                        , mAction.getID(), mRuleActionValueType, value);
                 break;
         }
     }

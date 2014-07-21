@@ -1,14 +1,8 @@
 package org.openhab.domain.rule;
 
-import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.rule.operators.RuleOperator;
-
-import java.util.Set;
+import org.openhab.domain.rule.operations.RuleOperation;
 
 public interface IRuleOperationProvider {
-    RuleOperator<?> getRuleOperator(OpenHABWidget openHABWidget, RuleOperatorType type);
 
-    RuleOperator<?> getRuleOperator(Class<?> operandClass, RuleOperatorType type);
-
-    Set<RuleOperatorType> getRuleOperatorTypes(Class<?> operandClass);
+    RuleOperation<?> getRuleOperation(String sourceId);
 }

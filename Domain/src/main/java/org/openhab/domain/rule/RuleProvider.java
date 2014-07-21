@@ -1,9 +1,6 @@
 package org.openhab.domain.rule;
 
-import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.user.AccessModifier;
-import org.openhab.domain.util.StringHandler;
-import org.openhab.domain.wear.IWearCommandHost;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,33 +13,30 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class RuleProvider implements IRuleProvider {
-    private final IWearCommandHost mWearCommandHost;
-    private final IOpenHABWidgetControl mWidgetControl;
-
+    private static final String HARDCODED_USER = "Admin123";
     private final Map<String, List<Rule>> mUserRules;
     private final Map<AccessModifier, List<Rule>> mRulesAccessMap;
 
     @Inject
-    public RuleProvider(IWearCommandHost wearCommandHost,
-                        IOpenHABWidgetControl widgetControl) {
-        mWearCommandHost = wearCommandHost;
-        mWidgetControl = widgetControl;
+    public RuleProvider() {
         mUserRules = new HashMap<String,List<Rule>>();
         mRulesAccessMap = new HashMap<AccessModifier, List<Rule>>();
     }
 
     @Override
-    public List<Rule> getUserRules(String userId) {
-        if(!mUserRules.containsKey(userId))
+    public List<Rule> getUserRules() {
+        if(!mUserRules.containsKey(HARDCODED_USER))
             return new ArrayList<Rule>();
-        return mUserRules.get(userId);
+
+        return mUserRules.get(HARDCODED_USER);
     }
 
     @Override
-    public Rule getUserRule(String userId, String ruleId) {
-        if(ruleId == null || userId == null)
+    public Rule getUserRule(String ruleId) {
+        if(ruleId == null)
             return null;
-        List<Rule> ruleList = getUserRules(userId);
+
+        List<Rule> ruleList = getUserRules();
         for(Rule rule : ruleList) {
             if(ruleId.equalsIgnoreCase(rule.getRuleId().toString()))
                 return rule;
@@ -60,33 +54,30 @@ public class RuleProvider implements IRuleProvider {
     }
 
     @Override
-    public void saveRule(Rule rule, String userId) {
-        if(mUserRules.get(userId) == null)
-            mUserRules.put(userId, new ArrayList<Rule>());
+    public void saveRule(Rule rule) {
+        if(mUserRules.get(HARDCODED_USER) == null)
+            mUserRules.put(HARDCODED_USER, new ArrayList<Rule>());
         if(mRulesAccessMap.get(rule.getAccess()) == null)
             mRulesAccessMap.put(rule.getAccess(), new ArrayList<Rule>());
 
         for(AccessModifier accessModifier : AccessModifier.values()) {
-            if (mUserRules.get(userId) != null && mUserRules.get(userId).contains(rule))
-                mUserRules.get(userId).remove(rule);
+            if (mUserRules.get(HARDCODED_USER) != null && mUserRules.get(HARDCODED_USER).contains(rule))
+                mUserRules.get(HARDCODED_USER).remove(rule);
             if(mRulesAccessMap.get(accessModifier) != null && mRulesAccessMap.get(accessModifier).contains(rule))
                 mRulesAccessMap.get(accessModifier).remove(rule);
-            break;
         }
 
-        mUserRules.get(userId).add(rule);
+        mUserRules.get(HARDCODED_USER).add(rule);
         mRulesAccessMap.get(rule.getAccess()).add(rule);
     }
 
     @Override
-    public Rule createNewRule(String userId, AccessModifier accessModifier, String ruleName) {
-        if(StringHandler.isNullOrEmpty(userId))
-            throw new IllegalArgumentException("userId is null or empty");
-        String name = StringHandler.isNullOrEmpty(ruleName)? "New rule" : ruleName;
-        Rule rule = new Rule(ruleName, mWidgetControl, mWearCommandHost);
+    public Rule createNewRule(AccessModifier accessModifier, String ruleName) {
+        final Rule rule = new Rule(ruleName);
         if(accessModifier != null)
             rule.setAccess(accessModifier);
-        saveRule(rule, userId);
+
+        saveRule(rule);
         return rule;
     }
 }

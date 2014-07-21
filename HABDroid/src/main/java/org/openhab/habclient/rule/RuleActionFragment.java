@@ -20,16 +20,16 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
-import org.openhab.domain.rule.IRuleOperationBuildListener;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.InjectUtils;
-import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
-import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.InjectUtils;
+import org.openhab.habdroid.R;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -43,9 +43,17 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    private RuleActionFragmentListener mListener;
 
     public static RuleActionFragment newInstance() {
         return new RuleActionFragment();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        mListener = (RuleActionFragmentListener) activity;
     }
 
     @Override
@@ -55,15 +63,6 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         InjectUtils.inject(this);
     }
 
-//    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
-//    {
-//        @Override
-//        public String toString() {
-//            return String.format("(%s) %s", getType().name(), getLabel());
-//
-//        }
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,11 +71,11 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         EditText mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
         mListView = (ListView) view.findViewById(R.id.rule_then_list);
 
-        mListAdapter = new ArrayAdapter<RuleAction>(getActivity(), android.R.layout.simple_list_item_1, ((RuleEditActivity)getActivity()).getRule().getActions());
+        mListAdapter = new ArrayAdapter<RuleAction>(getActivity(), android.R.layout.simple_list_item_1, mListener.getRuleActions());
         mListView.setAdapter(mListAdapter);
 
         setHasOptionsMenu(true);
-        mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
+        mRuleNameView.setText(mListener.getRuleName());
         TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -89,7 +88,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d(HABApplication.getLogTag(), "ruleNameTextWatcher.afterTextChanged = " + s.toString());
-                ((RuleEditActivity)getActivity()).setRuleName(s.toString());
+                mListener.setRuleName(s.toString());
             }
         };
         mRuleNameView.addTextChangedListener(ruleNameTextWatcher);
@@ -106,75 +105,10 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mSelectedActionPosition = position;
-//                mListView.setItemChecked(position, true);
-//                mListView.getFocusables(position);
-//                mListView.setSelection(position);
             }
         });
 
         return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("LifeCycle", "RuleActionFragment.onStart()");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("LifeCycle", "RuleActionFragment.onResume()");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("LifeCycle", "RuleActionFragment.onPause()");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d("LifeCycle", "RuleActionFragment.onStop()");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("LifeCycle", "RuleActionFragment.onDestroyView()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("LifeCycle", "RuleActionFragment.onDestroy()");
-    }
-
-//    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        Log.d("LifeCycle", "RuleActionFragment.onAttach()");
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("LifeCycle", "RuleActionFragment.onDetach()");
-//        mListener = null;
     }
 
     @Override
@@ -215,7 +149,6 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         } else {
             RuleEditActivity activity = ((RuleEditActivity)getActivity());
             activity.setActionUnderConstruction(mActionUnderConstruction);
-            activity.setRuleActionBuildListener(this);
             final RuleActionDialogFragment dialogFragment = RuleActionDialogFragment.newInstance();
             dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
         }
@@ -257,28 +190,20 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         }
 
         if (mSelectedActionPosition < 0/*mListView.getSelectedItem() == null*/) {
-            ((RuleEditActivity)getActivity()).getRule().getActions().add(mActionUnderConstruction);
+            mListener.getRuleActions().add(mActionUnderConstruction);
         } else {
-            int actionIndex = ((RuleEditActivity)getActivity()).getRule().getActions().indexOf(/*mListView.getSelectedItem()*/mListAdapter.getItem(mSelectedActionPosition));
-            ((RuleEditActivity)getActivity()).getRule().getActions().remove(actionIndex);
-            ((RuleEditActivity)getActivity()).getRule().getActions().add(actionIndex, mActionUnderConstruction);
+            int actionIndex = mListener.getRuleActions().indexOf(mListAdapter.getItem(mSelectedActionPosition));
+            mListener.getRuleActions().remove(actionIndex);
+            mListener.getRuleActions().add(actionIndex, mActionUnderConstruction);
         }
 
-//        IEntityDataType oldOperand = mOperationUnderConstruction.getOperand(operandPosition);
-//        if(oldOperand != null && oldOperand.getSourceType() == EntityDataTypeSource.UNIT)
-//            mWidgetProvider.removeItemListener((UnitEntityDataType)oldOperand);
-//        mOperationUnderConstruction.setOperand(operandPosition, operand);
-//        mWidgetProvider.addItemListener((UnitEntityDataType) operand);
-
-        if(((RuleEditActivity)getActivity()).getRule().getRuleOperation() != null)
-            ((RuleEditActivity)getActivity()).getRule().getRuleOperation().runCalculation();//TODO - TA: Temporary test code
         mListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface ruleOperationSelectionInterface
             , IRuleOperationBuildListener.RuleOperationDialogButtonInterface ruleOperationDialogButtonInterface, IEntityDataType operand
-            , int operandPosition, RuleOperator ruleOperator) {
+            , int operandPosition) {
         if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL)
             return;
 
@@ -293,9 +218,14 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
 
             RuleEditActivity activity = ((RuleEditActivity)getActivity());
             activity.setActionUnderConstruction(mActionUnderConstruction);
-            activity.setRuleActionBuildListener(this);
             final RuleActionDialogFragment dialogFragment = RuleActionDialogFragment.newInstance();
             dialogFragment.show(getFragmentManager(), "Action_Builder_Tag");
         }
+    }
+
+    public interface RuleActionFragmentListener {
+        List<RuleAction> getRuleActions();
+        void setRuleName(String name);
+        String getRuleName();
     }
 }

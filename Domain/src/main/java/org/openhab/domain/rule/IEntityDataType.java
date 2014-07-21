@@ -3,13 +3,14 @@ package org.openhab.domain.rule;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public interface IEntityDataType<T> extends IRuleTree, IRuleOperationOperand {
-    public EntityDataTypeSource getSourceType();
-    public String getName();
-    public Class<?> getDataType();
-    public T getValue();
-    public String getFormattedString();
-    public T valueOf(String input);
-    public void setDataSourceId(String value);
-    public String getDataSourceId();
+public interface IEntityDataType<T> {
+    EntityDataTypeSource getSourceType();
+    String getName();
+    void setName(String name);
+
+    Class<T> getValueType();
+    T getValue();
+
+    void setDataSourceId(String value);
+    String getDataSourceId();
 }

@@ -6,7 +6,6 @@ import org.openhab.domain.model.OpenHABItemType;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.util.StringHandler;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -31,24 +30,22 @@ public class RuleAction {
     }
 
     public boolean validate() {
-        if(StringHandler.isNullOrEmpty(mTargetOpenHABItemName)) {
-            //mTargetOpenHABItemName = mStaticValue = mTextValue = null;//TODO - TA: need code here? I dont think misc data shall be cleared due to missing target.
-        } else {
+        if (!StringHandler.isNullOrEmpty(mTargetOpenHABItemName)) {
             //Check if target getUnitEntityDataType match the source unit if any.
             final OpenHABWidget targetWidget = widgetProvider.getWidgetByItemName(mTargetOpenHABItemName);
-            final OpenHABWidget sourceWidget = mSourceUnit == null? null : widgetProvider.getWidgetByItemName(mSourceUnit.mDataSourceId);
+            //final OpenHABWidget sourceWidget = mSourceUnit == null? null : widgetProvider.getWidgetByItemName(mSourceUnit.getDataSourceId());
 
             OpenHABItemType targetType = targetWidget.getItem().getType();
             if(!targetType.equals(OpenHABItemType.String) && mSourceUnit != null && !mSourceUnit.getSourceType().equals(targetType)) {
                 removeSourceUnit();
             }
             //Check if target getUnitEntityDataType has getStaticValues() that match mStaticValue if it´s not null.
-            if(!StringHandler.isNullOrEmpty(mStaticValue)) {
-                UnitEntityDataType unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(targetWidget);
-                Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
-                if(staticValueHash == null || !staticValueHash.containsKey(mStaticValue))
-                    mStaticValue = null;
-            }
+            //if(!StringHandler.isNullOrEmpty(mStaticValue)) {
+                //UnitEntityDataType unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(targetWidget);
+                //Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
+                //if(staticValueHash == null || !staticValueHash.containsKey(mStaticValue))
+                //    mStaticValue = null;
+            //}
         }
         //TODO - TA: 3. Clear any COMMAND specific data if of type MESSAGE and vice versa.
        return true;
@@ -58,14 +55,16 @@ public class RuleAction {
         return mID;
     }
 
+    /*
     public String getCommand() {
         switch(getValueType()) {
-            case SOURCE_UNIT: return getSourceUnit().getFormattedString();/*widgetProvider.getWidgetByItemName(getSourceUnit().getDataSourceId()).getItem().getState()*/
+            case SOURCE_UNIT: return getSourceUnit().getFormattedString(); //widgetProvider.getWidgetByItemName(getSourceUnit().getDataSourceId()).getItem().getState()
             case STATIC: return getStaticValue();
             case TEXT: return getTextValue();
             default: return null;
         }
     }
+    */
 
     public RuleActionValueType getValueType() {
         if(mSourceUnit != null)
@@ -161,6 +160,10 @@ public class RuleAction {
             default: sb.append("<No value>"/*getString(R.string.no_value)*/);
         }
         return sb.toString();
+    }
+
+    public void execute() {
+
     }
 }
 
