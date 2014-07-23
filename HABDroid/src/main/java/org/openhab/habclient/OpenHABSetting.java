@@ -68,6 +68,8 @@ public class OpenHABSetting implements IOpenHABSetting {
     public AsyncHttpClient createAsyncHttpClient() {
         AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(mContext);
         asyncHttpClient.setBasicAuth(mUsername, mPassword);
+        asyncHttpClient.addHeader("Accept", "application/xml");
+        asyncHttpClient.setTimeout(30000);
         return asyncHttpClient;
     }
 

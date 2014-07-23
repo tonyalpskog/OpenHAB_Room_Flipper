@@ -72,12 +72,12 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
 
         if(mRestCommunication != null) {
-            mRestCommunication.requestOpenHABSitemap((String) null);
+            mRestCommunication.requestOpenHABSitemap((String) null, false);
             for (OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
                 if (widget == null)
                     Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
                 else if (widget.hasChildren())
-                    mRestCommunication.requestOpenHABSitemap(widget);
+                    mRestCommunication.requestOpenHABSitemap(widget, false);
             }
         }
 

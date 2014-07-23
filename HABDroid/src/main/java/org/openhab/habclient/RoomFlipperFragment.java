@@ -18,9 +18,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.rule.RuleEditActivity;
@@ -29,6 +31,8 @@ import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
 import javax.inject.Inject;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -50,6 +54,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
+    @Inject IRestCommunication mRestCommunication;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -84,13 +89,14 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomViewFlipper.setDisplayedChild(0);//Show middle image as initial image
         mRoomViewFlipper.setGestureListener(new GestureListener(rootView, true));
         mRoomViewFlipper.setOnRoomShiftListener(this);
-        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider));
+        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider, mRestCommunication));
 
         mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
 
         setHasOptionsMenu(true);
 
         mSpeechResultAnalyzer.setOnShowRoomListener(this);
+        EventBus.getDefault().register(this);
 
         return rootView;
     }
@@ -185,6 +191,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public void onShowRoom(Room room) {
         mRoomViewFlipper.showRoom(room);
+    }
+
+    public void onEvent(SitemapUpdateEvent updateEvent){
+        if(updateEvent.isUpdateFinished())
+            mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
     }
 }
 

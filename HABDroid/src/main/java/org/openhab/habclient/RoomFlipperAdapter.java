@@ -3,8 +3,11 @@ package org.openhab.habclient;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.Direction;
 import org.openhab.domain.model.Room;
+
+import javax.inject.Inject;
 
 /**
  * Created by Tony Alpskog in 2013.
@@ -13,11 +16,14 @@ public class RoomFlipperAdapter {
     private static final String TAG = "RoomFlipperAdapter";
     private final IRoomImageProvider mRoomImageProvider;
     private Room currentRoom;
+    private final IRestCommunication mRestCommunication;
 
     public RoomFlipperAdapter(Room initialRoom,
-                              IRoomImageProvider roomImageProvider) {
-        currentRoom = initialRoom;
+                              IRoomImageProvider roomImageProvider,
+                              IRestCommunication restCommunication) {
+        mRestCommunication = restCommunication;
         mRoomImageProvider = roomImageProvider;
+        setCurrentRoom(initialRoom);
     }
 
     public Bitmap getCurrentBitmap() {
@@ -28,7 +34,11 @@ public class RoomFlipperAdapter {
         return currentRoom;
     }
 
-    public void setCurrentRoom(Room room) { currentRoom = room; }
+    public void setCurrentRoom(Room room) {
+        currentRoom = room;
+        if(room != null)
+            mRestCommunication.requestOpenHABSitemap(room.getRoomWidget(), true);
+    }
 
     public Room getRoom(Gesture gesture) {
         Room nextRoom = null;

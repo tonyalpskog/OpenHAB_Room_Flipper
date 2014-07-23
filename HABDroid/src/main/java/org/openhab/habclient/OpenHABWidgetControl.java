@@ -71,7 +71,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
                 @Override
                 public void onSuccess(String response) {
                     Log.d(HABApplication.getLogTag(), "Command was sent successfully");
-                    mRestCommunication.requestOpenHABSitemap(habWidget);
+                    mRestCommunication.requestOpenHABSitemap(habWidget, false);
                 }
                 @Override
                 public void onFailure(Throwable error, String errorResponse) {

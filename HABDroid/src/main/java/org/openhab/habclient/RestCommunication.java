@@ -5,6 +5,7 @@ import android.content.Context;
 import com.loopj.android.http.AsyncHttpClient;
 
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
@@ -54,20 +55,20 @@ public class RestCommunication implements IRestCommunication {
     }
 
     @Override
-    public void requestOpenHABSitemap(OpenHABWidget widget) {
+    public void requestOpenHABSitemap(final OpenHABWidget widget, final boolean longPolling) {
         if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
-            requestOpenHABSitemap(/*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getItem().getLink()), widget);
+            requestOpenHABSitemap(/*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getParent().getLinkedPage().getLink()), widget, longPolling);
         else
             mLogger.e(HABApplication.getLogTag(2), "[AsyncHttpClient] Sitemap cannot be requested due to missing sitemap data.");
     }
 
     @Override
-    public void requestOpenHABSitemap(String sitemapUrl) {
-        requestOpenHABSitemap(sitemapUrl, null);
+    public void requestOpenHABSitemap(final String sitemapUrl, final boolean longPolling) {
+        requestOpenHABSitemap(sitemapUrl, null, longPolling);
     }
 
     @Override
-    public void requestOpenHABSitemap(String sitemapUrl, final OpenHABWidget widget) {
+    public void requestOpenHABSitemap(final String sitemapUrl, final OpenHABWidget widget, final boolean longPolling) {
         final String RESTaddress;
         if(StringHandler.isNullOrEmpty(sitemapUrl)) {
             mLogger.w(HABApplication.getLogTag(), String.format("\n\r%s\n\r[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
@@ -79,9 +80,11 @@ public class RestCommunication implements IRestCommunication {
 
         mLogger.d(HABApplication.getLogTag(2), String.format("\n\r[AsyncHttpClient] Requested sitemap URL is '%s'", sitemapUrl));
 
-        final Header[] headers = {};
-        final AsyncHttpClient asyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
+        Header[] headers = {};
+        if (longPolling)
+            headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
 
+        final AsyncHttpClient asyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
         mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
         asyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override

@@ -10,6 +10,7 @@ import org.openhab.domain.model.OpenHABWidgetEvent;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.util.ILogger;
@@ -172,6 +173,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         }
 
         if(isStartOfBatch) {
+            EventBus.getDefault().post(new SitemapUpdateEvent(true));
             recalculateUnits();
         }
     }

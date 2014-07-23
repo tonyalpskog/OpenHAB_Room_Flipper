@@ -110,7 +110,7 @@ public class UnitPlacementFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget());
+        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), false);
 
         return fragmentView;
     }
@@ -224,7 +224,7 @@ public class UnitPlacementFragment extends Fragment {
 //            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
 
         if(roomView.getRoom().getRoomWidget() == null) {
-            mRestCommunication.requestOpenHABSitemap((String) null);
+            mRestCommunication.requestOpenHABSitemap((String) null, false);
             if(roomView.getRoom().getRoomWidget() == null)
             {
                 Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with widget ID = '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupWidgetId()));
