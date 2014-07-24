@@ -109,9 +109,6 @@ public class UnitPlacementFragment extends Fragment {
 //        textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));//TODO - Fix this
 
         setHasOptionsMenu(true);
-
-        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), false);
-
         return fragmentView;
     }
 
@@ -125,12 +122,15 @@ public class UnitPlacementFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("LifeCycle", "UnitPlacementFragment.onResume(" + (getArguments()!=null? getArguments().getInt(ARG_SECTION_NUMBER): "?") + ")");
+        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), false, TAG);
+        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), true, TAG);//Used
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d("LifeCycle", "UnitPlacementFragment.onPause(" + (getArguments()!=null? getArguments().getInt(ARG_SECTION_NUMBER): "?") + ")");
+        mRestCommunication.cancelRequests(TAG);
     }
 
     @Override
@@ -224,7 +224,7 @@ public class UnitPlacementFragment extends Fragment {
 //            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
 
         if(roomView.getRoom().getRoomWidget() == null) {
-            mRestCommunication.requestOpenHABSitemap((String) null, false);
+            mRestCommunication.requestOpenHABSitemap((String) null, false, TAG);//Used
             if(roomView.getRoom().getRoomWidget() == null)
             {
                 Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with widget ID = '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupWidgetId()));

@@ -25,7 +25,6 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -41,8 +40,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     /**
      * The fragment argument representing the section number for this
      * fragment.
-     */
+    */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    final String TAG = "RoomFlipperFragment";
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
     @Inject IWearCommandHost mWearCommandHost;
@@ -89,7 +89,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomViewFlipper.setDisplayedChild(0);//Show middle image as initial image
         mRoomViewFlipper.setGestureListener(new GestureListener(rootView, true));
         mRoomViewFlipper.setOnRoomShiftListener(this);
-        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider, mRestCommunication));
+        mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider));
 
         mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
 
@@ -172,12 +172,14 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
         mWearCommandHost.registerReceiver();
+        requestRemoteRoomUpdate();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mWearCommandHost.unregisterReceiver();
+        cancelRemoteRoomUpdate();
     }
 
     @Override
@@ -185,7 +187,20 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         Log.d("Flip Room", "onRoomShift() - Shifted to room<" + room.getId() + ">");
         mRoomLabel.setText(room.getName());
         mRoomDataContainer.setFlipperRoom(room);
+        requestRemoteRoomUpdate();
         return false;
+    }
+
+    private void requestRemoteRoomUpdate() {
+        cancelRemoteRoomUpdate();
+        if(mRoomDataContainer.getFlipperRoom() != null) {
+            mRestCommunication.requestOpenHABSitemap(mRoomDataContainer.getFlipperRoom().getRoomWidget(), false, TAG);
+            mRestCommunication.requestOpenHABSitemap(mRoomDataContainer.getFlipperRoom().getRoomWidget(), true, TAG);//used
+        }
+    }
+
+    private void cancelRemoteRoomUpdate() {
+        mRestCommunication.cancelRequests(TAG);
     }
 
     @Override

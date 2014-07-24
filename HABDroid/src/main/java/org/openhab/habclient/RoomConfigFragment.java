@@ -111,7 +111,7 @@ public class RoomConfigFragment extends Fragment {
             //TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
             if(room.getGroupWidgetId() == null) {
                 OpenHABWidget groupWidget = mOpenHABWidgetProvider.getWidgetByID(room.getRoomWidget().getId());
-                mRestCommunication.requestOpenHABSitemap(groupWidget, false);
+                mRestCommunication.requestOpenHABSitemap(groupWidget, false, TAG);
             }
 
             roomArrayList.add(room);
@@ -173,7 +173,7 @@ public class RoomConfigFragment extends Fragment {
         mHABGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mRestCommunication.requestOpenHABSitemap((OpenHABWidget) mHABGroupSpinner.getSelectedItem(), false);
+                mRestCommunication.requestOpenHABSitemap((OpenHABWidget) mHABGroupSpinner.getSelectedItem(), false, TAG);//Used   //TODO - Needed?
             }
 
             @Override

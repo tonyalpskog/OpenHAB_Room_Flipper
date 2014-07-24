@@ -40,6 +40,7 @@ public class MainActivity extends Activity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private static final String mRestRequestTag = "HABClient.MainActivity";
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject
@@ -72,12 +73,14 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
 
         if(mRestCommunication != null) {
-            mRestCommunication.requestOpenHABSitemap((String) null, false);
+            mRestCommunication.requestOpenHABSitemap((String) null, false, mRestRequestTag);
+
+            //TODO - Run this temporary fix code after REST onSuccess in order to make it work...
             for (OpenHABWidget widget : mWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText))) {
                 if (widget == null)
                     Log.e(HABApplication.getLogTag(), "Got OpenHABWidget = NULL from OpenHABWidgetProvider in " + HABApplication.getLogTag(2));
                 else if (widget.hasChildren())
-                    mRestCommunication.requestOpenHABSitemap(widget, false);
+                    mRestCommunication.requestOpenHABSitemap(widget, false, mRestRequestTag);
             }
         }
 

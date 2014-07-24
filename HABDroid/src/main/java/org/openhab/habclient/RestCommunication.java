@@ -1,6 +1,7 @@
 package org.openhab.habclient;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 
@@ -19,7 +20,11 @@ import org.openhab.domain.IDocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.net.SocketTimeoutException;
+
 import javax.inject.Inject;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -31,6 +36,7 @@ public class RestCommunication implements IRestCommunication {
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final Context mContext;
     private final IDocumentFactory mDocumentFactory;
+    private final AsyncHttpClient mAsyncHttpClient;
 
     @Inject
     public RestCommunication(Context context,
@@ -52,23 +58,24 @@ public class RestCommunication implements IRestCommunication {
         mOpenHABSetting = openHABSetting;
         mWidgetProvider = widgetProvider;
         mDocumentFactory = documentFactory;
+        mAsyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
     }
 
     @Override
-    public void requestOpenHABSitemap(final OpenHABWidget widget, final boolean longPolling) {
+    public void requestOpenHABSitemap(final OpenHABWidget widget, final boolean longPolling, final Object ownerTag) {
         if(widget != null && (widget.hasItem() || widget.hasLinkedPage()))
-            requestOpenHABSitemap(/*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getParent().getLinkedPage().getLink()), widget, longPolling);
+            requestOpenHABSitemap(/*"https://demo.openhab.org:8443/rest/sitemaps/demo/" + */(widget.hasLinkedPage()? widget.getLinkedPage().getLink() : widget.getParent().getLinkedPage().getLink()), widget, longPolling, ownerTag);
         else
             mLogger.e(HABApplication.getLogTag(2), "[AsyncHttpClient] Sitemap cannot be requested due to missing sitemap data.");
     }
 
     @Override
-    public void requestOpenHABSitemap(final String sitemapUrl, final boolean longPolling) {
-        requestOpenHABSitemap(sitemapUrl, null, longPolling);
+    public void requestOpenHABSitemap(final String sitemapUrl, final boolean longPolling, final Object ownerTag) {
+        requestOpenHABSitemap(sitemapUrl, null, longPolling, ownerTag);
     }
 
     @Override
-    public void requestOpenHABSitemap(final String sitemapUrl, final OpenHABWidget widget, final boolean longPolling) {
+    public void requestOpenHABSitemap(final String sitemapUrl, final OpenHABWidget widget, final boolean longPolling, final Object ownerTag) {
         final String RESTaddress;
         if(StringHandler.isNullOrEmpty(sitemapUrl)) {
             mLogger.w(HABApplication.getLogTag(), String.format("\n\r%s\n\r[AsyncHttpClient] Requested sitemap URL is %s", HABApplication.getLogTag(2), (sitemapUrl == null? "NULL": "empty")));
@@ -78,15 +85,15 @@ public class RestCommunication implements IRestCommunication {
             RESTaddress = sitemapUrl;
         }
 
-        mLogger.d(HABApplication.getLogTag(2), String.format("\n\r[AsyncHttpClient] Requested sitemap URL is '%s'", sitemapUrl));
+        mLogger.d(HABApplication.getLogTag(2), String.format("\n\r[AsyncHttpClient] Requested sitemap URL is '%s'    longpolling = '%s'", sitemapUrl, longPolling));
+        final String callingMethod = HABApplication.getLogTag(2);
 
         Header[] headers = {};
         if (longPolling)
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
 
-        final AsyncHttpClient asyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
         mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
-        asyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
+        mAsyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 if (document == null) {
@@ -94,18 +101,36 @@ public class RestCommunication implements IRestCommunication {
                     return;
                 }
 
-                mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() -> 'get_items' = '" + document.toString() + "'");
+                mLogger.d(HABApplication.getLogTag(), String.format("\n\r%s - %s\n\r[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() for requested sitemap URL '%s'    longpolling = '%s'", ownerTag, callingMethod, sitemapUrl, longPolling));
                 final Node rootNode = document.getFirstChild();
 
                 if (widget == null)
                     mWidgetProvider.setOpenHABWidgets(new OpenHABWidgetDataSource(rootNode, mLogger, mColorParser));
                 else
                     mWidgetProvider.setOpenHABWidgets(new OpenHABWidgetDataSource(rootNode, widget, mLogger, mColorParser));
+
+                checkForLongPolling();
             }
             @Override
             public void onFailure(Throwable e, String errorResponse) {
-                mLogger.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\r\nget_items() - asyncHttpClient.onFailure  - " + e.toString());
+                mLogger.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\r\nget_items() - DocumentHttpResponseHandler.onFailure  - " + e.toString());
+                if (e instanceof SocketTimeoutException) {
+                    Log.d(HABApplication.getLogTag(), String.format("\n\r%s - %s\n\r[AsyncHttpClient] Connection timeout for requested sitemap URL '%s'    longpolling = '%s'", ownerTag, callingMethod, sitemapUrl, longPolling));
+                }
+                checkForLongPolling();
             }
-        });
+
+            private void checkForLongPolling() {
+                if(longPolling) {
+                    Log.d(HABApplication.getLogTag(), String.format("\n\r%s - %s\n\r[AsyncHttpClient] LongPolling => Will run the sitemap request again for requested sitemap URL '%s'    longpolling = '%s'", ownerTag, callingMethod, sitemapUrl, longPolling));
+                    requestOpenHABSitemap(RESTaddress, longPolling, ownerTag);
+                }
+            }
+        }, ownerTag);
+    }
+
+    @Override
+    public void cancelRequests(Object ownerTag) {
+        mAsyncHttpClient.cancelRequests(mContext, ownerTag, true);
     }
 }

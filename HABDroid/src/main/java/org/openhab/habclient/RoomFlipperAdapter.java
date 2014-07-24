@@ -16,12 +16,9 @@ public class RoomFlipperAdapter {
     private static final String TAG = "RoomFlipperAdapter";
     private final IRoomImageProvider mRoomImageProvider;
     private Room currentRoom;
-    private final IRestCommunication mRestCommunication;
 
     public RoomFlipperAdapter(Room initialRoom,
-                              IRoomImageProvider roomImageProvider,
-                              IRestCommunication restCommunication) {
-        mRestCommunication = restCommunication;
+                              IRoomImageProvider roomImageProvider) {
         mRoomImageProvider = roomImageProvider;
         setCurrentRoom(initialRoom);
     }
@@ -36,8 +33,6 @@ public class RoomFlipperAdapter {
 
     public void setCurrentRoom(Room room) {
         currentRoom = room;
-        if(room != null)
-            mRestCommunication.requestOpenHABSitemap(room.getRoomWidget(), true);
     }
 
     public Room getRoom(Gesture gesture) {

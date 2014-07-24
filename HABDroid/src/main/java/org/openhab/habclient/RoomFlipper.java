@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ViewFlipper;
 
+import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.Room;
 import org.openhab.habdroid.R;
 
@@ -218,8 +219,8 @@ public class RoomFlipper extends ViewFlipper implements GestureListener.OnGestur
         /**
          * Called when another room is shown.
          *
-         * @param newView The current view after switch.
-         * @param oldView The previous view after switch.
+         * @param gesture The gesture that caused the change.
+         * @param room The room the flipper switched to.
          * @return True if the listener has consumed the event, false otherwise.
          */
         boolean onRoomShift(Gesture gesture, Room room);
