@@ -12,7 +12,7 @@ import java.util.List;
 public interface ICommandAnalyzer {
     SpeechAnalyzerResult executeSpeech(ArrayList<String> speechResult, ApplicationMode applicationMode);
 
-    SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode);
+    SpeechAnalyzerResult analyzeRoomNavigation(ArrayList<String> speechResult, ApplicationMode applicationMode);
 
     CommandAnalyzerResult analyzeCommand(List<String> speechResult, ApplicationMode applicationMode);
 

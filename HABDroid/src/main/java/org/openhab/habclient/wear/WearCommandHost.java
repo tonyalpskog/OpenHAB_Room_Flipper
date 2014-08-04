@@ -93,7 +93,7 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
         if (text != null && !text.equals("")) {
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
-//            mApplication.getSpeechResultAnalyzer().analyze(replyToBeAnalyzed, HABApplication.getAppMode());
+//            mApplication.getSpeechResultAnalyzer().analyzeRoomNavigation(replyToBeAnalyzed, HABApplication.getAppMode());
             mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
 
             showNotification("Reply", "Hard coded message");

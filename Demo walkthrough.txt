@@ -4,12 +4,13 @@ Application demo walk through:
 2. Go to Ground Floor -> Corridor
 3. Note the status of the tree upper units
 4. Options menu -> Flipper Navigation
-5. On Basement Center swipe right, then up to get to Basement Southwest
+   (In flipper navigation you can swipe in all directions and pinch in/out)
+5. On Basement Center swipe diagonal up/right to get to Basement Southwest
 - Lets do some room configuration and add some OpenHAB widgets to it:
 6. Press the action bar edit icon (pen)
-7. Write your own room alias (This is the name that speech recognition will recognize)
+7. Write "My room" as room alias (This is the name that speech recognition will recognize)
 8. Select the (Group)0001_3::Corridor sitemap group in the HAB group spinner 
-9. At the Up Right spinner, select Basement Center. (Creates a diagonal shortcut between Basement Southwest and Basement Center)
+9. At the Down Left spinner, select Second floor Northeast. (Creates a diagonal shortcut between Basement Southwest and Second floor Northeast)
 10. Scroll down and press Save.
 11. Swipe to the Unit Placement tab
 12. Press the action bar Add icon (plus sign)
@@ -20,7 +21,7 @@ Application demo walk through:
 16. Swipe diagonal down/left to navigate to the center of the basement. (This is the shortcut that was created in item no. 9)
 17. Pinch in twice to navigate to Second Floor Center.
 18. Swipe to the left to get to Second Floor East.
-19. Press the action bar microphone icon and say "Basement southwest". (It will help if you have English enabled as a speech language)
+19. Press the action bar microphone icon and say "My room" to navigate to Basement southwest room. (It will help if you have English enabled as a speech language)
 - Try out the widgets in the room:
 20. Back in Basement Southwest, press the ceiling lamp widget to toggle lamp status.
 21. Press action bar widget list icon (sort by size). This is a shortcut to current sitemap group in the original OpenHAB app view.

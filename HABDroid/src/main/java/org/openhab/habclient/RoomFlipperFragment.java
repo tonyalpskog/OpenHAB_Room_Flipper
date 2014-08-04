@@ -91,7 +91,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mRoomViewFlipper.setOnRoomShiftListener(this);
         mRoomViewFlipper.setRoomFlipperAdapter(new RoomFlipperAdapter(mRoomDataContainer.getFlipperRoom(), mRoomImageProvider));
 
-        mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
+        mRoomLabel.setText(getRoomLabel());
 
         setHasOptionsMenu(true);
 
@@ -118,9 +118,6 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_edit_room_from_flipper:
                 Room roomToEdit = mRoomDataContainer.getFlipperRoom();
@@ -147,8 +144,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
                 Intent widgetListIntent = new Intent(getActivity().getApplicationContext(), OpenHABMainActivity.class);
                 widgetListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 widgetListIntent.setAction("SHOW_PAGE_AS_LIST");//TODO - Centralize this parameter
-                widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mRoomDataContainer.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
-
+                try {
+                    widgetListIntent.putExtra("pageUrl", "openhab://sitemaps/demo/" + mRoomDataContainer.getFlipperRoom().getRoomWidget().getLinkedPage().getId());
+                } catch (NullPointerException e) {
+                    return true;//Probably because no OpenHAB group was attached to the room.
+                }
                 // Start launch activity
                 getActivity().startActivity(widgetListIntent);
 
@@ -169,7 +169,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onResume() {
         super.onResume();
         mApplicationModeProvider.setAppMode(ApplicationMode.RoomFlipper);
-        mRoomLabel.setText(mRoomDataContainer.getFlipperRoom().getName());
+        mRoomLabel.setText(getRoomLabel());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
         mWearCommandHost.registerReceiver();
         requestRemoteRoomUpdate();
@@ -185,10 +185,16 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public boolean onRoomShift(Gesture gesture, Room room) {
         Log.d("Flip Room", "onRoomShift() - Shifted to room<" + room.getId() + ">");
-        mRoomLabel.setText(room.getName());
         mRoomDataContainer.setFlipperRoom(room);
+        mRoomLabel.setText(getRoomLabel());
         requestRemoteRoomUpdate();
         return false;
+    }
+
+    private String getRoomLabel() {
+        if(mRoomDataContainer.getFlipperRoom().getRoomWidget() == null)
+            return this.getString(R.string.missing_openhab_group_for_room);
+        return mRoomDataContainer.getFlipperRoom().getName();
     }
 
     private void requestRemoteRoomUpdate() {

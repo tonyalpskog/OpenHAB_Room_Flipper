@@ -17,7 +17,6 @@ import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.rule.RuleEditActivity;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 
@@ -42,12 +41,9 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
     private static final String mRestRequestTag = "HABClient.MainActivity";
 
-    @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject
-    IRestCommunication mRestCommunication;
+    @Inject IRestCommunication mRestCommunication;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject
-    IApplicationModeProvider mApplicationModeProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject ICommandAnalyzer mCommandAnalyzer;
 
     @Override
@@ -181,10 +177,8 @@ public class MainActivity extends Activity
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             final HABApplication application = ((HABApplication) getApplication());
 
-//            mSpeechResultAnalyzer.setRoomFlipper(mRoomFlipper);
-//            mSpeechResultAnalyzer.analyze(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
-
-            mCommandAnalyzer.analyzeCommand(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
+            mCommandAnalyzer.analyzeRoomNavigation(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
+//            mCommandAnalyzer.analyzeCommand(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS), mApplicationModeProvider.getAppMode());
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

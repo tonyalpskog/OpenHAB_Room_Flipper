@@ -2,7 +2,7 @@
 <resources>
 
     <!-- General app strings -->
-    <string name="app_name">openHAB</string>
+    <string name="app_name">openHAB - RFF</string>
     <string name="openhab_service_type">_openhab-server-ssl._tcp.local.</string>
     <string name="openhab_demo_url">https://demo.openhab.org:8443/</string>
     <string name="openhab_demo_sitemap_postfix">rest/sitemaps/demo</string>
@@ -133,4 +133,6 @@
     <string name="action_delete_rule">Remove rule</string>
     <string name="action_edit_rule">Edit rule</string>
     <string name="action_add_rule">Add rule</string>
+    <string name="missing_openhab_group_for_room"><![CDATA[<No OpenHAB group defined>]]></string>
+    <string name="install_app_name">OpenHAB - Room flipper fork</string>
 </resources>

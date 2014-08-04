@@ -126,6 +126,12 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         if(widget == null)
             return;
 
+        if(widget.getType() == null)
+            mLogger.d(TAG, String.format("[SITEMAP] typeless widget found: label = '%s'  link = '%s'", widget.getLabel(), widget.getLinkedPage()));
+
+        if(widget.getId() != null && widget.getId().equalsIgnoreCase("0001_3"))
+            mLogger.d(TAG, String.format("[SITEMAP] widget '%s' was found. Label = '%s'", widget.getId(), widget.getLabel()));
+
         widget.setUpdateUUID(mUpdateSetUUID);
 
         boolean widgetExists = mOpenHABWidgetIdMap.containsKey(widget.getId());

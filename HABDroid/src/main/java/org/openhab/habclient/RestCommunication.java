@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -93,6 +94,8 @@ public class RestCommunication implements IRestCommunication {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
 
         mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
+        RequestParams rp = new RequestParams();
+
         mAsyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {

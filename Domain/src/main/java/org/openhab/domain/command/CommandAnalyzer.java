@@ -78,7 +78,7 @@ public class CommandAnalyzer implements ICommandAnalyzer {
     }
 
     @Override
-    public SpeechAnalyzerResult analyze(ArrayList<String> speechResult, ApplicationMode applicationMode) {
+    public SpeechAnalyzerResult analyzeRoomNavigation(ArrayList<String> speechResult, ApplicationMode applicationMode) {
         // Fill the list view with the strings the recognizer thought it
         // could have heard
         List<Room> roomList = new ArrayList<Room>();
