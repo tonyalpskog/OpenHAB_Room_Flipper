@@ -41,7 +41,7 @@ NOTE! this has nothing to do with the design-time rules on the server side.
 Please read about the [OpenHAB](http://www.openhab.org/) server and the REST API.
 
 ## "I would like to contribute." ##
-Hey, your my man!
+Hey, you're my man!
 
 There is a ton of work to do so you are most welcome.
 
