@@ -34,7 +34,7 @@ NOTE! this has nothing to do with the design-time rules on the server side.
 * These voice commands is a lot more powerful and accurate (forgiving) than the original one.
 
 ## "Wanna try out now!" ##
-1. Download and install the latest APK that are published in the [Downloads](https://bitbucket.org/tonyalpskog/open-hab-android-client/downloads) area. 
+1. Download and install the latest APK that are published in the [Releases](https://github.com/tonyalpskog/OpenHAB_Room_Flipper/releases) area. 
 2. Run the app and follow the walkthrough named *Demo walkthrough.txt* that is found in the source root.
 
 ## "How does this stuff work?" ##
