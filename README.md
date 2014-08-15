@@ -52,6 +52,7 @@ Please note me and tell me what you would like to contribute with.
 
 To save me some time I had to cut the corners a lot while developing so please bear with me.
 
+* The source repo is cut off from the original repo.
 * Some boilerplate code is missing.
 * Device rotation is not supported in most of the views.
 * Nothing is stored persistent.

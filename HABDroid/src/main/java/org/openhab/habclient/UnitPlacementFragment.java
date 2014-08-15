@@ -219,10 +219,6 @@ public class UnitPlacementFragment extends Fragment {
         String strLogAll = "showAddUnitDialog() -> Full list: ";
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
-//TA: TODO - Not sure if this is needed.
-//        if(!HABApplication.getOpenHABWidgetProvider2().hasWidgetID(roomView.getRoom().getGroupWidgetId()))
-//            HABApplication.getRestCommunication().requestOpenHABSitemap(context, roomView.getRoom().getSitemapId());
-
         if(roomView.getRoom().getRoomWidget() == null) {
             mRestCommunication.requestOpenHABSitemap((String) null, false, TAG);//Used
             if(roomView.getRoom().getRoomWidget() == null)
