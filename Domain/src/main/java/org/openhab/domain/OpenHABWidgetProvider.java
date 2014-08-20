@@ -11,7 +11,6 @@ import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.SitemapUpdateEvent;
-import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
@@ -29,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.greenrobot.event.EventBus;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by Tony Alpskog in 2014.
