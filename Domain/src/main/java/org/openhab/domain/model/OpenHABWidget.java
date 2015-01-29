@@ -85,7 +85,7 @@ public class OpenHABWidget {
         if(colorParser == null) throw new IllegalArgumentException("colorParser is null");
 
         this.logger = logger;
-		this.parent = parent;
+		this.parent = parent;//TODO - Check if it's possible to not add parents that is root (type = null)
         this.children = new ArrayList<OpenHABWidget>();
 		this.mappings = new ArrayList<OpenHABWidgetMapping>();
 		if (startNode.hasChildNodes()) {
@@ -180,7 +180,11 @@ public class OpenHABWidget {
     public OpenHABWidget getParent() {
         return parent;
     }
-	
+
+    public void setParent(OpenHABWidget newParent) {//TODO - Just temporary test code
+        parent = newParent;
+    }
+    
 	public boolean hasItem() {
         return this.getItem() != null;
 	}

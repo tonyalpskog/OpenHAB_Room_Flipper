@@ -67,11 +67,14 @@
         <!--<item>Off</item>-->
     <!--</string-array>-->
 
+    <string-array name="command_phrases_goto">
+        <item>Go to &lt;unit&gt;</item>
+    </string-array>
+
     <string-array name="command_phrases_get_status">
         <item>Get &lt;unit&gt;</item>
         <item>Get &lt;unit&gt; status</item>
     </string-array>
-
 
     <string-array name="command_phrases_switch_on">
         <item>Turn on &lt;unit&gt;</item>

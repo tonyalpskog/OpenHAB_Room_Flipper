@@ -177,8 +177,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         if(view == null) {
             view = new GraphicUnitWidget(getContext(), graphicUnit, this);
 
-            view.setMinimumWidth(UNIT_SIZE);
-            view.setMinimumHeight(UNIT_SIZE);
+            view.setMinimumWidth(getQuickFixScaleValue(UNIT_SIZE));
+            view.setMinimumHeight(getQuickFixScaleValue(UNIT_SIZE));
             view.setTag(graphicUnit.getId());
             view.setSelected(graphicUnit.isSelected());
             mGraphicUnitWidgets.put(graphicUnit, view);
@@ -206,16 +206,21 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
         if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.Switch) {
             removeControlView();
             controlView = mOpenHABWidgetControl.initializeSwitchWidget(gUnit.getOpenHABWidget(), inflatedView);
-            params.setMargins(x - 30, y + 64, 0, 0);
+            params.setMargins(x - getQuickFixScaleValue(30), y + getQuickFixScaleValue(64), 0, 0);
             mAddedControlView = inflatedView;
         } else if(gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.ItemText/* || gUnit.getOpenHABWidget().getType() == OpenHABWidgetType.SitemapText*/) {
             mAddedUnitViews.add(inflatedView);
             controlView = mOpenHABWidgetControl.initializeTextWidget(gUnit.getOpenHABWidget(), inflatedView);
-            params.setMargins(x - 10, y + 64, 0, 0);
+            params.setMargins(x - getQuickFixScaleValue(10), y + getQuickFixScaleValue(64), 0, 0);
         }
 
         controlView.setLayoutParams(params);
         addView(inflatedView);
+    }
+    
+    private int getQuickFixScaleValue(int baseValue)//TODO - Temporary quick and extremely dirty fix for non-scaling unit views
+    {
+        return (int)(baseValue / (1.5 / getResources().getDisplayMetrics().density));
     }
 
     public void setRoom(Room nextRoom) {

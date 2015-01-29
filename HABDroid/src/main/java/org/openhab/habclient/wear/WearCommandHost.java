@@ -6,13 +6,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.preview.support.v4.app.NotificationManagerCompat;
-import android.preview.support.wearable.notifications.RemoteInput;
-import android.preview.support.wearable.notifications.WearableNotifications;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.NotificationCompat.WearableExtender;
+import android.support.v4.app.RemoteInput;
 
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.habclient.RoomFlipperFragment;
+import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
 
@@ -60,37 +63,39 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
         showNotification(title, message);
     }
 
-//    public void endSession() {
-//    }
-
-    private void showNotification(String title, String message) {
+    private void showNotification(String title, String message/*, Action[] actions, NotificationCompat.Builder preBuiltPrio, ...*/) {//TODO - More injection
         // Create intent for reply action
         Intent intent = new Intent(ACTION_RESPONSE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
 
-        // Build the notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext.getApplicationContext())
-                .setContentTitle(title)
-                .setContentText(message)
-                .setContentIntent(pendingIntent);
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.bg_eliza));
+        //A simple, non-limited, voice input without pre-defined input patterns.
+        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY).setLabel("Listening...").setAllowFreeFormInput(true).build();
 
         //Create primary action
-        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY).setLabel("Command").setAllowFreeFormInput(true).build();
+        NotificationCompat.Action commandoAction =
+                new NotificationCompat.Action.Builder(R.drawable.ic_menu_add_action,
+                        "Send command", pendingIntent)
+                        .addRemoteInput(remoteInput)
+                        .build();
 
-        // Create wearable notification and add remote input
-        Notification notification = new WearableNotifications.Builder(builder)
-                .setMinPriority()
-                .addRemoteInputForContentIntent(remoteInput)
+        // Build the notification
+        Notification notification = new NotificationCompat.Builder(mContext)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.ic_action_copy)
+                .setVibrate(new long[]{0, 350, 150, 350, 500, 350, 150, 350, 500})
+                .extend(new WearableExtender().addAction(commandoAction))
                 .build();
 
         NotificationManagerCompat.from(mContext).notify(0, notification);
     }
 
     private void processResponse(Intent intent) {
-        String text = intent.getStringExtra(EXTRA_REPLY);
-        if (text != null && !text.equals("")) {
+        Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+        CharSequence reply = remoteInput.getCharSequence(EXTRA_REPLY);
+        String text = reply.toString();
+        if (text != null && text.length() > 0) {
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyzeRoomNavigation(replyToBeAnalyzed, HABApplication.getAppMode());
