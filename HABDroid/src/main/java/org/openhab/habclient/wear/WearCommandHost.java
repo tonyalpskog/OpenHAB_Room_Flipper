@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat.WearableExtender;
 import android.support.v4.app.RemoteInput;
 
 import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.command.CommandAnalyzerResult;
 import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.RoomFlipperFragment;
 import org.openhab.habdroid.R;
@@ -99,9 +100,9 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
             ArrayList<String> replyToBeAnalyzed = new ArrayList<String>(1);
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyzeRoomNavigation(replyToBeAnalyzed, HABApplication.getAppMode());
-            mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
+            CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
 
-            showNotification("Reply", "Hard coded message");
+            showNotification("Command reply",  mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
         }
     }
 }

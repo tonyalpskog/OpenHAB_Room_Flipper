@@ -14,6 +14,7 @@ public enum OpenHABWidgetCommandType {
     RollerShutterStop(5, "Stop roller", OpenHABWidgetType.RollerShutter),
     SliderSetPercentage(6, "Set percentage", OpenHABWidgetType.Slider),
     AdjustSetpoint(7, "Adjust setpoint", OpenHABWidgetType.Setpoint);
+//    GotoGroup(8, "Goto group", OpenHABWidgetType.Group);
 
     public final int Id;
     public final String Name;

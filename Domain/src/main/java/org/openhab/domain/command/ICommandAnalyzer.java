@@ -16,6 +16,8 @@ public interface ICommandAnalyzer {
 
     CommandAnalyzerResult analyzeCommand(List<String> speechResult, ApplicationMode applicationMode);
 
+    String getCommandReply(CommandAnalyzerResult commandAnalyzerResult);
+        
     void setOnShowRoomListener(OnShowRoomListener listener);
 
     interface OnShowRoomListener {
