@@ -91,7 +91,7 @@ public class Rule implements OnOperandValueChangedListener {
 
     @Override
     public void onOperandValueChanged(IEntityDataType operand) {
-        if(!mEnabled)
+        if(!mEnabled || operand.getValue().equals(new LogicBoolean(false)))
             return;
 
         for(RuleAction action : mActions) {
