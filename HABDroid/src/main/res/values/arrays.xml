@@ -24,6 +24,11 @@
         <item>Toggle</item>
     </string-array>
 
+    <string-array name="wear_reply_choices">
+        <item>I\'ll handle this</item>
+        <item>I won\'t handle this</item>
+    </string-array>
+    
     <!-- Command phrases -->
     <!--<string-array name="command_commands_switch_on">-->
         <!--<item>Turn on</item>-->

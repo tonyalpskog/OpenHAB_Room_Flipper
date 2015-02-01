@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -61,11 +63,33 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
 
     @Override
     public void startSession(String title, String message) {
-        showNotification(title, message);
+        showNotification(title, message, new NotificationCompat.Action[]{getGroupMessageAction(), getVoiceCommandAction()}, getMediumPriorityVibratePattern());
     }
 
-    private void showNotification(String title, String message/*, Action[] actions, NotificationCompat.Builder preBuiltPrio, ...*/) {//TODO - More injection
-        // Create intent for reply action
+    private void showNotification(String title, String message, NotificationCompat.Action[] actions, long[] vibratePattern/*, NotificationCompat.Builder preBuiltPrio, ...*/) {//TODO - More injection
+        WearableExtender wearableExtender = new WearableExtender();
+        for(NotificationCompat.Action action : actions) {
+            wearableExtender.addAction(action);
+        }
+
+        wearableExtender.setBackground(BitmapFactory.decodeResource(mContext.getResources(),
+                R.drawable.openhab_320x320));
+                
+        // Build the notification
+        Notification notification = new NotificationCompat.Builder(mContext)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.openhabicon)
+                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.openhabicon_light))
+                .setVibrate(vibratePattern)
+                .extend(wearableExtender)
+                .build();
+
+        NotificationManagerCompat.from(mContext).notify(0, notification);
+    }
+    
+    public NotificationCompat.Action getVoiceCommandAction() {
+        // Create intent for action
         Intent intent = new Intent(ACTION_RESPONSE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
@@ -73,23 +97,45 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
         //A simple, non-limited, voice input without pre-defined input patterns.
         RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY).setLabel("Listening...").setAllowFreeFormInput(true).build();
 
-        //Create primary action
-        NotificationCompat.Action commandoAction =
-                new NotificationCompat.Action.Builder(R.drawable.ic_menu_add_action,
-                        "Send command", pendingIntent)
-                        .addRemoteInput(remoteInput)
-                        .build();
+        //Create action
+        return new NotificationCompat.Action.Builder(R.drawable.ic_white_microphone,
+            "Send command", pendingIntent)
+            .addRemoteInput(remoteInput)
+            .build();
+    }
 
-        // Build the notification
-        Notification notification = new NotificationCompat.Builder(mContext)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setSmallIcon(R.drawable.ic_action_copy)
-                .setVibrate(new long[]{0, 350, 150, 350, 500, 350, 150, 350, 500})
-                .extend(new WearableExtender().addAction(commandoAction))
+
+    public NotificationCompat.Action getGroupMessageAction() {
+        // Create intent for action
+        Intent intent = new Intent(ACTION_RESPONSE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
+
+        String[] replyChoices = mContext.getResources().getStringArray(R.array.wear_reply_choices);
+
+        //A simple, non-limited, voice input without pre-defined input patterns.
+        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_REPLY)
+                .setLabel("Select or speak")
+                .setChoices(replyChoices)
                 .build();
 
-        NotificationManagerCompat.from(mContext).notify(0, notification);
+        //Create action
+        return new NotificationCompat.Action.Builder(R.drawable.ic_message_accept_white,
+                "Group message", pendingIntent)
+                .addRemoteInput(remoteInput)
+                .build();
+    }
+    
+    public long[] getHighPriorityVibratePattern() {
+        return new long[]{0, 350, 150, 350, 500, 350, 150, 350, 500};
+    }
+
+    public long[] getMediumPriorityVibratePattern() {
+        return new long[]{0, 350, 150, 350};
+    }
+
+    public long[] getLowPriorityVibratePattern() {
+        return new long[]{0, 500};
     }
 
     private void processResponse(Intent intent) {
@@ -101,8 +147,9 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
             replyToBeAnalyzed.add(text);
 //            mApplication.getSpeechResultAnalyzer().analyzeRoomNavigation(replyToBeAnalyzed, HABApplication.getAppMode());
             CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
-
-            showNotification("Command reply",  mCommandAnalyzer.getCommandReply(commandAnalyzerResult));
+            
+            String commandReplyMessage =  commandAnalyzerResult != null? mCommandAnalyzer.getCommandReply(commandAnalyzerResult) : "Sorry, didn't get that.";
+                showNotification("Command reply",  commandReplyMessage, new NotificationCompat.Action[]{}, getLowPriorityVibratePattern());
         }
     }
 }
