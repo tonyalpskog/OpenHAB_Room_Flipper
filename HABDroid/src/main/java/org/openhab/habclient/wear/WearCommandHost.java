@@ -99,7 +99,7 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
 
         //Create action
         return new NotificationCompat.Action.Builder(R.drawable.ic_white_microphone,
-            "Send command", pendingIntent)
+            "Command", pendingIntent)
             .addRemoteInput(remoteInput)
             .build();
     }
@@ -120,8 +120,8 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
                 .build();
 
         //Create action
-        return new NotificationCompat.Action.Builder(R.drawable.ic_message_accept_white,
-                "Group message", pendingIntent)
+        return new NotificationCompat.Action.Builder(R.drawable.ic_message_members_white,
+                "Message", pendingIntent)
                 .addRemoteInput(remoteInput)
                 .build();
     }
