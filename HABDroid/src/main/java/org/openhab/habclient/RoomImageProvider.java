@@ -19,7 +19,9 @@ public class RoomImageProvider implements IRoomImageProvider {
 
     @Override
     public Bitmap getRoomImage(Room room) {
-        return getBitmap(room.getBackgroundImageResourceId());
+        if(room.getBackgroundImageFilePath() == null || room.getBackgroundImageFilePath().isEmpty())
+            return getBitmap(room.getBackgroundImageResourceId());
+        return BitmapFactory.decodeFile(room.getBackgroundImageFilePath());
     }
 
     private Bitmap getBitmap(int bitmapResourceId) {

@@ -27,6 +27,7 @@ public class Room {
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final ILogger mLogger;
     private final IColorParser mColorParser;
+    private String mBackgroundImageFilePath;
 
     public Room(String groupItemName, String name, int backgroundImageResourceId,
                 ILogger logger, IColorParser colorParser, IOpenHABWidgetProvider widgetProvider) {
@@ -63,7 +64,8 @@ public class Room {
         copy.mLatestWidgetUpdateUUID = this.mLatestWidgetUpdateUUID;
         copy.mLocalWidget = this.mLocalWidget;
         copy.mBackgroundImageResourceId = this.mBackgroundImageResourceId;
-
+        copy.mBackgroundImageFilePath = this.mBackgroundImageFilePath;
+        
         return copy;
     }
 
@@ -158,5 +160,10 @@ public class Room {
 
     public int getBackgroundImageResourceId() {
         return mBackgroundImageResourceId;
+    }
+    
+    public String getBackgroundImageFilePath() { return mBackgroundImageFilePath; }
+    public void setBackgroundImageFilePath(String backgroundImageFilePath) {
+        mBackgroundImageFilePath = backgroundImageFilePath;
     }
 }
