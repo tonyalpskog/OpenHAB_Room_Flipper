@@ -123,8 +123,9 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
         final HABApplication application = (HABApplication) getApplication();
         if(tab.getPosition() == 0)
             mApplicationModeProvider.setAppMode(ApplicationMode.RoomEdit);
-        else
+        else {
             mApplicationModeProvider.setAppMode(ApplicationMode.UnitPlacement);
+        }
     }
 
     @Override
@@ -156,30 +157,6 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
     public void setConfigRoom(Room configRoom) {
         mConfigRoom = configRoom;
     }
-
-//    @Override
-//    public void onTabChanged(String tabId) {
-//        Log.d(TAG, "onTabChanged(): tabId=" + tabId);
-//        if (TAB_WORDS.equals(tabId)) {
-//            updateTab(tabId, R.id.tab_1);
-//            mCurrentTab = 0;
-//            return;
-//        }
-//        if (TAB_NUMBERS.equals(tabId)) {
-//            updateTab(tabId, R.id.tab_2);
-//            mCurrentTab = 1;
-//            return;
-//        }
-//    }
-//
-//    private void updateTab(String tabId, int placeholder) {
-//        FragmentManager fm = getFragmentManager();
-//        if (fm.findFragmentByTag(tabId) == null) {
-//            fm.beginTransaction()
-//                    .replace(placeholder, new MyListFragment(tabId), tabId)
-//                    .commit();
-//        }
-//    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

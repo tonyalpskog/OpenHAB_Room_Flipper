@@ -24,8 +24,10 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
+import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
@@ -39,6 +41,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -50,7 +54,7 @@ public class UnitPlacementFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "UnitPlacementFragment";
 
-    private UnitContainerView roomView;
+    private UnitContainerView mRoomView;
     private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.ItemText, OpenHABWidgetType.SitemapText, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
@@ -100,12 +104,14 @@ public class UnitPlacementFragment extends Fragment {
 
         View fragmentView = inflater.inflate(R.layout.fragment_unit_placement, container, false);
         TextView textView = (TextView) fragmentView.findViewById(R.id.room_config_section_label);
-        roomView = (UnitContainerView) fragmentView.findViewById(R.id.room_layout);
+        mRoomView = (UnitContainerView) fragmentView.findViewById(R.id.room_layout);
 
-        roomView.setRoom(room);
+        mRoomView.setRoom(room);
+        
         //TODO - Make DragListener internal in UnitContainerView and control the usage of it by layout parameters (DragNDrop on/off)
-        roomView.setOnDragListener(dropListener);
-
+        mRoomView.setOnDragListener(dropListener);
+        EventBus.getDefault().register(this);
+        
 //        textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));//TODO - Fix this
 
         setHasOptionsMenu(true);
@@ -122,8 +128,8 @@ public class UnitPlacementFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("LifeCycle", "UnitPlacementFragment.onResume(" + (getArguments()!=null? getArguments().getInt(ARG_SECTION_NUMBER): "?") + ")");
-        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), false, TAG);
-        mRestCommunication.requestOpenHABSitemap(roomView.getRoom().getRoomWidget(), true, TAG);//Used
+        mRestCommunication.requestOpenHABSitemap(mRoomView.getRoom().getRoomWidget(), false, TAG);
+        mRestCommunication.requestOpenHABSitemap(mRoomView.getRoom().getRoomWidget(), true, TAG);//Used
     }
 
     @Override
@@ -155,6 +161,11 @@ public class UnitPlacementFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         Log.d("LifeCycle", "UnitPlacementFragment.onDetach(" + (getArguments()!=null? getArguments().getInt(ARG_SECTION_NUMBER): "?") + ")");
+    }
+    
+    public void onUpdateView() {
+        if(mRoomView != null)
+            mRoomView.setRoom(((RoomConfigActivity)getActivity()).getConfigRoom());
     }
 
     @Override
@@ -194,16 +205,16 @@ public class UnitPlacementFragment extends Fragment {
     private void removeSelectedUnits() {
         final List<GraphicUnit> unitsToBeRemovedList = new ArrayList<GraphicUnit>();
 
-        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             if(gu.isSelected())
                 unitsToBeRemovedList.add(gu);
         }
 
         for(GraphicUnit gu : unitsToBeRemovedList) {
-            roomView.getRoom().removeUnit(gu);
+            mRoomView.getRoom().removeUnit(gu);
         }
 
-        roomView.redrawAllUnits();//TA: TODO - Ugly way too remove a single View.
+        mRoomView.redrawAllUnits();//TA: TODO - Ugly way too remove a single View.
     }
 
     private void showAddUnitDialog(Context context) {
@@ -219,23 +230,23 @@ public class UnitPlacementFragment extends Fragment {
         String strLogAll = "showAddUnitDialog() -> Full list: ";
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
-        if(roomView.getRoom().getRoomWidget() == null) {
+        if(mRoomView.getRoom().getRoomWidget() == null) {
             mRestCommunication.requestOpenHABSitemap((String) null, false, TAG);//Used
-            if(roomView.getRoom().getRoomWidget() == null)
+            if(mRoomView.getRoom().getRoomWidget() == null)
             {
-                Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with widget ID = '%s'", roomView.getRoom().getName(), roomView.getRoom().getGroupWidgetId()));
+                Log.e(HABApplication.getLogTag(), String.format("Cannot get room items for Room '%s' with widget ID = '%s'", mRoomView.getRoom().getName(), mRoomView.getRoom().getGroupWidgetId()));
                 Toast.makeText(context, "Cannot get items for this room.", Toast.LENGTH_LONG).show();
                 return;
             }
         }
 
-        List<OpenHABWidget> widgetList = roomView.getRoom().getRoomWidget().getChildren();
+        List<OpenHABWidget> widgetList = mRoomView.getRoom().getRoomWidget().getChildren();
         Iterator<OpenHABWidget> iterator = widgetList.iterator();
         int i = 0;
         while(iterator.hasNext()) {
             OpenHABWidget next = iterator.next();
             strLogAll += next.getId() + ", ";
-            if(mUnitTypes.contains(next.getType()) && !roomView.getRoom().contains(next)){
+            if(mUnitTypes.contains(next.getType()) && !mRoomView.getRoom().contains(next)){
                 itemNameList.add(next.getItem().getName());
                 widgetMap.put(i, next);
                 itemsList.add(i++, String.format("(%s) %s", next.getType().Name, next.hasLinkedPage() ? next.getLinkedPage().getTitle() : next.getItem().getName()));
@@ -263,7 +274,7 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                roomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item)), 50, 50);
+                mRoomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item)), 50, 50);
                 Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
@@ -303,20 +314,20 @@ public class UnitPlacementFragment extends Fragment {
                     case 2:
                         final ArrayList<OpenHABWidgetType> selectedTypes = getSelectedWidgetsType();
 
-                        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+                        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
                             if(!gu.isSelected() && selectedTypes.contains(gu.getType())) {
                                 gu.setSelected(true);
-                                roomView.setSelected(gu);
+                                mRoomView.setSelected(gu);
                             }
                         }
                         break;
                     case 3:
                         ArrayList<String> selectedId = getSelectedWidgetsId();
 
-                        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+                        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
                             if(!gu.isSelected() && selectedId.contains(gu.getOpenHABWidget().getId())) {
                                 gu.setSelected(true);
-                                roomView.setSelected(gu);
+                                mRoomView.setSelected(gu);
                             }
                         }
                         break;
@@ -331,7 +342,7 @@ public class UnitPlacementFragment extends Fragment {
     private ArrayList<OpenHABWidgetType> getSelectedWidgetsType() {
         ArrayList<OpenHABWidgetType> selectedTypeList = new ArrayList<OpenHABWidgetType>();
 
-        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedTypeList.contains(gu.getType()))
                 selectedTypeList.add(gu.getType());
         }
@@ -342,7 +353,7 @@ public class UnitPlacementFragment extends Fragment {
     private ArrayList<String> getSelectedWidgetsId() {
         ArrayList<String> selectedIdList = new ArrayList<String>();
 
-        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedIdList.contains(gu.getOpenHABWidget().getId()))
                 selectedIdList.add(gu.getOpenHABWidget().getId());
         }
@@ -388,7 +399,7 @@ public class UnitPlacementFragment extends Fragment {
                     setRoomRelativePositions(droppedView);
 
                     Log.d("Unit", "Dropped view pos X/Y = " + droppedView.getX() + "/" + droppedView.getY());
-                    Log.d("UnitPos", "dropped REL: " + droppedView.getgUnit().getRoomRelativeX() + "/" + droppedView.getgUnit().getRoomRelativeY() + "   Calc: X=(" + roomView.getScaledBitmapWidth() + "/(" + droppedView.getX() + "-" + roomView.getScaledBitmapX() + ")  Y=(" + roomView.getScaledBitmapHeight() + "/(" + droppedView.getY() + "-" + roomView.getScaledBitmapY() + ")");
+                    Log.d("UnitPos", "dropped REL: " + droppedView.getgUnit().getRoomRelativeX() + "/" + droppedView.getgUnit().getRoomRelativeY() + "   Calc: X=(" + mRoomView.getScaledBitmapWidth() + "/(" + droppedView.getX() + "-" + mRoomView.getScaledBitmapX() + ")  Y=(" + mRoomView.getScaledBitmapHeight() + "/(" + droppedView.getY() + "-" + mRoomView.getScaledBitmapY() + ")");
                     break;
             }
             return true;
@@ -396,11 +407,11 @@ public class UnitPlacementFragment extends Fragment {
     };
 
 //    private int getRoomRelativeX(int percentOfX) {
-//        return (((roomView.getScaledBitmapWidth() / 100) * percentOfX) + roomView.getScaledBitmapX());
+//        return (((mRoomView.getScaledBitmapWidth() / 100) * percentOfX) + mRoomView.getScaledBitmapX());
 //    }
 //
 //    private int getRoomRelativeY(int percentOfY) {
-//        return (((roomView.getScaledBitmapHeight() / 100) * percentOfY) + roomView.getScaledBitmapY());
+//        return (((mRoomView.getScaledBitmapHeight() / 100) * percentOfY) + mRoomView.getScaledBitmapY());
 //    }
 
     private void setRoomRelativePositions(GraphicUnitWidget graphicUnitView) {
@@ -408,12 +419,12 @@ public class UnitPlacementFragment extends Fragment {
     }
 
     private void setRoomRelativePositions(GraphicUnit gUnit, View unitView) {
-        gUnit.setRoomRelativeX(roomView.getScaledBitmapWidth() / (unitView.getX() - roomView.getScaledBitmapX()));
-        gUnit.setRoomRelativeY(roomView.getScaledBitmapHeight() / (unitView.getY() - roomView.getScaledBitmapY()));
+        gUnit.setRoomRelativeX(mRoomView.getScaledBitmapWidth() / (unitView.getX() - mRoomView.getScaledBitmapX()));
+        gUnit.setRoomRelativeY(mRoomView.getScaledBitmapHeight() / (unitView.getY() - mRoomView.getScaledBitmapY()));
     }
 
     private void multiUnitSelection(boolean doSelect) {
-        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             setSelected(gu, doSelect);
         }
     }
@@ -421,21 +432,26 @@ public class UnitPlacementFragment extends Fragment {
     private void setSelected(GraphicUnit gu, boolean selected) {
         if(gu != null && gu.isSelected() != selected) {
             gu.setSelected(selected);
-            roomView.setSelected(gu);
+            mRoomView.setSelected(gu);
         }
     }
 
     private boolean cloneSelectedWidgets() {
         ArrayList<String> selectedWidgetsIdList = new ArrayList<String>();
 
-        for(GraphicUnit gu : roomView.getRoom().getUnits()) {
+        for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
-                roomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget()), 50, 50);
+                mRoomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget()), 50, 50);
                 selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());
             }
         }
 
         return selectedWidgetsIdList.size() > 0;
+    }
+
+    public void onEvent(RoomConfigEvent roomConfigEvent) {
+        if(mRoomView.getRoom().equals(roomConfigEvent.getRoom()) && roomConfigEvent.getEventType() == RoomConfigEvent.EventType.ConfigurationChanged)
+            onUpdateView();
     }
 }
 

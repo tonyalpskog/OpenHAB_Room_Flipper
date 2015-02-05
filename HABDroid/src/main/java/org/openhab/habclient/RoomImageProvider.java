@@ -18,16 +18,63 @@ public class RoomImageProvider implements IRoomImageProvider {
     }
 
     @Override
-    public Bitmap getRoomImage(Room room) {
-        if(room.getBackgroundImageFilePath() == null || room.getBackgroundImageFilePath().isEmpty())
-            return getBitmap(room.getBackgroundImageResourceId());
-        return BitmapFactory.decodeFile(room.getBackgroundImageFilePath());
+    public Bitmap getRoomImage(Room room, int maxWidth, int maxHeight) {
+        BitmapFactory.Options options = getBitMapOptions(room);
+        options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight);
+        options.inJustDecodeBounds = false;
+        
+        return getRoomBitmap(room, options);
     }
 
-    private Bitmap getBitmap(int bitmapResourceId) {
-        return BitmapFactory.decodeResource(mContext.getResources(), bitmapResourceId);
+    private boolean hasFileReference(Room room) {
+        return(room.getBackgroundImageFilePath() == null || room.getBackgroundImageFilePath().isEmpty());
     }
 
+    private Bitmap getRoomBitmap(Room room, BitmapFactory.Options options) {
+        if(hasFileReference(room))
+            return getBitmap(room.getBackgroundImageResourceId(), options);
+        return getBitmap(room.getBackgroundImageFilePath(), options);
+    }
+    
+    private Bitmap getBitmap(int bitmapResourceId, BitmapFactory.Options options) {
+        return BitmapFactory.decodeResource(mContext.getResources(), bitmapResourceId, options);
+    }
+
+    private Bitmap getBitmap(String bitmapFilePath, BitmapFactory.Options options) {
+        return BitmapFactory.decodeFile(bitmapFilePath, options);
+    }
+
+    private BitmapFactory.Options getBitMapOptions(Room room) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        if(hasFileReference(room))
+            BitmapFactory.decodeResource(mContext.getResources(), room.getBackgroundImageResourceId(), options);
+        BitmapFactory.decodeFile(room.getBackgroundImageFilePath(), options);
+        return options;
+    }
+    
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    || (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+    
     public Bitmap setPointAsAlfa(int x, int y, Bitmap source) {
         int pixelColor = source.getPixel(x, y);
         return setColorAsAlfa(pixelColor, source);

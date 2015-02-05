@@ -23,10 +23,6 @@ public class RoomFlipperAdapter {
         setCurrentRoom(initialRoom);
     }
 
-    public Bitmap getCurrentBitmap() {
-        return mRoomImageProvider.getRoomImage(currentRoom);
-    }
-
     public Room getCurrentRoom() {
         return currentRoom;
     }

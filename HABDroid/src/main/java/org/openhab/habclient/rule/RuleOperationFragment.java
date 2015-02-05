@@ -49,6 +49,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
     private SparseArray<RuleTreeItem> mTreeData;
     private RuleTreeItem mSelectedTreeItem;
     private RuleOperation mOperationUnderConstruction;
+    private EditText mRuleNameView;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IRuleOperationProvider mRuleOperationProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
@@ -83,7 +84,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
                              Bundle savedInstanceState) {
         Log.d(HABApplication.getLogTag(), "RuleOperationFragment.onCreateView()");
         View view = inflater.inflate(R.layout.fragment_rule_operation, container, false);
-        EditText mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
+        mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
         mTreeView = (ExpandableListView) view.findViewById(R.id.rule_if_tree);
         mTreeData = new SparseArray<RuleTreeItem>();
 
@@ -237,6 +238,11 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
     public void onDestroy() {
         super.onDestroy();
         Log.d("LifeCycle", "RuleOperationFragment.onDestroy()");
+    }
+
+    public void onUpdateView() {
+        if(mRuleNameView != null)
+            mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
     }
 
 //    // TODO: Rename method, update argument and hook method into UI event

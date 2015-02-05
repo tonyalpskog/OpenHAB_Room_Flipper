@@ -40,7 +40,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     private ArrayAdapter<RuleAction> mListAdapter;
     private int mSelectedActionPosition = -1;
     private RuleAction mActionUnderConstruction;
-
+    private EditText mRuleNameView;
+    
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
@@ -69,7 +70,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
                              Bundle savedInstanceState) {
         Log.d(HABApplication.getLogTag(), "RuleActionFragment.onCreateView()");
         View view = inflater.inflate(R.layout.fragment_rule_action, container, false);
-        EditText mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
+        mRuleNameView = (EditText) view.findViewById(R.id.rule_name_textview);
         mListView = (ListView) view.findViewById(R.id.rule_then_list);
 
         mListAdapter = new ArrayAdapter<RuleAction>(getActivity(), android.R.layout.simple_list_item_1, ((RuleEditActivity)getActivity()).getRule().getActions());
@@ -175,6 +176,11 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         super.onDetach();
         Log.d("LifeCycle", "RuleActionFragment.onDetach()");
 //        mListener = null;
+    }
+    
+    public void onUpdateView() {
+        if(mRuleNameView != null)
+            mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
     }
 
     @Override

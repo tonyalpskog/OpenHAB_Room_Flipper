@@ -22,6 +22,7 @@ import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.domain.command.ICommandAnalyzer;
@@ -45,13 +46,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     final String TAG = "RoomFlipperFragment";
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
+    
     @Inject IWearCommandHost mWearCommandHost;
-
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject
-    IRoomProvider mRoomProvider;
-    @Inject
-    IApplicationModeProvider mApplicationModeProvider;
+    @Inject IRoomProvider mRoomProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
     @Inject IRestCommunication mRestCommunication;
@@ -217,6 +216,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onEvent(SitemapUpdateEvent updateEvent){
         if(updateEvent.isUpdateFinished())
             mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
+    }
+
+    public void onEvent(RoomConfigEvent roomConfigEvent){
+        if(mRoomViewFlipper.getCurrentUnitContainer().getRoom().equals(roomConfigEvent.getRoom()) && roomConfigEvent.getEventType() == RoomConfigEvent.EventType.ConfigurationChanged)
+            mRoomViewFlipper.getCurrentUnitContainer().setRoom(roomConfigEvent.getRoom());//Force an update.
     }
 }
 

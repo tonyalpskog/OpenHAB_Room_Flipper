@@ -4,16 +4,20 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.Direction;
 import org.openhab.domain.model.Room;
+import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habdroid.R;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by Tony Alpskog in 2013.
@@ -61,6 +65,7 @@ public class RoomProvider implements IRoomProvider {
                 mNewRoom = null;//Reset temporary instance.//TODO - Fix this temporary solution when adding DB support
             }
         }
+        EventBus.getDefault().post(new RoomConfigEvent(room, RoomConfigEvent.EventType.ConfigurationChanged));
     }
 
     private boolean remove(Room room) {
@@ -68,6 +73,7 @@ public class RoomProvider implements IRoomProvider {
         for (Room tempRoom : roomHash.values()) {
             tempRoom.removeAlignment(room);
         }
+        EventBus.getDefault().post(new RoomConfigEvent(room, RoomConfigEvent.EventType.Removed));
         return true;
     }
 

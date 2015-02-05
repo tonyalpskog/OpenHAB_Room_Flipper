@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.openhab.domain.IOpenHABWidgetControl;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleEditActivity;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
@@ -129,6 +128,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         mViewPager.setCurrentItem(tab.getPosition());
             mRuleActivityMode = tab.getPosition() == 0? RuleActivityMode.OPERATION_EDITOR : RuleActivityMode.ACTION_LIST;
         setRuleOperationBuildListener((IRuleOperationBuildListener)mSectionsPagerAdapter.getItem(tab.getPosition()));
+        mSectionsPagerAdapter.updateItem(tab.getPosition());
     }
 
     @Override
@@ -238,10 +238,12 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
                 case 0:
                     if(mRuleOperationFragment == null)
                             mRuleOperationFragment = RuleOperationFragment.newInstance();
+                    mRuleOperationFragment.onUpdateView();
                     return mRuleOperationFragment;
                 case 1:
                     if(mRuleActionFragment == null)
                         mRuleActionFragment = RuleActionFragment.newInstance();
+                    mRuleActionFragment.onUpdateView();
                     return mRuleActionFragment;
             }
             return null;
@@ -263,6 +265,19 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
                     return getString(R.string.rule_tab_then).toUpperCase(l);
             }
             return null;
+        }
+        
+        public void updateItem(int position) {
+            switch (position) {
+                case 0:
+                    if(mRuleOperationFragment != null)
+                        mRuleOperationFragment.onUpdateView();
+                    break;
+                case 1:
+                    if(mRuleActionFragment != null)
+                        mRuleActionFragment.onUpdateView();
+                    break;
+            }            
         }
     }
 }

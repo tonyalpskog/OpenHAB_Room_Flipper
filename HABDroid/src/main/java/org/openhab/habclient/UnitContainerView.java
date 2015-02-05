@@ -2,6 +2,7 @@ package org.openhab.habclient;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     OnContainerBackgroundDrawn mOnContainerBackgroundDrawn;
 
     //TA: TODO - Will disposal of unused RoomImageView save some memory?
-    private RoomImageView roomImage;
+    private RoomImageView mRoomImageView;
     private Room mRoom;
     private List<View> mAddedUnitViews;
     private boolean mBlockUnitRedraw = false;
@@ -67,24 +68,24 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.room_layout, this, true);
 
-        roomImage = (RoomImageView) findViewById(R.id.dropImage);
-        roomImage.setOnBackgroundDrawnListener(this);
+        mRoomImageView = (RoomImageView) findViewById(R.id.dropImage);
+        mRoomImageView.setOnBackgroundDrawnListener(this);
     }
 
     public int getScaledBitmapHeight() {
-        return roomImage.getScaledBitmapHeight();
+        return mRoomImageView.getScaledBitmapHeight();
     }
 
     public int getScaledBitmapWidth() {
-        return roomImage.getScaledBitmapWidth();
+        return mRoomImageView.getScaledBitmapWidth();
     }
 
     public int getScaledBitmapX() {
-        return roomImage.getScaledBitmapX();
+        return mRoomImageView.getScaledBitmapX();
     }
 
     public int getScaledBitmapY() {
-        return roomImage.getScaledBitmapY();
+        return mRoomImageView.getScaledBitmapY();
     }
 
     @Override
@@ -226,7 +227,8 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     public void setRoom(Room nextRoom) {
         mRoom = nextRoom;
         mBlockUnitRedraw = true;
-        setImageBitmap(mRoomImageProvider.getRoomImage(mRoom));
+        
+        setImageBitmap(mRoomImageProvider.getRoomImage(mRoom, mRoomImageView.getResources().getConfiguration().screenWidthDp, mRoomImageView.getResources().getConfiguration().screenHeightDp));
         mBlockUnitRedraw = false;
         redrawAllUnits();
     }
@@ -236,7 +238,7 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     }
 
     public void setImageBitmap(Bitmap bitmap) {
-        roomImage.setImageBitmap(bitmap);
+        mRoomImageView.setImageBitmap(bitmap);
     }
 
     private void removeAllUnitViews() {

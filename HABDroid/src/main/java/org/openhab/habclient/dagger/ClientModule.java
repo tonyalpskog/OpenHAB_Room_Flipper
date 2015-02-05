@@ -46,6 +46,7 @@ import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.habclient.command.CommandColorProvider;
 import org.openhab.habclient.command.CommandPhrasesProvider;
 import org.openhab.habclient.media.Camera;
+import org.openhab.habclient.media.ImagePicker;
 import org.openhab.habclient.rule.AdapterProvider;
 import org.openhab.habclient.rule.IAdapterProvider;
 import org.openhab.habclient.rule.OperatorSelectionDialogFragment;
@@ -63,6 +64,7 @@ import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 import org.openhab.habdroid.ui.OpenHABWidgetListFragment;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
 import org.openhab.habclient.media.ICamera;
+import org.openhab.habclient.media.IImagePicker;
 
 import javax.inject.Singleton;
 
@@ -198,4 +200,7 @@ public class ClientModule {
 
     @Provides @Singleton
     public ICamera provideCamera(Camera camera) { return camera; }
+
+    @Provides @Singleton
+    public IImagePicker provideImagePicker(ImagePicker imagePicker) { return imagePicker; }
 }

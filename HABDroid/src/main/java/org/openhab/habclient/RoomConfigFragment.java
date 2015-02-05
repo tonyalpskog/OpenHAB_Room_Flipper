@@ -3,10 +3,7 @@ package org.openhab.habclient;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
@@ -29,6 +27,7 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.media.ICamera;
+import org.openhab.habclient.media.IImagePicker;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
@@ -41,11 +40,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import static android.support.v4.app.ActivityCompat.startActivityForResult;
-
 public class RoomConfigFragment extends Fragment {
     private static final String TAG = "RoomConfigFragment";
-    static final int ROOM_BACKGROUND_IMAGE_CAPTURE = 1001;
+    private int mRoomBackgroundImageCaptureRequestCode;
+    private int mRoomBackgroundImagePickRequestCode;
     private Room mCurrentRoom;
     private Button mSaveButton;
     private EditText mRoomNameText;
@@ -53,8 +51,8 @@ public class RoomConfigFragment extends Fragment {
     private OpenHABWidget mNullGroupWidget;
     private Room mNullRoom;
     private HashMap<Direction, Spinner> mSpinnerHashMap;
-    private boolean mHasCamera;
     private String mImageCaptureFilePath;
+    private TextView mRoomImageFilePathText;
 
     @Inject IRoomProvider mRoomProvider;
     @Inject IOpenHABWidgetProvider mOpenHABWidgetProvider;
@@ -62,6 +60,7 @@ public class RoomConfigFragment extends Fragment {
     @Inject ILogger mLogger;
     @Inject IColorParser mColorParser;
     @Inject ICamera mCamera;
+    @Inject IImagePicker mImagePicker;
     
     public static RoomConfigFragment newInstance() {
         return new RoomConfigFragment();
@@ -89,6 +88,7 @@ public class RoomConfigFragment extends Fragment {
         mRoomNameText = (EditText) view.findViewById(R.id.edittext_room_alias);
         mHABGroupSpinner = (Spinner) view.findViewById(R.id.spinner_hab_group);
         ImageView roomImageChangeView = (ImageView) view.findViewById(R.id.imageview_room_image);
+        mRoomImageFilePathText = (TextView) view.findViewById(R.id.room_background_image_path);
         Spinner upRoomSpinner = (Spinner) view.findViewById(R.id.spinner_up_room);
         Spinner upRightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_up_right_room);
         Spinner rightRoomSpinner = (Spinner) view.findViewById(R.id.spinner_right_room);
@@ -102,15 +102,26 @@ public class RoomConfigFragment extends Fragment {
         mSaveButton = (Button) view.findViewById(R.id.room_edit_save_button);
 
         mRoomNameText.setText(mCurrentRoom.getName() != null? mCurrentRoom.getName(): "");
-
+        
+        mImageCaptureFilePath = mCurrentRoom.getBackgroundImageFilePath();
+        String imagePathText = mImageCaptureFilePath == null || mImageCaptureFilePath.isEmpty()? "<Pick an image>" : mImageCaptureFilePath;
+        mRoomImageFilePathText.setText(imagePathText);
+        
         if(mCamera.hasCamera()) {
             roomImageChangeView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mImageCaptureFilePath = mCamera.takePictureWithIntent(ROOM_BACKGROUND_IMAGE_CAPTURE, (RoomConfigActivity)getActivity());
+                    mRoomBackgroundImageCaptureRequestCode = mCamera.takePhoto(RoomConfigFragment.this);
                 }
             });
         }
+
+        mRoomImageFilePathText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRoomBackgroundImagePickRequestCode = mImagePicker.pickImageFromGallery(RoomConfigFragment.this);
+            }
+        });
         
         List<OpenHABWidget> habGroupArrayList = mOpenHABWidgetProvider.getWidgetList(EnumSet.of(OpenHABWidgetType.Group, OpenHABWidgetType.SitemapText));
         if(habGroupArrayList.size() == 0)
@@ -270,8 +281,16 @@ public class RoomConfigFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!(requestCode == ROOM_BACKGROUND_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK))
-            mImageCaptureFilePath = null; 
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if(requestCode == mRoomBackgroundImageCaptureRequestCode) {
+            mImageCaptureFilePath = mCamera.getPhotoPath(resultCode, data);
+            mRoomImageFilePathText.setText(mImageCaptureFilePath);
+        } else if(requestCode == mRoomBackgroundImagePickRequestCode) {
+            mImageCaptureFilePath = mImagePicker.getImagePath(
+                    resultCode, data, getActivity().getContentResolver());
+            mRoomImageFilePathText.setText(mImageCaptureFilePath);
+        }
     }
     
     /**

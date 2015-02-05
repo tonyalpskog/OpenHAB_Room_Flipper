@@ -65,15 +65,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Image path"
+            android:text="Room image"
             android:layout_gravity="center_vertical" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="Image path"
             android:layout_gravity="fill_horizontal|center_vertical"
-            android:id="@+id/test_room_pic_path" />
+            android:id="@+id/room_background_image_path" />
 
         <ListView
             android:id="@+id/rowdivider3"
