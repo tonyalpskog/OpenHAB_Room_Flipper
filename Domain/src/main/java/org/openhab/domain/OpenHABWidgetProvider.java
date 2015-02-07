@@ -45,8 +45,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private IPopularNameProvider mPopularNameProvider;
     private Map<String, List<UnitEntityDataType>> mOpenHABItemListenerMap;
     private List<UnitEntityDataType> mRecalculationListenerList;
-    
-    private List<String> kitchenChildIds;//TODO - Temporary code for live Wear test
 
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
@@ -65,15 +63,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         mOpenHABItemListenerMap = new HashMap<String, List<UnitEntityDataType>>();
 
         mRecalculationListenerList = new ArrayList<UnitEntityDataType>();
-
-        //TODO - Temporary code for live Wear test
-        kitchenChildIds = new ArrayList<String>(5);
-        kitchenChildIds.add("GF_Kitchen_0");
-        kitchenChildIds.add("GF_Kitchen_1");
-        kitchenChildIds.add("GF_Kitchen_2");
-        kitchenChildIds.add("GF_Kitchen_3");
-        kitchenChildIds.add("GF_Kitchen_4");
-        kitchenChildIds.add("GF_Kitchen_5");
     }
 
     //Long polling method..?
@@ -143,8 +132,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         widget.setUpdateUUID(mUpdateSetUUID);
 
-        widget = fixKitchen(widget);//TODO - Temporary code for live Wear test
-        
         boolean widgetExists = mOpenHABWidgetIdMap.containsKey(widget.getId());
         if(widgetExists && widget.hasItem()) {
             EventBus.getDefault().postSticky(new OpenHABWidgetEvent(widget));
@@ -194,18 +181,6 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
             recalculateUnits();
         }
     }
-
-    //TODO - Temporary code for live Wear test
-    private OpenHABWidget fixKitchen(OpenHABWidget widget) {
-        if(kitchenChildIds.contains(widget.getId()))
-        {
-            OpenHABWidget parent = getWidgetByID("0001_1");
-            if(parent != null)
-                widget.setParent(parent);
-        }
-        return widget;
-    }
-    
 
     private void recalculateUnits() {
         for(UnitEntityDataType unit : mRecalculationListenerList)

@@ -123,7 +123,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	// sitemap root url
 	private String sitemapRootUrl = "";
 	// async http client
-	private static AsyncHttpClient pageAsyncHttpClient;
+	private static AsyncHttpClient mPageAsyncHttpClient;
 	// openHAB base url
 	private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	// List of widgets to display
@@ -519,8 +519,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		openHABWidgetAdapter.stopImageRefresh();
 		if(NfcAdapter.getDefaultAdapter(this) != null)
 			NfcAdapter.getDefaultAdapter(this).disableForegroundDispatch(this);
-		if (pageAsyncHttpClient != null)
-			pageAsyncHttpClient.cancelRequests(this, true);
+		if (mPageAsyncHttpClient != null)
+			mPageAsyncHttpClient.cancelRequests(this, true);
 	}
 
 	@Override
@@ -544,8 +544,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			this.progressDialog.dismiss();
 		if (this.serviceResolver != null)
 			this.serviceResolver.interrupt();
-		if (pageAsyncHttpClient != null)
-			pageAsyncHttpClient.cancelRequests(this, true);
+		if (mPageAsyncHttpClient != null)
+			mPageAsyncHttpClient.cancelRequests(this, true);
 	}
 	
 	/**
@@ -593,39 +593,40 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 		// Cancel any existing http request to openHAB (typically ongoing long poll)
 		if (!longPolling)
 			setProgressBarIndeterminateVisibility(true);
-		if (pageAsyncHttpClient != null) {
-			pageAsyncHttpClient.cancelRequests(this, true);
+		if (mPageAsyncHttpClient != null) {
+			mPageAsyncHttpClient.cancelRequests(this, true);
 		}
 		if (!longPolling) {
-			pageAsyncHttpClient = null;
-			pageAsyncHttpClient = new MyAsyncHttpClient(this);
+			mPageAsyncHttpClient = null;
+			mPageAsyncHttpClient = new MyAsyncHttpClient(this);
 		}
 		// If authentication is needed
-		pageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
+		mPageAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
 		// If long-polling is needed
 		if (longPolling) {
 			// Add corresponding fields to header to make openHAB know we need long-polling
-			pageAsyncHttpClient.addHeader("X-Atmosphere-Transport", "long-polling");
-			pageAsyncHttpClient.addHeader("Accept", "application/xml");
-			pageAsyncHttpClient.setTimeout(30000);
+			mPageAsyncHttpClient.addHeader("X-Atmosphere-Transport", "long-polling");
+			mPageAsyncHttpClient.addHeader("Accept", "application/xml");
+			mPageAsyncHttpClient.setTimeout(30000);
 		}
-		pageAsyncHttpClient.get(this, pageUrl, new AsyncHttpResponseHandler() {
-			@Override
-			public void onSuccess(String content) {
-				processContent(content);
-			}
-			@Override
-		     public void onFailure(Throwable e, String errorResponse) {
-				Log.e(HABApplication.getLogTag(), "http request failed");
-				if (e.getMessage() != null) {
-					Log.e(HABApplication.getLogTag(), e.getMessage());
-					if (e.getMessage().equals("Unauthorized")) {
-						showAlertDialog(getString(R.string.error_authentication_failed));
-					}
-				}
-				stopProgressIndicator();
-		     }
-		});
+		mPageAsyncHttpClient.get(this, pageUrl, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String content) {
+                processContent(content);
+            }
+
+            @Override
+            public void onFailure(Throwable e, String errorResponse) {
+                Log.e(HABApplication.getLogTag(), "http request failed");
+                if (e.getMessage() != null) {
+                    Log.e(HABApplication.getLogTag(), e.getMessage());
+                    if (e.getMessage().equals("Unauthorized")) {
+                        showAlertDialog(getString(R.string.error_authentication_failed));
+                    }
+                }
+                stopProgressIndicator();
+            }
+        });
 	}
 
     public Node getRootNode(String XMLContent) {
@@ -667,7 +668,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void processContent(String content) {
         Node rootNode = getRootNode(content);
         openHABWidgetDataSource.setSourceNode(rootNode);
-        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
+//        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         // As we change the page we need to stop all videos on current page
         // before going to the new page. This is quite dirty, but is the only
@@ -980,7 +981,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 			if (sitemapNodes.getLength() > 0) {
 				for (int i=0; i < sitemapNodes.getLength(); i++) {
 					Node sitemapNode = sitemapNodes.item(i);
-					OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode);
+					OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode, null, null);
 					sitemapList.add(openhabSitemap);
 				}
 			}

@@ -33,6 +33,7 @@ import android.app.Activity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.openhab.domain.IOpenHABSitemapProvider;
 import org.openhab.domain.model.OpenHABSitemap;
 import org.openhab.habdroid.R;
 import org.w3c.dom.Document;
@@ -44,9 +45,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class Util {
 
     private final static String TAG = "Util";
+    
+//    @Inject static IOpenHABSitemapProvider mOpenHABSitemapProvider;
 
 	public static void setActivityTheme(Activity activity) {
 		if (PreferenceManager.getDefaultSharedPreferences(activity).getString("default_openhab_theme", "dark").equals("dark")) {
@@ -100,16 +105,18 @@ public class Util {
 //        Crittercism.init(ctx, appKey, crittercismConfig);
 //    }
 
+    //TODO - Move this to a sitemap specific class. [Tony Alpskog 2015-02-07]
     public static List<OpenHABSitemap> parseSitemapList(Document document) {
         List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();
             NodeList sitemapNodes = document.getElementsByTagName("sitemap");
             if (sitemapNodes.getLength() > 0) {
                 for (int i=0; i < sitemapNodes.getLength(); i++) {
                     Node sitemapNode = sitemapNodes.item(i);
-                    OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode);
+                    OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode, null, null);
                     sitemapList.add(openhabSitemap);
                 }
             }
+//        mOpenHABSitemapProvider.setOpenHABSitemaps(sitemapList);
         return sitemapList;
     }
 

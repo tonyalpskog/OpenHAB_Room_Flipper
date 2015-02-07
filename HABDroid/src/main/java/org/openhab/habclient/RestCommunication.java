@@ -21,9 +21,18 @@ import org.openhab.domain.IDocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.SocketTimeoutException;
 
 import javax.inject.Inject;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import de.greenrobot.event.EventBus;
 
@@ -93,17 +102,18 @@ public class RestCommunication implements IRestCommunication {
         if (longPolling)
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
 
-        mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] Requesting REST data from: " + RESTaddress);
+        mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] <" + ownerTag + "> is requesting REST data from: " + RESTaddress);
         RequestParams rp = new RequestParams();
 
         mAsyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override
             public void onSuccess(Document document) {
                 if (document == null) {
-                    mLogger.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\nshowAddUnitDialog() -> Got a null response from openHAB");
+                    mLogger.e(HABApplication.getLogTag(), "[AsyncHttpClient] " + RESTaddress + "\nshowAddUnitDialog() -> <\" + ownerTag + \"> Got a null response from openHAB");
                     return;
                 }
 
+//                tryPrintDocument(document, System.out);
                 mLogger.d(HABApplication.getLogTag(), String.format("\n\r%s - %s\n\r[AsyncHttpClient] DocumentHttpResponseHandler.onSuccess() for requested sitemap URL '%s'    longpolling = '%s'", ownerTag, callingMethod, sitemapUrl, longPolling));
                 final Node rootNode = document.getFirstChild();
 
@@ -132,6 +142,26 @@ public class RestCommunication implements IRestCommunication {
         }, ownerTag);
     }
 
+    //TODO - Temporary method for debugging. Move this to another class [Tony Alpskog 2015-02-07]
+    public static boolean tryPrintDocument(Document doc, OutputStream out)/* throws IOException, TransformerException*/ {
+        try {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+            transformer.transform(new DOMSource(doc),
+                    new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+            return true;
+        } catch(Exception ex) {
+            Log.e("tryPrintDocument", "\n\rCould not print the XML document.");
+            return false;
+        }
+    }
+    
     @Override
     public void cancelRequests(Object ownerTag) {
         mAsyncHttpClient.cancelRequests(mContext, ownerTag, true);

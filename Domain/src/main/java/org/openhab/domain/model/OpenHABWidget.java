@@ -39,6 +39,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import static org.openhab.domain.util.StringHandler.isNullOrEmpty;
 
 /**
@@ -70,6 +72,8 @@ public class OpenHABWidget {
     private Integer valuecolor;
     private UUID updateUUID;
     private final ILogger logger;
+    @Inject private ILogger mLogger;
+    @Inject private IColorParser mColorParser;
 
     public OpenHABWidget(ILogger logger) {
         if(logger == null) throw new IllegalArgumentException("logger is null");
@@ -156,7 +160,8 @@ public class OpenHABWidget {
             }
         }
 
-        this.parent.addChildWidget(this);
+        if(this.parent != null)
+            this.parent.addChildWidget(this);
 	}
 	
 	public void addChildWidget(OpenHABWidget child) {

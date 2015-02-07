@@ -28,18 +28,30 @@
  */
 package org.openhab.domain.model;
 
+import org.openhab.domain.util.IColorParser;
+import org.openhab.domain.util.ILogger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
 public class OpenHABSitemap {
+    private String id;
+    private String title;
 	private String name;
     private String label;
 	private String link;
     private String icon;
 	private String homepageLink;
     private boolean leaf = false;
-	
-	public OpenHABSitemap(Node startNode) {
+    private List<OpenHABWidget> mWidgets;
+
+    @Inject
+	public OpenHABSitemap(Node startNode, ILogger logger, IColorParser colorParser) {
+        mWidgets = new ArrayList<OpenHABWidget>();
 		if (startNode.hasChildNodes()) {
 			NodeList childNodes = startNode.getChildNodes();
 			for (int i = 0; i < childNodes.getLength(); i ++) {
@@ -57,14 +69,20 @@ public class OpenHABSitemap {
 						NodeList homepageNodes = childNode.getChildNodes();
 						for (int j = 0; j < homepageNodes.getLength(); j++) {
 							Node homepageChildNode = homepageNodes.item(j);
-							if (homepageChildNode.getNodeName().equals("link")) {
-								this.setHomepageLink(homepageChildNode.getTextContent());
+							if (homepageChildNode.getNodeName().equals("id")) {
+								this.setId(homepageChildNode.getTextContent());
+                            } else if (homepageChildNode.getNodeName().equals("title")) {
+                                this.setTitle(homepageChildNode.getTextContent());
+                            } else if (homepageChildNode.getNodeName().equals("link")) {
+                                this.setHomepageLink(homepageChildNode.getTextContent());
 							} else if (homepageChildNode.getNodeName().equals("leaf")) {
                                 if (homepageChildNode.getTextContent().equals("true")) {
                                     setLeaf(true);
                                 } else {
                                     setLeaf(false);
                                 }
+                            } else if (homepageChildNode.getNodeName().equals("widget")) {
+                                mWidgets.add(new OpenHABWidget(null, homepageChildNode, logger, colorParser));
                             }
 						}
 					}
@@ -72,7 +90,7 @@ public class OpenHABSitemap {
 			}
 		}
 	}
-	
+    
 	public String getName() {
 		return name;
 	}
@@ -119,5 +137,25 @@ public class OpenHABSitemap {
 
     public void setLeaf(boolean isLeaf) {
         leaf = isLeaf;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public List<OpenHABWidget> getOpenHABWidgets() {
+        return mWidgets;
     }
 }

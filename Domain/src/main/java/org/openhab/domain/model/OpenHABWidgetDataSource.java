@@ -88,7 +88,21 @@ public class OpenHABWidgetDataSource {
     }
 
     public void setSourceNode(Node rootNode) {
-        setSourceNode(rootNode, new OpenHABWidget(logger));
+        if(rootNode.getNodeName().equals("sitemap")) {
+            OpenHABSitemap sitemap = new OpenHABSitemap(rootNode, logger, colorParser);
+            if(rootWidget == null)
+                rootWidget = new OpenHABWidget(logger);
+            if(sitemap.getIcon() != null)
+                rootWidget.setIcon(sitemap.getIcon());
+            if(sitemap.getLabel() != null)
+                rootWidget.setLabel(sitemap.getLabel());
+            if(sitemap.getId() != null)
+                rootWidget.setId(sitemap.getId());
+            rootWidget.setType(OpenHABWidgetType.Root);
+            for(OpenHABWidget widget : sitemap.getOpenHABWidgets())
+                rootWidget.addChildWidget(widget);
+        } else
+            setSourceNode(rootNode, new OpenHABWidget(logger));
     }
 
     private void setSourceNode(Node rootNode, OpenHABWidget widget) {
@@ -113,33 +127,35 @@ public class OpenHABWidgetDataSource {
 		}
 	}
 
-    private List<OpenHABSitemap> parseSitemapList(String xmlContent) {
-        List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder;
-        try {
-            builder = factory.newDocumentBuilder();
-            Document document;
-            document = builder.parse(new ByteArrayInputStream(xmlContent.getBytes("UTF-8")));
-            NodeList sitemapNodes = document.getElementsByTagName("sitemap");
-            if (sitemapNodes.getLength() > 0) {
-                for (int i=0; i < sitemapNodes.getLength(); i++) {
-                    Node sitemapNode = sitemapNodes.item(i);
-                    OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode);
-                    sitemapList.add(openhabSitemap);
-                }
-            }
-        } catch (ParserConfigurationException e) {
-            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
-        } catch (UnsupportedEncodingException e) {
-            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
-        } catch (SAXException e) {
-            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
-        } catch (IOException e) {
-            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
-        }
-        return sitemapList;
-    }
+//This method is unused
+    
+//    private List<OpenHABSitemap> parseSitemapList(String xmlContent) {
+//        List<OpenHABSitemap> sitemapList = new ArrayList<OpenHABSitemap>();
+//        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        DocumentBuilder builder;
+//        try {
+//            builder = factory.newDocumentBuilder();
+//            Document document;
+//            document = builder.parse(new ByteArrayInputStream(xmlContent.getBytes("UTF-8")));
+//            NodeList sitemapNodes = document.getElementsByTagName("sitemap");
+//            if (sitemapNodes.getLength() > 0) {
+//                for (int i=0; i < sitemapNodes.getLength(); i++) {
+//                    Node sitemapNode = sitemapNodes.item(i);
+//                    OpenHABSitemap openhabSitemap = new OpenHABSitemap(sitemapNode);
+//                    sitemapList.add(openhabSitemap);
+//                }
+//            }
+//        } catch (ParserConfigurationException e) {
+//            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
+//        } catch (UnsupportedEncodingException e) {
+//            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
+//        } catch (SAXException e) {
+//            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
+//        } catch (IOException e) {
+//            logger.e("OpenHABWidgetDataSource", e.getMessage(), e);
+//        }
+//        return sitemapList;
+//    }
 
 	public OpenHABWidget getRootWidget() {
 		return this.rootWidget;

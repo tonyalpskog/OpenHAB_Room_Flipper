@@ -390,7 +390,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
 
         Node rootNode = document.getFirstChild();
         openHABWidgetDataSource.setSourceNode(rootNode);
-        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
+//        mWidgetProvider.setOpenHABWidgets(openHABWidgetDataSource);
         widgetList.clear();
         for (OpenHABWidget w : openHABWidgetDataSource.getWidgets()) {
             // Remove frame widgets with no label text

@@ -61,6 +61,8 @@ public class MainActivity extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        mRestCommunication.requestOpenHABSitemap("https://demo.openhab.org:8443/rest/sitemaps/demo", false, "Flipper MainActivity");
     }
 
     @Override

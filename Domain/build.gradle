@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     compile 'javax.inject:javax.inject:1'
-    compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'de.greenrobot:eventbus:2.4.0'
 
     testCompile 'junit:junit:4.10'
     testCompile 'org.mockito:mockito-all:1.9.5'
