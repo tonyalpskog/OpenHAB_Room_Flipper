@@ -66,10 +66,10 @@ public enum RuleOperatorType {
                 for (int j = i; j < i + numberOfPrintSupportedOperationArgs; j++)
                     argsAsStringsSubArray[k++] = argsAsStrings[j];
 
-                formattedString.append(String.format(stringFormat, new Object[]{argsAsStringsSubArray}));
+                formattedString.append(String.format(stringFormat, argsAsStringsSubArray));
             }
         } else
-            formattedString.append(String.format(stringFormat, new Object[]{argsAsStrings}));
+            formattedString.append(String.format(stringFormat, argsAsStrings));
 
         return formattedString.toString();
     }
