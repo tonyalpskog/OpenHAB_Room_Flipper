@@ -228,15 +228,15 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
         if(mShowNextButton)
             return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0 ? "left" : "right") + " side operand")
                     .setView(createCustomView(activity))
-                    .setPositiveButton("Next", this)
-                    .setNegativeButton("Cancel", this)
-                    .setNeutralButton("Done", this)
+                    .setPositiveButton(activity.getString(R.string.choice_next), this)
+                    .setNegativeButton(activity.getString(R.string.choice_cancel), this)
+                    .setNeutralButton(activity.getString(R.string.choice_done), this)
                     .create();
 
         return new AlertDialog.Builder(activity).setTitle("Select " + (mPosition == 0 ? "left" : "right") + " side operand")
                 .setView(createCustomView(activity))
-                .setNegativeButton("Cancel", this)
-                .setNeutralButton("Done", this)
+                .setNegativeButton(activity.getString(R.string.choice_cancel), this)
+                .setNeutralButton(activity.getString(R.string.choice_done), this)
                 .create();
     }
 

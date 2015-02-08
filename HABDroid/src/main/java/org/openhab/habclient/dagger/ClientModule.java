@@ -2,12 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
-import org.openhab.domain.IOpenHABSitemapProvider;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.OpenHABSitemapProvider;
 import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.command.ICommandColorProvider;

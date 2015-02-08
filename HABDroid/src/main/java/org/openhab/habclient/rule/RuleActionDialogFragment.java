@@ -286,8 +286,8 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
 
         return new AlertDialog.Builder(activity).setTitle((StringHandler.isNullOrEmpty(mAction.getTargetOpenHABItemName())? "Create new" : "Edit") + " rule action")
                 .setView(createCustomView(activity))
-                .setPositiveButton("Done", this)
-                .setNegativeButton("Cancel", this)
+                .setPositiveButton(activity.getString(R.string.choice_done), this)
+                .setNegativeButton(activity.getString(R.string.choice_cancel), this)
                 .create();
     }
 

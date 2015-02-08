@@ -46,7 +46,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     final String TAG = "RoomFlipperFragment";
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
-    
+
     @Inject IWearCommandHost mWearCommandHost;
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;

@@ -135,4 +135,7 @@
     <string name="action_add_rule">Add rule</string>
     <string name="missing_openhab_group_for_room"><![CDATA[<No OpenHAB group defined>]]></string>
     <string name="install_app_name">OpenHAB - Room flipper fork</string>
+    <string name="choice_next">Next</string>
+    <string name="choice_done">Done</string>
+    <string name="choice_cancel">Cancel</string>
 </resources>

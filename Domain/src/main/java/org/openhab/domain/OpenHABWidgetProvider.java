@@ -37,6 +37,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private static final String TAG = "OpenHABWidgetProvider";
     private final IRegularExpression mRegularExpression;
     private final ILogger mLogger;
+    private final ITestInformation mTestInformation;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
@@ -49,13 +50,16 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
                                  ILogger logger,
-                                 IPopularNameProvider popularNameProvider) {
+                                 IPopularNameProvider popularNameProvider,
+                                 ITestInformation testInformation) {
         if(regularExpression == null) throw new IllegalArgumentException("regularExpression is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(testInformation == null) throw new IllegalArgumentException("testInformation is null");
 
         mRegularExpression = regularExpression;
         mLogger = logger;
         mPopularNameProvider = popularNameProvider;
+        mTestInformation = testInformation;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
@@ -177,7 +181,8 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         }
 
         if(isStartOfBatch) {
-            EventBus.getDefault().post(new SitemapUpdateEvent(true));
+            if(!mTestInformation.isRunningDomainTest())
+                EventBus.getDefault().post(new SitemapUpdateEvent(true));
             recalculateUnits();
         }
     }

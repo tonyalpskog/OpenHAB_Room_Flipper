@@ -97,15 +97,16 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         if(mShowNextButton)
             return new AlertDialog.Builder(activity).setTitle(mDialogTitle)
                     .setView(createCustomView(activity))
-                    .setPositiveButton("Next", this)
-                    .setNeutralButton("Done", this)
-                    .setNegativeButton("Cancel", this)
+                    .setCancelable(true)
+                    .setPositiveButton(activity.getString(R.string.choice_next), this)
+                    .setNeutralButton(activity.getString(R.string.choice_done), this)
+                    .setNegativeButton(activity.getString(R.string.choice_cancel), this)
                     .create();
 
         return new AlertDialog.Builder(activity).setTitle(mDialogTitle)
                 .setView(createCustomView(activity))
-                .setNeutralButton("Done", this)
-                .setNegativeButton("Cancel", this)
+                .setNeutralButton(activity.getString(R.string.choice_done), this)
+                .setNegativeButton(activity.getString(R.string.choice_cancel), this)
                 .create();
     }
 
