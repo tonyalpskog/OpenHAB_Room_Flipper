@@ -27,8 +27,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -37,6 +35,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private static final String TAG = "OpenHABWidgetProvider";
     private final IRegularExpression mRegularExpression;
     private final ILogger mLogger;
+    private final IEventBus mEventBus;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
@@ -49,10 +48,13 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     @Inject
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
                                  ILogger logger,
-                                 IPopularNameProvider popularNameProvider) {
+                                 IPopularNameProvider popularNameProvider,
+                                 IEventBus eventBus) {
         if(regularExpression == null) throw new IllegalArgumentException("regularExpression is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");
+        if(eventBus == null) throw new NullPointerException("eventBus");
 
+        mEventBus = eventBus;
         mRegularExpression = regularExpression;
         mLogger = logger;
         mPopularNameProvider = popularNameProvider;
@@ -134,7 +136,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         boolean widgetExists = mOpenHABWidgetIdMap.containsKey(widget.getId());
         if(widgetExists && widget.hasItem()) {
-            EventBus.getDefault().postSticky(new OpenHABWidgetEvent(widget));
+            mEventBus.postSticky(new OpenHABWidgetEvent(widget));
             updateListeners(widget.getItem());
         }
 
@@ -177,7 +179,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         }
 
         if(isStartOfBatch) {
-            EventBus.getDefault().post(new SitemapUpdateEvent(true));
+            mEventBus.post(new SitemapUpdateEvent(true));
             recalculateUnits();
         }
     }

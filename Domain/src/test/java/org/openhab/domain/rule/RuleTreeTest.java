@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
+import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
@@ -29,6 +30,7 @@ public class RuleTreeTest {
     private IRuleOperationProvider mRop;
     private IOpenHABWidgetProvider mWidgetProvider;
     private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    private IEventBus mEventBus;
 
     @Before
     public void setUp() throws Exception {
@@ -37,7 +39,8 @@ public class RuleTreeTest {
         final IColorParser colorParser = mock(IColorParser.class);
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
-        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
+        mEventBus = mock(IEventBus.class);
+        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider, mEventBus);
         mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);

@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
+import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
@@ -38,15 +39,17 @@ public class RuleTest {
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
     private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    private IEventBus mEventBus;
 
     @Before
     public void setUp() throws Exception {
 
         final ILogger logger = mock(ILogger.class);
         final IColorParser colorParser = mock(IColorParser.class);
+        mEventBus = mock(IEventBus.class);
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
-        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider);
+        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider, mEventBus);
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
