@@ -27,8 +27,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * Created by Tony Alpskog in 2014.
  */
@@ -37,7 +35,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     private static final String TAG = "OpenHABWidgetProvider";
     private final IRegularExpression mRegularExpression;
     private final ILogger mLogger;
-    private final ITestInformation mTestInformation;
+    private final IEventBus mEventBus;
     private Map<String, OpenHABWidget> mOpenHABWidgetIdMap;
     private Map<String, OpenHABWidget> mOpenHABItemNameMap;
     private Map<OpenHABWidgetType, List<String>> mOpenHABWidgetTypeMap;
@@ -51,15 +49,15 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
     public OpenHABWidgetProvider(IRegularExpression regularExpression,
                                  ILogger logger,
                                  IPopularNameProvider popularNameProvider,
-                                 ITestInformation testInformation) {
+                                 IEventBus eventBus) {
         if(regularExpression == null) throw new IllegalArgumentException("regularExpression is null");
         if(logger == null) throw new IllegalArgumentException("logger is null");
-        if(testInformation == null) throw new IllegalArgumentException("testInformation is null");
+        if(eventBus == null) throw new IllegalArgumentException("eventBus is null");
 
+        mEventBus = eventBus;
         mRegularExpression = regularExpression;
         mLogger = logger;
         mPopularNameProvider = popularNameProvider;
-        mTestInformation = testInformation;
         mOpenHABWidgetTypeMap = new HashMap<OpenHABWidgetType, List<String>>();
         mOpenHABItemTypeMap = new HashMap<OpenHABItemType, List<String>>();
         mOpenHABWidgetIdMap = new HashMap<String, OpenHABWidget>();
@@ -138,7 +136,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
 
         boolean widgetExists = mOpenHABWidgetIdMap.containsKey(widget.getId());
         if(widgetExists && widget.hasItem()) {
-            EventBus.getDefault().postSticky(new OpenHABWidgetEvent(widget));
+            mEventBus.postSticky(new OpenHABWidgetEvent(widget));
             updateListeners(widget.getItem());
         }
 
@@ -181,8 +179,7 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
         }
 
         if(isStartOfBatch) {
-            if(!mTestInformation.isRunningDomainTest())
-                EventBus.getDefault().post(new SitemapUpdateEvent(true));
+            mEventBus.post(new SitemapUpdateEvent(true));
             recalculateUnits();
         }
     }

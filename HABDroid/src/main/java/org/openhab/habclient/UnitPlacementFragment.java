@@ -22,16 +22,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.openhab.domain.IOpenHABSitemapProvider;
+import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
-import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.GraphicUnit;
+import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.habdroid.R;
-import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.model.OpenHABWidgetType;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -60,8 +59,8 @@ public class UnitPlacementFragment extends Fragment {
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject
-    IRestCommunication mRestCommunication;
+    @Inject IRestCommunication mRestCommunication;
+    @Inject IEventBus mEventBus;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -275,7 +274,7 @@ public class UnitPlacementFragment extends Fragment {
         builder.setTitle("Select unit type");
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                mRoomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item)), 50, 50);
+                mRoomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item), mEventBus), 50, 50);
                 Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
             dialog.dismiss();
             }
@@ -442,7 +441,7 @@ public class UnitPlacementFragment extends Fragment {
 
         for(GraphicUnit gu : mRoomView.getRoom().getUnits()) {
             if(gu.isSelected() && !selectedWidgetsIdList.contains(gu.getOpenHABWidget().getId())) {
-                mRoomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget()), 50, 50);
+                mRoomView.addNewUnitToRoom(new GraphicUnit(gu.getOpenHABWidget(), mEventBus), 50, 50);
                 selectedWidgetsIdList.add(gu.getOpenHABWidget().getId());
             }
         }

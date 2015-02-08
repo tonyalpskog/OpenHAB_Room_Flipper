@@ -1,14 +1,15 @@
 package org.openhab.domain.model;
 
-import java.util.UUID;
+import org.openhab.domain.IEventBus;
 
-import de.greenrobot.event.EventBus;
+import java.util.UUID;
 
 /**
  * Created by Tony Alpskog in 2013.
  */
 public class GraphicUnit {
     private OpenHABWidget mOpenHABWidget;
+    private final IEventBus mEventBus;
     private UUID id;
 //    private OpenHABWidgetType type;
     private float roomRelativeX = 0;
@@ -16,8 +17,9 @@ public class GraphicUnit {
     private UUID mLatestWidgetUpdateUUID;
     private boolean isSelected;
 
-    public GraphicUnit(OpenHABWidget openHABWidget) {
+    public GraphicUnit(OpenHABWidget openHABWidget, IEventBus eventBus) {
         mOpenHABWidget = openHABWidget;
+        mEventBus = eventBus;
 
         isSelected = false;
         this.id = UUID.randomUUID();
@@ -25,7 +27,8 @@ public class GraphicUnit {
         setRoomRelativeX(3);
         setRoomRelativeY(4);
 
-        EventBus.getDefault().registerSticky(this);
+        //TODO: why run logic in constructor?
+        mEventBus.registerSticky(this);
     }
 
     public boolean isSelected() {

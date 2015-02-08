@@ -5,13 +5,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
+import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
-import org.openhab.domain.ITestInformation;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.PopularNameProvider;
-import org.openhab.domain.TestInformation;
 import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.operators.AfterDateTimeRuleOperator;
@@ -31,8 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import static org.mockito.Mockito.mock;
 
 /**
@@ -42,16 +39,16 @@ public class RuleTest {
     private IRuleOperationProvider mRuleOperationProvider;
     private IOpenHABWidgetProvider mWidgetProvider;
     private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    private IEventBus mEventBus;
 
     @Before
     public void setUp() throws Exception {
-        final ITestInformation testInformation = new TestInformation();
-        testInformation.setRunningDomainTest(true);
         final ILogger logger = mock(ILogger.class);
         final IColorParser colorParser = mock(IColorParser.class);
+        mEventBus = mock(IEventBus.class);
         final RegularExpression regularExpression = new RegularExpression();
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
-        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider, testInformation);
+        mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider, mEventBus);
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
