@@ -102,6 +102,14 @@ public class RoomConfigFragment extends Fragment {
         mSaveButton = (Button) view.findViewById(R.id.room_edit_save_button);
 
         mRoomNameText.setText(mCurrentRoom.getName() != null? mCurrentRoom.getName(): "");
+        mRoomNameText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(v.equals(mRoomNameText) && !hasFocus && mRoomNameText.getText().toString().length() > 0) {
+                    mCurrentRoom.setName(mRoomNameText.getText().toString());
+                }
+            }
+        });
         
         mImageCaptureFilePath = mCurrentRoom.getBackgroundImageFilePath();
         String imagePathText = mImageCaptureFilePath == null || mImageCaptureFilePath.isEmpty()? "<Pick an image>" : mImageCaptureFilePath;
@@ -204,6 +212,10 @@ public class RoomConfigFragment extends Fragment {
         mHABGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                if(mCurrentRoom.getUnits().size() > 0) {
+//                    
+//                }
+                mCurrentRoom.setGroupWidgetId(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getId());
                 mRestCommunication.requestOpenHABSitemap((OpenHABWidget) mHABGroupSpinner.getSelectedItem(), false, TAG);//Used   //TODO - Needed?
             }
 
@@ -286,10 +298,12 @@ public class RoomConfigFragment extends Fragment {
         if(requestCode == mRoomBackgroundImageCaptureRequestCode) {
             mImageCaptureFilePath = mCamera.getPhotoPath(resultCode, data);
             mRoomImageFilePathText.setText(mImageCaptureFilePath);
+            mCurrentRoom.setBackgroundImageFilePath(mImageCaptureFilePath);
         } else if(requestCode == mRoomBackgroundImagePickRequestCode) {
             mImageCaptureFilePath = mImagePicker.getImagePath(
                     resultCode, data, getActivity().getContentResolver());
             mRoomImageFilePathText.setText(mImageCaptureFilePath);
+            mCurrentRoom.setBackgroundImageFilePath(mImageCaptureFilePath);
         }
     }
     
@@ -340,13 +354,13 @@ public class RoomConfigFragment extends Fragment {
             Toast.makeText(getActivity(),  "Unsuccessful! At least one room alignment must be selected.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        mCurrentRoom.setGroupWidgetId(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getId());
-
-        if(mRoomNameText.getText().toString().length() > 0)
-            mCurrentRoom.setName(mRoomNameText.getText().toString());
         
-        mCurrentRoom.setBackgroundImageFilePath(mImageCaptureFilePath);
+//        mCurrentRoom.setGroupWidgetId(((OpenHABWidget) mHABGroupSpinner.getSelectedItem()).getId());
+
+//        if(mRoomNameText.getText().toString().length() > 0)
+//            mCurrentRoom.setName(mRoomNameText.getText().toString());
+        
+//        mCurrentRoom.setBackgroundImageFilePath(mImageCaptureFilePath);
         
         mRoomProvider.saveRoom(mCurrentRoom);
     }

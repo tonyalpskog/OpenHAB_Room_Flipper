@@ -167,7 +167,8 @@ public class OpenHABWidgetListFragment extends ListFragment {
         openHABWidgetDataSource = new OpenHABWidgetDataSource(mLogger, mColorParser);
         openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(getActivity(),
                 R.layout.openhabwidgetlist_genericitem, widgetList,
-                mWidgetLayoutProvider);
+                mWidgetLayoutProvider,
+                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextControlList);
         getListView().setAdapter(openHABWidgetAdapter);
         openHABBaseUrl = mOpenHABSetting.getBaseUrl();
         openHABUsername = mOpenHABSetting.getUsername();

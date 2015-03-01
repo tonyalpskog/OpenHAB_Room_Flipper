@@ -244,7 +244,8 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
         IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
 		openHABWidgetDataSource = new OpenHABWidgetDataSource(logger, colorParser);
 		openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(OpenHABWidgetListActivity.this,
-				R.layout.openhabwidgetlist_genericitem, widgetList, widgetTypeLayoutProvider);
+				R.layout.openhabwidgetlist_genericitem, widgetList, widgetTypeLayoutProvider,
+                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextControlList);
 		getListView().setAdapter(openHABWidgetAdapter);
 		// Set adapter parameters
 		openHABWidgetAdapter.setOpenHABUsername(openHABUsername);

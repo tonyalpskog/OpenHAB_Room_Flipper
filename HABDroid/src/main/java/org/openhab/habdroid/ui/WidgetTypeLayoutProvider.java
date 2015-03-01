@@ -8,6 +8,11 @@ import java.util.HashMap;
 import javax.inject.Inject;
 
 public class WidgetTypeLayoutProvider implements IWidgetTypeLayoutProvider {
+//    public enum WidgetRowLayoutType {
+//        IconTextControlList,
+//        IconTextList
+//    }
+    
     private static final HashMap<OpenHABWidgetType, WidgetTypeResources> sResources = new HashMap<OpenHABWidgetType, WidgetTypeResources>();
     static {
         sResources.put(OpenHABWidgetType.GenericItem, new WidgetTypeResources(R.layout.openhabwidgetlist_genericitem, -1));
@@ -35,17 +40,19 @@ public class WidgetTypeLayoutProvider implements IWidgetTypeLayoutProvider {
     }
 
     @Override
-    public int getRowLayoutId(OpenHABWidgetType type) {
-        final WidgetTypeResources resources = sResources.get(type);
+    public int getRowLayoutId(OpenHABWidgetType widgetType) {
+        final WidgetTypeResources resources = sResources.get(widgetType);
         if(resources == null)
             return -1;
-
+        
+//        if(layoutType.equals(WidgetRowLayoutType.IconTextList))
+//            resources.
         return resources.getRowLayoutId();
     }
 
     @Override
-    public int getControlLayoutId(OpenHABWidgetType type) {
-        final WidgetTypeResources resources = sResources.get(type);
+    public int getControlLayoutId(OpenHABWidgetType widgetType) {
+        final WidgetTypeResources resources = sResources.get(widgetType);
         if(resources == null)
             return -1;
 

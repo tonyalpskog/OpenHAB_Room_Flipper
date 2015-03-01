@@ -82,6 +82,10 @@ import java.util.regex.Pattern;
  */
 
 public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> implements IHABWidgetCommunication {
+    public enum WidgetLayoutType {
+        IconTextControlList,
+        IconTextList
+    }
     private final IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
     private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	private String openHABUsername = "";
@@ -89,15 +93,18 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
 	private ArrayList<VideoView> videoWidgetList;
 	private ArrayList<AutoRefreshImageView> refreshImageList;
     private MyAsyncHttpClient mAsyncHttpClient;
+    private WidgetLayoutType mWidgetLayoutType;
 
 	public OpenHABWidgetArrayAdapter(Context context, int resource,
                                      List<OpenHABWidget> objects,
-                                     IWidgetTypeLayoutProvider widgetTypeLayoutProvider) {
+                                     IWidgetTypeLayoutProvider widgetTypeLayoutProvider,
+                                     WidgetLayoutType widgetLayoutType) {
 		super(context, resource, objects);
         mWidgetTypeLayoutProvider = widgetTypeLayoutProvider;
         // Initialize video view array
 		videoWidgetList = new ArrayList<VideoView>();
 		refreshImageList = new ArrayList<AutoRefreshImageView>();
+        mWidgetLayoutType = widgetLayoutType;
 	}
 
 	@Override
@@ -105,14 +112,25 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
         ViewData preparedViewData = new ViewData();
     	int widgetLayout;
     	preparedViewData.openHABWidget = getItem(position);
-    	widgetLayout = mWidgetTypeLayoutProvider.getRowLayoutId(getItem(position).getType());
-
+        switch (mWidgetLayoutType) {
+            case IconTextControlList:
+                widgetLayout = mWidgetTypeLayoutProvider.getRowLayoutId(preparedViewData.openHABWidget.getType());
+                break;
+            default:
+                widgetLayout = R.layout.openhabwidgetlist_generic_controlless_item;
+                break;
+        }
+        
     	if (convertView == null) {
             preparedViewData.widgetView = new RelativeLayout(getContext());
     		String inflater = Context.LAYOUT_INFLATER_SERVICE;
     		LayoutInflater vi;
     		vi = (LayoutInflater)getContext().getSystemService(inflater);
-    		vi.inflate(widgetLayout, preparedViewData.widgetView, true);
+            try {
+    		    vi.inflate(widgetLayout, preparedViewData.widgetView, true);
+            } catch (Exception ex) {
+                Log.w("OpenHABWidgetArrayAdapt", String.format("'%s' of type '%s' cannot get inflated in widget list", preparedViewData.openHABWidget, preparedViewData.openHABWidget.getType()), ex);
+            }
     	} else {
             preparedViewData.widgetView = (RelativeLayout) convertView;
     	}
@@ -122,7 +140,13 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
         preparedViewData.valueTextView = getValueTextView(preparedViewData.widgetView, preparedViewData.openHABWidget);
 
         View widgetView = null;
-    	switch (getItem(position).getType()) {
+        if(mWidgetLayoutType == WidgetLayoutType.IconTextList) {
+            widgetView = new OpenHABFrameWidget(this, preparedViewData).getWidget();
+            preparedViewData.labelTextView.setText(preparedViewData.openHABWidget.getLabel());
+            return widgetView;
+        }
+        
+        switch (preparedViewData.openHABWidget.getType()) {
             case Frame:
                 widgetView = new OpenHABFrameWidget(this, preparedViewData).getWidget();
                 break;
@@ -152,7 +176,7 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
                 widgetView = new OpenHABImageWidget(refreshImageList, this, preparedViewData).getWidget();
                 break;
             case Chart:
-                int screenWidth = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
+                int screenWidth = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
                 widgetView = new OpenHABChartWidget(screenWidth, refreshImageList, this, preparedViewData).getWidget();
                 break;
             case Video:
@@ -171,20 +195,21 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
                 if (preparedViewData.labelTextView != null)
                     preparedViewData.labelTextView.setText(preparedViewData.openHABWidget.getLabel());
                 break;
-    	}
+        }
 
-    	LinearLayout dividerLayout = (LinearLayout)widgetView.findViewById(R.id.listdivider);
-    	if (dividerLayout != null) {
-    		if (position < this.getCount()-1) {
-    			if (getItem(position + 1).getType() == OpenHABWidgetType.Frame) {
-        			dividerLayout.setVisibility(View.GONE); // hide dividers before frame widgets
-    			} else {
-    				dividerLayout.setVisibility(View.VISIBLE); // show dividers for all others
-    			}
-    		} else { // last widget in the list, hide divider
-    			dividerLayout.setVisibility(View.GONE);
-    		}
-    	}
+        LinearLayout dividerLayout = (LinearLayout) widgetView.findViewById(R.id.listdivider);
+        if (dividerLayout != null) {
+            if (position < this.getCount() - 1/* || !mWidgetLayoutType.equals(WidgetLayoutType.IconTextList)*/) {
+                if (getItem(position + 1).getType() == OpenHABWidgetType.Frame) {
+                    dividerLayout.setVisibility(View.GONE); // hide dividers before frame widgets
+                } else {
+                    dividerLayout.setVisibility(View.VISIBLE); // show dividers for all others
+                }
+            } else { // last widget in the list, hide divider
+                dividerLayout.setVisibility(View.GONE);
+            }
+        }
+
     	return widgetView;
     }
 

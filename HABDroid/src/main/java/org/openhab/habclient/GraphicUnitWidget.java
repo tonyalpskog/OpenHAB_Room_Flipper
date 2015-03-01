@@ -34,8 +34,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     private UnitContainerView mUnitContainerView;
     private HABApplication mApplication;
     @Inject IOpenHABSetting mOpenHABSetting;
-    @Inject
-    IApplicationModeProvider mApplicationModeProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     public GraphicUnitWidget(Context context) {
         super(context);

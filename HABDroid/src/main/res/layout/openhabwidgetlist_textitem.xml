@@ -43,7 +43,7 @@
             android:id="@+id/listdivider"
             android:layout_width="fill_parent"
             android:layout_height="1dip"
-            android:background="?attr/widgetlistItemDivider"
+            android:background="?android:attr/listDivider"
             android:orientation="horizontal"
             android:layout_below="@+id/widgetimage"
             android:layout_marginLeft="@dimen/widgetlist_divider_left_margin"

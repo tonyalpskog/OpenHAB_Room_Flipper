@@ -7,31 +7,57 @@ package org.openhab.habclient;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
 
 import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.habdroid.R;
+import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
+import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
+import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
+import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
+import org.openhab.habdroid.util.AutoRefreshImageView;
+import org.openhab.habdroid.util.MyAsyncHttpClient;
 
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -56,11 +82,13 @@ public class UnitPlacementFragment extends Fragment {
 
     private UnitContainerView mRoomView;
     private final EnumSet<OpenHABWidgetType> mUnitTypes = EnumSet.of(OpenHABWidgetType.RollerShutter, OpenHABWidgetType.Switch, OpenHABWidgetType.Slider, OpenHABWidgetType.ItemText, OpenHABWidgetType.SitemapText, OpenHABWidgetType.SelectionSwitch, OpenHABWidgetType.Selection, OpenHABWidgetType.Setpoint, OpenHABWidgetType.Color, OpenHABWidgetType.Group);
+    private OpenHABWidgetArrayAdapter mOpenHABWidgetAdapter;
     //TA: TODO - Add a LinkedPageLink string member here for REST Get sitemap usage. Then Load HABApp with the resulting data source.
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IRestCommunication mRestCommunication;
     @Inject IEventBus mEventBus;
+    @Inject IOpenHABSetting mOpenHABSetting;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -173,8 +201,6 @@ public class UnitPlacementFragment extends Fragment {
         //TODO - Create dynamic menu
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.room_config_default, menu);
-
-        //menu.findItem(R.id.action_remove).setVisible()
     }
 
     @Override
@@ -217,16 +243,11 @@ public class UnitPlacementFragment extends Fragment {
         mRoomView.redrawAllUnits();//TA: TODO - Ugly way too remove a single View.
     }
 
-    private void showAddUnitDialog(Context context) {
+    private void showAddUnitDialog(final Context context) {
         List<OpenHABWidget> list = mWidgetProvider.getWidgetList((Set<OpenHABWidgetType>) null);
         for (OpenHABWidget aList : list)
             Log.d(HABApplication.getLogTag(), "WidgetProvider data ID = " + aList.getId());
 
-//        Toast.makeText(context, "ALL widgetList = " + (mOpenHABWidgetRoomProvider == null? "NULL-Provider": mOpenHABWidgetRoomProvider.getWidgetList(OpenHABWidgetType.Switch).size()), Toast.LENGTH_SHORT).show();
-        //TA: Just a test. TODO - Replace some List<> for a better sustainable solution.
-        List<CharSequence> itemsList = new ArrayList<CharSequence>();
-        List<String> itemNameList = new ArrayList<String>();
-        final HashMap<Integer, OpenHABWidget> widgetMap = new HashMap<Integer, OpenHABWidget>();
         String strLogAll = "showAddUnitDialog() -> Full list: ";
         String strLogRemoved = "showAddUnitDialog() -> Removed list: ";
 
@@ -241,55 +262,53 @@ public class UnitPlacementFragment extends Fragment {
         }
 
         List<OpenHABWidget> widgetList = mRoomView.getRoom().getRoomWidget().getChildren();
-        Iterator<OpenHABWidget> iterator = widgetList.iterator();
-        int i = 0;
-        while(iterator.hasNext()) {
-            OpenHABWidget next = iterator.next();
-            strLogAll += next.getId() + ", ";
-            if(mUnitTypes.contains(next.getType()) && !mRoomView.getRoom().contains(next)){
-                itemNameList.add(next.getItem().getName());
-                widgetMap.put(i, next);
-                itemsList.add(i++, String.format("(%s) %s", next.getType().Name, next.hasLinkedPage() ? next.getLinkedPage().getTitle() : next.getItem().getName()));
+        final List<OpenHABWidget> unusedWidgetsList = new ArrayList<OpenHABWidget>();
+        for(OpenHABWidget widget : widgetList) {
+            strLogAll += widget.getId() + ", ";
+            if(mUnitTypes.contains(widget.getType()) && !mRoomView.getRoom().contains(widget)){
+                unusedWidgetsList.add(widget);
             }
             else
-                strLogRemoved += next.getId() + ", ";
+                strLogRemoved += widget.getId() + ", ";
         }
         Log.d(HABApplication.getLogTag(), strLogAll);
         Log.d(HABApplication.getLogTag(), strLogRemoved);
 
-        if(itemsList.size() < 1) {
+        if(unusedWidgetsList.size() < 1) {
             Toast.makeText(context, "There are no more items for this room.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        final List<String> finalItemNameList = itemNameList;
-
-        CharSequence[] items = (CharSequence[]) itemsList.toArray(new CharSequence[itemsList.size()]);
-//        Toast.makeText(context, "widgetList = " + widgetList.size() + "   itemsList = " + itemsList.size(), Toast.LENGTH_SHORT).show();
-
-        AlertDialog addUnitDialog;
+        final AlertDialog addUnitDialog;
         // Creating and Building the Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        //builder.setOnDismissListener(new MyOnDismissListener());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater li = LayoutInflater.from(getActivity());
+        View convertView = li.inflate(R.layout.openhabwidgetlist, null);
+
+        ListView widgetListView = (ListView) convertView.findViewById(android.R.id.list);
+        IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
+        mOpenHABWidgetAdapter = new OpenHABWidgetArrayAdapter(context,
+                R.layout.openhabwidgetlist_genericitem, unusedWidgetsList, widgetTypeLayoutProvider,
+                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextList);
+        widgetListView.setAdapter(mOpenHABWidgetAdapter);
+        
+        // Set adapter parameters
+        mOpenHABWidgetAdapter.setOpenHABUsername(mOpenHABSetting.getUsername());
+        mOpenHABWidgetAdapter.setOpenHABPassword(mOpenHABSetting.getPassword());
+
         builder.setTitle("Select unit type");
-        builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                mRoomView.addNewUnitToRoom(new GraphicUnit(widgetMap.get(item), mEventBus), 50, 50);
-                Log.d(TAG, "showAddUnitDialog() -> (list:)Added widget = " + finalItemNameList.get(item));
-            dialog.dismiss();
+        builder.setView(convertView);
+        addUnitDialog = builder.create();
+
+        widgetListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mRoomView.addNewUnitToRoom(new GraphicUnit(unusedWidgetsList.get(Integer.valueOf(position)), mEventBus), 50, 50);
+                addUnitDialog.dismiss();
             }
         });
-        addUnitDialog = builder.create();
+
         addUnitDialog.show();
-
-        class MyOnDismissListener implements DialogInterface.OnDismissListener {
-
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-            }
-        }
     }
 
     private void unitSelectionDialog(Context context) {
