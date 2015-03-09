@@ -43,6 +43,8 @@ import org.openhab.habclient.UnitContainerView;
 import org.openhab.habclient.UnitPlacementFragment;
 import org.openhab.domain.command.CommandAnalyzer;
 import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.habclient.auto.AutoUnreadConversationManager;
+import org.openhab.habclient.auto.IAutoUnreadConversationManager;
 import org.openhab.habclient.command.CommandColorProvider;
 import org.openhab.habclient.command.CommandPhrasesProvider;
 import org.openhab.habclient.media.Camera;
@@ -203,6 +205,9 @@ public class ClientModule {
 
     @Provides @Singleton
     public IImagePicker provideImagePicker(ImagePicker imagePicker) { return imagePicker; }
+
+    @Provides @Singleton
+    public IAutoUnreadConversationManager provideAutoUnreadConversationManager(AutoUnreadConversationManager autoUnreadConversationManager) { return autoUnreadConversationManager; }
 
 //    @Provides @Singleton
 //    public IOpenHABSitemapProvider provideOpenHABSitemapProvider(OpenHABSitemapProvider provider) {

@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -17,10 +16,12 @@ import android.support.v4.app.RemoteInput;
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.command.CommandAnalyzerResult;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.RoomFlipperFragment;
+import org.openhab.habclient.auto.AutoUnreadConversationManager;
+import org.openhab.habclient.auto.IAutoUnreadConversationManager;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -33,14 +34,17 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
     private final IApplicationModeProvider mApplicationModeProvider;
     private BroadcastReceiver mReceiver;
     private ICommandAnalyzer mCommandAnalyzer;
+    private final IAutoUnreadConversationManager mAutoUnreadConversationManager;
 
     @Inject
     public WearCommandHost(Context context,
                            IApplicationModeProvider applicationModeProvider,
-                           ICommandAnalyzer commandAnalyzer) {
+                           ICommandAnalyzer commandAnalyzer,
+                           IAutoUnreadConversationManager autoUnreadConversationManager) {
         mContext = context;
         mApplicationModeProvider = applicationModeProvider;
         mCommandAnalyzer = commandAnalyzer;
+        mAutoUnreadConversationManager = autoUnreadConversationManager;
 
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -74,20 +78,30 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
 
         wearableExtender.setBackground(BitmapFactory.decodeResource(mContext.getResources(),
                 R.drawable.openhab_320x320));
-                
+
+        //Android Auto
+        mAutoUnreadConversationManager.addMessageToUnreadConversations(message);
+
         // Build the notification
         Notification notification = new NotificationCompat.Builder(mContext)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.openhabicon)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.openhabicon_light))
+                .setWhen(Calendar.getInstance().get(Calendar.SECOND))
                 .setVibrate(vibratePattern)
-                .extend(wearableExtender)
+                .extend(wearableExtender)//Wear
+                .extend(new NotificationCompat.CarExtender().setUnreadConversation(mAutoUnreadConversationManager.getUnreadConversation()))//Auto
                 .build();
 
+        try {
+            Thread.sleep(6000, 0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         NotificationManagerCompat.from(mContext).notify(0, notification);
     }
-    
+
     public NotificationCompat.Action getVoiceCommandAction() {
         // Create intent for action
         Intent intent = new Intent(ACTION_RESPONSE);
@@ -103,7 +117,6 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
             .addRemoteInput(remoteInput)
             .build();
     }
-
 
     public NotificationCompat.Action getGroupMessageAction() {
         // Create intent for action
@@ -153,3 +166,4 @@ public class WearCommandHost implements org.openhab.domain.wear.IWearCommandHost
         }
     }
 }
+

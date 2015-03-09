@@ -31,12 +31,17 @@
         android:allowBackup="true"
         android:icon="@drawable/openhabicon"
         android:label="@string/install_app_name" >
-        <!--android:banner="@drawable/openhabicon" >-->
+        <!--android:banner="@drawable/openhabicon" >  Android TV banner-->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="4030500" />
 
-        <!-- Service -->
+    <!-- Android Auto -->
+
+        <meta-data android:name="com.google.android.gms.car.application"
+                   android:resource="@xml/automotive_app_desc" />
+        
+    <!-- Service -->
 
         <service
             android:name="org.openhab.habclient.HABService"
@@ -45,7 +50,7 @@
         <service android:name="org.openhab.habclient.SpeechService" />
         <service android:name="org.openhab.habdroid.core.GcmIntentService" />
 
-        <!-- Activity -->
+    <!-- Activity -->
 
         <activity
             android:name="org.openhab.habdroid.ui.OpenHABPreferencesActivity"
@@ -81,11 +86,13 @@
         <activity
             android:name="org.openhab.habclient.MainActivity"
             android:label="@string/app_name" >
+            <!-- Begin: Android TV main view -->
             <!--android:theme="@style/Theme.Leanback">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+            <!-- End: Android TV -->
         </activity>
         <activity
             android:name="org.openhab.habclient.rule.RuleEditActivity"
@@ -103,7 +110,7 @@
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
 
-        <!-- BroadcastReceiver -->
+    <!-- BroadcastReceiver -->
 
         <receiver
             android:name="org.openhab.habdroid.core.GcmBroadcastReceiver"
@@ -114,6 +121,7 @@
                 <category android:name="org.openhab.habdroid" />
             </intent-filter>
         </receiver>
+        
         <receiver android:name="org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver" >
             <intent-filter>
                 <action android:name="org.openhab.habdroid.notification.deleted" />
@@ -122,11 +130,27 @@
             </intent-filter>
         </receiver>
 
+        <!-- Android Auto -->
+
+        <receiver android:name="org.openhab.habclient.auto.AutoMessageReadReceiver">
+            <intent-filter>
+                <action android:name="org.openhab.habclient.auto.AutoUnreadConversationManager.MESSAGE_READ_ACTION"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="org.openhab.habclient.auto.AutoMessageReplyReceiver">
+            <intent-filter>
+                <action android:name="com.myapp.messagingservice.ACTION_MESSAGE_REPLY"/>
+            </intent-filter>
+        </receiver>
+    
     </application>
+
+<!-- Android TV stuff -->
 
     <uses-feature android:name="android.software.leanback"
                   android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen"
                   android:required="false" />
-    
+
 </manifest>

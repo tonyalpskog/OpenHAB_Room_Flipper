@@ -153,7 +153,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 return true;
             case R.id.action_start_wear_app:
-                mWearCommandHost.startSession("Test Message", "Kitchen Dishwasher leakage sensor [closed]");
+                mWearCommandHost.startSession("Test Message", "Kitchen Dishwasher leakage detected");
                 return true;
             case R.id.action_open_rules:
                 Intent i = new Intent(getActivity(), RuleListActivity.class);
