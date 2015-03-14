@@ -70,6 +70,7 @@ import com.loopj.android.image.WebImageCache;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABLinkedPage;
 import org.openhab.domain.model.OpenHABSitemap;
 import org.openhab.habclient.HABService;
@@ -77,6 +78,7 @@ import org.openhab.habclient.INavDrawerActivity;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.InjectUtils;
 import org.openhab.habclient.MainActivity;
+import org.openhab.habclient.notification.NotificationHost;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;

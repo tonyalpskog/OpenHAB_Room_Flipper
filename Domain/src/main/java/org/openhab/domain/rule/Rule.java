@@ -1,9 +1,10 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.INotificationHost;
 import org.openhab.domain.IOpenHABWidgetControl;
+import org.openhab.domain.SenderType;
 import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.domain.wear.IWearCommandHost;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,15 +27,15 @@ public class Rule implements OnOperandValueChangedListener {
     protected UUID mRuleId;
 
     private final IOpenHABWidgetControl mOpenHABWidgetControl;
-    private final IWearCommandHost mWearCommandHost;
+    private final INotificationHost mNotificationHost;
 
-    public Rule(IOpenHABWidgetControl widgetControl, IWearCommandHost wearCommandHost) {
-        this("New Rule", widgetControl, wearCommandHost);
+    public Rule(IOpenHABWidgetControl widgetControl, INotificationHost notificationHost) {
+        this("New Rule", widgetControl, notificationHost);
     }
 
-    public Rule(String name, IOpenHABWidgetControl widgetControl, IWearCommandHost wearCommandHost) {
+    public Rule(String name, IOpenHABWidgetControl widgetControl, INotificationHost notificationHost) {
         mOpenHABWidgetControl = widgetControl;
-        mWearCommandHost = wearCommandHost;
+        mNotificationHost = notificationHost;
         setRuleId(UUID.randomUUID());
         setName(name);
         mActions = new ArrayList<RuleAction>();
@@ -100,7 +101,7 @@ public class Rule implements OnOperandValueChangedListener {
             if(action.getActionType() == RuleActionType.COMMAND)
                 mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
             else
-                mWearCommandHost.startSession("Rule Action", action.getTextValue());
+                mNotificationHost.startSession(SenderType.System, "Rule Action", action.getTextValue());
         }
     }
 

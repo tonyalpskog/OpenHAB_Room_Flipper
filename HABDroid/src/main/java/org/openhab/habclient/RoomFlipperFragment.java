@@ -18,14 +18,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.INotificationHost;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
-import org.openhab.domain.wear.IWearCommandHost;
 import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.domain.user.User;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -47,13 +49,14 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private RoomFlipper mRoomViewFlipper;
     private TextView mRoomLabel;
 
-    @Inject IWearCommandHost mWearCommandHost;
+    @Inject INotificationHost mNotificationHost;
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
     @Inject IRestCommunication mRestCommunication;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;//TODO - temporary
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -76,7 +79,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         InjectUtils.inject(this);
 
-//        mWearCommandHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
+//        mNotificationHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
     }
 
     @Override
@@ -153,7 +156,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 return true;
             case R.id.action_start_wear_app:
-                mWearCommandHost.startSession("Test Message", "Kitchen Dishwasher leakage detected");
+//                mNotificationHost.startSession("OpenHab", mWidgetProvider.getWidgetByID("Light_GF_Kitchen_Ceiling"), "Kitchen Dishwasher leakage detected");
+                mNotificationHost.startSession("Person", new User(), "Hi, this is a test message");
                 return true;
             case R.id.action_open_rules:
                 Intent i = new Intent(getActivity(), RuleListActivity.class);
@@ -170,14 +174,14 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
         mApplicationModeProvider.setAppMode(ApplicationMode.RoomFlipper);
         mRoomLabel.setText(getRoomLabel());
         mRoomViewFlipper.getCurrentUnitContainer().redrawAllUnits();
-        mWearCommandHost.registerReceiver();
+        mNotificationHost.registerReceivers();
         requestRemoteRoomUpdate();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mWearCommandHost.unregisterReceiver();
+//        mNotificationHost.unregisterReceivers();
         cancelRemoteRoomUpdate();
     }
 

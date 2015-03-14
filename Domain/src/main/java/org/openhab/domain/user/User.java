@@ -5,4 +5,9 @@ package org.openhab.domain.user;
  */
 public class User {
     public static final String ARG_USER_ID = "User ID";
+    public final String defaultImage = "http://www.icone-png.com/png/47/47162.png";
+
+    public String getImageUrl() {
+        return defaultImage;
+    }
 }

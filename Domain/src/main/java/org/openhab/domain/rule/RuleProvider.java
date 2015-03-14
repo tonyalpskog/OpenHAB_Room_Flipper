@@ -1,9 +1,9 @@
 package org.openhab.domain.rule;
 
+import org.openhab.domain.INotificationHost;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.domain.wear.IWearCommandHost;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,16 +16,16 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class RuleProvider implements IRuleProvider {
-    private final IWearCommandHost mWearCommandHost;
+    private final INotificationHost mNotificationHost;
     private final IOpenHABWidgetControl mWidgetControl;
 
     private final Map<String, List<Rule>> mUserRules;
     private final Map<AccessModifier, List<Rule>> mRulesAccessMap;
 
     @Inject
-    public RuleProvider(IWearCommandHost wearCommandHost,
+    public RuleProvider(INotificationHost notificationHost,
                         IOpenHABWidgetControl widgetControl) {
-        mWearCommandHost = wearCommandHost;
+        mNotificationHost = notificationHost;
         mWidgetControl = widgetControl;
         mUserRules = new HashMap<String,List<Rule>>();
         mRulesAccessMap = new HashMap<AccessModifier, List<Rule>>();
@@ -83,7 +83,7 @@ public class RuleProvider implements IRuleProvider {
         if(StringHandler.isNullOrEmpty(userId))
             throw new IllegalArgumentException("userId is null or empty");
         String name = StringHandler.isNullOrEmpty(ruleName)? "New rule" : ruleName;
-        Rule rule = new Rule(ruleName, mWidgetControl, mWearCommandHost);
+        Rule rule = new Rule(ruleName, mWidgetControl, mNotificationHost);
         if(accessModifier != null)
             rule.setAccess(accessModifier);
         saveRule(rule, userId);

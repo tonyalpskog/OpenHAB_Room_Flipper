@@ -4,11 +4,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.RemoteInput;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -17,62 +16,79 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2015.
  */
 public class AutoUnreadConversationManager implements IAutoUnreadConversationManager {
-    public static final String UNREAD_CONVERSATION_BUILDER_NAME = "OpenHab";
-    public static final String MESSAGE_CONVERSATION_ID_KEY = "Android_Auto_Conversation_Id";
-    public static final String MESSAGE_READ_ACTION = "Android_Auto_Conversation_Read_Action";
+    public static final String UNREAD_CONVERSATION_BUILDER_NAME = "OpenHabben";
+    public static final String NOTIFICATION_CONVERSATION_ID_KEY = "Android_Auto_Conversation_Id";
+    public static final String NOTIFICATION_READ_ACTION = "Android_Auto_Conversation_Read_Action";
+    public static final String NOTIFICATION_REPLY_ACTION = "Android_Auto_Conversation_Reply_Action";
+    public static final String AUTO_VOICE_REPLY_KEY = "Android_Auto_Voice_Reply";
 
     private final Context mContext;
-    private Map<Integer, List<String>> mUnreadConversations;
+    private Map<String, Integer> mConversationsIdMap;
+    private Map<Integer, Conversation> mUnreadConversations;
     private int nextConversationId = 0;
-    private final int CONVERSATION_ID = 0;
+    private final int CONVERSATION_ID = 99;
 
     long mLatestTimestamp = Calendar.getInstance().get(Calendar.SECOND);
 
     @Inject
     public AutoUnreadConversationManager(Context context) {
         mContext = context;
-        mUnreadConversations = new HashMap<Integer, List<String>>();
+        mConversationsIdMap = new HashMap<String, Integer>();
+        mUnreadConversations = new HashMap<Integer, Conversation>();
     }
 
     @Override
-    public int addMessageToUnreadConversations(String message) {
-        return addMessageToUnreadConversations(message, CONVERSATION_ID);
+    public int addMessageToUnreadConversations(String stringId, String message) {
+        if(!mConversationsIdMap.containsKey(stringId))
+            mConversationsIdMap.put(stringId, CONVERSATION_ID);//Hardcoded for now. Not sure yet if multiple id's really needed.
+        int conversationId = mConversationsIdMap.get(stringId);
+        return addMessageToUnreadConversations(conversationId, stringId, message);
     }
 
-    private int addMessageToUnreadConversations(String message, int conversationId) {
-        List<String> messageList = mUnreadConversations.get(Integer.valueOf(conversationId));
-        if(messageList == null)
-            messageList = new ArrayList<String>();
-        messageList.add(message);
-        mUnreadConversations.put(conversationId, messageList);
-        setLatestTimestamp(Calendar.getInstance().get(Calendar.SECOND));
+    private int addMessageToUnreadConversations(int conversationId, String title, String message) {
+        Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+        if(conversation == null) {
+            conversation = new Conversation(conversationId, title, message);
+            mUnreadConversations.put(Integer.valueOf(conversationId), conversation);
+        }
+        conversation.putMessage(message);
+        //setLatestTimestamp(Calendar.getInstance().get(Calendar.SECOND));
         return conversationId;
     }
 
     @Override
     public void removeMessageFromUnreadConversations(int conversationId) {
         if(mUnreadConversations.containsKey(Integer.valueOf(conversationId))) {
-            List<String> conversationMessages = mUnreadConversations.get(Integer.valueOf(conversationId));
-            conversationMessages.remove(0);
+            Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+            conversation.popMessage();
         }
     }
 
     @Override
-    public NotificationCompat.CarExtender.UnreadConversation getUnreadConversation() {
-        return getUnreadConversation(CONVERSATION_ID);
+    public NotificationCompat.CarExtender.UnreadConversation[] getUnreadConversations() {
+        return new NotificationCompat.CarExtender.UnreadConversation[] {getUnreadConversation(CONVERSATION_ID)};//Hardcoded for now. Not sure yet if multiple id's really needed.
+    }
+
+    @Override
+    public Conversation getConversation(String stringId) {
+        return null;
     }
 
     private NotificationCompat.CarExtender.UnreadConversation getUnreadConversation(int conversationId) {
+        Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+        if(conversation == null)
+            return null;
+
         NotificationCompat.CarExtender.UnreadConversation.Builder unreadConversationBuilder =
-                new NotificationCompat.CarExtender.UnreadConversation.Builder( UNREAD_CONVERSATION_BUILDER_NAME );
+                new NotificationCompat.CarExtender.UnreadConversation.Builder(conversation.getTitle());
 
         unreadConversationBuilder
                 .setReadPendingIntent(getMessageReadPendingIntent(conversationId))
-//                .setReplyAction(getMessageReplyPendingIntent(), getVoiceReplyRemoteInput())
-//                .addMessage("Warning. The living room sofa is occupied by cats!")
+                .setReplyAction(getMessageReplyPendingIntent(), getVoiceReplyRemoteInput())
+//                .putMessage("Warning. The living room sofa is occupied by cats!")
                 .setLatestTimestamp(getLatestTimestamp());
 
-        for(String message : mUnreadConversations.get(conversationId)) {
+        for(String message : conversation.getMessages()) {
             unreadConversationBuilder.addMessage(message);
         }
 
@@ -89,29 +105,29 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     private Intent getMessageReadIntent(int conversationId) {
         return new Intent()
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-                .setAction(MESSAGE_READ_ACTION)
-                .putExtra(MESSAGE_CONVERSATION_ID_KEY, conversationId);
+                .setAction(NOTIFICATION_READ_ACTION)
+                .putExtra(NOTIFICATION_CONVERSATION_ID_KEY, conversationId);
     }
 
-//    private PendingIntent getMessageReplyPendingIntent() {
-//        return PendingIntent.getBroadcast(mContext,
-//                1,
-//                getMessageReplyIntent(),
-//                PendingIntent.FLAG_UPDATE_CURRENT);
-//    }
-//
-//    private Intent getMessageReplyIntent() {
-//        return new Intent()
-//                .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-//                .setAction(MESSAGE_REPLY_ACTION)
-//                .putExtra(MESSAGE_CONVERSATION_ID_KEY, 1);
-//    }
-//
-//    private RemoteInput getVoiceReplyRemoteInput() {
-//        return new RemoteInput.Builder(VOICE_REPLY_KEY)
-//                .setLabel("Reply")
-//                .build();
-//    }
+    private PendingIntent getMessageReplyPendingIntent() {
+        return PendingIntent.getBroadcast(mContext,
+                1,
+                getMessageReplyIntent(),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private Intent getMessageReplyIntent() {
+        return new Intent()
+                .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+                .setAction(NOTIFICATION_REPLY_ACTION)
+                .putExtra(NOTIFICATION_CONVERSATION_ID_KEY, 1);
+    }
+
+    private RemoteInput getVoiceReplyRemoteInput() {
+        return new RemoteInput.Builder(AUTO_VOICE_REPLY_KEY)
+                .setLabel("Reply")
+                .build();
+    }
 
     public long getLatestTimestamp() {
         return mLatestTimestamp;

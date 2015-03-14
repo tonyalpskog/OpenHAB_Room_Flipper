@@ -1,7 +1,10 @@
 package org.openhab.habclient.dagger;
 
+import android.content.Context;
+
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
+import org.openhab.domain.INotificationReplyHandler;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IPopularNameProvider;
@@ -16,7 +19,13 @@ import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.RuleProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
-import org.openhab.domain.wear.IWearCommandHost;
+import org.openhab.domain.INotificationHost;
+import org.openhab.habclient.auto.AutoMessageReadReceiver;
+import org.openhab.habclient.auto.AutoMessageReplyReceiver;
+import org.openhab.habclient.notification.INotificationSender;
+import org.openhab.habclient.notification.NotificationHost;
+import org.openhab.habclient.notification.NotificationReplyHandler;
+import org.openhab.habclient.wear.IWearCommandHost;
 import org.openhab.habclient.AndroidLogger;
 import org.openhab.domain.ApplicationModeProvider;
 import org.openhab.habclient.ColorParser;
@@ -95,7 +104,12 @@ injects = {
         RuleOperandDialogFragment.class,
         SpeechService.class,
         AdapterProvider.class,
-        WearCommandHost.class
+        WearCommandHost.class,
+        AutoUnreadConversationManager.class,
+        NotificationHost.class,
+        NotificationReplyHandler.class,
+        AutoMessageReplyReceiver.class,
+        AutoMessageReadReceiver.class
 })
 public class ClientModule {
     @Provides @Singleton
@@ -213,4 +227,19 @@ public class ClientModule {
 //    public IOpenHABSitemapProvider provideOpenHABSitemapProvider(OpenHABSitemapProvider provider) {
 //        return provider;
 //    }
+//
+    @Provides @Singleton
+    public INotificationHost provideNotificationHostProvider(NotificationHost notificationHost) {
+        return notificationHost;
+    }
+
+    @Provides @Singleton
+    public INotificationSender provideNotificationSenderProvider(NotificationHost notificationHost) {
+        return notificationHost;
+    }
+
+    @Provides @Singleton
+    public INotificationReplyHandler provideNotificationReplyHandlerProvider(NotificationReplyHandler notificationReplyHandler) {
+        return notificationReplyHandler;
+    }
 }

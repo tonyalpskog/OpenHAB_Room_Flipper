@@ -85,11 +85,11 @@ public class MyWebImage implements SmartImage {
     }
 
     public MyWebImage(String url, boolean useCache, String username, String password) {
-    	this.url = url;
-    	this.useCache = useCache;
+        this.url = url;
+        this.useCache = useCache;
         this.setAuthentication(username, password);
     }
-    
+
     public Bitmap getBitmap(Context context) {
         // Don't leak context
         if(webImageCache == null) {
@@ -116,6 +116,13 @@ public class MyWebImage implements SmartImage {
     private Bitmap getBitmapFromUrl(String url) {
         Bitmap bitmap = null;
         String encodedUserPassword = null;
+        URL bitmapUrl;
+        try {
+            bitmapUrl = new URL(url);
+        } catch (MalformedURLException e) {
+            Log.e("MyWebImage", String.format("Malformed title icon URL: [%s]  Default bitmap will be used.", url), e);
+            return null;
+        }
         if (shouldAuth)
         	try {
         		String userPassword = this.authUsername + ":" + this.authPassword;
@@ -124,30 +131,30 @@ public class MyWebImage implements SmartImage {
         		// TODO Auto-generated catch block
         		e1.printStackTrace();
         	}
-        if (url.startsWith("https")) {
+        if (bitmapUrl.getProtocol().equalsIgnoreCase("https")) {
         	try {
         		HttpsURLConnection.setDefaultHostnameVerifier(getHostnameVerifier());
-        		HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
+        		HttpsURLConnection conn = (HttpsURLConnection) bitmapUrl.openConnection();
         		conn.setSSLSocketFactory(getSSLSocketFactory());
         		conn.setConnectTimeout(CONNECT_TIMEOUT);
         		conn.setReadTimeout(READ_TIMEOUT);
         		if (this.shouldAuth)
         			conn.setRequestProperty("Authorization", "Basic " + encodedUserPassword);
         		bitmap = BitmapFactory.decodeStream((InputStream) conn.getContent());
-        	} catch(Exception e) {
+        	} catch(IOException e) {
+                Log.w("MyWebImage", String.format("Could not fetch bitmap from icon URL: [%s]  Default bitmap will be used.", url), e);
         		e.printStackTrace();
         	}
         } else {
         	try {
-				HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+				HttpURLConnection conn = (HttpURLConnection) bitmapUrl.openConnection();
         		conn.setConnectTimeout(CONNECT_TIMEOUT);
         		conn.setReadTimeout(READ_TIMEOUT);
         		if (this.shouldAuth)
         			conn.setRequestProperty("Authorization", "Basic " + encodedUserPassword);
         		bitmap = BitmapFactory.decodeStream((InputStream) conn.getContent());
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
+                Log.w("MyWebImage", String.format("Could not fetch bitmap from icon URL: [%s]  Default bitmap will be used.", url), e);
 				e.printStackTrace();
 			}
         }

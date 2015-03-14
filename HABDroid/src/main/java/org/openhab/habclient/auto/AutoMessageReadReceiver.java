@@ -9,13 +9,19 @@ import android.util.Log;
 import javax.inject.Inject;
 
 public class AutoMessageReadReceiver extends BroadcastReceiver {
-    @Inject public IAutoUnreadConversationManager mAutoUnreadConversationManager;
+    @Inject IAutoUnreadConversationManager mAutoUnreadConversationManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.MESSAGE_CONVERSATION_ID_KEY, -1 );
-        Log.d("Message", "id: " + conversationId);
+        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.NOTIFICATION_CONVERSATION_ID_KEY, -1);
+        Log.d("Auto message READ", "conversation id = " + conversationId);
+        if(conversationId == -1)
+            return;
+
         NotificationManagerCompat.from(context).cancel(conversationId);
-        mAutoUnreadConversationManager.removeMessageFromUnreadConversations(conversationId);
+        if(mAutoUnreadConversationManager == null)
+            Log.e("Auto message READ", "AutoUnreadConversationManager is NULL");
+        else
+            mAutoUnreadConversationManager.removeMessageFromUnreadConversations(conversationId);
     }
 }

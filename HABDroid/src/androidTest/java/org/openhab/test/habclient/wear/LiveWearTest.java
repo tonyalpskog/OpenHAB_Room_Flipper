@@ -2,7 +2,7 @@ package org.openhab.test.habclient.wear;
 
 import android.test.AndroidTestCase;
 
-import org.openhab.domain.wear.IWearCommandHost;
+import org.openhab.habclient.wear.IWearCommandHost;
 import org.openhab.habclient.dagger.AndroidModule;
 import org.openhab.habclient.dagger.ClientModule;
 

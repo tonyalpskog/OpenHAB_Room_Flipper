@@ -140,10 +140,10 @@
 
         <receiver android:name="org.openhab.habclient.auto.AutoMessageReplyReceiver">
             <intent-filter>
-                <action android:name="com.myapp.messagingservice.ACTION_MESSAGE_REPLY"/>
+                <action android:name="org.openhab.habclient.auto.AutoUnreadConversationManager.MESSAGE_REPLY_ACTION"/>
             </intent-filter>
         </receiver>
-    
+
     </application>
 
 <!-- Android TV stuff -->
