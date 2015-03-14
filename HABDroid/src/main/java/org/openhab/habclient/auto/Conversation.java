@@ -43,6 +43,10 @@ public class Conversation {
         return true;
     }
 
+    public boolean hasMessages() {
+        return mMessages.size() > 0;
+    }
+
     public int getId() {
         return mId;
     }

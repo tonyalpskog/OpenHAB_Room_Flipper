@@ -24,7 +24,7 @@ public class AutoMessageReadReceiver extends BroadcastReceiver {
         if(conversationId == -1)
             return;
 
-        NotificationManagerCompat.from(context).cancel(conversationId);
         mAutoUnreadConversationManager.removeMessageFromUnreadConversations(conversationId);
+        NotificationManagerCompat.from(context).cancel(conversationId);
     }
 }

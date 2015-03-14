@@ -61,6 +61,8 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
         if(mUnreadConversations.containsKey(conversationId)) {
             Conversation conversation = mUnreadConversations.get(conversationId);
             conversation.popMessage();
+            if(!conversation.hasMessages())
+                mUnreadConversations.remove(conversationId);
         }
     }
 
