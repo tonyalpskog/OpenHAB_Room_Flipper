@@ -9,10 +9,12 @@ import android.util.Log;
 import javax.inject.Inject;
 
 public class AutoMessageReadReceiver extends BroadcastReceiver {
-    @Inject IAutoUnreadConversationManager mAutoUnreadConversationManager;
+    private final IAutoUnreadConversationManager mAutoUnreadConversationManager;
 
     @Inject
-    public AutoMessageReadReceiver() {
+    public AutoMessageReadReceiver(IAutoUnreadConversationManager autoUnreadConversationManager) {
+        if(autoUnreadConversationManager == null) throw new IllegalArgumentException("autoUnreadConversationManager is null");
+        mAutoUnreadConversationManager = autoUnreadConversationManager;
     }
 
     @Override
@@ -23,9 +25,6 @@ public class AutoMessageReadReceiver extends BroadcastReceiver {
             return;
 
         NotificationManagerCompat.from(context).cancel(conversationId);
-        if(mAutoUnreadConversationManager == null)
-            Log.e("Auto message READ", "AutoUnreadConversationManager is NULL");
-        else
-            mAutoUnreadConversationManager.removeMessageFromUnreadConversations(conversationId);
+        mAutoUnreadConversationManager.removeMessageFromUnreadConversations(conversationId);
     }
 }

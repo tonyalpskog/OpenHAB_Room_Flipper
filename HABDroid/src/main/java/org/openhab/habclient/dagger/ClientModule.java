@@ -1,7 +1,5 @@
 package org.openhab.habclient.dagger;
 
-import android.content.Context;
-
 import org.openhab.domain.DocumentFactory;
 import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.INotificationReplyHandler;
@@ -22,8 +20,9 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.INotificationHost;
 import org.openhab.habclient.auto.AutoMessageReadReceiver;
 import org.openhab.habclient.auto.AutoMessageReplyReceiver;
-import org.openhab.habclient.notification.INotificationSender;
+import org.openhab.domain.INotificationSender;
 import org.openhab.habclient.notification.NotificationHost;
+import org.openhab.habclient.notification.NotificationSender;
 import org.openhab.habclient.notification.NotificationReplyHandler;
 import org.openhab.habclient.wear.IWearCommandHost;
 import org.openhab.habclient.AndroidLogger;
@@ -106,7 +105,7 @@ injects = {
         AdapterProvider.class,
         WearCommandHost.class,
         AutoUnreadConversationManager.class,
-        NotificationHost.class,
+        NotificationSender.class,
         NotificationReplyHandler.class,
         AutoMessageReplyReceiver.class,
         AutoMessageReadReceiver.class
@@ -229,13 +228,13 @@ public class ClientModule {
 //    }
 //
     @Provides @Singleton
-    public INotificationHost provideNotificationHost(NotificationHost notificationHost) {
-        return notificationHost;
+    public INotificationHost provideNotificationHost(NotificationHost notificationSender) {
+        return notificationSender;
     }
 
     @Provides @Singleton
-    public INotificationSender provideNotificationSender(NotificationHost notificationHost) {
-        return notificationHost;
+    public INotificationSender provideNotificationSender(NotificationSender notificationSender) {
+        return notificationSender;
     }
 
     @Provides @Singleton

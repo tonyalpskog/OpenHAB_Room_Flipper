@@ -14,7 +14,12 @@ import org.openhab.domain.INotificationReplyHandler;
 import javax.inject.Inject;
 
 public class AutoMessageReplyReceiver extends BroadcastReceiver {
-    @Inject INotificationReplyHandler mNotificationReplyHandler;
+    private final INotificationReplyHandler mNotificationReplyHandler;
+
+    @Inject
+    public AutoMessageReplyReceiver(INotificationReplyHandler notificationReplyHandler) {
+        mNotificationReplyHandler = notificationReplyHandler;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {

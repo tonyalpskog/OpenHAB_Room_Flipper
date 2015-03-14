@@ -1,6 +1,6 @@
 package org.openhab.domain.rule;
 
-import org.openhab.domain.INotificationHost;
+import org.openhab.domain.INotificationSender;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.SenderType;
 import org.openhab.domain.user.AccessModifier;
@@ -27,15 +27,15 @@ public class Rule implements OnOperandValueChangedListener {
     protected UUID mRuleId;
 
     private final IOpenHABWidgetControl mOpenHABWidgetControl;
-    private final INotificationHost mNotificationHost;
+    private final INotificationSender mNotificationSender;
 
-    public Rule(IOpenHABWidgetControl widgetControl, INotificationHost notificationHost) {
-        this("New Rule", widgetControl, notificationHost);
+    public Rule(IOpenHABWidgetControl widgetControl, INotificationSender notificationSender) {
+        this("New Rule", widgetControl, notificationSender);
     }
 
-    public Rule(String name, IOpenHABWidgetControl widgetControl, INotificationHost notificationHost) {
+    public Rule(String name, IOpenHABWidgetControl widgetControl, INotificationSender notificationSender) {
         mOpenHABWidgetControl = widgetControl;
-        mNotificationHost = notificationHost;
+        mNotificationSender = notificationSender;
         setRuleId(UUID.randomUUID());
         setName(name);
         mActions = new ArrayList<RuleAction>();
@@ -101,7 +101,7 @@ public class Rule implements OnOperandValueChangedListener {
             if(action.getActionType() == RuleActionType.COMMAND)
                 mOpenHABWidgetControl.sendItemCommand(action.getTargetOpenHABItemName(), action.getCommand());
             else
-                mNotificationHost.startSession(SenderType.System, "Rule Action", action.getTextValue());
+                mNotificationSender.startSession(SenderType.System, "Rule Action", action.getTextValue());
         }
     }
 

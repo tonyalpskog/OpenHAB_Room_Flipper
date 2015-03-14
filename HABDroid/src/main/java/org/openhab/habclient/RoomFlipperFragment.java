@@ -19,14 +19,14 @@ import android.widget.TextView;
 
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.INotificationHost;
-import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.domain.INotificationSender;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.IRoomProvider;
+import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
-import org.openhab.domain.command.ICommandAnalyzer;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
@@ -50,13 +50,13 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     private TextView mRoomLabel;
 
     @Inject INotificationHost mNotificationHost;
+    @Inject INotificationSender mNotificationSender;
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
     @Inject IRoomProvider mRoomProvider;
     @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
     @Inject IRestCommunication mRestCommunication;
-    @Inject IOpenHABWidgetProvider mWidgetProvider;//TODO - temporary
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -79,7 +79,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
         InjectUtils.inject(this);
 
-//        mNotificationHost = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
+//        mNotificationSender = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
     }
 
     @Override
@@ -156,8 +156,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 return true;
             case R.id.action_start_wear_app:
-//                mNotificationHost.startSession("OpenHab", mWidgetProvider.getWidgetByID("Light_GF_Kitchen_Ceiling"), "Kitchen Dishwasher leakage detected");
-                mNotificationHost.startSession("Person", new User(), "Hi, this is a test message");
+//                mNotificationSender.startSession("OpenHab", mWidgetProvider.getWidgetByID("Light_GF_Kitchen_Ceiling"), "Kitchen Dishwasher leakage detected");
+                mNotificationSender.startSession("Person", new User(), "Hi, this is a test message");
                 return true;
             case R.id.action_open_rules:
                 Intent i = new Intent(getActivity(), RuleListActivity.class);
@@ -181,7 +181,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Override
     public void onPause() {
         super.onPause();
-//        mNotificationHost.unregisterReceivers();
+//        mNotificationSender.unregisterReceivers();
         cancelRemoteRoomUpdate();
     }
 

@@ -14,7 +14,16 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2015.
  */
 public class WearNotificationReplyHandler extends BroadcastReceiver {
-    @Inject INotificationReplyHandler mNotificationReplyHandler;
+    public static final long[] LOW_PRIORITY_VIBRATE_PATTERN = new long[]{0, 500};
+    public static final long[] MEDIUM_PRIORITY_VIBRATE_PATTERN = new long[]{0, 350, 150, 350};
+    public static final long[] HIGH_PRIORITY_VIBRATE_PATTERN = new long[]{0, 350, 150, 350, 500, 350, 150, 350, 500};
+
+    private final INotificationReplyHandler mNotificationReplyHandler;
+
+    @Inject
+    public WearNotificationReplyHandler(INotificationReplyHandler notificationReplyHandler) {
+        mNotificationReplyHandler = notificationReplyHandler;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,21 +33,8 @@ public class WearNotificationReplyHandler extends BroadcastReceiver {
     private void processResponse(Intent intent) {
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
         CharSequence reply = remoteInput.getCharSequence(WearCommandHost.EXTRA_REPLY);
-        String text = reply.toString();
-        if (text != null && text.length() > 0) {
-            mNotificationReplyHandler.handleReplyMessage(text, getLowPriorityVibratePattern());
+        if (reply != null && reply.toString().length() > 0) {
+            mNotificationReplyHandler.handleReplyMessage(reply.toString(), LOW_PRIORITY_VIBRATE_PATTERN);
         }
-    }
-
-    public long[] getMediumPriorityVibratePattern() {
-        return new long[]{0, 350, 150, 350};
-    }
-
-    public long[] getLowPriorityVibratePattern() {
-        return new long[]{0, 500};
-    }
-
-    public long[] getHighPriorityVibratePattern() {
-        return new long[]{0, 350, 150, 350, 500, 350, 150, 350, 500};
     }
 }

@@ -1,13 +1,11 @@
 package org.openhab.habclient.notification;
 
-import android.support.v4.app.NotificationCompat;
-
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.INotificationReplyHandler;
+import org.openhab.domain.INotificationSender;
 import org.openhab.domain.SenderType;
 import org.openhab.domain.command.CommandAnalyzerResult;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.wear.IWearCommandHost;
 
 import java.util.ArrayList;
 
@@ -37,6 +35,6 @@ public class NotificationReplyHandler implements INotificationReplyHandler {
 //            mApplication.getSpeechResultAnalyzer().analyzeRoomNavigation(replyToBeAnalyzed, HABApplication.getAppMode());
         CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(replyToBeAnalyzed, mApplicationModeProvider.getAppMode());
         String commandReplyMessage =  commandAnalyzerResult != null? mCommandAnalyzer.getCommandReply(commandAnalyzerResult) : "Sorry, didn't get that.";
-        mNotificationHost.showNotification(SenderType.System, "Command reply", null, commandReplyMessage, new NotificationCompat.Action[]{}, vibratePattern);
+        mNotificationHost.showNotification(SenderType.System, "Command reply", null, commandReplyMessage, vibratePattern);
     }
 }
