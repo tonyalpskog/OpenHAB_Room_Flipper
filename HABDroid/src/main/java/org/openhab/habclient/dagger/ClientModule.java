@@ -229,17 +229,17 @@ public class ClientModule {
 //    }
 //
     @Provides @Singleton
-    public INotificationHost provideNotificationHostProvider(NotificationHost notificationHost) {
+    public INotificationHost provideNotificationHost(NotificationHost notificationHost) {
         return notificationHost;
     }
 
     @Provides @Singleton
-    public INotificationSender provideNotificationSenderProvider(NotificationHost notificationHost) {
+    public INotificationSender provideNotificationSender(NotificationHost notificationHost) {
         return notificationHost;
     }
 
     @Provides @Singleton
-    public INotificationReplyHandler provideNotificationReplyHandlerProvider(NotificationReplyHandler notificationReplyHandler) {
+    public INotificationReplyHandler provideNotificationReplyHandler(NotificationReplyHandler notificationReplyHandler) {
         return notificationReplyHandler;
     }
 }

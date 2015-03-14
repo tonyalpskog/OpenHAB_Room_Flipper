@@ -11,6 +11,10 @@ import javax.inject.Inject;
 public class AutoMessageReadReceiver extends BroadcastReceiver {
     @Inject IAutoUnreadConversationManager mAutoUnreadConversationManager;
 
+    @Inject
+    public AutoMessageReadReceiver() {
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         int conversationId = intent.getIntExtra(AutoUnreadConversationManager.NOTIFICATION_CONVERSATION_ID_KEY, -1);

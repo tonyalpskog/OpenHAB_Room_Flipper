@@ -46,20 +46,20 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private int addMessageToUnreadConversations(int conversationId, String title, String message) {
-        Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+        Conversation conversation = mUnreadConversations.get(conversationId);
         if(conversation == null) {
             conversation = new Conversation(conversationId, title, message);
-            mUnreadConversations.put(Integer.valueOf(conversationId), conversation);
-        }
-        conversation.putMessage(message);
+            mUnreadConversations.put(conversationId, conversation);
+        } else
+            conversation.putMessage(message);
         //setLatestTimestamp(Calendar.getInstance().get(Calendar.SECOND));
         return conversationId;
     }
 
     @Override
     public void removeMessageFromUnreadConversations(int conversationId) {
-        if(mUnreadConversations.containsKey(Integer.valueOf(conversationId))) {
-            Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+        if(mUnreadConversations.containsKey(conversationId)) {
+            Conversation conversation = mUnreadConversations.get(conversationId);
             conversation.popMessage();
         }
     }
@@ -75,7 +75,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private NotificationCompat.CarExtender.UnreadConversation getUnreadConversation(int conversationId) {
-        Conversation conversation = mUnreadConversations.get(Integer.valueOf(conversationId));
+        Conversation conversation = mUnreadConversations.get(conversationId);
         if(conversation == null)
             return null;
 
