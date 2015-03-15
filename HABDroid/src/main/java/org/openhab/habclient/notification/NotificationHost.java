@@ -8,6 +8,7 @@ import org.openhab.domain.INotificationHost;
 import org.openhab.habclient.auto.AutoMessageReadReceiver;
 import org.openhab.habclient.auto.AutoMessageReplyReceiver;
 import org.openhab.habclient.auto.AutoUnreadConversationManager;
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habclient.wear.WearCommandHost;
 import org.openhab.habclient.wear.WearNotificationReplyHandler;
 
@@ -21,7 +22,7 @@ public class NotificationHost implements INotificationHost {
     private boolean mIsRegistered;
 
     @Inject
-    public NotificationHost(Context context,
+    public NotificationHost(@ApplicationContext Context context,
                             AutoMessageReadReceiver autoMessageReadReceiver,
                             AutoMessageReplyReceiver autoMessageReplyReceiver,
                             WearNotificationReplyHandler wearNotificationReplyHandler) {

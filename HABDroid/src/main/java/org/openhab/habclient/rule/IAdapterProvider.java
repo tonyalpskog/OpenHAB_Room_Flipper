@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IAdapterProvider {
 
-    List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue);
+    List<String> getRuleOperatorList(Context context, IEntityDataType<?> operand, boolean includeNonSelectionValue);
 
     BaseAdapter getStaticUnitValueAdapter(Context context, String openHABItemName);
 

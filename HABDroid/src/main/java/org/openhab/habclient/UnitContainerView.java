@@ -2,7 +2,6 @@ package org.openhab.habclient;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,8 @@ import android.widget.RelativeLayout;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
+import org.openhab.habclient.dagger.Dagger_UnitContainerComponent;
+import org.openhab.habclient.dagger.UnitContainerComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
@@ -52,8 +53,10 @@ public class UnitContainerView extends FrameLayout implements RoomImageView.OnBa
     public UnitContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        final HABApplication app = (HABApplication) context.getApplicationContext();
-        app.inject(this);
+        UnitContainerComponent unitContainerComponent = Dagger_UnitContainerComponent.builder()
+                .appComponent(((HABApplication) context.getApplicationContext()).appComponent())
+                .build();
+        unitContainerComponent.inject(this);
 
         mAddedUnitViews = new ArrayList<View>();
 

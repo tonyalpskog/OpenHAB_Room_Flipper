@@ -3,9 +3,7 @@ package org.openhab.habclient.rule;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,18 +13,13 @@ import android.widget.Toast;
 
 import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.Rule;
-import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.dagger.Dagger_RuleListComponent;
+import org.openhab.habclient.dagger.RuleListComponent;
 import org.openhab.habdroid.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
-
-import de.duenndns.ssl.MemorizingTrustManager;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -42,10 +35,11 @@ public class RuleListActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        InjectUtils.inject(this);
-//        setContentView(R.layout.activity_rule_list);
-//        if(mRuleProvider.getUserRules(mTemporaryHardCodedUserId).size() < 1)
-//            mRuleProvider.saveRule(new Rule("<No data>", null),mTemporaryHardCodedUserId );
+
+        RuleListComponent component = Dagger_RuleListComponent.builder()
+                .appComponent(((HABApplication) getApplication()).appComponent())
+                .build();
+        component.inject(this);
     }
 
     @Override

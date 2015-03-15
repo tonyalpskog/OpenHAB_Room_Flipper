@@ -2,21 +2,19 @@ package org.openhab.habclient;
 
 import android.app.Application;
 
-import org.openhab.habclient.dagger.AndroidModule;
-import org.openhab.habclient.dagger.ClientModule;
-
-import dagger.ObjectGraph;
+import org.openhab.habclient.dagger.AndroidApplicationModule;
+import org.openhab.habclient.dagger.AppComponent;
+import org.openhab.habclient.dagger.Dagger_AppComponent;
 
 /**
  * Created by Tony Alpskog in 2013.
  */
 public class HABApplication extends Application {
-    private ObjectGraph mObjectGraph;
+    private AppComponent mAppComponent;
 
-    public ObjectGraph getObjectGraph() {
-        return mObjectGraph;
+    public AppComponent appComponent() {
+        return mAppComponent;
     }
-
 
     public static String getLogTag() {
         return getLogTag(1);//Actually gets index 0(zero) but this call adds one more level to the stacktrace.
@@ -32,10 +30,8 @@ public class HABApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mObjectGraph = ObjectGraph.create(new AndroidModule(this), new ClientModule());
-    }
-
-    public void inject(Object object) {
-        mObjectGraph.inject(object);
+        mAppComponent = Dagger_AppComponent.builder()
+                .androidApplicationModule(new AndroidApplicationModule(this))
+                .build();
     }
 }

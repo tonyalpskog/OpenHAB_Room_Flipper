@@ -12,6 +12,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
@@ -27,25 +28,16 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABWidgetControl implements IOpenHABWidgetControl {
-    private Context mContext;
-    @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject RestCommunication mRestCommunication;
+    private final Context mContext;
+    private final IOpenHABWidgetProvider mWidgetProvider;
+    private final MyAsyncHttpClient mAsyncHttpClient;
 
     @Inject
-    public OpenHABWidgetControl(Context context) {
+    public OpenHABWidgetControl(@ApplicationContext Context context, IOpenHABWidgetProvider widgetProvider) {
         if(context == null) throw new IllegalArgumentException("context is null");
         mContext = context;
+        mWidgetProvider = widgetProvider;
         mAsyncHttpClient = new MyAsyncHttpClient(context);
-    }
-
-    private MyAsyncHttpClient mAsyncHttpClient;
-
-    public MyAsyncHttpClient getAsyncHttpClient() {
-        return mAsyncHttpClient;
-    }
-
-    public void setAsyncHttpClient(MyAsyncHttpClient asyncHttpClient) {
-        mAsyncHttpClient = asyncHttpClient;
     }
 
     @Override
@@ -80,8 +72,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
                 }
             });
         } catch (UnsupportedEncodingException e) {
-            if (e != null)
-                Log.e(HABApplication.getLogTag(), e.getMessage());
+            Log.e(HABApplication.getLogTag(), e.getMessage());
         }
     }
 

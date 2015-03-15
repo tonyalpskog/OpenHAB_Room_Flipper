@@ -4,23 +4,26 @@ import android.content.Context;
 
 import com.loopj.android.http.AsyncHttpClient;
 
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
+@Singleton
 public class OpenHABSetting implements IOpenHABSetting {
     private String mBaseUrl;
     private String mSitemapRootUrl;
     private String mUsername = "";
     private String mPassword = "";
-    private Context mContext;
+    private final Context mContext;
 
     @Inject
-    public OpenHABSetting(Context context) {
+    public OpenHABSetting(@ApplicationContext Context context) {
         mContext = context;
         mBaseUrl = mContext.getString(R.string.openhab_demo_url);
         mSitemapRootUrl = mBaseUrl + context.getString(R.string.openhab_demo_sitemap_postfix);

@@ -17,6 +17,7 @@ import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.habclient.dagger.Dagger_MainComponent;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 
@@ -51,7 +52,10 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
 
-        InjectUtils.inject(this);
+        Dagger_MainComponent.builder()
+                .appComponent(((HABApplication) getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);

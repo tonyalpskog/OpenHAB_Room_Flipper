@@ -8,7 +8,6 @@ import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IPopularNameProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.OpenHABWidgetProvider;
-import org.openhab.domain.command.CommandAnalyzer;
 import org.openhab.domain.command.CommandAnalyzerResult;
 import org.openhab.domain.command.CommandPhraseMatchResult;
 import org.openhab.domain.command.OpenHABWidgetCommandType;
@@ -26,9 +25,12 @@ import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.IRegularExpression;
 import org.openhab.domain.util.RegExAccuracyResult;
 import org.openhab.domain.util.RegExResult;
-import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.dagger.AndroidModule;
-import org.openhab.habclient.dagger.ClientModule;
+import org.openhab.habclient.dagger.AndroidApplicationModule;
+import org.openhab.habclient.dagger.ApplicationModule;
+import org.openhab.habclient.dagger.CommandModule;
+import org.openhab.habclient.dagger.EventBusModule;
+import org.openhab.habclient.dagger.UtilModule;
+import org.openhab.habclient.dagger.WidgetModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -50,9 +52,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 
-import dagger.Module;
-import dagger.ObjectGraph;
-import dagger.Provides;
+import dagger.Component;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -76,11 +76,26 @@ public class CommandTest extends AndroidTestCase {
     @Inject IApplicationModeProvider mApplicationModeProvider;
     @Inject IPopularNameProvider mPopularNameProvider;
 
+    @Singleton
+    @Component(modules = {
+            CommandModule.class,
+            ApplicationModule.class,
+            UtilModule.class,
+            AndroidApplicationModule.class,
+            EventBusModule.class,
+            WidgetModule.class
+    })
+    public interface TestComponent {
+        void inject(CommandTest commandTest);
+    }
+
     public void setUp() throws Exception {
         super.setUp();
 
-        ObjectGraph graph = ObjectGraph.create(new AndroidModule(getContext()), new TestModule());
-        graph.inject(this);
+        Dagger_CommandTest_TestComponent.builder()
+                .androidApplicationModule(new AndroidApplicationModule(getContext()))
+                .build()
+                .inject(this);
 
         loadHttpDataFromString();
 
@@ -101,19 +116,6 @@ public class CommandTest extends AndroidTestCase {
         mListOfTestPhrases2.add("hej hopp " + mTestedRoomsNameArray[2] + " Windows");
         mListOfTestPhrases2.add("Det var Window_FF_Office_Window en gång en " + mTestedRoomsNameArray[3] + " som mådde dåligt");
         mListOfTestPhrases2.add("Shutter_FF_Bath " + mTestedRoomsNameArray[4] + " är bra Light_Outdoor_Frontdoor att ha");
-    }
-
-    @Module(injects = CommandTest.class, includes = ClientModule.class, overrides = true)
-    public class TestModule {
-        @Provides @Singleton
-        public CommandAnalyzer provideCommandAnalyzer(CommandAnalyzerWrapper wrapper) {
-            return wrapper;
-        }
-
-        @Provides @Singleton
-        public IOpenHABSetting provideOpenHABSetting() {
-            return new TestOpenHABSetting();
-        }
     }
 
     public void testFinalArrayOfNamesUsedInTests() {

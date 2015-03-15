@@ -20,10 +20,9 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.dagger.Dagger_RuleActionComponent;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleAction;
@@ -53,17 +52,11 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_RuleActionComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
     }
-
-//    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
-//    {
-//        @Override
-//        public String toString() {
-//            return String.format("(%s) %s", getType().name(), getLabel());
-//
-//        }
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

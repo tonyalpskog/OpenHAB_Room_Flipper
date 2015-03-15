@@ -1,8 +1,6 @@
 package org.openhab.habclient.dagger;
 
 import org.openhab.domain.IEventBus;
-import org.openhab.domain.util.IRegularExpression;
-import org.openhab.domain.util.RegularExpression;
 
 import javax.inject.Singleton;
 
@@ -10,13 +8,8 @@ import dagger.Module;
 import dagger.Provides;
 import de.greenrobot.event.EventBus;
 
-@Module(library = true, includes = AndroidModule.class)
-public class DomainModule {
-    @Provides @Singleton
-    public IRegularExpression provideRegularExpression(RegularExpression regularExpression) {
-        return regularExpression;
-    }
-
+@Module
+public class EventBusModule {
     @Provides @Singleton
     public IEventBus provideEventBus() {
         return new IEventBus() {

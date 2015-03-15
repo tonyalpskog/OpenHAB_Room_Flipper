@@ -16,6 +16,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.auto.IAutoUnreadConversationManager;
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habclient.wear.IWearCommandHost;
 import org.openhab.habclient.wear.WearNotificationReplyHandler;
 import org.openhab.habdroid.R;
@@ -33,7 +34,7 @@ public class NotificationSender implements INotificationSender {
     private final IOpenHABSetting mOpenHABSetting;
 
     @Inject
-    public NotificationSender(Context context,
+    public NotificationSender(@ApplicationContext Context context,
                               IAutoUnreadConversationManager autoUnreadConversationManager,
                               IWearCommandHost wearCommandHost,
                               IOpenHABSetting openHABSetting) {

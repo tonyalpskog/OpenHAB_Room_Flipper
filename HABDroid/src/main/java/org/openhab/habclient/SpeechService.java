@@ -19,6 +19,7 @@ import android.util.Log;
 
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
+import org.openhab.habclient.dagger.Dagger_SpeechComponent;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -39,8 +40,7 @@ public class SpeechService extends Service
     protected volatile boolean mIsCountDownOn;
 
     @Inject ICommandAnalyzer mSpeechResultAnalyzer;
-    @Inject
-    IApplicationModeProvider mApplicationModeProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     private static final int MSG_RECOGNIZER_START_LISTENING = 1;
     private static final int MSG_RECOGNIZER_CANCEL = 2;
@@ -50,7 +50,10 @@ public class SpeechService extends Service
     {
         super.onCreate();
 
-        InjectUtils.inject(this);
+        Dagger_SpeechComponent.builder()
+                .appComponent(((HABApplication) getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         Log.d(HABApplication.getLogTag(), "SpeechService created");
 

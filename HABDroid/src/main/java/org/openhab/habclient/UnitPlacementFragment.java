@@ -7,21 +7,12 @@ package org.openhab.habclient;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,39 +20,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.loopj.android.http.AsyncHttpClient;
 
 import org.openhab.domain.IEventBus;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABWidget;
-import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
+import org.openhab.habclient.dagger.Dagger_UnitPlacementComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
-import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 import org.openhab.habdroid.ui.WidgetTypeLayoutProvider;
-import org.openhab.habdroid.util.AutoRefreshImageView;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -119,7 +97,10 @@ public class UnitPlacementFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_UnitPlacementComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         Log.d("LifeCycle", "UnitPlacementFragment(" + (getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : "?") + ") <constructor>");
     }

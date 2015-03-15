@@ -74,11 +74,11 @@ import org.openhab.domain.model.OpenHABNFCActionList;
 import org.openhab.domain.model.OpenHABSitemap;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
-import org.openhab.habclient.AndroidLogger;
+import org.openhab.habclient.dagger.Dagger_WidgetListActivityComponent;
+import org.openhab.habdroid.util.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.InjectUtils;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.AsyncServiceResolver;
 import org.openhab.habdroid.util.AsyncServiceResolverListener;
@@ -181,7 +181,10 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+		Dagger_WidgetListActivityComponent.builder()
+				.appComponent(((HABApplication)getApplication()).appComponent())
+				.build()
+				.inject(this);
 
         Log.d("OpenHABWidgetListActivity", "onCreate");
 		// Set default values, false means do it one time during the very first launch

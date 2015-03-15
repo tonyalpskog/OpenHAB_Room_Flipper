@@ -20,13 +20,12 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.dagger.Dagger_RuleOperationComponent;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
@@ -59,25 +58,15 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
         return new RuleOperationFragment();
     }
 
-    public RuleOperationFragment() {
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_RuleOperationComponent.builder()
+                .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
     }
-
-//    public class OpenHABWidgetSpinnerItem extends OpenHABWidget
-//    {
-//        @Override
-//        public String toString() {
-//            return String.format("(%s) %s", getType().name(), getLabel());
-//
-//        }
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

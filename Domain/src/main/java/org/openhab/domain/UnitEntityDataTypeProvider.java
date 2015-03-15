@@ -2,9 +2,7 @@ package org.openhab.domain;
 
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.EntityDataTypeSource;
-import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.UnitEntityDataType;
-import org.openhab.domain.rule.operators.RuleOperator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,21 +11,16 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
-@Singleton
 public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
-    List<UnitEntityDataType> mUnitDataTypeList;//Only for unit test
-
-    private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
+    List<UnitEntityDataType<?>> mUnitDataTypeList;//Only for unit test
 
     @Inject
-    public UnitEntityDataTypeProvider(IOpenHABWidgetProvider openHABWidgetProvider) {
-        if(openHABWidgetProvider == null) throw new IllegalArgumentException("openHABWidgetProvider is null");
-        mOpenHABWidgetProvider = openHABWidgetProvider;
+    public UnitEntityDataTypeProvider() {
+
     }
 
     @Override
@@ -49,16 +42,16 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
                 unitEntityDataType = new UnitEntityDataType<Boolean>(isUnitType? openHABWidget.getItem().getName() : UUID.randomUUID().toString(), aBoolean)
                 {
                     public String getFormattedString(){
-                        return getValue().booleanValue()? "ON": "OFF";
+                        return getValue() ? "ON": "OFF";
                     }
 
                     @Override
                     public Boolean valueOf(String input) {
                         if(input.equalsIgnoreCase("ON"))
-                                return Boolean.valueOf(true);
+                                return true;
 
                         if(input.equalsIgnoreCase("OFF"))
-                                return Boolean.valueOf(false);
+                                return false;
 
                         return null;
                     }
@@ -95,16 +88,16 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
                 unitEntityDataType = new UnitEntityDataType<Boolean>(isUnitType? openHABWidget.getItem().getName() : UUID.randomUUID().toString(), aBoolean)
                 {
                     public String getFormattedString(){
-                        return getValue().booleanValue()? "CLOSED": "OPEN";
+                        return getValue() ? "CLOSED": "OPEN";
                     }
 
                     @Override
                     public Boolean valueOf(String input) {
                         if(input.equalsIgnoreCase("CLOSED"))
-                            return Boolean.valueOf(true);
+                            return true;
 
                         if(input.equalsIgnoreCase("OPEN"))
-                            return Boolean.valueOf(false);
+                            return false;
 
                         return null;
                     }
@@ -185,16 +178,17 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
     }
 
     @Override
-    public List<UnitEntityDataType> getUnitDataTypeList() {
+    public List<UnitEntityDataType<?>> getUnitDataTypeList() {
         if(mUnitDataTypeList == null)
-            createUnitDataTypes();
+            mUnitDataTypeList = createUnitDataTypes();
+
         return mUnitDataTypeList;
     }
 
-    private void createUnitDataTypes() {
-        mUnitDataTypeList = new ArrayList<UnitEntityDataType>();
+    private List<UnitEntityDataType<?>> createUnitDataTypes() {
+        List<UnitEntityDataType<?>> dataTypeList = new ArrayList<UnitEntityDataType<?>>();
 
-        mUnitDataTypeList.add(new UnitEntityDataType<Boolean>("Switch", false)
+        dataTypeList.add(new UnitEntityDataType<Boolean>("Switch", false)
         {
             public String getFormattedString(){
                 return getValue() ? "On": "Off";//TODO - Language independent
@@ -211,7 +205,7 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
             }
         });
 
-        mUnitDataTypeList.add(new UnitEntityDataType<Integer>("Dimmer percentage", 75)
+        dataTypeList.add(new UnitEntityDataType<Integer>("Dimmer percentage", 75)
         {
             public String getFormattedString(){
                 return getValue().toString() + "%";
@@ -228,7 +222,7 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
             }
         });
 
-        mUnitDataTypeList.add(new UnitEntityDataType<Double>("Humidity percentage", 50.7)
+        dataTypeList.add(new UnitEntityDataType<Double>("Humidity percentage", 50.7)
         {
             public String getFormattedString(){
                 return getValue().toString() + "%Rh";
@@ -245,7 +239,7 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
             }
         });
 
-        mUnitDataTypeList.add(new UnitEntityDataType<Double>("Temperature", 8.4)
+        dataTypeList.add(new UnitEntityDataType<Double>("Temperature", 8.4)
         {
             public String getFormattedString(){
                 return getValue().toString() + "°C";//TODO - Fahrenheit, (Kelvin)
@@ -261,6 +255,8 @@ public class UnitEntityDataTypeProvider implements IUnitEntityDataTypeProvider {
                 return null;
             }
         });
+
+        return dataTypeList;
     }
 
 }

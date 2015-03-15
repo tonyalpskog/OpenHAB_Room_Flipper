@@ -23,7 +23,8 @@ import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.user.User;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.dagger.Dagger_RuleEditActivityComponent;
 import org.openhab.habdroid.R;
 
 import java.util.HashMap;
@@ -55,7 +56,10 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rule_edit);
 
-        InjectUtils.inject(this);
+        Dagger_RuleEditActivityComponent.builder()
+                .appComponent(((HABApplication)getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         String userId = getIntent().getExtras().getString(User.ARG_USER_ID);
         String ruleId = getIntent().getExtras().getString(Rule.ARG_RULE_ID);

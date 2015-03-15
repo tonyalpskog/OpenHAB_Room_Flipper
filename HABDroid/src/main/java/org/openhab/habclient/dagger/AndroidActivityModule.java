@@ -6,21 +6,21 @@ import android.view.LayoutInflater;
 import dagger.Module;
 import dagger.Provides;
 
-@Module(library = true)
-public class AndroidModule {
+@Module
+public class AndroidActivityModule {
     private final Context mContext;
 
-    public AndroidModule(Context context) {
+    public AndroidActivityModule(Context context) {
         mContext = context;
     }
 
-    @Provides
+    @Provides @ActivityContext
     public Context provideContext() {
         return mContext;
     }
 
     @Provides
-    public LayoutInflater provideLayoutInflater() {
-        return LayoutInflater.from(mContext);
+    public LayoutInflater provideLayoutInflater(@ActivityContext Context context) {
+        return LayoutInflater.from(context);
     }
 }

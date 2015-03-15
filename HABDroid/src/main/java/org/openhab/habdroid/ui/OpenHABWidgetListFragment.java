@@ -56,7 +56,7 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.dagger.Dagger_WidgetListFragmentComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.domain.IDocumentFactory;
@@ -129,7 +129,10 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_WidgetListFragmentComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         mTag = this;
         Log.d(TAG, "onCreate()");

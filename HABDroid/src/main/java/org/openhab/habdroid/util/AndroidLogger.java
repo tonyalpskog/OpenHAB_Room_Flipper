@@ -1,4 +1,4 @@
-package org.openhab.habclient;
+package org.openhab.habdroid.util;
 
 import android.util.Log;
 

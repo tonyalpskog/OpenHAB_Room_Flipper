@@ -10,11 +10,11 @@ import java.util.List;
  * Created by Tony Alpskog in 2014.
  */
 public interface IUnitEntityDataTypeProvider {
-    UnitEntityDataType getEntityDataType(OpenHABWidget openHABWidget, String staticValue, EntityDataTypeSource sourceType);
+    UnitEntityDataType<?> getEntityDataType(OpenHABWidget openHABWidget, String staticValue, EntityDataTypeSource sourceType);
 
-    UnitEntityDataType getUnitEntityDataType(OpenHABWidget openHABWidget);
+    UnitEntityDataType<?> getUnitEntityDataType(OpenHABWidget openHABWidget);
 
-    UnitEntityDataType getStaticEntityDataType(OpenHABWidget openHABWidget, String staticValue);
+    UnitEntityDataType<?> getStaticEntityDataType(OpenHABWidget openHABWidget, String staticValue);
 
-    List<UnitEntityDataType> getUnitDataTypeList();
+    List<UnitEntityDataType<?>> getUnitDataTypeList();
 }

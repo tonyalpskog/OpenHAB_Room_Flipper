@@ -15,6 +15,7 @@ import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
+import org.openhab.habclient.dagger.Dagger_RoomConfigActivityComponent;
 import org.openhab.habdroid.R;
 
 import java.util.Locale;
@@ -40,19 +41,20 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
 
     private Room mConfigRoom;
 
-    @Inject
-    IRoomProvider mRoomProvider;
+    @Inject IRoomProvider mRoomProvider;
     @Inject IRoomDataContainer mRoomDataContainer;
-    @Inject
-    IApplicationModeProvider mApplicationModeProvider;
+    @Inject IApplicationModeProvider mApplicationModeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
-
         setContentView(R.layout.activity_room_config);
+
+        Dagger_RoomConfigActivityComponent.builder()
+                .appComponent(((HABApplication) getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();

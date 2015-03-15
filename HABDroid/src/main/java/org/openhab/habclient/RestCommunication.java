@@ -8,6 +8,7 @@ import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
@@ -15,13 +16,12 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.StringHandler;
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.domain.IDocumentFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.SocketTimeoutException;
@@ -29,12 +29,9 @@ import java.net.SocketTimeoutException;
 import javax.inject.Inject;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by Tony Alpskog in 2014.
@@ -49,7 +46,7 @@ public class RestCommunication implements IRestCommunication {
     private final AsyncHttpClient mAsyncHttpClient;
 
     @Inject
-    public RestCommunication(Context context,
+    public RestCommunication(@ApplicationContext Context context,
                              ILogger logger,
                              IColorParser colorParser,
                              IOpenHABSetting openHABSetting,

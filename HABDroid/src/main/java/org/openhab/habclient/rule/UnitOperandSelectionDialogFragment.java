@@ -7,12 +7,13 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.dagger.Dagger_UnitOperandSelectionComponent;
+import org.openhab.habclient.dagger.UnitOperandSelectionComponent;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.ArrayList;
@@ -56,7 +57,10 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        UnitOperandSelectionComponent component = Dagger_UnitOperandSelectionComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build();
+        component.inject(this);
 
         Bundle args = getArguments();
         if(args == null)

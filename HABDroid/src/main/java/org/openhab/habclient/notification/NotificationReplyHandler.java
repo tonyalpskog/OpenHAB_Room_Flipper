@@ -16,8 +16,8 @@ import javax.inject.Inject;
  */
 public class NotificationReplyHandler implements INotificationReplyHandler {
     private final IApplicationModeProvider mApplicationModeProvider;
-    private ICommandAnalyzer mCommandAnalyzer;
-    private INotificationSender mNotificationHost;
+    private final ICommandAnalyzer mCommandAnalyzer;
+    private final INotificationSender mNotificationHost;
 
     @Inject
     public NotificationReplyHandler(IApplicationModeProvider applicationModeProvider,

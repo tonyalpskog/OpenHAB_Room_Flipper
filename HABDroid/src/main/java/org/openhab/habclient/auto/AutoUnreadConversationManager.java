@@ -5,36 +5,40 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.RemoteInput;
+import android.util.SparseArray;
+
+import org.openhab.habclient.dagger.ApplicationContext;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by Tony Alpskog in 2015.
  */
+@Singleton
 public class AutoUnreadConversationManager implements IAutoUnreadConversationManager {
     public static final String UNREAD_CONVERSATION_BUILDER_NAME = "OpenHabben";
     public static final String NOTIFICATION_CONVERSATION_ID_KEY = "Android_Auto_Conversation_Id";
     public static final String NOTIFICATION_READ_ACTION = "Android_Auto_Conversation_Read_Action";
     public static final String NOTIFICATION_REPLY_ACTION = "Android_Auto_Conversation_Reply_Action";
     public static final String AUTO_VOICE_REPLY_KEY = "Android_Auto_Voice_Reply";
+    private static final int CONVERSATION_ID = 99;
 
     private final Context mContext;
     private Map<String, Integer> mConversationsIdMap;
-    private Map<Integer, Conversation> mUnreadConversations;
-    private int nextConversationId = 0;
-    private final int CONVERSATION_ID = 99;
+    private SparseArray<Conversation> mUnreadConversations;
 
     long mLatestTimestamp = Calendar.getInstance().get(Calendar.SECOND);
 
     @Inject
-    public AutoUnreadConversationManager(Context context) {
+    public AutoUnreadConversationManager(@ApplicationContext Context context) {
         mContext = context;
         mConversationsIdMap = new HashMap<String, Integer>();
-        mUnreadConversations = new HashMap<Integer, Conversation>();
+        mUnreadConversations = new SparseArray<Conversation>();
     }
 
     @Override
@@ -58,8 +62,8 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
 
     @Override
     public void removeMessageFromUnreadConversations(int conversationId) {
-        if(mUnreadConversations.containsKey(conversationId)) {
-            Conversation conversation = mUnreadConversations.get(conversationId);
+        Conversation conversation = mUnreadConversations.get(conversationId);
+        if(conversation != null) {
             conversation.popMessage();
             if(!conversation.hasMessages())
                 mUnreadConversations.remove(conversationId);

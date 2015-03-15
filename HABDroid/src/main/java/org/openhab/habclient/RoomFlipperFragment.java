@@ -28,6 +28,7 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.user.User;
+import org.openhab.habclient.dagger.Dagger_RoomFlipperComponent;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -77,9 +78,10 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
-
-//        mNotificationSender = new WearCommandHost(mApplication, mSpeechResultAnalyzer);
+        Dagger_RoomFlipperComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
     }
 
     @Override

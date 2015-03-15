@@ -6,14 +6,14 @@ import android.os.Bundle;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.operators.RuleOperator;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.dagger.Dagger_OperatorSelectionComponent;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.ArrayList;
@@ -62,7 +62,10 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_OperatorSelectionComponent.builder()
+                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         final Bundle args = getArguments();
         if(args == null)
@@ -73,7 +76,7 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
         mOperatorMap = getRuleOperatorMap(sourceType == EntityDataTypeSource.OPERATION? new RuleOperation().getDataType() : mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByItemName(mOpenHABItemName)).getDataType());
     }
 
-    public Map<String, RuleOperator<?>> getRuleOperatorMap(Class operandClassType) {
+    public Map<String, RuleOperator<?>> getRuleOperatorMap(Class<?> operandClassType) {
         Set<RuleOperatorType> ruleOperatorTypes = mRuleOperationProvider.getRuleOperatorTypes(operandClassType);
         HashMap<String, RuleOperator<?>> operatorNameHash = new HashMap<String, RuleOperator<?>>();
         for(RuleOperatorType operatorType : ruleOperatorTypes)

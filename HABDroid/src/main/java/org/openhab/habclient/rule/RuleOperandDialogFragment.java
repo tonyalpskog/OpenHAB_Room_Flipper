@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.UnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.EntityDataTypeSource;
@@ -29,7 +28,8 @@ import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
-import org.openhab.habclient.InjectUtils;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.dagger.Dagger_RuleOperandComponent;
 import org.openhab.habdroid.R;
 
 import java.util.Map;
@@ -87,7 +87,10 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        InjectUtils.inject(this);
+        Dagger_RuleOperandComponent.builder()
+                .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
+                .build()
+                .inject(this);
 
         final Bundle args = getArguments();
         if(args == null)

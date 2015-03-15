@@ -3,10 +3,10 @@ package org.openhab.habclient.wear;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.RemoteInput;
 
+import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 
 import javax.inject.Inject;
@@ -16,12 +16,11 @@ import javax.inject.Inject;
  */
 public class WearCommandHost implements IWearCommandHost {
     public static final String EXTRA_REPLY = "Command";
-
     public static final String ACTION_RESPONSE = "com.zenit.android.wearable.openhab.COMMAND";//TODO rename all zenit
     private final Context mContext;
 
     @Inject
-    public WearCommandHost(Context context) {
+    public WearCommandHost(@ApplicationContext Context context) {
         mContext = context;
     }
 //

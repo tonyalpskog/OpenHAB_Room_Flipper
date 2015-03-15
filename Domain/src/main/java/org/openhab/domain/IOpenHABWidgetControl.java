@@ -1,6 +1,5 @@
 package org.openhab.domain;
 
-import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
 
 public interface IOpenHABWidgetControl {

@@ -20,23 +20,26 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Created by Tony Alpskog in 2014.
  */
-@Singleton
 public class AdapterProvider implements IAdapterProvider {
-    @Inject IRuleOperationProvider mRuleOperationProvider;
-    @Inject IOpenHABWidgetProvider mOpenHABWidgetProvider;
-    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
+    private final IRuleOperationProvider mRuleOperationProvider;
+    private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
+    private final IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     @Inject
-    public AdapterProvider() {
+    public AdapterProvider(IRuleOperationProvider ruleOperationProvider,
+                           IOpenHABWidgetProvider openHABWidgetProvider,
+                           IUnitEntityDataTypeProvider unitEntityDataTypeProvider) {
+        mRuleOperationProvider = ruleOperationProvider;
+        mOpenHABWidgetProvider = openHABWidgetProvider;
+        mUnitEntityDataTypeProvider = unitEntityDataTypeProvider;
     }
 
     @Override
-    public List<String> getRuleOperatorList(Context context, IEntityDataType operand, boolean includeNonSelectionValue) {
+    public List<String> getRuleOperatorList(Context context, IEntityDataType<?> operand, boolean includeNonSelectionValue) {
         Set<RuleOperatorType> ruleOperatorTypes = mRuleOperationProvider.getRuleOperatorTypes(operand.getDataType());
         List<String> adapterList = new ArrayList<String>();
         if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
@@ -53,7 +56,7 @@ public class AdapterProvider implements IAdapterProvider {
 
     @Override
     public BaseAdapter getStaticUnitValueAdapter(Context context, OpenHABWidget openHABWidget) {
-        UnitEntityDataType unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(openHABWidget);
+        UnitEntityDataType<?> unitEntityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(openHABWidget);
         Map<String, ?> staticValueHash = unitEntityDataType.getStaticValues();
         if(staticValueHash == null)
             return null;

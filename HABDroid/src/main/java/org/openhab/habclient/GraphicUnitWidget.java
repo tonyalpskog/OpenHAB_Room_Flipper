@@ -18,8 +18,10 @@ import android.widget.Toast;
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.GraphicUnit;
-import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.habclient.dagger.Dagger_GraphicUnitComponent;
+import org.openhab.habclient.dagger.GraphicUnitComponent;
+import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 import org.openhab.habdroid.util.AutoRefreshImageView;
 
@@ -32,15 +34,16 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
 
     private GraphicUnit gUnit;
     private UnitContainerView mUnitContainerView;
-    private HABApplication mApplication;
     @Inject IOpenHABSetting mOpenHABSetting;
     @Inject IApplicationModeProvider mApplicationModeProvider;
 
     public GraphicUnitWidget(Context context) {
         super(context);
 
-        mApplication = (HABApplication) context.getApplicationContext();
-        mApplication.inject(this);
+        GraphicUnitComponent component = Dagger_GraphicUnitComponent.builder()
+                .appComponent(((HABApplication) context.getApplicationContext()).appComponent())
+                .build();
+        component.inject(this);
     }
     public GraphicUnitWidget(Context context, GraphicUnit graphicUnit, UnitContainerView unitContainerView) {
         this(context);
