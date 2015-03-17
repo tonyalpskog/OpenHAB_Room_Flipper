@@ -19,7 +19,7 @@ public class AutoMessageReadReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.NOTIFICATION_CONVERSATION_ID_KEY, -1);
+        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.AUTO_NOTIFICATION_CONVERSATION_ID_KEY, -1);
         Log.d("Auto message READ", "conversation id = " + conversationId);
         if(conversationId == -1)
             return;

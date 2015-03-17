@@ -32,9 +32,13 @@ public class WearNotificationReplyHandler extends BroadcastReceiver {
 
     private void processResponse(Intent intent) {
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
-        CharSequence reply = remoteInput.getCharSequence(WearCommandHost.EXTRA_REPLY);
-        if (reply != null && reply.toString().length() > 0) {
-            mNotificationReplyHandler.handleReplyMessage(reply.toString(), LOW_PRIORITY_VIBRATE_PATTERN);
+        if (remoteInput.containsKey(WearNotificationActions.WEAR_GROUP_MESSAGE)) {
+            CharSequence actionInput = remoteInput.getCharSequence(WearNotificationActions.WEAR_GROUP_MESSAGE);
+            //TODO - Implement a group message reply handler.
+        } else if (remoteInput.containsKey(WearNotificationActions.WEAR_PERSON_REPLY) || remoteInput.containsKey(WearNotificationActions.WEAR_COMMAND_REPLY)) {
+            int conversationId = intent.getIntExtra(WearNotificationActions.WEAR_NOTIFICATION_CONVERSATION_ID_KEY, -1);
+            CharSequence actionInput = remoteInput.getCharSequence(WearNotificationActions.WEAR_GROUP_MESSAGE);
+            mNotificationReplyHandler.handleReplyMessage(conversationId, actionInput.toString(), LOW_PRIORITY_VIBRATE_PATTERN);
         }
     }
 }

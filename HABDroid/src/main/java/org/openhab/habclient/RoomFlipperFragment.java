@@ -20,6 +20,7 @@ import android.widget.TextView;
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.INotificationHost;
 import org.openhab.domain.INotificationSender;
+import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
@@ -58,6 +59,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     @Inject IRoomDataContainer mRoomDataContainer;
     @Inject IRoomImageProvider mRoomImageProvider;
     @Inject IRestCommunication mRestCommunication;
+    @Inject IOpenHABWidgetProvider mWidgetProvider;//TODO - temporary
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -158,8 +160,9 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 
                 return true;
             case R.id.action_start_wear_app:
-//                mNotificationSender.startSession("OpenHab", mWidgetProvider.getWidgetByID("Light_GF_Kitchen_Ceiling"), "Kitchen Dishwasher leakage detected");
+                mNotificationSender.startSession("OpenHAB", mWidgetProvider.getWidgetByItemName("Light_GF_Kitchen_Ceiling"), "Kitchen Dishwasher leakage detected");
                 mNotificationSender.startSession("Person", new User(), "Hi, this is a test message");
+                mNotificationSender.startSession("Person", new User(), "Hi, this is another message");
                 return true;
             case R.id.action_open_rules:
                 Intent i = new Intent(getActivity(), RuleListActivity.class);

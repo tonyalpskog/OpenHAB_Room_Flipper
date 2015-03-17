@@ -6,6 +6,6 @@ import android.support.v4.app.NotificationCompat;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public interface IWearCommandHost {
-    NotificationCompat.Action[] getNotificationActions();
+public interface IWearNotificationActions {
+    NotificationCompat.Action[] getNotificationActions(int conversationId);
 }

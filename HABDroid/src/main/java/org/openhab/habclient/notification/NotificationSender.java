@@ -1,6 +1,5 @@
 package org.openhab.habclient.notification;
 
-import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,10 +16,12 @@ import org.openhab.domain.user.User;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.auto.IAutoUnreadConversationManager;
 import org.openhab.habclient.dagger.ApplicationContext;
-import org.openhab.habclient.wear.IWearCommandHost;
+import org.openhab.habclient.wear.IWearNotificationActions;
 import org.openhab.habclient.wear.WearNotificationReplyHandler;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyWebImage;
+
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -30,17 +31,18 @@ import javax.inject.Inject;
 public class NotificationSender implements INotificationSender {
     private final Context mContext;
     private final IAutoUnreadConversationManager mAutoUnreadConversationManager;
-    private final IWearCommandHost mWearCommandHost;
+    private final IWearNotificationActions mWearNotificationActions;
     private final IOpenHABSetting mOpenHABSetting;
+    private final String TAG = "NotificationSender";
 
     @Inject
     public NotificationSender(@ApplicationContext Context context,
                               IAutoUnreadConversationManager autoUnreadConversationManager,
-                              IWearCommandHost wearCommandHost,
+                              IWearNotificationActions wearNotificationActions,
                               IOpenHABSetting openHABSetting) {
         mContext = context;
         mAutoUnreadConversationManager = autoUnreadConversationManager;
-        mWearCommandHost = wearCommandHost;
+        mWearNotificationActions = wearNotificationActions;
         mOpenHABSetting = openHABSetting;
     }
 
@@ -69,29 +71,47 @@ public class NotificationSender implements INotificationSender {
 
     @Override
     public void showNotification(SenderType senderType, String title, String titleIconUrl, String message, long[] vibratePattern/*, NotificationCompat.Builder preBuiltPrio, ...*/) {//TODO - More injection
+        //Android Auto
+        int conversationId = mAutoUnreadConversationManager.getConservationId(senderType, title);
+        mAutoUnreadConversationManager.addMessageToUnreadConversations(conversationId, title, message);
+
+        //Wear
         NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
-        NotificationCompat.Action[] actions = mWearCommandHost.getNotificationActions();
+        NotificationCompat.Action[] actions = mWearNotificationActions.getNotificationActions(conversationId);
         for(NotificationCompat.Action action : actions) {
             wearableExtender.addAction(action);
         }
 
-        wearableExtender.setBackground(BitmapFactory.decodeResource(mContext.getResources(),
-                R.drawable.openhab_320x320));
+        Bitmap wearBackgroundBitmap = getBitmapFromUrl(titleIconUrl);
+        if(wearBackgroundBitmap == null) {
+            wearBackgroundBitmap = BitmapFactory.decodeResource(mContext.getResources(),
+                    senderType.equals(SenderType.System)? R.drawable.openhab_320x320 : R.drawable.default_user);
+        }
+        wearableExtender.setBackground(wearBackgroundBitmap);
 
-        //Android Auto
-        mAutoUnreadConversationManager.addMessageToUnreadConversations(title, message);
+        //Mobile & Auto
+        Bitmap senderBitmap = getBitmapFromUrl(titleIconUrl);
+        if(senderBitmap == null) {
+            senderBitmap = BitmapFactory.decodeResource(mContext.getResources(),
+                    senderType.equals(SenderType.System)? R.drawable.openhabicon_light : R.drawable.default_user);
+        }
 
-        // Build the notification
+        // Build the notification (for all device types)
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.openhabicon)//App icon
+                .setLargeIcon(senderBitmap)//Auto and Mobile
+//                .setContentIntent(mAutoUnreadConversationManager.getMessageReadPendingIntent(conversationId))
                 .setWhen(System.currentTimeMillis())
                 .setVibrate(vibratePattern)
                 .extend(wearableExtender);//Wear
         addUnreadConversations(builder, mAutoUnreadConversationManager.getUnreadConversations());
-
-        new SendNotification(mContext).execute(new NotificationContent(builder, senderType, titleIconUrl));
+        try {
+            NotificationManagerCompat.from(mContext).notify(conversationId, builder.build());
+        } catch (Exception e) {
+            Log.e(TAG, "Could not send a notification.", e);
+        }
     }
 
     //Auto
@@ -101,60 +121,22 @@ public class NotificationSender implements INotificationSender {
         }
     }
 
-    private class SendNotification extends AsyncTask<NotificationContent, Void, Notification> {
-        Context mContext;
-
-        public SendNotification(Context context) {
-            super();
-            this.mContext = context;
+    private Bitmap getBitmapFromUrl(String url) {
+        try {
+            return new AsyncTask<String, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(String... params) {
+                    String url = params[0];
+                    MyWebImage webImage = new MyWebImage(url, false, mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
+                    return webImage.getBitmap(mContext);
+                }
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url).get();
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+            return null;
+        } catch (ExecutionException e) {
+            Log.e(TAG, e.getMessage());
+            return null;
         }
-
-        @Override
-        protected Notification doInBackground(NotificationContent... params) {
-            NotificationContent notificationContent = params[0];
-            NotificationCompat.Builder builder = notificationContent.getBuilder();
-            String largeIconUrl = notificationContent.getLargeIconUrl();
-            MyWebImage webImage = new MyWebImage(largeIconUrl, false, mOpenHABSetting.getUsername(), mOpenHABSetting.getPassword());
-            Bitmap largeIcon = webImage.getBitmap(mContext);
-            if(largeIcon == null) {
-                largeIcon = BitmapFactory.decodeResource(mContext.getResources(),
-                        notificationContent.getSenderType().equals(SenderType.System)? R.drawable.openhabicon_light : R.drawable.default_user);
-            }
-            builder.setLargeIcon(largeIcon);// Conversation/Sender icon
-            return builder.build();
-        }
-
-        @Override
-        protected void onPostExecute(Notification notification) {
-
-            super.onPostExecute(notification);
-            try {
-                NotificationManagerCompat.from(mContext).notify(0, notification);
-            } catch (Exception e) {
-                Log.e("NotificationHost", "Could not send a notification.", e);
-            }
-        }
-    }
-
-    public class NotificationContent {
-        String mLargeIconUrl;
-        NotificationCompat.Builder mBuilder;
-        SenderType mSenderType;
-
-        public NotificationContent(NotificationCompat.Builder builder, SenderType senderType, String largeIconUrl) {
-            mBuilder = builder;
-            mSenderType = senderType;
-            mLargeIconUrl = largeIconUrl;
-        }
-
-        public String getLargeIconUrl() {
-            return mLargeIconUrl;
-        }
-
-        public NotificationCompat.Builder getBuilder() {
-            return mBuilder;
-        }
-
-        public SenderType getSenderType() { return mSenderType; }
     }
 }

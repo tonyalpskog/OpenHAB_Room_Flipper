@@ -2,7 +2,7 @@ package org.openhab.test.habclient.wear;
 
 import android.test.AndroidTestCase;
 
-import org.openhab.habclient.wear.IWearCommandHost;
+import org.openhab.habclient.wear.IWearNotificationActions;
 
 import javax.inject.Inject;
 
@@ -10,22 +10,23 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class LiveWearTest extends AndroidTestCase {
-    @Inject IWearCommandHost mIWearCommandHost;
+    @Inject
+    IWearNotificationActions mIWearNotificationActions;
 
     public void setUp() throws Exception {
         super.setUp();
 
-        //mIWearCommandHost.registerReceiver();
+        //mIWearNotificationActions.registerReceiver();
 
     }
 
     public void tearDown() {
-        //mIWearCommandHost.unregisterReceiver();
+        //mIWearNotificationActions.unregisterReceiver();
     }
 
     public void testShowLeakageMessageOnWear() {
-//        mWearCommandHost = new WearCommandHost(mHABApplication);
-//        mWearCommandHost.registerReceiver();
-        //mIWearCommandHost.startSession("Leakage alarm", "Kitchen Dishwasher leakage sensor [closed]");
+//        mIWearNotificationActions = new WearNotificationActions(mHABApplication);
+//        mIWearNotificationActions.registerReceiver();
+        //mIWearNotificationActions.startSession("Leakage alarm", "Kitchen Dishwasher leakage sensor [closed]");
     }
 }

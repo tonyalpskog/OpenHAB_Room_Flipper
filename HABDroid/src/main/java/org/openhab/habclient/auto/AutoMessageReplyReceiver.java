@@ -25,13 +25,13 @@ public class AutoMessageReplyReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Toast.makeText(context, "Message Received", Toast.LENGTH_LONG).show();
 
-        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.NOTIFICATION_CONVERSATION_ID_KEY, -1);
+        int conversationId = intent.getIntExtra(AutoUnreadConversationManager.AUTO_NOTIFICATION_CONVERSATION_ID_KEY, -1);
         Log.d("Auto message REPLY", "conversation id = " + conversationId);
         NotificationManagerCompat.from(context).cancel(conversationId);
 
         String message = getMessageFromIntent(intent);
         Log.d("Auto message REPLY", "Reply string = " + message);
-        mNotificationReplyHandler.handleReplyMessage(message, new long[] {});
+        mNotificationReplyHandler.handleReplyMessage(conversationId, message, new long[] {});
     }
 
     private String getMessageFromIntent(Intent intent) {

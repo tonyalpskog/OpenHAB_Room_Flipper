@@ -9,7 +9,7 @@ import org.openhab.habclient.auto.AutoMessageReadReceiver;
 import org.openhab.habclient.auto.AutoMessageReplyReceiver;
 import org.openhab.habclient.auto.AutoUnreadConversationManager;
 import org.openhab.habclient.dagger.ApplicationContext;
-import org.openhab.habclient.wear.WearCommandHost;
+import org.openhab.habclient.wear.WearNotificationActions;
 import org.openhab.habclient.wear.WearNotificationReplyHandler;
 
 import javax.inject.Inject;
@@ -39,16 +39,16 @@ public class NotificationHost implements INotificationHost {
 
         //Android Wear
         IntentFilter wearReadFilter = new IntentFilter();
-        wearReadFilter.addAction(WearCommandHost.EXTRA_REPLY);
+        wearReadFilter.addAction(WearNotificationActions.WEAR_COMMAND_REPLY);
         mContext.registerReceiver(mWearNotificationReplyHandler, wearReadFilter);
 
         //Android Auto
         IntentFilter autoReadFilter = new IntentFilter();
-        autoReadFilter.addAction(AutoUnreadConversationManager.NOTIFICATION_READ_ACTION);
+        autoReadFilter.addAction(AutoUnreadConversationManager.AUTO_NOTIFICATION_READ_ACTION);
         mContext.registerReceiver(mAutoMessageReadReceiver, autoReadFilter);
 
         IntentFilter autoReplyFilter = new IntentFilter();
-        autoReplyFilter.addAction(AutoUnreadConversationManager.NOTIFICATION_REPLY_ACTION);
+        autoReplyFilter.addAction(AutoUnreadConversationManager.AUTO_NOTIFICATION_REPLY_ACTION);
         mContext.registerReceiver(mAutoMessageReplyReceiver, autoReplyFilter);
 
         mIsRegistered = true;
