@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.RemoteInput;
 import android.util.SparseArray;
+import android.util.Log;
 
 import org.openhab.habclient.dagger.ApplicationContext;
 
@@ -127,6 +128,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
 
     @Override
     public PendingIntent getMessageReadPendingIntent(int conversationId) {
+        Log.d("Notification", String.format("Auto.getMessageReadPendingIntent(%d)", conversationId));
         return PendingIntent.getBroadcast(mContext,
                 conversationId,
                 getMessageReadIntent(conversationId),
@@ -134,6 +136,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private Intent getMessageReadIntent(int conversationId) {
+        Log.d("Notification", String.format("Auto.getMessageReadIntent(%d)", conversationId));
         return new Intent()
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 .setAction(AUTO_NOTIFICATION_READ_ACTION)
@@ -141,6 +144,8 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private PendingIntent getMessageReplyPendingIntent(int conversationId) {
+        Log.d("Notification", String.format("Auto.getMessageReplyPendingIntent(%d)", conversationId));
+
         return PendingIntent.getBroadcast(mContext,
                 conversationId,
                 getMessageReplyIntent(conversationId),
@@ -148,6 +153,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private Intent getMessageReplyIntent(int conversationId) {
+        Log.d("Notification", String.format("Auto.getMessageReplyIntent(%d)", conversationId));
         return new Intent()
                 .addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 .setAction(AUTO_NOTIFICATION_REPLY_ACTION)
@@ -155,6 +161,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     }
 
     private RemoteInput getVoiceReplyRemoteInput() {
+        Log.d("Notification", "Auto.getVoiceReplyRemoteInput()");
         return new RemoteInput.Builder(AUTO_VOICE_REPLY_KEY)
                 .setLabel("Reply")//TODO - Change label to "Command" if conversationId = OpenHAB system
                 .build();

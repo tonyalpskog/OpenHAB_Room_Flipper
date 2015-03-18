@@ -73,6 +73,7 @@ public class NotificationSender implements INotificationSender {
     public void showNotification(SenderType senderType, String title, String titleIconUrl, String message, long[] vibratePattern/*, NotificationCompat.Builder preBuiltPrio, ...*/) {//TODO - More injection
         //Android Auto
         int conversationId = mAutoUnreadConversationManager.getConservationId(senderType, title);
+        Log.d("Notification.showNotification()", String.format("Before adding %s - \"%s\" as Conservation ID %d", title, message, conversationId));
         mAutoUnreadConversationManager.addMessageToUnreadConversations(conversationId, title, message);
 
         //Wear
@@ -106,8 +107,10 @@ public class NotificationSender implements INotificationSender {
                 .setWhen(System.currentTimeMillis())
                 .setVibrate(vibratePattern)
                 .extend(wearableExtender);//Wear
+        Log.d("Notification.showNotification()", String.format("Before adding unread messages. Conservation ID = %d", conversationId));
         addUnreadConversations(builder, mAutoUnreadConversationManager.getUnreadConversations());
         try {
+            Log.d("Notification.showNotification()", String.format("Before sending %s - \"%s\" as Conservation ID %d", title, message, conversationId));
             NotificationManagerCompat.from(mContext).notify(conversationId, builder.build());
         } catch (Exception e) {
             Log.e(TAG, "Could not send a notification.", e);
