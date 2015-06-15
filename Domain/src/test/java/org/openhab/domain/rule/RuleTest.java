@@ -52,7 +52,7 @@ public class RuleTest {
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
-        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
+        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
         mRuleOperationProvider = new RuleOperationProvider();
     }
 

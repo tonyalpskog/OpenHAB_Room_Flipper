@@ -32,7 +32,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
-import org.openhab.habclient.dagger.Dagger_UnitPlacementComponent;
+import org.openhab.habclient.dagger.DaggerUnitPlacementComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
@@ -97,7 +97,7 @@ public class UnitPlacementFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_UnitPlacementComponent.builder()
+        DaggerUnitPlacementComponent.builder()
                 .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

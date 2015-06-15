@@ -16,7 +16,6 @@ import org.openhab.domain.model.OpenHABWidgetDataSource;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.StringHandler;
-import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;
@@ -46,7 +45,7 @@ public class RestCommunication implements IRestCommunication {
     private final AsyncHttpClient mAsyncHttpClient;
 
     @Inject
-    public RestCommunication(@ApplicationContext Context context,
+    public RestCommunication(Context context,
                              ILogger logger,
                              IColorParser colorParser,
                              IOpenHABSetting openHABSetting,

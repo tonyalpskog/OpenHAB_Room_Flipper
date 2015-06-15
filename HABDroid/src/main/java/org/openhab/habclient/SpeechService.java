@@ -19,7 +19,7 @@ import android.util.Log;
 
 import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.dagger.Dagger_SpeechComponent;
+import org.openhab.habclient.dagger.DaggerSpeechComponent;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class SpeechService extends Service
     {
         super.onCreate();
 
-        Dagger_SpeechComponent.builder()
+        DaggerSpeechComponent.builder()
                 .appComponent(((HABApplication) getApplication()).appComponent())
                 .build()
                 .inject(this);

@@ -14,13 +14,13 @@ public class AndroidApplicationModule {
         mContext = context;
     }
 
-    @Provides @ApplicationContext
+    @Provides
     public Context provideContext() {
         return mContext;
     }
 
     @Provides
-    public LayoutInflater provideLayoutInflater(@ActivityContext Context context) {
+    public LayoutInflater provideLayoutInflater(Context context) {
         return LayoutInflater.from(context);
     }
 }

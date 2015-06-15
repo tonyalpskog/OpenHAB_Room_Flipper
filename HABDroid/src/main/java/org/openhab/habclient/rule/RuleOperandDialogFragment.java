@@ -29,7 +29,7 @@ import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.Dagger_RuleOperandComponent;
+import org.openhab.habclient.dagger.DaggerRuleOperandComponent;
 import org.openhab.habdroid.R;
 
 import java.util.Map;
@@ -87,7 +87,7 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_RuleOperandComponent.builder()
+        DaggerRuleOperandComponent.builder()
                 .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

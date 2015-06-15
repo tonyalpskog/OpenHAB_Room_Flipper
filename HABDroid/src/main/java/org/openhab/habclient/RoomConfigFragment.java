@@ -26,7 +26,7 @@ import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
-import org.openhab.habclient.dagger.Dagger_RoomConfigFragmentComponent;
+import org.openhab.habclient.dagger.DaggerRoomConfigFragmentComponent;
 import org.openhab.habclient.dagger.RoomConfigFragmentComponent;
 import org.openhab.habclient.media.ICamera;
 import org.openhab.habclient.media.IImagePicker;
@@ -72,7 +72,7 @@ public class RoomConfigFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomConfigFragmentComponent component = Dagger_RoomConfigFragmentComponent.builder()
+        RoomConfigFragmentComponent component = DaggerRoomConfigFragmentComponent.builder()
                 .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
                 .build();
         component.inject(this);

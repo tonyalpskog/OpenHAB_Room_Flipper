@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/imageNoConnection"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_full_sad"
+        android:focusableInTouchMode="false"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:layout_gravity="start"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/dark_blue"
+                android:layout_weight="1" >
+                <ImageButton
+                    android:id="@+id/buttonSpeak"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_btn_speak_now"
+                    android:scaleType="fitCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_green_light"
+                android:layout_weight="1" >
+                <ImageButton
+                    android:id="@+id/buttonNotifications"
+                    android:layout_marginBottom="30dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    android:scaleType="fitCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_gravity="end"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_red_dark"
+                android:layout_weight="1" >
+                <ImageButton
+                    android:id="@+id/buttonFavorites"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_gravity="top|left"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/btn_star_big_off"
+                    android:scaleType="fitCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/darker_gray"
+                android:layout_weight="1" >
+                <ImageButton
+                    android:id="@+id/buttonSearch"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_search"
+                    android:scaleType="fitCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

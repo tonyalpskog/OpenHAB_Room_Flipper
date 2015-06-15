@@ -4,7 +4,7 @@ import android.app.Application;
 
 import org.openhab.habclient.dagger.AndroidApplicationModule;
 import org.openhab.habclient.dagger.AppComponent;
-import org.openhab.habclient.dagger.Dagger_AppComponent;
+import org.openhab.habclient.dagger.DaggerAppComponent;
 
 /**
  * Created by Tony Alpskog in 2013.
@@ -30,7 +30,7 @@ public class HABApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mAppComponent = Dagger_AppComponent.builder()
+        mAppComponent = DaggerAppComponent.builder()
                 .androidApplicationModule(new AndroidApplicationModule(this))
                 .build();
     }

@@ -24,7 +24,7 @@ import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.user.AccessModifier;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.Dagger_RuleEditActivityComponent;
+import org.openhab.habclient.dagger.DaggerRuleEditActivityComponent;
 import org.openhab.habdroid.R;
 
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rule_edit);
 
-        Dagger_RuleEditActivityComponent.builder()
+        DaggerRuleEditActivityComponent.builder()
                 .appComponent(((HABApplication)getApplication()).appComponent())
                 .build()
                 .inject(this);

@@ -56,7 +56,7 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.dagger.Dagger_WidgetListFragmentComponent;
+import org.openhab.habclient.dagger.DaggerWidgetListFragmentComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.domain.IDocumentFactory;
@@ -81,7 +81,7 @@ import javax.inject.Inject;
  */
 
 public class OpenHABWidgetListFragment extends ListFragment {
-    private static final String TAG = "OpenHABWidgetListFragment";
+    private static final String TAG = "OpenHABWidgetListFrgmt";
     private OnWidgetSelectedListener widgetSelectedListener;
     // Datasource, providing list of openHAB widgets
     private OpenHABWidgetDataSource openHABWidgetDataSource;
@@ -129,7 +129,7 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_WidgetListFragmentComponent.builder()
+        DaggerWidgetListFragmentComponent.builder()
                 .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

@@ -19,7 +19,7 @@ import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.GraphicUnit;
 import org.openhab.domain.model.OpenHABWidgetType;
-import org.openhab.habclient.dagger.Dagger_GraphicUnitComponent;
+import org.openhab.habclient.dagger.DaggerGraphicUnitComponent;
 import org.openhab.habclient.dagger.GraphicUnitComponent;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -40,7 +40,7 @@ public class GraphicUnitWidget extends AutoRefreshImageView implements View.OnCl
     public GraphicUnitWidget(Context context) {
         super(context);
 
-        GraphicUnitComponent component = Dagger_GraphicUnitComponent.builder()
+        GraphicUnitComponent component = DaggerGraphicUnitComponent.builder()
                 .appComponent(((HABApplication) context.getApplicationContext()).appComponent())
                 .build();
         component.inject(this);

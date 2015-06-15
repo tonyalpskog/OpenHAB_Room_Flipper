@@ -77,7 +77,7 @@ import org.openhab.habclient.HABService;
 import org.openhab.habclient.INavDrawerActivity;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.MainActivity;
-import org.openhab.habclient.dagger.Dagger_MainActivityComponent;
+import org.openhab.habclient.dagger.DaggerMainActivityComponent;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
@@ -167,7 +167,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_MainActivityComponent.builder()
+        DaggerMainActivityComponent.builder()
                 .appComponent(((HABApplication)getApplication()).appComponent())
                 .build()
                 .inject(this);

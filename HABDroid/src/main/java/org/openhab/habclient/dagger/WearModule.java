@@ -1,7 +1,7 @@
 package org.openhab.habclient.dagger;
 
-import org.openhab.habclient.wear.IWearCommandHost;
-import org.openhab.habclient.wear.WearCommandHost;
+import org.openhab.habclient.wear.IWearNotificationActions;
+import org.openhab.habclient.wear.WearNotificationActions;
 
 import dagger.Module;
 import dagger.Provides;
@@ -9,5 +9,5 @@ import dagger.Provides;
 @Module
 public class WearModule {
     @Provides
-    public IWearCommandHost provideWearCommandHost(WearCommandHost wearCommandHost) { return wearCommandHost; }
+    public IWearNotificationActions provideWearNotificationActions(WearNotificationActions wearNotificationActions) { return wearNotificationActions; }
 }

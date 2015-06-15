@@ -28,7 +28,7 @@ import dagger.Component;
 })
 @Singleton
 public interface AppComponent {
-    @ApplicationContext Context applicationContext();
+    Context applicationContext();
     IEventBus eventBus();
     IRoomProvider roomProvider();
     IOpenHABWidgetProvider widgetProvider();

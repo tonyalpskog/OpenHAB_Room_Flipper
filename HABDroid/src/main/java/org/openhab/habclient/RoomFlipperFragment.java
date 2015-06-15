@@ -29,7 +29,7 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.user.User;
-import org.openhab.habclient.dagger.Dagger_RoomFlipperComponent;
+import org.openhab.habclient.dagger.DaggerRoomFlipperComponent;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -80,7 +80,7 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_RoomFlipperComponent.builder()
+        DaggerRoomFlipperComponent.builder()
                 .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);
@@ -143,7 +143,11 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
 //                ((MainActivity) getActivity()).selectNavigationDrawerItem(2);//TODO - Use enum as fragment identifier.
                 return true;
             case R.id.action_speak_room_from_flipper:
-                ((MainActivity) getActivity()).startVoiceRecognition(mRoomViewFlipper);
+                Intent broadcastIntent = new Intent("Wear_Command");
+                broadcastIntent.putExtra("Wear_Command", "get kitchen temperature");
+                broadcastIntent.putExtra("Android_Wear_Conversation_Id", 0);
+                ((MainActivity) getActivity()).sendBroadcast(broadcastIntent);
+//                ((MainActivity) getActivity()).startVoiceRecognition(mRoomViewFlipper);
                 return true;
             case R.id.action_go_to_list_view:
                 // Get launch intent for application

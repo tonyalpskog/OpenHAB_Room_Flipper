@@ -15,7 +15,7 @@ import org.openhab.domain.IApplicationModeProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.model.ApplicationMode;
 import org.openhab.domain.model.Room;
-import org.openhab.habclient.dagger.Dagger_RoomConfigActivityComponent;
+import org.openhab.habclient.dagger.DaggerRoomConfigActivityComponent;
 import org.openhab.habdroid.R;
 
 import java.util.Locale;
@@ -51,7 +51,7 @@ public class RoomConfigActivity extends Activity implements ActionBar.TabListene
 
         setContentView(R.layout.activity_room_config);
 
-        Dagger_RoomConfigActivityComponent.builder()
+        DaggerRoomConfigActivityComponent.builder()
                 .appComponent(((HABApplication) getApplication()).appComponent())
                 .build()
                 .inject(this);

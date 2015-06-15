@@ -32,7 +32,7 @@ import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.Dagger_RuleActionComponent;
+import org.openhab.habclient.dagger.DaggerRuleActionComponent;
 import org.openhab.habdroid.R;
 
 import java.util.List;
@@ -82,7 +82,7 @@ public class RuleActionDialogFragment extends DialogFragment implements DialogIn
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_RuleActionComponent.builder()
+        DaggerRuleActionComponent.builder()
                 .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

@@ -17,7 +17,7 @@ import org.openhab.domain.IRestCommunication;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.habclient.dagger.Dagger_MainComponent;
+import org.openhab.habclient.dagger.DaggerMainComponent;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 
@@ -52,7 +52,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
 
-        Dagger_MainComponent.builder()
+        DaggerMainComponent.builder()
                 .appComponent(((HABApplication) getApplication()).appComponent())
                 .build()
                 .inject(this);

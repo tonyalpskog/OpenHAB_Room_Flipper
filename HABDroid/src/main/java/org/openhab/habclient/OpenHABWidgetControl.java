@@ -12,7 +12,6 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
@@ -33,7 +32,7 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
     private final MyAsyncHttpClient mAsyncHttpClient;
 
     @Inject
-    public OpenHABWidgetControl(@ApplicationContext Context context, IOpenHABWidgetProvider widgetProvider) {
+    public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
         if(context == null) throw new IllegalArgumentException("context is null");
         mContext = context;
         mWidgetProvider = widgetProvider;

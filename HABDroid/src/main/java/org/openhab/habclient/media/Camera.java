@@ -10,8 +10,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import org.openhab.habclient.dagger.ApplicationContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,7 +27,7 @@ public class Camera implements ICamera {
     private final Context mContext;
 
     @Inject
-    public Camera(@ApplicationContext Context context) {
+    public Camera(Context context) {
         mContext = context;
     }
 

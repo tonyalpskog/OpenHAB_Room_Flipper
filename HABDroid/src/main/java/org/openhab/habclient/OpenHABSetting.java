@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.loopj.android.http.AsyncHttpClient;
 
-import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
@@ -23,7 +22,7 @@ public class OpenHABSetting implements IOpenHABSetting {
     private final Context mContext;
 
     @Inject
-    public OpenHABSetting(@ApplicationContext Context context) {
+    public OpenHABSetting(Context context) {
         mContext = context;
         mBaseUrl = mContext.getString(R.string.openhab_demo_url);
         mSitemapRootUrl = mBaseUrl + context.getString(R.string.openhab_demo_sitemap_postfix);

@@ -41,7 +41,7 @@ public class RuleTreeTest {
         final IPopularNameProvider popularNameProvider = new PopularNameProvider();
         mEventBus = mock(IEventBus.class);
         mWidgetProvider = new OpenHABWidgetProvider(regularExpression, logger, popularNameProvider, mEventBus);
-        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider(mWidgetProvider);
+        mUnitEntityDataTypeProvider = new UnitEntityDataTypeProvider();
         final IDocumentFactory documentFactory = new DocumentFactory();
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());

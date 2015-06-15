@@ -25,7 +25,7 @@ import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.IRuleOperationProvider;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.Dagger_RuleOperationComponent;
+import org.openhab.habclient.dagger.DaggerRuleOperationComponent;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
@@ -62,7 +62,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_RuleOperationComponent.builder()
+        DaggerRuleOperationComponent.builder()
                 .appComponent(((HABApplication)getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

@@ -92,7 +92,7 @@ public class CommandTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        Dagger_CommandTest_TestComponent.builder()
+        DaggerCommandTest_TestComponent.builder()
                 .androidApplicationModule(new AndroidApplicationModule(getContext()))
                 .build()
                 .inject(this);

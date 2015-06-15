@@ -8,8 +8,6 @@ import android.support.v4.app.RemoteInput;
 import android.util.SparseArray;
 import android.util.Log;
 
-import org.openhab.habclient.dagger.ApplicationContext;
-
 import org.openhab.domain.SenderType;
 
 import java.util.ArrayList;
@@ -41,7 +39,7 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
     long mLatestTimestamp = Calendar.getInstance().get(Calendar.SECOND);
 
     @Inject
-    public AutoUnreadConversationManager(@ApplicationContext Context context) {
+    public AutoUnreadConversationManager(Context context) {
         mContext = context;
         mConversationsIdMap = new HashMap<String, Integer>();
         mUnreadConversations = new SparseArray<Conversation>();
@@ -67,8 +65,8 @@ public class AutoUnreadConversationManager implements IAutoUnreadConversationMan
 
     @Override
     public void removeMessageFromUnreadConversations(int conversationId) {
-        if(mUnreadConversations.containsKey(conversationId)) {
-            Conversation conversation = mUnreadConversations.get(conversationId);
+        Conversation conversation = mUnreadConversations.get(conversationId);
+        if(conversation == null) {
             conversation.popMessage();
             if(!conversation.hasMessages())
                 mUnreadConversations.remove(conversationId);

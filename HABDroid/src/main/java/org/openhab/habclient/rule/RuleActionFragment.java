@@ -22,7 +22,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.Dagger_RuleActionComponent;
+import org.openhab.habclient.dagger.DaggerRuleActionComponent;
 import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.RuleAction;
@@ -52,7 +52,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_RuleActionComponent.builder()
+        DaggerRuleActionComponent.builder()
                 .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
                 .build()
                 .inject(this);

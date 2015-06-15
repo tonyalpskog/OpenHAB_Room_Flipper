@@ -74,7 +74,7 @@ import org.openhab.domain.model.OpenHABNFCActionList;
 import org.openhab.domain.model.OpenHABSitemap;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetDataSource;
-import org.openhab.habclient.dagger.Dagger_WidgetListActivityComponent;
+import org.openhab.habclient.dagger.DaggerWidgetListActivityComponent;
 import org.openhab.habdroid.util.AndroidLogger;
 import org.openhab.habclient.ColorParser;
 import org.openhab.habclient.HABApplication;
@@ -181,7 +181,7 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		Dagger_WidgetListActivityComponent.builder()
+		DaggerWidgetListActivityComponent.builder()
 				.appComponent(((HABApplication)getApplication()).appComponent())
 				.build()
 				.inject(this);

@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
 import org.openhab.domain.model.Room;
-import org.openhab.habclient.dagger.ApplicationContext;
 
 import javax.inject.Inject;
 
@@ -14,7 +13,7 @@ public class RoomImageProvider implements IRoomImageProvider {
     private final Context mContext;
 
     @Inject
-    public RoomImageProvider(@ApplicationContext Context context) {
+    public RoomImageProvider(Context context) {
         mContext = context;
     }
 

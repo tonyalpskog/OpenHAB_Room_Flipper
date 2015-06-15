@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.openhab.domain.command.ICommandPhrasesProvider;
 import org.openhab.domain.command.OpenHABWidgetCommandType;
-import org.openhab.habclient.dagger.ApplicationContext;
 import org.openhab.habdroid.R;
 
 import javax.inject.Inject;
@@ -13,7 +12,7 @@ public class CommandPhrasesProvider implements ICommandPhrasesProvider {
     private final Context mContext;
 
     @Inject
-    public CommandPhrasesProvider(@ApplicationContext Context context) {
+    public CommandPhrasesProvider(Context context) {
         mContext = context;
     }
 
