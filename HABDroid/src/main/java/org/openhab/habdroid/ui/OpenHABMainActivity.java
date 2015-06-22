@@ -70,6 +70,7 @@ import com.loopj.android.image.WebImageCache;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.StringEntity;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.model.OpenHABLinkedPage;
 import org.openhab.domain.model.OpenHABSitemap;
 import org.openhab.habclient.HABApplication;
@@ -81,7 +82,6 @@ import org.openhab.habclient.dagger.DaggerMainActivityComponent;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.domain.IDocumentFactory;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
 import org.openhab.habdroid.core.OpenHABTracker;
 import org.openhab.habdroid.core.OpenHABTrackerReceiver;

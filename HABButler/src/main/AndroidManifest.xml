@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.openhab.habwear.habbutler" >
+    package="org.openhab.habdroid" >
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -12,13 +12,14 @@
         <meta-data android:name="com.google.android.gms.version"
                    android:value="@integer/google_play_services_version" />
         <activity
-            android:name=".MainActivity"
+            android:name="org.openhab.habwear.habbutler.MainActivity"
             android:label="@string/voice_start_app_command" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
     </application>
 
 </manifest>

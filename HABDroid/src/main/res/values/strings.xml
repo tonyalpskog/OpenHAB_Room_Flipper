@@ -138,4 +138,7 @@
     <string name="choice_next">Next</string>
     <string name="choice_done">Done</string>
     <string name="choice_cancel">Cancel</string>
+    <string name="unknown_command">Sorry, didn\'t get that.</string>
+    <string name="empty_command">Command message was empty</string>
+    <string name="wearable_api_unavailable">Wearable API is unavailable.</string>
 </resources>

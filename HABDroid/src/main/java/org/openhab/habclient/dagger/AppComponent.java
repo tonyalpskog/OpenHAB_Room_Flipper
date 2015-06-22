@@ -3,7 +3,9 @@ package org.openhab.habclient.dagger;
 import android.content.Context;
 
 import org.openhab.domain.IApplicationModeProvider;
+import org.openhab.domain.IDeviceCommunicator;
 import org.openhab.domain.IEventBus;
+import org.openhab.domain.INodeMessageHandler;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
@@ -40,4 +42,6 @@ public interface AppComponent {
     IColorParser colorParser();
     IRoomDataContainer roomDataContainer();
     ICommandAnalyzer commandAnalyzer();
+    IDeviceCommunicator deviceCommunicator();
+    INodeMessageHandler nodeMessageHandler();
 }

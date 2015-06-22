@@ -1,31 +1,30 @@
 package org.openhab.habwear.habbutler;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.RemoteInput;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import org.openhab.habdroid.R;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
-    public static final String WEAR_COMMAND_BROADCAST = "Wear_Command";
-    private final int OPENHAB_SYSTEM_CONVERSATION_ID = 0;
-
+    public static final String WEAR_COMMAND_BROADCAST = "org.openhab.habdroid.command.Wear_App_Command";
     private static final int SPEECH_REQUEST_CODE = 0;
+    private final String TAG = "Wear";
+
     private ImageView mImageNoConnection;
+    private IDeviceCommunicator mobileCommunicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,22 +36,45 @@ public class MainActivity extends Activity {
             public void onLayoutInflated(WatchViewStub stub) {
                 mImageNoConnection = (ImageView) stub.findViewById(R.id.imageNoConnection);
                 mImageNoConnection.setVisibility(View.GONE);
-                ImageButton button = (ImageButton) stub.findViewById(R.id.buttonSpeak);
-                button.setOnClickListener(new View.OnClickListener() {
+
+                ImageButton buttonSpeak = (ImageButton) stub.findViewById(R.id.buttonSpeak);
+                buttonSpeak.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         displaySpeechRecognizer();
                     }
                 });
+
+                ImageButton buttonFavorites = (ImageButton) stub.findViewById(R.id.buttonFavorites);
+                buttonFavorites.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendMessageToPhone("hi");
+                    }
+                });
             }
         });
+//        retrieveDeviceNode();
+        mobileCommunicator = new MobileCommunicator(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mobileCommunicator.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        mobileCommunicator.dispose();
+        super.onPause();
     }
 
     private void displaySpeechRecognizer() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, new String[]{"sv-SE","en-US"});
+        intent.putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, new String[]{"sv-SE", "en-US"});
 //        intent.putExtra("android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES", new String[]{"sv-SE","en-US"});
         startActivityForResult(intent, SPEECH_REQUEST_CODE);
     }
@@ -80,29 +102,76 @@ public class MainActivity extends Activity {
             sendOrderedBroadcast(intent, null, myBroadcastReceiver, null, Activity.RESULT_OK, null, null);
 
             String spokenText = results.get(0);
-            Log.d("Wear", String.format("Spoken phrase: '%s'", spokenText));
-//            Log.d("Wear", "EXTRA_SUPPORTED_LANGUAGES: " + data.getStringExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES));
-            Log.d("Wear", "EXTRA_LANGUAGE: " + data.getStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE));
-            Log.d("Wear", "EXTRA_LANGUAGE_MODEL: " + data.getStringExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL));
-            Log.d("Wear", "EXTRA_LANGUAGE_PREFERENCE: " + data.getStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE));
+            Log.d(TAG, String.format("Spoken phrase: '%s'", spokenText));
+//            Log.d(TAG, "EXTRA_SUPPORTED_LANGUAGES: " + data.getStringExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES));
+            Log.d(TAG, "EXTRA_LANGUAGE: " + data.getStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE));
+            Log.d(TAG, "EXTRA_LANGUAGE_MODEL: " + data.getStringExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL));
+            Log.d(TAG, "EXTRA_LANGUAGE_PREFERENCE: " + data.getStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE));
             if(spokenText.length() > 0) {
-                Intent broadcastIntent = new Intent("Wear_Command");
-                broadcastIntent.putExtra("Wear_Command", "get kitchen temperature");
-                broadcastIntent.putExtra("Android_Wear_Conversation_Id", 0);
-                intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                this.getApplicationContext().sendBroadcast(broadcastIntent);
+//                Intent broadcastIntent = new Intent("Wear_Command");
+//                broadcastIntent.putExtra("Wear_Command", "get kitchen temperature");
+//                broadcastIntent.putExtra("Android_Wear_Conversation_Id", 0);
+//                intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+//                this.getApplicationContext().sendBroadcast(broadcastIntent);
 
-                Log.d("Wear", "'Wear_Command' broadcast sent with 'Android_Wear_Conversation_Id' = 0");
+                sendMessageToPhone(spokenText);
+
 //                Intent broadcastIntent = new Intent(WEAR_COMMAND_BROADCAST);
 //                broadcastIntent.putExtra(WEAR_COMMAND_BROADCAST, spokenText);
+//                broadcastIntent.putExtra(COMMAND_CONVERSATION_ID, OPENHAB_SYSTEM_CONVERSATION_ID);
 //                sendBroadcast(broadcastIntent);
+//                Log.d(TAG, "'Wear_Command' broadcast sent with 'Android_Wear_Conversation_Id' = 0");
             }
         }
     }
 
+//    private GoogleApiClient getGoogleApiClient(Context context) {
+//        return new GoogleApiClient.Builder(context)
+//                .addApi(Wearable.API)
+//                .build();
+//    }
+//
+//    public String nodeId;
+//
+//    private void retrieveDeviceNode() {
+//        final GoogleApiClient client = getGoogleApiClient(this);
+//        final long CONNECTION_TIME_OUT_MS = 5000;
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+//                NodeApi.GetConnectedNodesResult result =
+//                        Wearable.NodeApi.getConnectedNodes(client).await();
+//                List<Node> nodes = result.getNodes();
+//                if (nodes.size() > 0) {
+//                    nodeId = nodes.get(0).getId();
+//                }
+//                client.disconnect();
+//            }
+//        }).start();
+//    }
+
+    private void sendMessageToPhone(final String message) {
+        Log.v(TAG, String.format("About to send '%s'...", message));
+        mobileCommunicator.sendMessage(MobileCommunicator.WEAR_COMMAND, message.getBytes(StandardCharsets.UTF_8));
+//        final GoogleApiClient client = getGoogleApiClient(this);
+//        final long CONNECTION_TIME_OUT_MS = 5000;
+//        if (nodeId != null) {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+//                    Wearable.MessageApi.sendMessage(client, nodeId, WEAR_COMMAND_BROADCAST, message.getBytes());
+//                    client.disconnect();
+//                }
+//            }).start();
+//        }
+    }
 }
 
 class LangBroadcastReceiver extends BroadcastReceiver {
+    private final String TAG = "Wear";
+
     ArrayList<String> recognisedText;
     Activity parentActivity;
 
@@ -115,7 +184,7 @@ class LangBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle results = getResultExtras(true);
         String lang = results.getString(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE);
-        Log.d("Wear", "LangBroadcastReceiver: Got 'EXTRA_LANGUAGE_PREFERENCE' = " + lang);
+        Log.d(TAG, "LangBroadcastReceiver: Got 'EXTRA_LANGUAGE_PREFERENCE' = " + lang);
         // now handle the recognisedText with the known language.
     }
 }

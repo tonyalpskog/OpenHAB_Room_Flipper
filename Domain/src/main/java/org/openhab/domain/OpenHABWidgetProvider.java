@@ -167,7 +167,10 @@ public class OpenHABWidgetProvider implements IOpenHABWidgetProvider {
                         mOpenHABItemTypeMap.put(widget.getItem().getType(), new ArrayList<String>());
 
                     List<String> itemList = mOpenHABItemTypeMap.get(widget.getItem().getType());
-                    itemList.add(widget.getItemName());
+                    if(itemList == null)
+                        mLogger.e("OpenHABWidgetProvider", String.format("Cannot find openHABWidget item type. Item name = '%s'. Widget ID = %s. Item was not added in mOpenHABItemTypeMap.", widget.getItem().getName(), widget.getId()));
+                    else
+                        itemList.add(widget.getItemName());
                 }
             }
         }

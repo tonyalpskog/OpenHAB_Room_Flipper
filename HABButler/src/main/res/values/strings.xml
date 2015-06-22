@@ -3,4 +3,8 @@
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
     <string name="voice_start_app_command">HAB Butler</string>
+    <string name="message_sent">Message sent</string>
+    <string name="send_error">Error sending</string>
+    <string name="peer_connected">Peer connected</string>
+    <string name="peer_disconnected">Peer disconnected</string>
 </resources>
