@@ -5,12 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.openhab.habdroid.R;
 
@@ -25,10 +27,12 @@ public class MainActivity extends Activity {
 
     private ImageView mImageNoConnection;
     private IDeviceCommunicator mobileCommunicator;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handler = new Handler();
         setContentView(R.layout.activity_main);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
@@ -56,6 +60,32 @@ public class MainActivity extends Activity {
         });
 //        retrieveDeviceNode();
         mobileCommunicator = new MobileCommunicator(this);
+
+        final Intent intent = getIntent();
+        if (getIntent() != null)
+            handleActivityIntent(intent);
+    }
+
+    private void handleActivityIntent(final Intent intent) {
+        final Context context = this;
+        if (WearListenerService.WEAR_COMMAND_RESULT.equals(intent.getAction())) {
+            final String message = intent.getStringExtra(WearListenerService.WEAR_COMMAND_RESULT_MESSAGE);
+            Log.v(TAG, "Received: '" + message + "'");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.v(TAG, "Unknown => " + intent.getAction());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "Unknown => " + intent.getAction(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override

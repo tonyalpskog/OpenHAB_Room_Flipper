@@ -30,10 +30,10 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2015.
  */
 public class WearListenerService extends WearableListenerService implements IDeviceCommunicator {
-    public static final String EXTERNAL_WEAR_COMMAND = "org.openhab.habdroid.command.Wear_App_Command";
-    public static final String PHONE_REPLY = "org.openhab.habdroid.command.Wear_App_Command";
-    public static final String INTERNAL_WEAR_COMMAND = "org.openhab.habdroid.command.Internal_Wear_App_Command";
-    public static final String WEAR_NODE_ID = "Wear_Node_Id";
+    public static final String WEAR_COMMAND = "org.openhab.habdroid.wear.Command";
+    public static final String WEAR_COMMAND_CONFIRM = "org.openhab.habdroid.wear.Command_Confirm";
+    public static final String WEAR_COMMAND_RESULT = "org.openhab.habdroid.wear.Command_Result";
+
     private final String TAG = "WearListenerService";
 
     private GoogleApiClient googleApiClient;
@@ -113,7 +113,7 @@ public class WearListenerService extends WearableListenerService implements IDev
         String path = messageEvent.getPath();
         Log.v(TAG, String.format("Receive '%s' from %s", messageData, nodeId));
 
-        if(path.equals(EXTERNAL_WEAR_COMMAND) && !StringHandler.isNullOrEmpty(messageData)) {
+        if(path.equals(WEAR_COMMAND) && !StringHandler.isNullOrEmpty(messageData)) {
             if(messageData.equals("hi"))
                 sendMessage(path, "hello there", nodeId);
             else

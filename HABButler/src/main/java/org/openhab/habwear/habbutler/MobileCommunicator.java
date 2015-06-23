@@ -20,40 +20,34 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import org.openhab.habdroid.R;
 
-import java.nio.charset.StandardCharsets;
-
 public class MobileCommunicator implements IDeviceCommunicator {
-    public static final String WEAR_COMMAND = "org.openhab.habdroid.command.Wear_App_Command";
+    public static final String WEAR_COMMAND = "org.openhab.habdroid.wear.Command";
     private final String TAG = "Wear";
 
     private GoogleApiClient googleApiClient;
     private NodeApi.NodeListener nodeListener;
-    private MessageApi.MessageListener messageListener;
     private String mobileNodeId;
-    private Handler handler;
+//    private Handler handler;
     private Activity mActivity;
 
     public MobileCommunicator(Activity activity) {
         mActivity = activity;
-        handler = new Handler();
+//        handler = new Handler();
 
         Log.v(TAG, "Initializing");
 
@@ -90,37 +84,12 @@ public class MobileCommunicator implements IDeviceCommunicator {
             }
         };
 
-        messageListener = new MessageApi.MessageListener() {
-            @Override
-            public void onMessageReceived(final MessageEvent messageEvent) {
-                Log.v(TAG, "Receiving...");
-                if (messageEvent.getPath().equals(WEAR_COMMAND)) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.v(TAG, "Received: '" + new String(messageEvent.getData(), StandardCharsets.UTF_8) + "'");
-                            Toast.makeText(mActivity, new String(messageEvent.getData(), StandardCharsets.UTF_8), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.v(TAG, "Unknown => " + messageEvent.getPath());
-                            Toast.makeText(mActivity, "Unknown => " + messageEvent.getPath(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        };
-
         googleApiClient = new GoogleApiClient.Builder(mActivity.getApplicationContext()).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
                 Log.i(TAG, "Connected");
 
                 Wearable.NodeApi.addListener(googleApiClient, nodeListener);
-                Wearable.MessageApi.addListener(googleApiClient, messageListener);
 
                 Wearable.NodeApi.getConnectedNodes(googleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
                     @Override
@@ -161,17 +130,17 @@ public class MobileCommunicator implements IDeviceCommunicator {
         Wearable.MessageApi.sendMessage(googleApiClient, mobileNodeId, path, data).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
             @Override
             public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+            if (sendMessageResult.getStatus().isSuccess()) {
+                Log.v(TAG, "Successful send");
+//                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+//                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, mActivity.getString(R.string.message_sent));
+            } else {
+                Log.v(TAG, "Send error");
                 Intent intent = new Intent(mActivity.getApplicationContext(), ConfirmationActivity.class);
-                if (sendMessageResult.getStatus().isSuccess()) {
-                    Log.v(TAG, "Successful send");
-                    intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
-                    intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, mActivity.getString(R.string.message_sent));
-                } else {
-                    Log.v(TAG, "Send error");
-                    intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
-                    intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, mActivity.getString(R.string.send_error));
-                }
-//                mActivity.startActivity(intent);//TODO - TA: This line caused the connection to be disconnected.
+                intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
+                intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, mActivity.getString(R.string.send_error));
+                mActivity.startActivity(intent);
+            }
             }
         });
     }
@@ -185,7 +154,6 @@ public class MobileCommunicator implements IDeviceCommunicator {
     public void dispose() {
         Log.v(TAG, "Disconnecting by dispose");
         Wearable.NodeApi.removeListener(googleApiClient, nodeListener);
-        Wearable.MessageApi.removeListener(googleApiClient, messageListener);
         googleApiClient.disconnect();
     }
 }

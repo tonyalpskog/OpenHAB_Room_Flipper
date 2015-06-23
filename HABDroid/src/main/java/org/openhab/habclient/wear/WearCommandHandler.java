@@ -39,7 +39,7 @@ public class WearCommandHandler implements INodeMessageHandler {
     public void handleNodeMessage(IDeviceCommunicator nodeCommunicator, String path, String message, String senderNodeId) {
         if(StringHandler.isNullOrEmpty(message) || StringHandler.isNullOrEmpty(senderNodeId)) {
             String commandReplyMessage = mContext.getString(R.string.empty_command);
-            nodeCommunicator.sendMessage(WearListenerService.EXTERNAL_WEAR_COMMAND, commandReplyMessage, senderNodeId);
+            nodeCommunicator.sendMessage(WearListenerService.WEAR_COMMAND_RESULT, commandReplyMessage, senderNodeId);
         }
 
         if(StringHandler.isNullOrEmpty(senderNodeId))
@@ -49,6 +49,6 @@ public class WearCommandHandler implements INodeMessageHandler {
         commandToBeAnalyzed.add(message);
         CommandAnalyzerResult commandAnalyzerResult = mCommandAnalyzer.analyzeCommand(commandToBeAnalyzed, mApplicationModeProvider.getAppMode());
         String commandReplyMessage = commandAnalyzerResult != null ? mCommandAnalyzer.getCommandReply(commandAnalyzerResult) : mContext.getString(R.string.unknown_command);
-        nodeCommunicator.sendMessage(WearListenerService.EXTERNAL_WEAR_COMMAND, commandReplyMessage, senderNodeId);
+        nodeCommunicator.sendMessage(WearListenerService.WEAR_COMMAND_RESULT, commandReplyMessage, senderNodeId);
     }
 }
