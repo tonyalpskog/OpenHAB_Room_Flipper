@@ -27,7 +27,7 @@ import javax.inject.Inject;
 public class RuleListActivity extends ListActivity {
 
 //    public static final int RULE_REQUEST_CODE = 4321;
-    private String mTemporaryHardCodedUserId = "Admin123";//TODO - TA: Replace this with data from user module/provider
+    public static String TemporaryHardCodedUserId = "Admin123";//TODO - TA: Replace this with data from user module/provider
     private ArrayAdapter<Rule> mListAdapter;
 
     @Inject IRuleProvider mRuleProvider;
@@ -46,7 +46,7 @@ public class RuleListActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 //        mListAdapter.notifyDataSetChanged();
-        mListAdapter = new ArrayAdapter<Rule>(this, android.R.layout.simple_list_item_1, mRuleProvider.getUserRules(mTemporaryHardCodedUserId));
+        mListAdapter = new ArrayAdapter<Rule>(this, android.R.layout.simple_list_item_1, mRuleProvider.getUserRules(TemporaryHardCodedUserId));
         setListAdapter(mListAdapter);
     }
 
@@ -56,7 +56,7 @@ public class RuleListActivity extends ListActivity {
         Rule itemValue = (Rule) l.getItemAtPosition(position);
 
         Intent intent = new Intent(this, RuleEditActivity.class);
-        intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
+        intent.putExtra(User.ARG_USER_ID, TemporaryHardCodedUserId);
         intent.putExtra(Rule.ARG_RULE_ID, itemValue.getRuleId().toString());
         startActivity(intent);
     }
@@ -72,7 +72,7 @@ public class RuleListActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_add_rule:
                 Intent intent = new Intent(this, RuleEditActivity.class);
-                intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
+                intent.putExtra(User.ARG_USER_ID, TemporaryHardCodedUserId);
                 intent.putExtra(Rule.ARG_RULE_ID, "");
                 startActivity(intent);
 //                startActivityForResult(intent, RULE_REQUEST_CODE);
@@ -82,7 +82,7 @@ public class RuleListActivity extends ListActivity {
                     Toast.makeText(this, "No selected rule", Toast.LENGTH_SHORT).show();
                 else {
                     intent = new Intent(this, RuleEditActivity.class);
-                    intent.putExtra(User.ARG_USER_ID, mTemporaryHardCodedUserId);
+                    intent.putExtra(User.ARG_USER_ID, TemporaryHardCodedUserId);
                     intent.putExtra(Rule.ARG_RULE_ID, getSelectedItemId());
                     startActivity(intent);
 //                startActivityForResult(intent, RULE_REQUEST_CODE);

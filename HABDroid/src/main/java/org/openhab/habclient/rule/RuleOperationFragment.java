@@ -22,7 +22,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
-import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.IRuleOperatorProvider;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.dagger.DaggerRuleOperationComponent;
@@ -50,7 +50,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
     private RuleOperation mOperationUnderConstruction;
     private EditText mRuleNameView;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject IRuleOperationProvider mRuleOperationProvider;
+    @Inject IRuleOperatorProvider mRuleOperationProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
     @Inject IAdapterProvider mAdapterProvider;
 
@@ -158,7 +158,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(
                         getActivity(),
-                        position + " OnItemLongClickListener" + "  Parent => " + ((RuleTreeItem)parent.getSelectedItem()).mName, Toast.LENGTH_SHORT)
+                        position + " OnItemLongClickListener" + "  Parent => " + ((RuleTreeItem) parent.getSelectedItem()).mName, Toast.LENGTH_SHORT)
                         .show();
 //                mSelectedTreeItem = XXX
                 //TODO - TA: set parent as mSelectedTreeItem
@@ -167,7 +167,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
             }
         });
 
-        mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
+        mRuleNameView.setText(((RuleEditActivity) getActivity()).getRuleName());
         TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -189,6 +189,14 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
 
         RuleOperation initialRootOperation = null/*getInitialTreeOperation()*/;//TODO - TA: getInitialTreeOperation is just a time saver for UI test
         ((RuleEditActivity)getActivity()).getRule().setRuleOperation(initialRootOperation);
+
+        //TODO - TA: getInitialTreeOperation is just a time saver for UI test
+//        prepareMockedListData();
+//        prepareListData(initialRootOperation);
+//        mTreeListAdapter.notifyDataSetChanged();
+//        mTreeListAdapter.notifyDataSetInvalidated();
+//        updateRuleTree(initialRootOperation);
+        //-----------------------------------------
 
         return view;
     }
@@ -332,14 +340,15 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
                 if(oldOperand != null && oldOperand.getSourceType() == EntityDataTypeSource.UNIT)
                     mWidgetProvider.removeItemListener((UnitEntityDataType)oldOperand);
                 mOperationUnderConstruction.setOperand(operandPosition, operand);
-                mWidgetProvider.addItemListener((UnitEntityDataType) operand);
+                if(operand != null)
+                    mWidgetProvider.addItemListener((UnitEntityDataType) operand);
 
                 if(ruleOperationDialogButtonInterface == IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT)
                     openNewDialogAfterOperandSelection(operandPosition, operand);
 
                 break;
             case NEW_OPERATION:
-            case OLD_OPERATION:
+            case EXISTING_OPERATION:
             case STATIC:
                 if(mOperationUnderConstruction == null)
                     mOperationUnderConstruction = new RuleOperation(/*"My operation"*/);
@@ -443,7 +452,8 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
         RuleOperator ror =  mRuleOperationProvider.getRuleOperator(Boolean.class, RuleOperatorType.And);
         RuleOperation ron = new RuleOperation(ror, operandList);
         ron.setName("The is the name of the root operation.");
-
+//        prepareMockedListData();//TODO - TA: getInitialTreeOperation is just a time saver for UI test
+//        prepareListData(ron);//TODO - TA: getInitialTreeOperation is just a time saver for UI test
         return ron;
     }
 
@@ -520,7 +530,7 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
 
     private RuleOperation getRuleOperation() {
         final HABApplication application = (HABApplication) getActivity().getApplication();
-        OpenHABWidget widget = mWidgetProvider.getWidgetByID("demo_1_0");
+        OpenHABWidget widget = mWidgetProvider.getWidgetByID("FF_Child_2");
         return new RuleOperation(mRuleOperationProvider.getRuleOperator(widget, RuleOperatorType.Equal), getOperandsAsList3(2));
     }
 
@@ -536,8 +546,8 @@ public class RuleOperationFragment extends Fragment implements IRuleOperationBui
 
             case 2:
                 //Number
-                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//"demo_1_0"
-                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("demo_1_0")));//ekafallettest_1
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Child_2")));//"demo_1_0"
+                operands.add(mUnitEntityDataTypeProvider.getUnitEntityDataType(mWidgetProvider.getWidgetByID("FF_Bath_4")));//ekafallettest_1
                 break;
         }
 

@@ -9,8 +9,10 @@ import org.openhab.domain.OpenHABWidgetProvider;
 import org.openhab.domain.PopularNameProvider;
 import org.openhab.domain.command.CommandAnalyzer;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.domain.rule.IRuleOperationProvider;
-import org.openhab.domain.rule.RuleOperationProvider;
+import org.openhab.domain.rule.IRuleOperatorProvider;
+import org.openhab.domain.rule.IRuleProvider;
+import org.openhab.domain.rule.RuleOperatorProvider;
+import org.openhab.domain.rule.RuleProvider;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.IRoomDataContainer;
 import org.openhab.habclient.OpenHABSetting;
@@ -42,7 +44,7 @@ public class ApplicationModule {
     }
 
     @Provides @Singleton
-    public IRuleOperationProvider provideRuleOperationProvider(RuleOperationProvider provider) {
+    public IRuleOperatorProvider provideRuleOperatorProvider(RuleOperatorProvider provider) {
         return provider;
     }
 
@@ -71,4 +73,8 @@ public class ApplicationModule {
             AutoUnreadConversationManager autoUnreadConversationManager) {
         return autoUnreadConversationManager;
     }
+
+    @Provides @Singleton
+    public IRuleProvider provideRuleProvider(RuleProvider provider) { return provider; }
+
 }

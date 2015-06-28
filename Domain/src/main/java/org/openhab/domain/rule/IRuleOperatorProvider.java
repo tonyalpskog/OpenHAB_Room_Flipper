@@ -5,7 +5,7 @@ import org.openhab.domain.rule.operators.RuleOperator;
 
 import java.util.Set;
 
-public interface IRuleOperationProvider {
+public interface IRuleOperatorProvider {
     RuleOperator<?> getRuleOperator(OpenHABWidget openHABWidget, RuleOperatorType type);
 
     RuleOperator<?> getRuleOperator(Class<?> operandClass, RuleOperatorType type);

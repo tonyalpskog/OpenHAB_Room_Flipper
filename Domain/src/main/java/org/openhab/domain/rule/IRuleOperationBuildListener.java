@@ -10,7 +10,7 @@ public interface IRuleOperationBuildListener {
         NA(0),
         UNIT(1),
         NEW_OPERATION(2),
-        OLD_OPERATION(3),
+        EXISTING_OPERATION(3),
         STATIC(4),
         OPERATOR(5);
 

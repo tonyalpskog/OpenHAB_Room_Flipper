@@ -153,7 +153,7 @@ public class RoomConfigFragment extends Fragment {
         List<Room> roomArrayList = new ArrayList<Room>(allRooms.size());
         for(Room room : allRooms) {
             //TA: TODO - Load the whole sitemap to ensure that all groups are loaded.
-            if(room.getGroupWidgetId() == null) {
+            if(room.getGroupWidgetId() == null && room.getRoomWidget() != null) {
                 OpenHABWidget groupWidget = mOpenHABWidgetProvider.getWidgetByID(room.getRoomWidget().getId());
                 mRestCommunication.requestOpenHABSitemap(groupWidget, false, TAG);
             }

@@ -6,7 +6,6 @@ import org.openhab.domain.util.StringHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -302,6 +301,9 @@ public class RuleOperation extends EntityDataType<LogicBoolean> implements IRule
         HashMap<String, RuleOperation> operationIdHash = new HashMap<String, RuleOperation>();
         operationIdHash.put(getDataSourceId(), this);
         for(IEntityDataType operand : mOperands) {
+            if(operand == null)
+                continue;
+
             if(operand.getSourceType() == EntityDataTypeSource.OPERATION)
                 operationIdHash.putAll(((RuleOperation) operand).getRuleOperationHash());
             else

@@ -35,11 +35,11 @@ import javax.inject.Inject;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class RuleOperationProvider implements IRuleOperationProvider {
+public class RuleOperatorProvider implements IRuleOperatorProvider {
     private HashMap<Class<?>, HashMap<RuleOperatorType, ?>> mOperatorHash;
 
     @Inject
-    public RuleOperationProvider() {
+    public RuleOperatorProvider() {
         mOperatorHash = new HashMap<Class<?>, HashMap<RuleOperatorType, ?>>();
 
         createLogicOperators();

@@ -5,38 +5,27 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
-import org.openhab.domain.util.StringHandler;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerUnitOperandSelectionComponent;
-import org.openhab.habclient.dagger.UnitOperandSelectionComponent;
+import org.openhab.domain.rule.Rule;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 /**
- * Created by Tony Alpskog in 2014.
+ * Created by Tony Alpskog in 2015.
  */
-public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFragment<String> {
+public class OperationOperandSelectionDialogFragment<T> extends StringSelectionDialogFragment<T> {
     private static final String ARG_POSITION = "position";
 
     private int mOperandIndex;
     private IRuleOperationBuildListener mListener;
 
-    @Inject IOpenHABWidgetProvider mWidgetProvider;
-    @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
-
-    public static UnitOperandSelectionDialogFragment newInstance(List<String> source,
+    public static <T>OperationOperandSelectionDialogFragment newInstance(List<T> source,
                                                               String dialogTitle,
                                                               int position,
                                                               boolean showNextButton) {
-        final UnitOperandSelectionDialogFragment fragment = new UnitOperandSelectionDialogFragment();
+        final OperationOperandSelectionDialogFragment fragment = new OperationOperandSelectionDialogFragment<T>();
 
         final Bundle args = new Bundle();
         args.putString(ARG_DIALOG_TITLE, dialogTitle);
@@ -56,11 +45,6 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UnitOperandSelectionComponent component = DaggerUnitOperandSelectionComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build();
-        component.inject(this);
-
         Bundle args = getArguments();
         if(args == null)
             return;
@@ -76,17 +60,18 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                 case DialogInterface.BUTTON_NEUTRAL:
-                    if(StringHandler.isNullOrEmpty(mSelectedItem.toString())) {
+                    if(mSelectedItem == null) {
                         Toast.makeText(getActivity(), "No selection", Toast.LENGTH_SHORT).show();
                         break;
                     }
-                    final OpenHABWidget widget = mWidgetProvider.getWidgetByItemName(mSelectedItem.toString());
-                    final IEntityDataType entityDataType = mUnitEntityDataTypeProvider.getUnitEntityDataType(widget);
+
+                    final Rule rule = (Rule) mSelectedItem;
+                    final IEntityDataType entityDataType = rule.getRuleOperation();
                     final IRuleOperationBuildListener.RuleOperationDialogButtonInterface buttonInterface = which == DialogInterface.BUTTON_POSITIVE ? IRuleOperationBuildListener.RuleOperationDialogButtonInterface.NEXT : IRuleOperationBuildListener.RuleOperationDialogButtonInterface.DONE;
-                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT, buttonInterface, entityDataType, mOperandIndex, null);
+                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.EXISTING_OPERATION, buttonInterface, entityDataType, mOperandIndex, null);
                     break;
                 default:
-                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.UNIT
+                    mListener.onOperationBuildResult(IRuleOperationBuildListener.RuleOperationSelectionInterface.EXISTING_OPERATION
                             , IRuleOperationBuildListener.RuleOperationDialogButtonInterface.CANCEL
                             , null, 0, null);
                     break;

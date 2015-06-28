@@ -8,7 +8,8 @@ import org.openhab.domain.INodeMessageHandler;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IRoomProvider;
 import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.IRuleOperatorProvider;
+import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.IOpenHABSetting;
@@ -25,7 +26,9 @@ import dagger.Component;
         ApplicationModule.class,
         UtilModule.class,
         WidgetModule.class,
-        CommandModule.class
+        CommandModule.class,
+        NotificationModule.class,
+        WearModule.class
 })
 @Singleton
 public interface AppComponent {
@@ -36,10 +39,11 @@ public interface AppComponent {
     IOpenHABSetting openHABSetting();
     IApplicationModeProvider applicationModeProvider();
     IAutoUnreadConversationManager autoUnreadConversationManager();
-    IRuleOperationProvider ruleOperationProvider();
+    IRuleOperatorProvider ruleOperatorProvider();
     ILogger logger();
     IColorParser colorParser();
     IRoomDataContainer roomDataContainer();
     ICommandAnalyzer commandAnalyzer();
     INodeMessageHandler nodeMessageHandler();
+    IRuleProvider provideRuleProvider();
 }

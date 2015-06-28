@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class StringListSearchTest {
+public class ListStringSearchTest {
     @Test
     public void test_dev_split() {
         String[] splittedString = "hello how\tare   you".split("\\s+");
@@ -24,14 +24,14 @@ public class StringListSearchTest {
 
     @Test
     public void test_isSearchPhraseLegal() {
-        StringListSearch stringListSearch = new StringListSearch(3, "\\s+");
+        ListStringSearch listStringSearch = new ListStringSearch(3, "\\s+");
 
-        Assert.assertEquals(true, stringListSearch.isSearchPhraseLegal("hello how  \tare  you"));
+        Assert.assertEquals(true, listStringSearch.isSearchPhraseLegal("hello how  \tare  you"));
     }
 
     @Test
     public void test_getFilteredArray() {
-        StringListSearch stringListSearch = new StringListSearch(2, "\\s+");
+        ListStringSearch listStringSearch = new ListStringSearch(2, "\\s+");
 
         List<String> sourceList = new ArrayList<String>();
         sourceList.add("Hello");
@@ -41,7 +41,7 @@ public class StringListSearchTest {
         sourceList.add("Are");
         sourceList.add("You");
 
-        List<String> tempList = stringListSearch.getFilteredArray(sourceList, "e");
+        List<String> tempList = listStringSearch.getFilteredArray(sourceList, "e");
 
         //Check the source list - Shall be unfiltered due to minimum word length < 2
         Assert.assertEquals(true, tempList.contains("Hello"));
@@ -51,7 +51,7 @@ public class StringListSearchTest {
         Assert.assertEquals(true, tempList.contains("Are"));
         Assert.assertEquals(true, tempList.contains("You"));
 
-        tempList = stringListSearch.getFilteredArray(sourceList, "er");
+        tempList = listStringSearch.getFilteredArray(sourceList, "er");
 
         Assert.assertEquals(false, tempList.contains("Hello"));
         Assert.assertEquals(true, tempList.contains("There"));
@@ -60,7 +60,7 @@ public class StringListSearchTest {
         Assert.assertEquals(false, tempList.contains("Are"));
         Assert.assertEquals(false, tempList.contains("You"));
 
-        tempList = stringListSearch.getFilteredArray(sourceList, "ery");
+        tempList = listStringSearch.getFilteredArray(sourceList, "ery");
 
         Assert.assertEquals(false, tempList.contains("Hello"));
         Assert.assertEquals(false, tempList.contains("There"));
@@ -69,7 +69,7 @@ public class StringListSearchTest {
         Assert.assertEquals(false, tempList.contains("Are"));
         Assert.assertEquals(false, tempList.contains("You"));
 
-        tempList = stringListSearch.getFilteredArray(sourceList, "erys");
+        tempList = listStringSearch.getFilteredArray(sourceList, "erys");
 
         Assert.assertEquals(false, tempList.contains("Hello"));
         Assert.assertEquals(false, tempList.contains("There"));
@@ -78,7 +78,7 @@ public class StringListSearchTest {
         Assert.assertEquals(false, tempList.contains("Are"));
         Assert.assertEquals(false, tempList.contains("You"));
 
-        tempList = stringListSearch.getFilteredArray(sourceList, "er re");
+        tempList = listStringSearch.getFilteredArray(sourceList, "er re");
 
         Assert.assertEquals(false, tempList.contains("Hello"));
         Assert.assertEquals(true, tempList.contains("There"));
@@ -87,7 +87,7 @@ public class StringListSearchTest {
         Assert.assertEquals(false, tempList.contains("Are"));
         Assert.assertEquals(false, tempList.contains("You"));
 
-        tempList = stringListSearch.getFilteredArray(sourceList, "er o re");
+        tempList = listStringSearch.getFilteredArray(sourceList, "er o re");
 
         Assert.assertEquals(false, tempList.contains("Hello"));
         Assert.assertEquals(true, tempList.contains("There"));

@@ -8,7 +8,7 @@ import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.rule.IEntityDataType;
-import org.openhab.domain.rule.IRuleOperationProvider;
+import org.openhab.domain.rule.IRuleOperatorProvider;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.UnitEntityDataType;
@@ -25,22 +25,22 @@ import javax.inject.Inject;
  * Created by Tony Alpskog in 2014.
  */
 public class AdapterProvider implements IAdapterProvider {
-    private final IRuleOperationProvider mRuleOperationProvider;
+    private final IRuleOperatorProvider mRuleOperatorProvider;
     private final IOpenHABWidgetProvider mOpenHABWidgetProvider;
     private final IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
 
     @Inject
-    public AdapterProvider(IRuleOperationProvider ruleOperationProvider,
+    public AdapterProvider(IRuleOperatorProvider ruleOperatorProvider,
                            IOpenHABWidgetProvider openHABWidgetProvider,
                            IUnitEntityDataTypeProvider unitEntityDataTypeProvider) {
-        mRuleOperationProvider = ruleOperationProvider;
+        mRuleOperatorProvider = ruleOperatorProvider;
         mOpenHABWidgetProvider = openHABWidgetProvider;
         mUnitEntityDataTypeProvider = unitEntityDataTypeProvider;
     }
 
     @Override
     public List<String> getRuleOperatorList(Context context, IEntityDataType<?> operand, boolean includeNonSelectionValue) {
-        Set<RuleOperatorType> ruleOperatorTypes = mRuleOperationProvider.getRuleOperatorTypes(operand.getDataType());
+        Set<RuleOperatorType> ruleOperatorTypes = mRuleOperatorProvider.getRuleOperatorTypes(operand.getDataType());
         List<String> adapterList = new ArrayList<String>();
         if(includeNonSelectionValue) adapterList.add(context.getString(R.string.no_value));
         for(RuleOperatorType operatorType : ruleOperatorTypes)

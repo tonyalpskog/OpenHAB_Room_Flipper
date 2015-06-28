@@ -99,13 +99,13 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("LifeCycle.RuleEditActivity", "onResume()");
+        Log.d("LifeCy.RuleEditActivity", "onResume()");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("LifeCycle.RuleEditActivity", "onPause()");
+        Log.d("LifeCy.RuleEditActivity", "onPause()");
     }
 
     @Override
@@ -223,10 +223,7 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
     public RuleOperation getOperationToEdit() {
         return mOperationUnderConstruction;
     }
-    /**
-     * A {@link android.support.v13.app.FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         private RuleOperationFragment mRuleOperationFragment;
@@ -255,7 +252,6 @@ public class RuleEditActivity extends Activity implements IRuleEditActivity, Act
 
         @Override
         public int getCount() {
-            // Support for 2 pages.
             return 2;
         }
 

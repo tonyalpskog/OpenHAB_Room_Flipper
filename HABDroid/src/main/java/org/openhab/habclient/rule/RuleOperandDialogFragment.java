@@ -25,6 +25,7 @@ import org.openhab.domain.model.OpenHABWidgetTypeSet;
 import org.openhab.domain.rule.EntityDataTypeSource;
 import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
+import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.UnitEntityDataType;
 import org.openhab.domain.rule.operators.RuleOperator;
@@ -61,11 +62,12 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
 
     private IRuleOperationBuildListener mListener;
     private IEntityDataType mOldOperand;
-    private int mPosition;
+    private int mPosition;//The operand order number. The leftmost = first = 0
 
     @Inject IOpenHABWidgetProvider mWidgetProvider;
     @Inject IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
     @Inject IAdapterProvider mAdapterProvider;
+    @Inject IRuleProvider mRuleProvider;
 
     public static RuleOperandDialogFragment newInstance(int position, boolean showNextButton) {
         final RuleOperandDialogFragment fragment = new RuleOperandDialogFragment();
@@ -132,6 +134,16 @@ public class RuleOperandDialogFragment extends DialogFragment implements DialogI
                     ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
                     final UnitOperandSelectionDialogFragment dialogFragment
                             = UnitOperandSelectionDialogFragment.newInstance(mWidgetProvider.getItemNameListByWidgetType(OpenHABWidgetTypeSet.UnitItem)
+                            , mButtonUnit.getText().toString(), mPosition, mShowNextButton);
+                    dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
+                }
+            });
+            mButtonOperation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((RuleEditActivity)getActivity()).setRuleOperationBuildListener(localListener);
+                    final OperationOperandSelectionDialogFragment dialogFragment
+                            = OperationOperandSelectionDialogFragment.newInstance(mRuleProvider.getUserRules(RuleListActivity.TemporaryHardCodedUserId)
                             , mButtonUnit.getText().toString(), mPosition, mShowNextButton);
                     dialogFragment.show(getFragmentManager(), "String_Selection_Dialog_Tag");
                 }

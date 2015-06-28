@@ -6,11 +6,11 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class StringListSearch {
+public class ListStringSearch<T> {
     int mMinSearchWordLength;
     String mWordDelimiter;
 
-    public StringListSearch(int minSearchWordLength, String wordDelimiter) {
+    public ListStringSearch(int minSearchWordLength, String wordDelimiter) {
         mMinSearchWordLength = minSearchWordLength;
         mWordDelimiter = wordDelimiter;
     }
@@ -24,17 +24,17 @@ public class StringListSearch {
         return true;
     }
 
-    public List<String> getFilteredArray(final List<String> sourceList, String filter) {
-        List<String> result = new ArrayList<String>();
+    public List<T> getFilteredArray(final List<T> sourceList, String filter) {
+        List<T> result = new ArrayList<T>();
         String[] filterItems = filter.split(mWordDelimiter);
 
-        for (String listItem : sourceList) {
+        for (T listItem : sourceList) {
             boolean isFound = true;
             for (String filterWord : filterItems) {
                 if(filterWord.length() < mMinSearchWordLength)
                     continue;
-                if (filterWord.length() <= listItem.length()) {
-                    if (!listItem.toLowerCase().contains(filterWord.toLowerCase().trim())) {
+                if (filterWord.length() <= listItem.toString().length()) {
+                    if (!listItem.toString().toLowerCase().contains(filterWord.toLowerCase().trim())) {
                         isFound = false;
                     }
                 } else {

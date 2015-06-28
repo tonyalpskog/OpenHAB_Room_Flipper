@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
  * Created by Tony Alpskog in 2014.
  */
 public class RuleTreeTest {
-    private IRuleOperationProvider mRop;
+    private IRuleOperatorProvider mRop;
     private IOpenHABWidgetProvider mWidgetProvider;
     private IUnitEntityDataTypeProvider mUnitEntityDataTypeProvider;
     private IEventBus mEventBus;
@@ -46,7 +46,7 @@ public class RuleTreeTest {
         final HttpDataSetup httpDataSetup = new HttpDataSetup(logger, colorParser, documentFactory);
         mWidgetProvider.setOpenHABWidgets(httpDataSetup.loadTestData());
 
-        mRop = new RuleOperationProvider();
+        mRop = new RuleOperatorProvider();
     }
 
     @Test

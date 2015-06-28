@@ -19,7 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.openhab.domain.util.StringListSearch;
+import org.openhab.domain.util.ListStringSearch;
 import org.openhab.habdroid.R;
 
 import java.util.ArrayList;
@@ -28,32 +28,45 @@ import java.util.List;
 /**
  * Created by Tony Alpskog in 2014.
  */
-public class StringSelectionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class StringSelectionDialogFragment<T> extends DialogFragment implements DialogInterface.OnClickListener {
     protected static final String ARG_SOURCE = "source";
     protected static final String ARG_DIALOG_TITLE = "dialogTitle";
     protected static final String ARG_SHOW_NEXT_BUTTON = "showNextButton";
 
-    protected List<String> mSourceList = new ArrayList<String>();
+    protected List<T> mSourceList = new ArrayList<T>();
     String mDialogTitle;
     EditText mEditTextFilter;
     ListView mFilteredListView;
     ArrayAdapter mArrayAdapter;
-    protected String mSelectedString = null;
+    protected T mSelectedItem = null;
     String mPreviousSearch = "";
-    StringListSearch mStringListSearch;
+    ListStringSearch mListStringSearch;
     boolean mShowNextButton;
 
     private static final int MIN_SEARCH_WORD_LENGTH = 3;
     private static final String SEARCH_WORD_DELIMITER = "\\s+";
 
-    public static StringSelectionDialogFragment newInstance(List<String> source, String dialogTitle, boolean showNextButton) {
-        final StringSelectionDialogFragment fragment = new StringSelectionDialogFragment();
+//    public static <T extends String> StringSelectionDialogFragment newInstance(List<String> source, String dialogTitle, boolean showNextButton) {
+//        final StringSelectionDialogFragment fragment = new StringSelectionDialogFragment();
+//        final Bundle args = new Bundle();
+//        args.putStringArrayList(ARG_SOURCE, new ArrayList<>(source));
+//        args.putString(ARG_DIALOG_TITLE, dialogTitle);
+//        args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
+    public static <T>StringSelectionDialogFragment newInstance(String dialogTitle, boolean showNextButton) {
+        final StringSelectionDialogFragment<T> fragment = new StringSelectionDialogFragment<T>();
         final Bundle args = new Bundle();
-        args.putStringArrayList(ARG_SOURCE, new ArrayList<String>(source));
         args.putString(ARG_DIALOG_TITLE, dialogTitle);
         args.putBoolean(ARG_SHOW_NEXT_BUTTON, showNextButton);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setSourceList(List<T> source) {
+        mSourceList = source;
     }
 
     @Override
@@ -61,8 +74,8 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         super.onAttach(activity);
     }
 
-    private StringSelectionListener getListener() {
-        return (StringSelectionListener) getActivity();
+    private SelectionListener getListener() {
+        return (SelectionListener) getActivity();
     }
 
     @Override
@@ -76,9 +89,9 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         if(args == null)
             return;
 
-        mSourceList = args.getStringArrayList(ARG_SOURCE);
+//        mSourceList = args.getStringArrayList(ARG_SOURCE);
         mDialogTitle = args.getString(ARG_DIALOG_TITLE);
-        mStringListSearch = new StringListSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
+        mListStringSearch = new ListStringSearch(MIN_SEARCH_WORD_LENGTH, SEARCH_WORD_DELIMITER);
         mShowNextButton = args.getBoolean(ARG_SHOW_NEXT_BUTTON);
     }
 
@@ -130,17 +143,17 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
                     if(mEditTextFilter.getText().length() == 0)
                         mEditTextFilter.setBackgroundColor(android.R.drawable.editbox_background_normal);
                     else {
-                        mEditTextFilter.setBackgroundColor(mStringListSearch.isSearchPhraseLegal(mEditTextFilter.getText().toString())? android.R.drawable.editbox_background_normal : Color.RED);
+                        mEditTextFilter.setBackgroundColor(mListStringSearch.isSearchPhraseLegal(mEditTextFilter.getText().toString())? android.R.drawable.editbox_background_normal : Color.RED);
                     }
 
                     if(mEditTextFilter.getText().length() >= 3 && mEditTextFilter.getText().charAt(mEditTextFilter.getText().length() - 1) != ' ') {
                         mPreviousSearch = mEditTextFilter.getText().toString();
-                        List<String> tempList = mStringListSearch.getFilteredArray(mSourceList, mEditTextFilter.getText().toString());
+                        List<String> tempList = mListStringSearch.getFilteredArray(mSourceList, mEditTextFilter.getText().toString());
                         mArrayAdapter.clear();
                         mArrayAdapter.addAll(tempList);
                         mArrayAdapter.notifyDataSetChanged();
                     } else if(mEditTextFilter.getText().length() < 3 && mPreviousSearch.length() >= 3) {
-                        List<String> initialList = new ArrayList<String>();
+                        List<T> initialList = new ArrayList<T>();
                         initialList.addAll(mSourceList);
                         mArrayAdapter.clear();
                         mArrayAdapter.addAll(initialList);
@@ -155,26 +168,26 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
                     mFilteredListView.clearChoices();
                     mFilteredListView.setItemChecked(position, true);
                     mFilteredListView.setSelection(position);// mArrayAdapter.getItem(position);
-                    mSelectedString = mFilteredListView.getItemAtPosition(position).toString();
+                    mSelectedItem = (T) mFilteredListView.getItemAtPosition(position);
                 }
             });
 
             mFilteredListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    mSelectedString = parent.getAdapter().getItem(position).toString();
+                    mSelectedItem = (T) parent.getAdapter().getItem(position);
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    mSelectedString = null;
+                    mSelectedItem = null;
                 }
             });
 
         }
-        List<String> initialList = new ArrayList<String>();
+        List<T> initialList = new ArrayList<T>();
         initialList.addAll(mSourceList);
-        mArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, initialList);
+        mArrayAdapter = new ArrayAdapter<T>(getActivity(), android.R.layout.simple_list_item_1, initialList);
         mFilteredListView.setAdapter(mArrayAdapter);
 
         return view;
@@ -186,7 +199,7 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
             case DialogInterface.BUTTON_POSITIVE:
             case DialogInterface.BUTTON_NEUTRAL:
                 if(getListener() != null) {
-                    getListener().onStringSelected(mSelectedString);
+                    getListener().onSelected(mSelectedItem);
                 }
                 break;
             default:
@@ -197,8 +210,8 @@ public class StringSelectionDialogFragment extends DialogFragment implements Dia
         }
     }
 
-    public interface StringSelectionListener {
-        public void onStringSelected(String selection);
+    public interface SelectionListener {
+        public <T> void onSelected(T selection);
         public void onSelectionAborted();
     }
 }

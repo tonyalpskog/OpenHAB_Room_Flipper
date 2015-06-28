@@ -20,15 +20,15 @@ import android.widget.Toast;
 
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.IUnitEntityDataTypeProvider;
-import org.openhab.domain.rule.IRuleOperationBuildListener;
-import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerRuleActionComponent;
-import org.openhab.habdroid.R;
 import org.openhab.domain.rule.IEntityDataType;
+import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.rule.RuleAction;
 import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.operators.RuleOperator;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.dagger.DaggerRuleActionComponent;
+import org.openhab.habdroid.R;
 
 import javax.inject.Inject;
 
@@ -70,7 +70,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
         mListView.setAdapter(mListAdapter);
 
         setHasOptionsMenu(true);
-        mRuleNameView.setText(((RuleEditActivity)getActivity()).getRuleName());
+        mRuleNameView.setText(((RuleEditActivity) getActivity()).getRuleName());
         TextWatcher ruleNameTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -83,7 +83,7 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d(HABApplication.getLogTag(), "ruleNameTextWatcher.afterTextChanged = " + s.toString());
-                ((RuleEditActivity)getActivity()).setRuleName(s.toString());
+                ((RuleEditActivity) getActivity()).setRuleName(s.toString());
             }
         };
         mRuleNameView.addTextChangedListener(ruleNameTextWatcher);

@@ -24,7 +24,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/rule_name_textview"
                 android:layout_gravity="left|top"
-                android:text="SampleRuleName" />
+                android:text="SampleRuleName"
+                android:singleLine="true"/>
 
         </LinearLayout>
 
