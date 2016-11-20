@@ -31,20 +31,10 @@ package org.openhab.domain.model;
 
 import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class provides datasource for openHAB widgets from sitemap page.
@@ -89,7 +79,7 @@ public class OpenHABWidgetDataSource {
 
     public void setSourceNode(Node rootNode) {
         if(rootNode.getNodeName().equals("sitemap")) {
-            OpenHABSitemap sitemap = new OpenHABSitemap(rootNode, logger, colorParser);
+            OpenHABSitemap sitemap = new OpenHABSitemap();
             if(rootWidget == null)
                 rootWidget = new OpenHABWidget(logger);
             if(sitemap.getIcon() != null)
@@ -99,7 +89,7 @@ public class OpenHABWidgetDataSource {
             if(sitemap.getId() != null)
                 rootWidget.setId(sitemap.getId());
             rootWidget.setType(OpenHABWidgetType.Root);
-            for(OpenHABWidget widget : sitemap.getOpenHABWidgets())
+            for(OpenHABWidget widget : sitemap.getWidgets())
                 rootWidget.addChildWidget(widget);
         } else
             setSourceNode(rootNode, new OpenHABWidget(logger));

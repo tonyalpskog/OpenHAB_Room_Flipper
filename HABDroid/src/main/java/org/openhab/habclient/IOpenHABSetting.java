@@ -1,7 +1,5 @@
 package org.openhab.habclient;
 
-import com.loopj.android.http.AsyncHttpClient;
-
 public interface IOpenHABSetting {
     String getUsername();
 
@@ -18,8 +16,6 @@ public interface IOpenHABSetting {
     void setSitemapRootUrl(String sitemapRootUrl);
 
     String getSitemapRootUrl();
-
-    AsyncHttpClient createAsyncHttpClient();
 
     boolean runningInDemoMode();
 }

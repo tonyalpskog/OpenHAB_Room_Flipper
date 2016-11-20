@@ -13,7 +13,6 @@ import org.openhab.domain.rule.RuleOperation;
 import org.openhab.domain.rule.RuleOperatorType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerOperatorSelectionComponent;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.HashMap;
@@ -61,9 +60,8 @@ public class OperatorSelectionDialogFragment extends StringSelectionDialogFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerOperatorSelectionComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build()
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .operatorSelection()
                 .inject(this);
 
         final Bundle args = getArguments();

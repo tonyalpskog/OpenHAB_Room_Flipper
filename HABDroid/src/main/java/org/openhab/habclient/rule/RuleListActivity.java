@@ -15,8 +15,6 @@ import org.openhab.domain.rule.IRuleProvider;
 import org.openhab.domain.rule.Rule;
 import org.openhab.domain.user.User;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerRuleListComponent;
-import org.openhab.habclient.dagger.RuleListComponent;
 import org.openhab.habdroid.R;
 
 import javax.inject.Inject;
@@ -36,10 +34,9 @@ public class RuleListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RuleListComponent component = DaggerRuleListComponent.builder()
-                .appComponent(((HABApplication) getApplication()).appComponent())
-                .build();
-        component.inject(this);
+        ((HABApplication) getApplication()).appComponent()
+                .ruleList()
+                .inject(this);
     }
 
     @Override

@@ -3,10 +3,10 @@ package org.openhab.habclient.dagger;
 import org.openhab.habclient.rule.RuleActionDialogFragment;
 import org.openhab.habclient.rule.RuleActionFragment;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @FragmentScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         RuleProviderModule.class,
         UnitEntityDataTypeModule.class
 })

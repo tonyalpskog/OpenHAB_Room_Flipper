@@ -42,14 +42,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import org.openhab.habclient.HABApplication;
-
-import org.apache.http.entity.StringEntity;
-import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
+import org.openhab.habclient.HABApplication;
+import org.openhab.habclient.rest.OpenHabService;
+import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.widget.IHABWidgetCommunication;
 import org.openhab.habdroid.ui.widget.OpenHABChartWidget;
 import org.openhab.habdroid.ui.widget.OpenHABColorWidget;
@@ -66,13 +64,16 @@ import org.openhab.habdroid.ui.widget.OpenHABTextWidget;
 import org.openhab.habdroid.ui.widget.OpenHABVideoWidget;
 import org.openhab.habdroid.ui.widget.OpenHABWebWidget;
 import org.openhab.habdroid.util.AutoRefreshImageView;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * This class provides openHAB widgets adapter for list view.
@@ -87,20 +88,22 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
         IconTextList
     }
     private final IWidgetTypeLayoutProvider mWidgetTypeLayoutProvider;
+    private final OpenHabService openHabService;
     private String openHABBaseUrl = "https://demo.openhab.org:8443/";
 	private String openHABUsername = "";
 	private String openHABPassword = "";
 	private ArrayList<VideoView> videoWidgetList;
 	private ArrayList<AutoRefreshImageView> refreshImageList;
-    private MyAsyncHttpClient mAsyncHttpClient;
     private WidgetLayoutType mWidgetLayoutType;
 
 	public OpenHABWidgetArrayAdapter(Context context, int resource,
                                      List<OpenHABWidget> objects,
                                      IWidgetTypeLayoutProvider widgetTypeLayoutProvider,
-                                     WidgetLayoutType widgetLayoutType) {
+                                     WidgetLayoutType widgetLayoutType,
+                                     OpenHabService openHabService) {
 		super(context, resource, objects);
         mWidgetTypeLayoutProvider = widgetTypeLayoutProvider;
+        this.openHabService = openHabService;
         // Initialize video view array
 		videoWidgetList = new ArrayList<VideoView>();
 		refreshImageList = new ArrayList<AutoRefreshImageView>();
@@ -283,25 +286,21 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
     }
     
     public void sendItemCommand(OpenHABItem item, String command) {
-        try {
-            Log.d(HABApplication.getLogTag(), String.format("[AsyncHttpClient] POST Request for OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
-            StringEntity se = new StringEntity(command);
-            mAsyncHttpClient.post(getContext(), item.getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(String response) {
-                    Log.d(HABApplication.getLogTag(), "Command was sent successfully");
-                }
-                @Override
-                public void onFailure(Throwable error, String errorResponse) {
-                    Log.e(HABApplication.getLogTag(), "Got command error " + error.getMessage());
-                    if (errorResponse != null)
-                        Log.e(HABApplication.getLogTag(), "Error response = " + errorResponse);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            if (e != null)
-            Log.e(HABApplication.getLogTag(), e.getMessage());
-        }
+        Log.d(HABApplication.getLogTag(), String.format("[AsyncHttpClient] POST Request for OpenHABItem = '%s'   command = '%s'", item.getLink(), command));
+        openHabService.post(item.getLink(), command)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.d(HABApplication.getLogTag(), "Command was sent successfully");
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable error) throws Exception {
+                        Log.e(HABApplication.getLogTag(), "Got command error " + error.getMessage(), error);
+                    }
+                });
     }
 
     @Override
@@ -357,14 +356,6 @@ public class OpenHABWidgetArrayAdapter extends ArrayAdapter<OpenHABWidget> imple
 		}
 		refreshImageList.clear();
 	}
-
-    public MyAsyncHttpClient getAsyncHttpClient() {
-        return mAsyncHttpClient;
-    }
-
-    public void setAsyncHttpClient(MyAsyncHttpClient asyncHttpClient) {
-        mAsyncHttpClient = asyncHttpClient;
-    }
 
     public boolean areAllItemsEnabled() {
         return false;

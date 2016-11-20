@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habclient.RoomFlipperFragment;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @FragmentScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         NotificationModule.class,
         WearModule.class,
         RoomImageModule.class,

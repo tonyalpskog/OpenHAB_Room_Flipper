@@ -43,8 +43,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
+import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABItemType;
@@ -56,11 +55,8 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.habclient.HABApplication;
 import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.dagger.DaggerWidgetListFragmentComponent;
+import org.openhab.habclient.rest.OpenHabService;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
-import org.openhab.domain.IDocumentFactory;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -69,6 +65,12 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 //import com.loopj.android.http.AsyncHttpAbortException;//TODO - removed by TA
 
@@ -109,8 +111,6 @@ public class OpenHABWidgetListFragment extends ListFragment {
     private boolean nfcAutoClose = false;
     // parent activity
     private OpenHABMainActivity mActivity;
-    // loopj
-    private MyAsyncHttpClient mAsyncHttpClient;
     // Am I visible?
     private boolean mIsVisible = false;
     private  OpenHABWidgetListFragment mTag;
@@ -124,14 +124,15 @@ public class OpenHABWidgetListFragment extends ListFragment {
     @Inject ILogger mLogger;
     @Inject IColorParser mColorParser;
     @Inject IDocumentFactory mDocumentFactory;
+    @Inject OpenHabService openHabService;
+    private CompositeDisposable disposables;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerWidgetListFragmentComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build()
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .widgetListFragment()
                 .inject(this);
 
         mTag = this;
@@ -171,7 +172,8 @@ public class OpenHABWidgetListFragment extends ListFragment {
         openHABWidgetAdapter = new OpenHABWidgetArrayAdapter(getActivity(),
                 R.layout.openhabwidgetlist_genericitem, widgetList,
                 mWidgetLayoutProvider,
-                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextControlList);
+                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextControlList,
+                openHabService);
         getListView().setAdapter(openHABWidgetAdapter);
         openHABBaseUrl = mOpenHABSetting.getBaseUrl();
         openHABUsername = mOpenHABSetting.getUsername();
@@ -179,7 +181,6 @@ public class OpenHABWidgetListFragment extends ListFragment {
         openHABWidgetAdapter.setOpenHABUsername(openHABUsername);
         openHABWidgetAdapter.setOpenHABPassword(openHABPassword);
         openHABWidgetAdapter.setOpenHABBaseUrl(openHABBaseUrl);
-        openHABWidgetAdapter.setAsyncHttpClient(mAsyncHttpClient);
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
@@ -256,7 +257,6 @@ public class OpenHABWidgetListFragment extends ListFragment {
         if (activity instanceof OnWidgetSelectedListener) {
             widgetSelectedListener = (OnWidgetSelectedListener)activity;
             mActivity = (OpenHABMainActivity)activity;
-            mAsyncHttpClient = OpenHABMainActivity.getAsyncHttpClient();
         } else {
             Log.e(HABApplication.getLogTag(), "Attached to incompatible activity");
         }
@@ -274,12 +274,14 @@ public class OpenHABWidgetListFragment extends ListFragment {
     public void onPause () {
         super.onPause();
         Log.d(HABApplication.getLogTag(), "onPause() " + displayPageUrl);
-        mAsyncHttpClient.cancelRequests(mActivity, mTag, true);
         if (openHABWidgetAdapter != null) {
             openHABWidgetAdapter.stopImageRefresh();
             openHABWidgetAdapter.stopVideoWidgets();
         }
         mCurrentSelectedItem = getListView().getCheckedItemPosition();
+
+        if(disposables != null)
+            disposables.dispose();
     }
 
     @Override
@@ -336,46 +338,48 @@ public class OpenHABWidgetListFragment extends ListFragment {
      * @return      void
      */
     public void showPage(String pageUrl, final boolean longPolling) {
-//        pageUrl = "https://demo.openhab.org:8443/rest/sitemaps/demo";
-        Log.i(HABApplication.getLogTag(), "[AsyncHttpClient] GET Request for: " + pageUrl + "   longPolling = " + longPolling);
-        // Cancel any existing http request to openHAB (typically ongoing long poll)
-        Header[] headers = {};
-        if (!longPolling)
-            startProgressIndicator();
-        if (longPolling) {
-            headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
-        }
-        //TA - Calling REST Get method, requesting data from server.
-        mAsyncHttpClient.get(mActivity, pageUrl, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
-            @Override
-            public void onSuccess(Document document) {
-                if (document != null) {
-                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Response: "  + document.toString());
-                    if (!longPolling)
-                        stopProgressIndicator();
-                    processContent(document, longPolling);
-                } else {
-                    Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Got a null response from openHAB");
-                }
-            }
-            @Override
-            public void onFailure(Throwable error, String content) {
-                if (!longPolling)
-                    stopProgressIndicator();
+        //TODO: add back long polling...
+
+        disposables.add(openHabService.getPage(pageUrl)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<String, Document>() {
+                    @Override
+                    public Document apply(String s) throws Exception {
+                        return mDocumentFactory.build(s);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Document>() {
+                    @Override
+                    public void accept(Document document) throws Exception {
+                        if (document != null) {
+                            Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Response: " + document.toString());
+                            if (!longPolling)
+                                stopProgressIndicator();
+                            processContent(document, longPolling);
+                        } else {
+                            Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Got a null response from openHAB");
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable error) throws Exception {
+                        if (!longPolling)
+                            stopProgressIndicator();
 //                if (error instanceof AsyncHttpAbortException) {//TODO - removed by TA
 //                    Log.d(TAG, "Request for " + displayPageUrl + " was aborted");
 //                    return;
 //                }
-                if (error instanceof SocketTimeoutException) {
-                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Connection timeout, reconnecting");
-                    Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
-                    showPage(displayPageUrl, longPolling);
-                    return;
-                }
-                Log.e(HABApplication.getLogTag(), error.getClass().toString());
-                Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Connection error = " + error.getClass().toString() + ", cycle aborted");
-            }
-        }, mTag);
+                        if (error instanceof SocketTimeoutException) {
+                            Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] Connection timeout, reconnecting");
+                            Log.d(HABApplication.getLogTag(), "[AsyncHttpClient] showPage() - Calling showPage(longPolling = " + longPolling + ") displayPageUrl = " + displayPageUrl);
+                            showPage(displayPageUrl, longPolling);
+                            return;
+                        }
+                        Log.e(HABApplication.getLogTag(), error.getClass().toString());
+                        Log.e(HABApplication.getLogTag(), "[AsyncHttpClient] Connection error = " + error.getClass().toString() + ", cycle aborted");
+                    }
+                }));
     }
 
     /**

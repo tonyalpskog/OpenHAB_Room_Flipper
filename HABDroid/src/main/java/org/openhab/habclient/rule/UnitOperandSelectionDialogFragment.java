@@ -12,8 +12,6 @@ import org.openhab.domain.rule.IEntityDataType;
 import org.openhab.domain.rule.IRuleOperationBuildListener;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerUnitOperandSelectionComponent;
-import org.openhab.habclient.dagger.UnitOperandSelectionComponent;
 import org.openhab.habclient.util.StringSelectionDialogFragment;
 
 import java.util.List;
@@ -56,10 +54,9 @@ public class UnitOperandSelectionDialogFragment extends StringSelectionDialogFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UnitOperandSelectionComponent component = DaggerUnitOperandSelectionComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build();
-        component.inject(this);
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .unitOperandSelection()
+                .inject(this);
 
         Bundle args = getArguments();
         if(args == null)

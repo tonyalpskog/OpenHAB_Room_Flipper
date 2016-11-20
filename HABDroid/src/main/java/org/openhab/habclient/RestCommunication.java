@@ -3,9 +3,6 @@ package org.openhab.habclient;
 import android.content.Context;
 import android.util.Log;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.RequestParams;
-
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.openhab.domain.IDocumentFactory;
@@ -17,7 +14,6 @@ import org.openhab.domain.util.IColorParser;
 import org.openhab.domain.util.ILogger;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -42,7 +38,6 @@ public class RestCommunication implements IRestCommunication {
     private final IOpenHABWidgetProvider mWidgetProvider;
     private final Context mContext;
     private final IDocumentFactory mDocumentFactory;
-    private final AsyncHttpClient mAsyncHttpClient;
 
     @Inject
     public RestCommunication(Context context,
@@ -64,7 +59,6 @@ public class RestCommunication implements IRestCommunication {
         mOpenHABSetting = openHABSetting;
         mWidgetProvider = widgetProvider;
         mDocumentFactory = documentFactory;
-        mAsyncHttpClient = mOpenHABSetting.createAsyncHttpClient();
     }
 
     @Override
@@ -99,7 +93,6 @@ public class RestCommunication implements IRestCommunication {
             headers = new Header[] {new BasicHeader("X-Atmosphere-Transport", "long-polling")};
 
         mLogger.d(HABApplication.getLogTag(), "[AsyncHttpClient] <" + ownerTag + "> is requesting REST data from: " + RESTaddress);
-        RequestParams rp = new RequestParams();
 
         mAsyncHttpClient.get(mContext, RESTaddress, headers, null, new DocumentHttpResponseHandler(mDocumentFactory) {
             @Override

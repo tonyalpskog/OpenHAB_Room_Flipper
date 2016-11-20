@@ -1,20 +1,6 @@
 package org.openhab.habclient.dagger;
 
-import android.content.Context;
-
-import org.openhab.domain.IApplicationModeProvider;
-import org.openhab.domain.IEventBus;
-import org.openhab.domain.INodeMessageHandler;
-import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.domain.IRoomProvider;
-import org.openhab.domain.command.ICommandAnalyzer;
-import org.openhab.domain.rule.IRuleOperatorProvider;
-import org.openhab.domain.rule.IRuleProvider;
-import org.openhab.domain.util.IColorParser;
-import org.openhab.domain.util.ILogger;
-import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habclient.IRoomDataContainer;
-import org.openhab.habclient.auto.IAutoUnreadConversationManager;
+import org.openhab.habclient.rest.RestModule;
 
 import javax.inject.Singleton;
 
@@ -28,22 +14,48 @@ import dagger.Component;
         WidgetModule.class,
         CommandModule.class,
         NotificationModule.class,
-        WearModule.class
+        WearModule.class,
+        RestModule.class
 })
 @Singleton
 public interface AppComponent {
-    Context applicationContext();
-    IEventBus eventBus();
-    IRoomProvider roomProvider();
-    IOpenHABWidgetProvider widgetProvider();
-    IOpenHABSetting openHABSetting();
-    IApplicationModeProvider applicationModeProvider();
-    IAutoUnreadConversationManager autoUnreadConversationManager();
-    IRuleOperatorProvider ruleOperatorProvider();
-    ILogger logger();
-    IColorParser colorParser();
-    IRoomDataContainer roomDataContainer();
-    ICommandAnalyzer commandAnalyzer();
-    INodeMessageHandler nodeMessageHandler();
-    IRuleProvider provideRuleProvider();
+    RuleEditActivityComponent ruleEditActivity();
+
+    UnitContainerComponent unitContainerView();
+
+    GraphicUnitComponent graphicUnit();
+
+    RuleActionComponent ruleAction();
+
+    RuleOperationComponent ruleOperation();
+
+    RuleListComponent ruleList();
+
+    OperatorSelectionComponent operatorSelection();
+
+    UnitOperandSelectionComponent unitOperandSelection();
+
+    RuleOperandComponent ruleOperand();
+
+    MainComponent main();
+
+    UnitPlacementComponent unitPlacement();
+
+    RoomFlipperComponent roomFlipper();
+
+    WidgetListActivityComponent widgetListActivity();
+
+    SpeechComponent speech();
+
+    RoomConfigActivityComponent roomConfigActivity();
+
+    WearListenerServiceComponent wearListenerService();
+
+    MainActivityComponent mainActivity();
+
+    WidgetListFragmentComponent widgetListFragment();
+
+    RoomConfigFragmentComponent roomConfigFragment();
+
+    InfoActivityComponent infoActivity();
 }

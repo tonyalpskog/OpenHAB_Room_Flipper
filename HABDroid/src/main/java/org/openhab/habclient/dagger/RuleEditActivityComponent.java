@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habclient.rule.RuleEditActivity;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ActivityScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         WidgetModule.class,
         RuleProviderModule.class,
         NotificationModule.class,

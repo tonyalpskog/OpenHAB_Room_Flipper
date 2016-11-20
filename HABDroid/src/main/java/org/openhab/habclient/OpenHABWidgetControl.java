@@ -1,42 +1,37 @@
 package org.openhab.habclient;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
-
-import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.habclient.rest.OpenHabService;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 
-import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+
 /**
  * Created by Tony Alpskog in 2014.
  */
 public class OpenHABWidgetControl implements IOpenHABWidgetControl {
-    private final Context mContext;
     private final IOpenHABWidgetProvider mWidgetProvider;
-    private final MyAsyncHttpClient mAsyncHttpClient;
+    private final OpenHabService openHabService;
 
     @Inject
-    public OpenHABWidgetControl(Context context, IOpenHABWidgetProvider widgetProvider) {
-        if(context == null) throw new IllegalArgumentException("context is null");
-        mContext = context;
+    public OpenHABWidgetControl(IOpenHABWidgetProvider widgetProvider, OpenHabService openHabService) {
+        this.openHabService = openHabService;
         mWidgetProvider = widgetProvider;
-        mAsyncHttpClient = new MyAsyncHttpClient(context);
     }
 
     @Override
@@ -55,24 +50,20 @@ public class OpenHABWidgetControl implements IOpenHABWidgetControl {
 
     @Override
     public void sendItemCommand(final OpenHABWidget habWidget, String command) {
-        try {
-            Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", habWidget.getItem().getLink(), command));
-            StringEntity se = new StringEntity(command);
-            mAsyncHttpClient.post(mContext, habWidget.getItem().getLink(), se, "text/plain", new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(String response) {
-                    Log.d(HABApplication.getLogTag(), "Command was sent successfully");
-                }
-                @Override
-                public void onFailure(Throwable error, String errorResponse) {
-                    Log.e(HABApplication.getLogTag(), "Got command error " + error.getMessage());
-                    if (errorResponse != null)
-                        Log.e(HABApplication.getLogTag(), "Error response = " + errorResponse);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            Log.e(HABApplication.getLogTag(), e.getMessage());
-        }
+        Log.d(HABApplication.getLogTag(), String.format("sendItemCommand() -> OpenHABItem = '%s'   command = '%s'", habWidget.getItem().getLink(), command));
+
+        openHabService.post(habWidget.getItem().getLink(), command)
+                .subscribe(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.d(HABApplication.getLogTag(), "Command was sent successfully");
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable e) throws Exception {
+                        Log.e(HABApplication.getLogTag(), "Got command error " + e.getMessage(), e);
+                    }
+                });
     }
 
     public View initializeSwitchWidget(final OpenHABWidget openHABWidget, View inflatedView) {

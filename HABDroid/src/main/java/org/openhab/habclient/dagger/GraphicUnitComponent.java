@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habclient.GraphicUnitWidget;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ViewScope
-@Component(dependencies = AppComponent.class)
+@Subcomponent
 public interface GraphicUnitComponent {
     void inject(GraphicUnitWidget widget);
 }

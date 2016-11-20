@@ -32,7 +32,7 @@ import org.openhab.domain.model.OpenHABWidget;
 import org.openhab.domain.model.OpenHABWidgetType;
 import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
-import org.openhab.habclient.dagger.DaggerUnitPlacementComponent;
+import org.openhab.habclient.rest.OpenHabService;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.IWidgetTypeLayoutProvider;
 import org.openhab.habdroid.ui.OpenHABWidgetArrayAdapter;
@@ -67,6 +67,7 @@ public class UnitPlacementFragment extends Fragment {
     @Inject IRestCommunication mRestCommunication;
     @Inject IEventBus mEventBus;
     @Inject IOpenHABSetting mOpenHABSetting;
+    @Inject OpenHabService openHabService;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -97,9 +98,8 @@ public class UnitPlacementFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerUnitPlacementComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build()
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .unitPlacement()
                 .inject(this);
 
         Log.d("LifeCycle", "UnitPlacementFragment(" + (getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : "?") + ") <constructor>");
@@ -270,7 +270,8 @@ public class UnitPlacementFragment extends Fragment {
         IWidgetTypeLayoutProvider widgetTypeLayoutProvider = new WidgetTypeLayoutProvider();
         mOpenHABWidgetAdapter = new OpenHABWidgetArrayAdapter(context,
                 R.layout.openhabwidgetlist_genericitem, unusedWidgetsList, widgetTypeLayoutProvider,
-                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextList);
+                OpenHABWidgetArrayAdapter.WidgetLayoutType.IconTextList,
+                openHabService);
         widgetListView.setAdapter(mOpenHABWidgetAdapter);
         
         // Set adapter parameters

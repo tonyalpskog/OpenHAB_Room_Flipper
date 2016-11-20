@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habdroid.ui.OpenHABWidgetListActivity;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ActivityScope
-@Component(dependencies = AppComponent.class)
+@Subcomponent
 public interface WidgetListActivityComponent {
     void inject(OpenHABWidgetListActivity activity);
 }

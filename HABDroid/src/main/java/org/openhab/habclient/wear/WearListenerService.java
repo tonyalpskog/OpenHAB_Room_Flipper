@@ -19,7 +19,6 @@ import org.openhab.domain.IDeviceCommunicator;
 import org.openhab.domain.INodeMessageHandler;
 import org.openhab.domain.util.StringHandler;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerWearListenerServiceComponent;
 import org.openhab.habdroid.R;
 
 import java.io.UnsupportedEncodingException;
@@ -46,9 +45,8 @@ public class WearListenerService extends WearableListenerService implements IDev
     public void onCreate() {
         super.onCreate();
         Log.v(TAG, "Initializing");
-        DaggerWearListenerServiceComponent.builder()
-                .appComponent(((HABApplication) getApplication()).appComponent())
-                .build()
+        ((HABApplication) getApplication()).appComponent()
+                .wearListenerService()
                 .inject(this);
 
         googleApiClient = new GoogleApiClient.Builder(this)

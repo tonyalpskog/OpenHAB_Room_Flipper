@@ -29,7 +29,6 @@ import org.openhab.domain.model.Room;
 import org.openhab.domain.model.RoomConfigEvent;
 import org.openhab.domain.model.SitemapUpdateEvent;
 import org.openhab.domain.user.User;
-import org.openhab.habclient.dagger.DaggerRoomFlipperComponent;
 import org.openhab.habclient.rule.RuleListActivity;
 import org.openhab.habdroid.R;
 import org.openhab.habdroid.ui.OpenHABMainActivity;
@@ -80,9 +79,8 @@ public class RoomFlipperFragment extends Fragment implements RoomFlipper.OnRoomS
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerRoomFlipperComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build()
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .roomFlipper()
                 .inject(this);
     }
 

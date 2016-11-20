@@ -27,7 +27,6 @@ import org.openhab.domain.rule.RuleActionType;
 import org.openhab.domain.rule.RuleActionValueType;
 import org.openhab.domain.rule.operators.RuleOperator;
 import org.openhab.habclient.HABApplication;
-import org.openhab.habclient.dagger.DaggerRuleActionComponent;
 import org.openhab.habdroid.R;
 
 import javax.inject.Inject;
@@ -52,9 +51,8 @@ public class RuleActionFragment extends Fragment implements RuleActionDialogFrag
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerRuleActionComponent.builder()
-                .appComponent(((HABApplication) getActivity().getApplication()).appComponent())
-                .build()
+        ((HABApplication) getActivity().getApplication()).appComponent()
+                .ruleAction()
                 .inject(this);
     }
 

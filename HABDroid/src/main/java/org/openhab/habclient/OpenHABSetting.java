@@ -2,10 +2,7 @@ package org.openhab.habclient;
 
 import android.content.Context;
 
-import com.loopj.android.http.AsyncHttpClient;
-
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -65,15 +62,6 @@ public class OpenHABSetting implements IOpenHABSetting {
 
     @Override
     public String getSitemapRootUrl() {return mSitemapRootUrl;}
-
-    @Override
-    public AsyncHttpClient createAsyncHttpClient() {
-        AsyncHttpClient asyncHttpClient = new MyAsyncHttpClient(mContext);
-        asyncHttpClient.setBasicAuth(mUsername, mPassword);
-        asyncHttpClient.addHeader("Accept", "application/xml");
-        asyncHttpClient.setTimeout(30000);
-        return asyncHttpClient;
-    }
 
     @Override
     public boolean runningInDemoMode() {

@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habdroid.ui.OpenHABMainActivity;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ActivityScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         RestCommunicationModule.class
 })
 public interface MainActivityComponent {

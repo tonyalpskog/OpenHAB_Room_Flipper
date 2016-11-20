@@ -7,7 +7,6 @@ import com.loopj.android.http.AsyncHttpClient;
 import org.apache.http.Header;
 import org.openhab.domain.IDocumentFactory;
 import org.openhab.habclient.IOpenHABSetting;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.w3c.dom.Document;
 
 import java.net.SocketTimeoutException;

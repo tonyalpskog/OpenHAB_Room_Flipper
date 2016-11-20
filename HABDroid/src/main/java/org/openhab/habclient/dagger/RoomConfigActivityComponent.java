@@ -2,12 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habclient.RoomConfigActivity;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ActivityScope
-@Component(dependencies = AppComponent.class, modules = {
-
-})
+@Subcomponent
 public interface RoomConfigActivityComponent {
     void inject(RoomConfigActivity activity);
 }

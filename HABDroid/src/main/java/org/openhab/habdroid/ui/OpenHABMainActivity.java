@@ -1,25 +1,25 @@
 /**
  * openHAB, the open Home Automation Bus.
  * Copyright (C) 2010-2012, openHAB.org <admin@openhab.org>
- *
+ * <p>
  * See the contributors.txt file in the distribution for a
  * full listing of individual contributors.
- *
+ * <p>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of the
  * License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * <p>
  * Additional permission under GNU GPL version 3 section 7
- *
+ * <p>
  * If you modify this Program, or any covered work, by linking or
  * combining it with Eclipse (or a modified version of that library),
  * containing parts covered by the terms of the Eclipse Public License
@@ -30,6 +30,7 @@
 package org.openhab.habdroid.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -41,7 +42,6 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -64,11 +64,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
 
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IDocumentFactory;
 import org.openhab.domain.model.OpenHABLinkedPage;
 import org.openhab.domain.model.OpenHABSitemap;
@@ -77,17 +74,15 @@ import org.openhab.habclient.HABService;
 import org.openhab.habclient.INavDrawerActivity;
 import org.openhab.habclient.IOpenHABSetting;
 import org.openhab.habclient.MainActivity;
-import org.openhab.habclient.dagger.DaggerMainActivityComponent;
+import org.openhab.habclient.rest.MyOpenHabService;
+import org.openhab.habclient.rest.OpenHabService;
 import org.openhab.habdroid.BuildConfig;
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.core.DocumentHttpResponseHandler;
 import org.openhab.habdroid.core.NotificationDeletedBroadcastReceiver;
 import org.openhab.habdroid.core.OpenHABTracker;
 import org.openhab.habdroid.core.OpenHABTrackerReceiver;
 import org.openhab.habdroid.ui.drawer.OpenHABDrawerAdapter;
-import org.openhab.habdroid.util.MyAsyncHttpClient;
 import org.openhab.habdroid.util.Util;
-import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -100,6 +95,11 @@ import javax.inject.Inject;
 import de.duenndns.ssl.MTMDecision;
 import de.duenndns.ssl.MemorizingResponder;
 import de.duenndns.ssl.MemorizingTrustManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSelectedListener, INavDrawerActivity,
         OpenHABTrackerReceiver, MemorizingResponder {
@@ -139,8 +139,6 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     private boolean mVoiceRecognitionEnabled = false;
     // If openHAB discovery is enabled
     private boolean mServiceDiscoveryEnabled = true;
-    // Loopj
-    private static MyAsyncHttpClient mAsyncHttpClient;
     // NFC Launch data
     private String mNfcData;
     // Pending NFC page
@@ -161,14 +159,19 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     @Inject IOpenHABSetting mOpenHABSetting;
     @Inject IDocumentFactory mDocumentFactory;
+    @Inject OpenHabService openHabService;
+    @Inject MyOpenHabService myOpenHabService;
+
+    private CompositeDisposable disposables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerMainActivityComponent.builder()
-                .appComponent(((HABApplication)getApplication()).appComponent())
-                .build()
+        disposables = new CompositeDisposable();
+
+        ((HABApplication) getApplication()).appComponent()
+                .mainActivity()
                 .inject(this);
 
         Log.d(TAG, "onCreate()");
@@ -208,11 +211,6 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         openHABUsername = mSettings.getString("default_openhab_username", null);
         openHABPassword = mSettings.getString("default_openhab_password", null);
 
-        mAsyncHttpClient = new MyAsyncHttpClient(this);
-        mAsyncHttpClient.setBasicAuth(openHABUsername, openHABPassword);
-        mAsyncHttpClient.addHeader("Accept", "application/xml");
-        mAsyncHttpClient.setTimeout(30000);
-
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         setProgressBarIndeterminateVisibility(true);
@@ -242,7 +240,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             return;
         }
 
-        if ("org.openhab.notification.selected".equals(intent.getAction())) {
+        if ("org.openhab.notification.selected" .equals(intent.getAction())) {
             onNotificationSelected(getIntent());
         }
 
@@ -251,7 +249,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
     private String getNfcDataFromIntent(Intent intent) {
         final String action = intent.getAction();
-        if ("android.nfc.action.NDEF_DISCOVERED".equals(action)) {
+        if ("android.nfc.action.NDEF_DISCOVERED" .equals(action)) {
             Log.d(TAG, "This is NFC action");
             final String dataString = intent.getDataString();
             if (dataString == null) {
@@ -260,7 +258,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
             Log.d(TAG, "NFC data = " + dataString);
             return dataString;
-        } else if("SHOW_PAGE_AS_LIST".equalsIgnoreCase(action) && intent.getStringExtra("pageUrl") != null) {
+        } else if ("SHOW_PAGE_AS_LIST" .equalsIgnoreCase(action) && intent.getStringExtra("pageUrl") != null) {
             return intent.getStringExtra("pageUrl");
         }
 
@@ -268,7 +266,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     }
 
     private void setUpPager() {
-        pager = (OpenHABViewPager)findViewById(R.id.pager);
+        pager = (OpenHABViewPager) findViewById(R.id.pager);
         pager.setScrollDurationFactor(2.5);
         pager.setOffscreenPageLimit(1);
         pagerAdapter = new OpenHABFragmentPagerAdapter(getSupportFragmentManager());
@@ -288,6 +286,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             public void onDrawerClosed(View view) {
                 Log.d(TAG, "onDrawerClosed");
             }
+
             public void onDrawerOpened(View drawerView) {
                 Log.d(TAG, "onDrawerOpened");
             }
@@ -341,7 +340,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         }
         pagerAdapter.setColumnsNumber(getResources().getInteger(R.integer.pager_columns));
         FragmentManager fm = getSupportFragmentManager();
-        stateFragment = (StateRetainFragment)fm.findFragmentByTag("stateFragment");
+        stateFragment = (StateRetainFragment) fm.findFragmentByTag("stateFragment");
         if (stateFragment == null) {
             stateFragment = new StateRetainFragment();
             fm.beginTransaction().add(stateFragment, "stateFragment").commit();
@@ -367,15 +366,15 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             // If not, then open this page as new one
         } else {
             pagerAdapter.openPage(mPendingNfcPage);
-            pager.setCurrentItem(pagerAdapter.getCount()-1);
+            pager.setCurrentItem(pagerAdapter.getCount() - 1);
         }
         mPendingNfcPage = null;
     }
 
     public void onOpenHABTracked(String baseUrl, String message) {
         if (message != null)
-        Toast.makeText(getApplicationContext(), message,
-                Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), message,
+                    Toast.LENGTH_LONG).show();
         openHABBaseUrl = baseUrl;
         mOpenHABSetting.setBaseUrl(openHABBaseUrl);
         pagerAdapter.setOpenHABBaseUrl(openHABBaseUrl);
@@ -406,118 +405,96 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
      * just open it. If no preffered sitemap is configured - let user select one.
      *
      * @param  baseUrl  an absolute base URL of openHAB to open
-     * @return      void
+     * @return void
      */
 
     private void selectSitemap(final String baseUrl, final boolean forceSelect) {
         String restURL = baseUrl + "rest/sitemaps";
         Log.d(TAG, "[AsyncHttpClient] GET Request from: " + restURL);
         startProgressIndicator();
-        mAsyncHttpClient.get(restURL, new DocumentHttpResponseHandler(mDocumentFactory) {
-            @Override
-            public void onSuccess(Document document) {
-                stopProgressIndicator();
-                Log.d(TAG, "[AsyncHttpClient] Response: " + document.toString());
+        mSitemapList.clear();
 
-                //Remove all sitemap items in navigator drawer.
-                for (OpenHABSitemap aMSitemapList : mSitemapList) {
-                    mNavDrawerItemList.remove(aMSitemapList);
-                }
+        disposables.add(openHabService.getSiteMap()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<OpenHABSitemap>() {
+                    @Override
+                    public void accept(OpenHABSitemap sitemap) throws Exception {
+                        mNavDrawerItemList.remove(sitemap);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        stopProgressIndicator();
 
-                mSitemapList.clear();
-                mSitemapList.addAll(Util.parseSitemapList(document));
-                if (mSitemapList.size() == 0) {
-                    // Got an empty sitemap list!
-                    Log.e(TAG, "[AsyncHttpClient] openHAB returned empty sitemap list");
-                    showAlertDialog(getString(R.string.error_empty_sitemap_list));
-                    return;
-                }
-                mDrawerAdapter.notifyDataSetChanged();
-                // If we are forced to do selection, just open selection dialog
-                if (forceSelect) {
-                    showSitemapSelectionDialog(mSitemapList);
-                } else {
-                    // Check if we have a sitemap configured to use
-                    SharedPreferences settings =
-                            PreferenceManager.getDefaultSharedPreferences(OpenHABMainActivity.this);
-                    String configuredSitemap = settings.getString("default_openhab_sitemap", "");
-                    // If we have sitemap configured
-                    if (configuredSitemap.length() > 0) {
-                        // Configured sitemap is on the list we got, open it!
-                        if (Util.sitemapExists(mSitemapList, configuredSitemap)) {
-                            Log.d(TAG, "Configured sitemap is on the list");
-                            OpenHABSitemap selectedSitemap = Util.getSitemapByName(mSitemapList, configuredSitemap);
-                            openSitemap(selectedSitemap.getHomepageLink());
-                            // Configured sitemap is not on the list we got!
+                        Log.e(TAG, throwable.getClass().toString(), throwable);
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        stopProgressIndicator();
+
+                        if (mSitemapList.size() == 0) {
+                            // Got an empty sitemap list!
+                            Log.e(TAG, "[AsyncHttpClient] openHAB returned empty sitemap list");
+                            showAlertDialog(getString(R.string.error_empty_sitemap_list));
+                            return;
+                        }
+
+                        mDrawerAdapter.notifyDataSetChanged();
+                        // If we are forced to do selection, just open selection dialog
+                        if (forceSelect) {
+                            showSitemapSelectionDialog(mSitemapList);
                         } else {
-                            Log.d(TAG, "Configured sitemap is not on the list");
-                            if (mSitemapList.size() == 1) {
-                                Log.d(TAG, "Got only one sitemap");
-                                SharedPreferences.Editor preferencesEditor = settings.edit();
-                                preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
-                                preferencesEditor.commit();
-                                openSitemap(mSitemapList.get(0).getHomepageLink());
+                            // Check if we have a sitemap configured to use
+                            SharedPreferences settings =
+                                    PreferenceManager.getDefaultSharedPreferences(OpenHABMainActivity.this);
+                            String configuredSitemap = settings.getString("default_openhab_sitemap", "");
+                            // If we have sitemap configured
+                            if (configuredSitemap.length() > 0) {
+                                // Configured sitemap is on the list we got, open it!
+                                if (Util.sitemapExists(mSitemapList, configuredSitemap)) {
+                                    Log.d(TAG, "Configured sitemap is on the list");
+                                    OpenHABSitemap selectedSitemap = Util.getSitemapByName(mSitemapList, configuredSitemap);
+                                    openSitemap(selectedSitemap.getHomepageLink());
+                                    // Configured sitemap is not on the list we got!
+                                } else {
+                                    Log.d(TAG, "Configured sitemap is not on the list");
+                                    if (mSitemapList.size() == 1) {
+                                        Log.d(TAG, "Got only one sitemap");
+                                        SharedPreferences.Editor preferencesEditor = settings.edit();
+                                        preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
+                                        preferencesEditor.commit();
+                                        openSitemap(mSitemapList.get(0).getHomepageLink());
+                                    } else {
+                                        Log.d(TAG, "Got multiply sitemaps, user have to select one");
+                                        showSitemapSelectionDialog(mSitemapList);
+                                    }
+                                }
+                                // No sitemap is configured to use
                             } else {
-                                Log.d(TAG, "Got multiply sitemaps, user have to select one");
-                                showSitemapSelectionDialog(mSitemapList);
+                                // We got only one single sitemap from openHAB, use it
+                                if (mSitemapList.size() == 1) {
+                                    Log.d(TAG, "Got only one sitemap");
+                                    SharedPreferences.Editor preferencesEditor = settings.edit();
+                                    preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
+                                    preferencesEditor.commit();
+                                    openSitemap(mSitemapList.get(0).getHomepageLink());
+                                } else {
+                                    Log.d(TAG, "Got multiply sitemaps, user have to select one");
+                                    showSitemapSelectionDialog(mSitemapList);
+                                }
                             }
                         }
-                        // No sitemap is configured to use
-                    } else {
-                        // We got only one single sitemap from openHAB, use it
-                        if (mSitemapList.size() == 1) {
-                            Log.d(TAG, "Got only one sitemap");
-                            SharedPreferences.Editor preferencesEditor = settings.edit();
-                            preferencesEditor.putString("default_openhab_sitemap", mSitemapList.get(0).getName());
-                            preferencesEditor.commit();
-                            openSitemap(mSitemapList.get(0).getHomepageLink());
-                        } else {
-                            Log.d(TAG, "Got multiply sitemaps, user have to select one");
-                            showSitemapSelectionDialog(mSitemapList);
-                        }
                     }
-                }
-            }
-            @Override
-            public void onFailure(Throwable error, String content) {
-                stopProgressIndicator();
-                if (error instanceof HttpResponseException) {
-                    switch (((HttpResponseException) error).getStatusCode()) {
-                        case 401:
-                            showAlertDialog(getString(R.string.error_authentication_failed));
-                            break;
-                        default:
-                            Log.e(TAG, String.format("Http code = %d", ((HttpResponseException) error).getStatusCode()));
-                            break;
-                    }
-                } else if (error instanceof org.apache.http.conn.HttpHostConnectException) {
-                    Log.e(TAG, "Error connecting to host");
-                    if (error.getMessage() != null) {
-                        Log.e(TAG, error.getMessage());
-                        showAlertDialog(error.getMessage());
-                    } else {
-                        showAlertDialog(getString(R.string.error_connection_failed));
-                    }
-                } else if (error instanceof java.net.UnknownHostException) {
-                    Log.e(TAG, "Unable to resolve hostname");
-                    if (error.getMessage() != null) {
-                        Log.e(TAG, error.getMessage());
-                        showAlertDialog(error.getMessage());
-                    } else {
-                        showAlertDialog(getString(R.string.error_connection_failed));
-                    }
-                } else {
-                    Log.e(TAG, error.getClass().toString());
-                }
-            }
-        });
-
+                }));
     }
 
     private void showSitemapSelectionDialog(final List<OpenHABSitemap> sitemapList) {
         Log.d(TAG, "Opening sitemap selection dialog");
-        final List<String> sitemapNameList = new ArrayList<String>();;
-        for (int i=0; i<sitemapList.size(); i++) {
+        final List<String> sitemapNameList = new ArrayList<String>();
+        ;
+        for (int i = 0; i < sitemapList.size(); i++) {
             sitemapNameList.add(sitemapList.get(i).getName());
         }
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(OpenHABMainActivity.this);
@@ -593,7 +570,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                 Log.d(TAG, "Restarting");
                 // Get launch intent for application
                 Intent restartIntent = getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
                 restartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 // Finish current activity
                 finish();
@@ -639,7 +616,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
                 Log.d(TAG, "Restarting after settings");
                 // Get launch intent for application
                 Intent restartIntent = getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
                 restartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 // Finish current activity
                 finish();
@@ -652,7 +629,7 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
             case VOICE_RECOGNITION_REQUEST_CODE:
                 Log.d(TAG, "Got back from Voice recognition");
                 setProgressBarIndeterminateVisibility(false);
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     ArrayList<String> textMatchList = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     if (!textMatchList.isEmpty()) {
@@ -777,33 +754,30 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
     }
 
     public void sendItemCommand(String itemName, String command) {
-        try {
-            StringEntity se = new StringEntity(command);
-            String restURL = openHABBaseUrl + "rest/items/" + itemName;
-            Log.d(TAG, "[AsyncHttpClient] POST Request for: " + restURL);
-            mAsyncHttpClient.post(this, restURL, se, "text/plain", new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(String response) {
-                    Log.d(TAG, "Command was sent successfully");
-                }
-                @Override
-                public void onFailure(Throwable error, String errorResponse) {
-                    Log.e(TAG, "Got command error " + error.getMessage());
-                    if (errorResponse != null)
-                        Log.e(TAG, "Error response = " + errorResponse);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            if (e.getMessage() != null)
-                Log.e(TAG, e.getMessage());
-        }
+        String restURL = openHABBaseUrl + "rest/items/" + itemName;
+        Log.d(TAG, "[AsyncHttpClient] POST Request for: " + restURL);
+
+        disposables.add(openHabService.postItem(itemName, command)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.d(TAG, "Command was sent successfully");
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "Got command error " + throwable.getMessage(), throwable);
+                    }
+                }));
     }
 
     public void onWidgetSelectedListener(OpenHABLinkedPage linkedPage, OpenHABWidgetListFragment source) {
         Log.i(TAG, "onWidgetSelectedListener() Got widget link = " + linkedPage.getLink());
         Log.i(TAG, "       " + String.format("Link came from fragment on position %d", source.getPosition()));
         pagerAdapter.openPage(linkedPage.getLink(), source.getPosition() + 1);
-        pager.setCurrentItem(pagerAdapter.getCount()-1);
+        pager.setCurrentItem(pagerAdapter.getCount() - 1);
         setTitle(linkedPage.getTitle());
     }
 
@@ -949,10 +923,6 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         this.openHABPassword = openHABPassword;
     }
 
-    public static MyAsyncHttpClient getAsyncHttpClient() {
-        return mAsyncHttpClient;
-    }
-
     private void gcmRegisterBackground() {
         // We need settings
         if (mSettings == null)
@@ -970,38 +940,36 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
 
         Log.d(TAG, "[AsyncHttpClient] Creating new GCM AsyncTask<...>");
 
-        new AsyncTask<Void, Void, String>() {
+        String deviceModel;
+        try {
+            deviceModel = URLEncoder.encode(Build.MODEL, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Cannot encode url", e);
+            return;
+        }
+
+        String regId;
+        try {
+            regId = mGcm.register(GCM_SENDER_ID);
+        } catch (IOException e) {
+            Log.e(TAG, "Cannot encode url", e);
+            return;
+        }
+
+        @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        disposables.add(myOpenHabService.addRegistration(deviceId, deviceModel, regId)
+            .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action() {
             @Override
-            protected String doInBackground(Void... params) {
-                String regId = null;
-                try {
-                    regId = mGcm.register(GCM_SENDER_ID);
-                    String deviceModel = URLEncoder.encode(Build.MODEL, "UTF-8");
-                    String deviceId = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
-                    String regUrl = "https://my.openhab.org/addAndroidRegistration?deviceId=" + deviceId +
-                            "&deviceModel=" + deviceModel + "&regId=" + regId;
-                    Log.d(TAG, "[AsyncHttpClient] GET Request for: " + regUrl);
-                    mAsyncHttpClient.get(getApplicationContext(), regUrl, new AsyncHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(String response) {
-                            Log.d(TAG, "[AsyncHttpClient] GCM reg id success");
-                        }
-                        @Override
-                        public void onFailure(Throwable error, String errorResponse) {
-                            Log.e(TAG, "[AsyncHttpClient] GCM reg id error: " + error.getMessage());
-                            if (errorResponse != null)
-                                Log.e(TAG, "[AsyncHttpClient] Error response = " + errorResponse);
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, e.getMessage());
-                }
-                return regId;
+            public void run() throws Exception {
+                Log.d(TAG, "[AsyncHttpClient] GCM reg id success");
             }
+        }, new Consumer<Throwable>() {
             @Override
-            protected void onPostExecute(String regId) {
+            public void accept(Throwable e) throws Exception {
+                Log.e(TAG, "[AsyncHttpClient] GCM reg id error: " + e.getMessage(), e);
             }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,null, null, null);
+        }));
     }
 }

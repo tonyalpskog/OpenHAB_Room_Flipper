@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habdroid.ui.OpenHABWidgetListFragment;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @FragmentScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         WidgetListModule.class,
         RestCommunicationModule.class
 })

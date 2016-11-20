@@ -2,10 +2,10 @@ package org.openhab.habclient.dagger;
 
 import org.openhab.habclient.UnitContainerView;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 @ViewScope
-@Component(dependencies = AppComponent.class, modules = {
+@Subcomponent(modules = {
         WidgetModule.class,
         RoomImageModule.class
 })
