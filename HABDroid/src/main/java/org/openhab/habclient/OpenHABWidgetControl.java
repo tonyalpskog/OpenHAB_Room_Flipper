@@ -12,9 +12,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.apache.http.entity.StringEntity;
 import org.openhab.domain.IOpenHABWidgetControl;
 import org.openhab.domain.IOpenHABWidgetProvider;
-import org.openhab.habdroid.R;
 import org.openhab.domain.model.OpenHABItem;
 import org.openhab.domain.model.OpenHABWidget;
+import org.openhab.habdroid.R;
 import org.openhab.habdroid.util.MyAsyncHttpClient;
 
 import java.io.UnsupportedEncodingException;

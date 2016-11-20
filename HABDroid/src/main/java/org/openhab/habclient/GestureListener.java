@@ -1,6 +1,5 @@
 package org.openhab.habclient;
 
-import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,7 +70,7 @@ public class GestureListener implements View.OnTouchListener {
                 //Get the distance when the second pointer touch
                 distx = event.getX(0) - event.getX(1);
                 disty = event.getY(0) - event.getY(1);
-                dist0 = FloatMath.sqrt(distx * distx + disty * disty);
+                dist0 = (float) Math.sqrt(distx * distx + disty * disty);
 
                 pinchBeginDist = dist0;
                 ongoingPinch = true;
@@ -86,7 +85,7 @@ public class GestureListener implements View.OnTouchListener {
                     //Get the current distance
                     distx = event.getX(0) - event.getX(1);
                     disty = event.getY(0) - event.getY(1);
-                    distCurrent = FloatMath.sqrt(distx * distx + disty * disty);
+                    distCurrent = (float) Math.sqrt(distx * distx + disty * disty);
 
                     if(pinchEndDist == 0)//2:nd measure will detect the type of pinch.
                         isPinchOut = pinchBeginDist < distCurrent;

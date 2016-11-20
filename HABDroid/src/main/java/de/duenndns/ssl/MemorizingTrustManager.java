@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.os.Handler;
 
@@ -369,14 +370,17 @@ public class MemorizingTrustManager implements X509TrustManager {
 	}
 
 	void startActivityNotification(Intent intent, String certName) {
-		Notification n = new Notification(android.R.drawable.ic_lock_lock,
-				master.getString(R.string.mtm_notification),
-				System.currentTimeMillis());
 		PendingIntent call = PendingIntent.getActivity(master, 0, intent, 0);
-		n.setLatestEventInfo(master.getApplicationContext(),
-				master.getString(R.string.mtm_notification),
-				certName, call);
-		n.flags |= Notification.FLAG_AUTO_CANCEL;
+
+		Notification n = new NotificationCompat.Builder(master)
+			.setSmallIcon(android.R.drawable.ic_lock_lock)
+				.setContentText(master.getString(R.string.mtm_notification))
+				.setShowWhen(true)
+				.setWhen(System.currentTimeMillis())
+				.setAutoCancel(true)
+				.setContentIntent(call)
+				.setTicker(master.getString(R.string.mtm_notification))
+				.build();
 
 		notificationManager.notify(NOTIFICATION_ID, n);
 	}

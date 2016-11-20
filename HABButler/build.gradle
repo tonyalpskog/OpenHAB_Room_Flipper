@@ -1,21 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
-repositories {
-    mavenCentral()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-}
-
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
         applicationId "org.openhab.habdroid"
         minSdkVersion 21
-        targetSdkVersion 21
+        targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -28,9 +21,14 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android.support:wearable:1.1.0'
-    compile 'com.google.android.gms:play-services-wearable:6.5.87'
-    compile 'com.google.dagger:dagger:2.0'
-    apt('com.google.dagger:dagger-compiler:2.0')
-    androidTestCompile('com.google.dagger:dagger-compiler:2.0')
+    //TODO: will it work by disabling warning below?
+    //noinspection GradleCompatible
+    compile 'com.google.android.support:wearable:1.4.0'
+    compile "com.android.support:support-annotations:$supportVersion"
+    compile "com.android.support:recyclerview-v7:$supportVersion"
+    compile "com.android.support:support-v4:$supportVersion"
+
+    compile "com.google.android.gms:play-services-wearable:$playServicesVersion"
+    compile "com.google.dagger:dagger:$daggerVersion"
+    apt "com.google.dagger:dagger-compiler:$daggerVersion"
 }
