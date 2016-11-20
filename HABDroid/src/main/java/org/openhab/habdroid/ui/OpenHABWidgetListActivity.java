@@ -62,7 +62,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
 
-import com.google.analytics.tracking.android.EasyTracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
@@ -152,26 +151,6 @@ public class OpenHABWidgetListActivity extends ListActivity implements AsyncServ
 
     @Inject IOpenHABSetting mOpenHABSetting;
     @Inject IOpenHABWidgetProvider mWidgetProvider;
-
-	/**
-	 * Overriding onStart to enable Google Analytics stats collection
-	 */
-	@Override
-	public void onStart() {
-		super.onStart();
-		// Start activity tracking via Google Analytics
-		EasyTracker.getInstance().activityStart(this);
-	}
-	
-	/**
-	 * Overriding onStop to enable Google Analytics stats collection
-	 */
-	@Override
-	public void onStop() {
-		super.onStop();
-		// Stop activity tracking via Google Analytics
-		EasyTracker.getInstance().activityStop(this);
-	}
 
 	/**
 	 * This is called when activity is created. Initializes the state, performs network

@@ -63,7 +63,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.image.WebImageCache;
@@ -690,27 +689,10 @@ public class OpenHABMainActivity extends FragmentActivity implements OnWidgetSel
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    /**
-     * Overriding onStart to enable Google Analytics stats collection
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Start activity tracking via Google Analytics
-        if (!BuildConfig.DEBUG)
-            EasyTracker.getInstance().activityStart(this);
-    }
-
-    /**
-     * Overriding onStop to enable Google Analytics stats collection
-     */
     @Override
     public void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
-        // Stop activity tracking via Google Analytics
-        if (!isDeveloper)
-            EasyTracker.getInstance().activityStop(this);
         if (mOpenHABTracker != null)
             mOpenHABTracker.stop();
     }

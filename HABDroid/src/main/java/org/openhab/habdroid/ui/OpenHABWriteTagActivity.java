@@ -29,17 +29,9 @@
 
 package org.openhab.habdroid.ui;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.openhab.habdroid.R;
-import org.openhab.habdroid.util.Util;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -48,13 +40,19 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
+
+import org.openhab.habdroid.R;
+import org.openhab.habdroid.util.Util;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class OpenHABWriteTagActivity extends Activity {
 
@@ -63,18 +61,6 @@ public class OpenHABWriteTagActivity extends Activity {
 	private String sitemapPage = "";
 	private String item = "";
 	private String command = "";
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		EasyTracker.getInstance().activityStart(this);
-	}
-	
-	@Override
-	public void onStop() {
-		super.onStop();
-		EasyTracker.getInstance().activityStop(this);
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
